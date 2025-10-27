@@ -6,11 +6,16 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_ollama import ChatOllama
+from langchain_huggingface import ChatHuggingFace, HuggingFacePipeline
+
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 
 import argparse
 import getpass
 import os
+
+os.environ["MODEL_PATH"] = "/home/peng/.cache/modelscope/hub/models/LLM-Research/"
 
 if not os.environ.get("OPENAI_API_KEY"):
   os.environ["OPENAI_API_KEY"] = getpass.getpass("Enter API key for OpenAI: ")
@@ -24,6 +29,7 @@ def parse_args():
                         help="The model to be used.")
     # parser.add_argument("--model_type", default="gemma3", type=str,
     #                     help="The model architecture to be used.")
+    parser.add_argument("--base_model", required=True, help="Path to the base model.")
     parser.add_argument("--output", default="./output", help="output path")
     args = parser.parse_args()
     return args
@@ -61,13 +67,13 @@ class VulResult(BaseModel):
         description="Vulnerability status indicator, only 0 or 1 (0: secure, 1: vulnerable)"
     )
 
-def main():
+def main(llm):
     args = parse_args()
     csv_path=f'{args.output}/{args.dataset}'
     csvfile=f'{csv_path}/{args.model_name}.csv'
     create_directory(csv_path)
 
-    llm = ChatOllama(model=args.model_name)
+    
     structured_llm = llm.with_structured_output(VulResult, include_raw=True)
     chain = prompt_template | structured_llm
     data=load_devign(f'./data/{args.dataset}/function.json')
@@ -82,8 +88,7 @@ def main():
         temp_df = pd.DataFrame({'Index': i, 'Code': [sample['code']], 'Label': [sample['label']], 'Prediction': [prediction],
                                     'Response': [str(res['raw'])]})
         temp_df.to_csv(csvfile, index=False, mode='w' if i == 0 else 'a', header=i == 0)
-        if i>100:
-            break
+
         
     print_metrics_from_csv(csvfile)
     
@@ -95,4 +100,25 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    args = parse_args()
+
+    tokenizer = AutoTokenizer.from_pretrained(os.environ["MODEL_PATH"]+args.base_model, padding_side='left')
+    tokenizer.pad_token = tokenizer.eos_token
+    tokenizer.pad_token_id = tokenizer.eos_token_id
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    model = AutoModelForCausalLM.from_pretrained(
+        os.environ["MODEL_PATH"]+args.base_model,
+        load_in_8bit=True,
+        dtype=torch.float16,
+        device_map="auto",
+        pad_token_id=tokenizer.eos_token_id
+    )
+    print("Base model loaded!")
+
+    pipe = pipeline("text-generation", model=model, tokenizer=tokenizer, max_new_tokens=128)
+    hf = HuggingFacePipeline(pipeline=pipe)
+    # tokenizer.chat_template
+    # chat_model = ChatHuggingFace(llm=hf)
+
+    ai_msg = hf.invoke("Who are you?")
+    print(ai_msg)
