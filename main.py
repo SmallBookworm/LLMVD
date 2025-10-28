@@ -1,5 +1,8 @@
 from data_process.utils.loader import load_devign
 from getresdata_csv import print_metrics_from_csv
+
+import tools.joernl as joernl
+
 import pandas as pd
 
 from typing import Literal
@@ -76,6 +79,7 @@ def main(llm):
     
     structured_llm = llm.with_structured_output(VulResult, include_raw=True)
     chain = prompt_template | structured_llm
+    #devign
     data=load_devign(f'./data/{args.dataset}/function.json')
     for i, sample in enumerate(data):
         res=chain.invoke({'code':sample['code']})
@@ -92,14 +96,7 @@ def main(llm):
         
     print_metrics_from_csv(csvfile)
     
-    
-    
-
-    
-    
-
-
-if __name__ == "__main__":
+def local_model():
     args = parse_args()
 
     tokenizer = AutoTokenizer.from_pretrained(os.environ["MODEL_PATH"]+args.base_model, padding_side='left')
@@ -122,3 +119,24 @@ if __name__ == "__main__":
 
     ai_msg = hf.invoke("Who are you?")
     print(ai_msg)
+    
+def save_code(code, filepath='./temp/temp_code.c'):
+    with open(filepath, 'w') as f:
+        f.write(code)
+
+
+
+if __name__ == "__main__":
+
+    data=load_devign(f'./data/devign/function.json')
+    for i, sample in enumerate(data):
+        if i>0:
+            break
+        print( 'label:', sample['label'])
+        filepath=f'./temp/temp_code_{i}.c'
+        # save_code(sample['code'], filepath)
+        joernl.parse_file(filepath, output=f'cpg{i}.bin', language='c')
+        joern_runner = joernl.JoernRunner(cpg_path=f'./temp/cpg{i}.bin')
+        result = joern_runner.run_script(script_path='./tools/joernl_scripts/base_slice.sc')
+        print(result)
+
