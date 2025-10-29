@@ -74,7 +74,7 @@ class JoernRunner:
                 logging.warning(f"Joern script failed: {result.stderr}")
                 # 尝试解析 stdout 是否有部分 JSON
                 try:
-                    return json.loads(result.stdout)
+                    return {"result":json.loads(result.stdout)}
                 except:
                     return {
                         "error": "joern_script_failed",
@@ -87,7 +87,7 @@ class JoernRunner:
             if result.stdout.strip():
                 try:
                     json_data =result.stdout.split("Json:")[-1].strip()
-                    return json.loads(json_data)
+                    return {"result":json.loads(json_data)}
                 except json.JSONDecodeError as e:
                     return {
                         "error": "json_decode_failed",

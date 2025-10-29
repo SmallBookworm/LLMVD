@@ -10,7 +10,6 @@ from typing import Literal
 from pydantic import BaseModel, Field
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_huggingface import ChatHuggingFace, HuggingFacePipeline
-from langchain_ollama import ChatOllama
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
@@ -33,7 +32,7 @@ def parse_args():
                         help="The model to be used.")
     # parser.add_argument("--model_type", default="gemma3", type=str,
     #                     help="The model architecture to be used.")
-    parser.add_argument("--base_model", help="Path to the base model. ( for finetune only )")
+    parser.add_argument("--base_model", required=True, help="Path to the base model.")
     parser.add_argument("--output", default="./output", help="output path")
     args = parser.parse_args()
     return args
@@ -58,10 +57,8 @@ def create_directory(directory):
 
 system_template = "You are a code security expert who analyzes the given code to detect the security vulnerability."
 
-prompt_template = ChatPromptTemplate(
-    [("system", system_template), ("user", "Detect whether the following code contains vulnerabilities:\n\n{code}."),
-    ("placeholder", "{conversation}"),
-    ]
+prompt_template = ChatPromptTemplate.from_messages(
+    [("system", system_template), ("user", "Detect whether the following code contains vulnerabilities:\n\n{code}")]
 )
 
 class VulResult(BaseModel):
@@ -73,43 +70,19 @@ class VulResult(BaseModel):
         description="Vulnerability status indicator, only 0 or 1 (0: secure, 1: vulnerable)"
     )
 
-
-
-def save_code(code, filepath='./temp/temp_code.c'):
-    with open(filepath, 'w') as f:
-        f.write(code)
-
-
 def main(llm):
     args = parse_args()
     csv_path=f'{args.output}/{args.dataset}'
-    csvfile=f'{csv_path}/{args.model_name}_taint.csv'
+    csvfile=f'{csv_path}/{args.model_name}.csv'
     create_directory(csv_path)
 
     
     structured_llm = llm.with_structured_output(VulResult, include_raw=True)
-    # chain = prompt_template | structured_llm
+    chain = prompt_template | structured_llm
     #devign
     data=load_devign(f'./data/{args.dataset}/function.json')
     for i, sample in enumerate(data):
-        # static analysis with joern
-        if i>0:
-            break
-        print( 'label:', sample['label'])
-        filepath=f'./temp/temp_code_{i}.c'
-        save_code(sample['code'], filepath)
-        joernl.parse_file(filepath, output=f'cpg{i}.bin', language='c')
-        joern_runner = joernl.JoernRunner(cpg_path=f'./temp/cpg{i}.bin')
-        result = joern_runner.run_script(script_path='./tools/joernl_scripts/base_slice.sc')
-
-        if 'result' in result:
-            print(result["result"])
-            message=prompt_template.invoke({'code':sample['code'], 'conversation': [("user", f"This is some information from static analysis to help you:\n\n Taint analysis result:\n{result["result"]}.")]})
-        else:
-            print(result.get('error', 'No result or error found'))
-            message=prompt_template.invoke({'code':sample['code']})
-        # LLM prediction
-        res=chain.invoke(message)
+        res=chain.invoke({'code':sample['code']})
         prediction=0
         if res['parsing_error']:
             print(res)
@@ -122,14 +95,51 @@ def main(llm):
 
         
     print_metrics_from_csv(csvfile)
+    
+def local_model():
+    args = parse_args()
 
+    tokenizer = AutoTokenizer.from_pretrained(os.environ["MODEL_PATH"]+args.base_model, padding_side='left')
+    tokenizer.pad_token = tokenizer.eos_token
+    tokenizer.pad_token_id = tokenizer.eos_token_id
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    model = AutoModelForCausalLM.from_pretrained(
+        os.environ["MODEL_PATH"]+args.base_model,
+        load_in_8bit=True,
+        dtype=torch.float16,
+        device_map="auto",
+        pad_token_id=tokenizer.eos_token_id
+    )
+    print("Base model loaded!")
+
+    pipe = pipeline("text-generation", model=model, tokenizer=tokenizer, max_new_tokens=128)
+    hf = HuggingFacePipeline(pipeline=pipe)
+    # tokenizer.chat_template
+    # chat_model = ChatHuggingFace(llm=hf)
+
+    ai_msg = hf.invoke("Who are you?")
+    print(ai_msg)
+    
+def save_code(code, filepath='./temp/temp_code.c'):
+    with open(filepath, 'w') as f:
+        f.write(code)
 
 
 
 if __name__ == "__main__":
-    args = parse_args()
 
-    model=ChatOllama(model=args.model_name)
-
-    main(model)
+    data=load_devign(f'./data/devign/function.json')
+    for i, sample in enumerate(data):
+        if i>0:
+            break
+        print( 'label:', sample['label'])
+        filepath=f'./temp/temp_code_{i}.c'
+        # save_code(sample['code'], filepath)
+        joernl.parse_file(filepath, output=f'cpg{i}.bin', language='c')
+        joern_runner = joernl.JoernRunner(cpg_path=f'./temp/cpg{i}.bin')
+        result = joern_runner.run_script(script_path='./tools/joernl_scripts/base_slice.sc')
+        if 'result' in result:
+            print(result["result"])
+        else:
+            print(result.get('error', 'No result or error found'))
 
