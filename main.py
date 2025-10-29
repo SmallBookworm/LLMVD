@@ -93,13 +93,13 @@ def main(llm):
     data=load_devign(f'./data/{args.dataset}/function.json')
     for i, sample in enumerate(data):
         # static analysis with joern
-        if i>0:
+        if i>10:
             break
-        print( 'label:', sample['label'])
-        filepath=f'./temp/temp_code_{i}.c'
+
+        filepath=f'./temp/temp_code.c'
         save_code(sample['code'], filepath)
-        joernl.parse_file(filepath, output=f'cpg{i}.bin', language='c')
-        joern_runner = joernl.JoernRunner(cpg_path=f'./temp/cpg{i}.bin')
+        joernl.parse_file(filepath, output='cpg.bin', language='c')
+        joern_runner = joernl.JoernRunner(cpg_path=f'./temp/cpg.bin')
         result = joern_runner.run_script(script_path='./tools/joernl_scripts/base_slice.sc')
 
         if 'result' in result:
@@ -109,7 +109,7 @@ def main(llm):
             print(result.get('error', 'No result or error found'))
             message=prompt_template.invoke({'code':sample['code']})
         # LLM prediction
-        res=chain.invoke(message)
+        res=structured_llm.invoke(message)
         prediction=0
         if res['parsing_error']:
             print(res)
