@@ -93,9 +93,6 @@ def main(llm):
     data=load_devign(f'./data/{args.dataset}/function.json')
     for i, sample in enumerate(data):
         # static analysis with joern
-        if i>10:
-            break
-
         filepath=f'./temp/temp_code.c'
         save_code(sample['code'], filepath)
         joernl.parse_file(filepath, output='cpg.bin', language='c')
@@ -103,7 +100,7 @@ def main(llm):
         result = joern_runner.run_script(script_path='./tools/joernl_scripts/base_slice.sc')
 
         if 'result' in result:
-            print(result["result"])
+            print(len(result["result"]))
             message=prompt_template.invoke({'code':sample['code'], 'conversation': [("user", f"This is some information from static analysis to help you:\n\n Taint analysis result:\n{result["result"]}.")]})
         else:
             print(result.get('error', 'No result or error found'))
@@ -124,7 +121,11 @@ def main(llm):
     print_metrics_from_csv(csvfile)
 
 
-
+def print_metrics():
+    args = parse_args()
+    csv_path=f'{args.output}/{args.dataset}'
+    csvfile=f'{csv_path}/{args.model_name}_taint.csv'
+    print_metrics_from_csv(csvfile)
 
 if __name__ == "__main__":
     args = parse_args()

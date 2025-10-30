@@ -25,6 +25,7 @@ def print_metrics_from_csv(csv_path):
     f1 = f1_score(y_true, y_pred, zero_division=0)
     fpr = fpr_score(y_true, y_pred)
 
+    print(f'Length: {len(y_pred)}')
     print(f'Accuracy: {accuracy:.4f}')
     print(f'Precision: {precision:.4f}')
     print(f'Recall: {recall:.4f}')

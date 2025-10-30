@@ -11,9 +11,21 @@ def parse_file(path, output='cpg.bin', language='c'):
     cmd = ['joern-parse', abspath, '--language', language, '--output', output_path]
     
     try:
-        subprocess.run(cmd, check=True)
+        subprocess.run(cmd, stdout=subprocess.DEVNULL, check=True)
     except subprocess.CalledProcessError as e:
         logging.error(f"Error parsing file {path}: {e}")
+        raise
+
+def scan_file(path):
+    abspath = os.path.abspath(path)
+    work_dir = os.path.dirname(abspath)
+    cmd = ['joern-scan', abspath, '--overwrite']
+    
+    try:
+        result = subprocess.run(cmd, cwd=work_dir, capture_output=True, text=True, check=True)
+        return result.stdout
+    except subprocess.CalledProcessError as e:
+        logging.error(f"Error scanning file {path}: {e}")
         raise
 
 class JoernRunner:
