@@ -19,7 +19,7 @@ def parse_file(path, output='cpg.bin', language='c'):
 def scan_file(path):
     abspath = os.path.abspath(path)
     work_dir = os.path.dirname(abspath)
-    cmd = ['joern-scan', abspath, '--overwrite']
+    cmd = ['joern-scan', abspath, '--overwrite', '--tags', 'all']
     
     try:
         result = subprocess.run(cmd, cwd=work_dir, capture_output=True, text=True, check=True)

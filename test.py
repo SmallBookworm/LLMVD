@@ -17,6 +17,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 import argparse
 import getpass
 import os
+import re
 
 os.environ["MODEL_PATH"] = "/home/peng/.cache/modelscope/hub/models/LLM-Research/"
 
@@ -124,10 +125,7 @@ def save_code(code, filepath='./temp/temp_code.c'):
     with open(filepath, 'w') as f:
         f.write(code)
 
-
-
-if __name__ == "__main__":
-
+def test_joernrun():
     data=load_devign(f'./data/devign/function.json')
     for i, sample in enumerate(data):
         if i>0:
@@ -142,4 +140,41 @@ if __name__ == "__main__":
             print(result["result"])
         else:
             print(result.get('error', 'No result or error found'))
+
+def test_scan():
+    data=load_devign(f'./data/devign/function.json')
+    for i, sample in enumerate(data):
+        if i>0:
+            break
+        print( 'label:', sample['label'])
+        filepath=f'./temp/temp_code_{i}.c'
+        save_code(sample['code'], filepath)
+        joernl.scan_file(filepath)
+
+if __name__ == "__main__":
+    log_text=joernl.scan_file('./temp/temp_code.c')
+    print('1A')
+
+    pattern = r'^Result:\s*([0-9]+(?:\.[0-9]+)?)\s*:\s*(.*?):\s*([^:\s]+):(\d+):(\S+)$'
+    results = []
+    for line in log_text.splitlines():
+        match = re.match(pattern, line.strip())
+        if match:
+            score = float(match.group(1))
+            title = match.group(2).strip()
+            filepath = match.group(3)
+            line_number = int(match.group(4))
+            function_name = match.group(5)
+            results.append({
+                "score": score,
+                "title": title,
+                "filepath": filepath,
+                "line_number": line_number,
+                "function_name": function_name
+            })
+
+    # 打印结果
+    for r in results:
+        print(r)
+
 
