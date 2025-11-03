@@ -1,7 +1,7 @@
 from data_process.utils.loader import load_devign
 from getresdata_csv import print_metrics_from_csv
 
-import tools.joernl as joernl
+import tools.joern as joern
 
 import pandas as pd
 
@@ -133,9 +133,9 @@ def test_joernrun():
         print( 'label:', sample['label'])
         filepath=f'./temp/temp_code_{i}.c'
         # save_code(sample['code'], filepath)
-        joernl.parse_file(filepath, output=f'cpg{i}.bin', language='c')
-        joern_runner = joernl.JoernRunner(cpg_path=f'./temp/cpg{i}.bin')
-        result = joern_runner.run_script(script_path='./tools/joernl_scripts/base_slice.sc')
+        joern.parse_file(filepath, output=f'cpg{i}.bin', language='c')
+        joern_runner = joern.JoernRunner(cpg_path=f'./temp/cpg{i}.bin')
+        result = joern_runner.run_script(script_path='./tools/joern_scripts/base_slice.sc')
         if 'result' in result:
             print(result["result"])
         else:
@@ -149,10 +149,10 @@ def test_scan():
         print( 'label:', sample['label'])
         filepath=f'./temp/temp_code_{i}.c'
         save_code(sample['code'], filepath)
-        joernl.scan_file(filepath)
+        joern.scan_file(filepath)
 
 if __name__ == "__main__":
-    log_text=joernl.scan_file('./temp/temp_code.c')
+    log_text=joern.scan_file('./temp/temp_code.c')
     print('1A')
 
     pattern = r'^Result:\s*([0-9]+(?:\.[0-9]+)?)\s*:\s*(.*?):\s*([^:\s]+):(\d+):(\S+)$'

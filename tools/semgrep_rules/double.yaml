@@ -1,0 +1,22 @@
+rules:
+  - id: c-double-free
+    patterns:
+      - pattern-either:
+          - pattern: |
+              free($PTR);
+              ...
+              free($PTR);
+          - pattern: |
+              $PTR = ...;
+              free($PTR);
+              ...
+              free($PTR);
+    message: "Potential double-free vulnerability: pointer '$PTR' is freed more than once without reallocation."
+    languages: [c]
+    severity: ERROR
+    metadata:
+      category: security
+      cwe: "CWE-415: Double Free"
+      confidence: medium
+      references:
+        - https://cwe.mitre.org/data/definitions/415.html

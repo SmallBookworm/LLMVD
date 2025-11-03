@@ -1,7 +1,7 @@
 from data_process.utils.loader import load_devign
 from getresdata_csv import print_metrics_from_csv
 
-import tools.joernl as joernl
+import tools.joern as joern
 
 import pandas as pd
 
@@ -95,9 +95,9 @@ def main(llm):
         # static analysis with joern
         filepath=f'./temp/temp_code.c'
         save_code(sample['code'], filepath)
-        joernl.parse_file(filepath, output='cpg.bin', language='c')
-        joern_runner = joernl.JoernRunner(cpg_path=f'./temp/cpg.bin')
-        result = joern_runner.run_script(script_path='./tools/joernl_scripts/base_slice.sc')
+        joern.parse_file(filepath, output='cpg.bin', language='c')
+        joern_runner = joern.JoernRunner(cpg_path=f'./temp/cpg.bin')
+        result = joern_runner.run_script(script_path='./tools/joern_scripts/base_slice.sc')
 
         if 'result' in result:
             print(len(result["result"]))
