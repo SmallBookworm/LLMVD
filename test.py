@@ -2,6 +2,7 @@ from data_process.utils.loader import load_devign
 from getresdata_csv import print_metrics_from_csv
 
 import tools.joern as joern
+import tools.semgrep as semgrep
 
 import pandas as pd
 
@@ -151,7 +152,7 @@ def test_scan():
         save_code(sample['code'], filepath)
         joern.scan_file(filepath)
 
-if __name__ == "__main__":
+def read_joernscan():
     log_text=joern.scan_file('./temp/temp_code.c')
     print('1A')
 
@@ -177,4 +178,53 @@ if __name__ == "__main__":
     for r in results:
         print(r)
 
+def test_semgreprun():
+    data=load_devign(f'./data/devign/function.json')
+    for i, sample in enumerate(data):
+        if i>0:
+            break
+        print( 'label:', sample['label'])
+        filepath=f'./temp/temp_code_{i}.c'
+        save_code(sample['code'], filepath)
+        semgrep_runner = semgrep.SemgrepRunner()
+        result = semgrep_runner.run_rule(
+            rule_path='./tools/semgrep_rules',
+            target_path=filepath,
+            output_path=f'./temp/semgrep_output_{i}.json'
+        )
+        if 'result' in result:
+            print(result["result"].stdout)
+        else:
+            print(result.get('error', 'No result or error found'))
+
+def generate_semgrep_rules():
+    args = parse_args()
+
+    model=ChatOllama(model=args.model_name)
+    prompt_template_rules = ChatPromptTemplate.from_messages(
+        [("system", "You are a code security expert specializing in generating Semgrep rules for vulnerability detection."),
+         ("user", "This is some information about a vulnerability in a function code:\n {info}.\n\nGenerate semgrep rules to detect vulnerabilities in C code. Provide the rules in YAML format.")]
+    )
+    structured_llm_rules = model.with_structured_output(
+        dict,
+        response_model_name="SemgrepRules",
+        include_raw=True
+    )
+    chain_rules = prompt_template_rules | structured_llm_rules
+    data=load_devign(f'./data/{args.dataset}/function.json')
+    for i, sample in enumerate(data):
+        if i>0:
+            break
+        print( 'label:', sample['label'])
+        message_rules=chain_rules.invoke({'info':sample['vul_info']})
+        if message_rules['parsing_error']:
+            print(message_rules)
+        else:
+            rules_yaml=message_rules['parsed']
+            with open(f'./temp/semgrep_rule_{i}.yaml', 'w') as f:
+                f.write(rules_yaml['raw'])
+            print(rules_yaml['raw'])
+
+if __name__ == "__main__":
+    test_semgreprun()
 
