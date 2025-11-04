@@ -11,6 +11,7 @@ from typing import Literal
 from pydantic import BaseModel, Field
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_huggingface import ChatHuggingFace, HuggingFacePipeline
+from langchain_ollama import ChatOllama
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
@@ -34,7 +35,6 @@ def parse_args():
                         help="The model to be used.")
     # parser.add_argument("--model_type", default="gemma3", type=str,
     #                     help="The model architecture to be used.")
-    parser.add_argument("--base_model", required=True, help="Path to the base model.")
     parser.add_argument("--output", default="./output", help="output path")
     args = parser.parse_args()
     return args
@@ -203,28 +203,45 @@ def generate_semgrep_rules():
     model=ChatOllama(model=args.model_name)
     prompt_template_rules = ChatPromptTemplate.from_messages(
         [("system", "You are a code security expert specializing in generating Semgrep rules for vulnerability detection."),
-         ("user", "This is some information about a vulnerability in a function code:\n {info}.\n\nGenerate semgrep rules to detect vulnerabilities in C code. Provide the rules in YAML format.")]
+         ("user", "This is some information about a vulnerability in a function code:\n {info}.\n\nGenerate semgrep rules to detect vulnerabilities in C code. Output only the Semgrep rule in YAML format.")]
     )
-    structured_llm_rules = model.with_structured_output(
-        dict,
-        response_model_name="SemgrepRules",
-        include_raw=True
-    )
-    chain_rules = prompt_template_rules | structured_llm_rules
+
     data=load_devign(f'./data/{args.dataset}/function.json')
     for i, sample in enumerate(data):
         if i>0:
             break
         print( 'label:', sample['label'])
-        message_rules=chain_rules.invoke({'info':sample['vul_info']})
-        if message_rules['parsing_error']:
+        message_rules=model.invoke([("user",'''You are a C language security expert. Please generate a Semgrep rule (in YAML format) based on the following vulnerability patch information:
+
+Vulnerability type: Buffer Overflow (CWE-120)
+Affected function: process_data()
+Vulnerable code (before fix):
+c
+memcpy(buffer, input, size);
+
+Fixed code:
+c
+if (size > sizeof(buffer)) return -1;
+memcpy(buffer, input, size);
+
+Goal: Detect all calls to memcpy that do not validate the destination buffer size beforehand.
+Language: C
+
+Output only the Semgrep rule in YAML format.
+''') ])
+
+        if message_rules:
             print(message_rules)
-        else:
-            rules_yaml=message_rules['parsed']
-            with open(f'./temp/semgrep_rule_{i}.yaml', 'w') as f:
-                f.write(rules_yaml['raw'])
-            print(rules_yaml['raw'])
+            rule_text=message_rules.content
+            # 使用正则表达式去掉开头的 ```yaml 和结尾的 ```
+            cleaned_yaml = re.sub(r'^```yaml\s*\n?', '', rule_text, flags=re.MULTILINE)
+            cleaned_yaml = re.sub(r'\n?```$', '', cleaned_yaml, flags=re.MULTILINE)
+
+            rule_path=f'./temp/semgrep_rule_{i}.yaml'
+            with open(rule_path, 'w') as f:
+                f.write(cleaned_yaml)
+            print(f'Semgrep rule saved to {rule_path}')
 
 if __name__ == "__main__":
-    test_semgreprun()
+    generate_semgrep_rules()
 
