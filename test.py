@@ -199,19 +199,7 @@ def test_semgreprun():
 
 def generate_semgrep_rules():
     args = parse_args()
-
-    model=ChatOllama(model=args.model_name)
-    prompt_template_rules = ChatPromptTemplate.from_messages(
-        [("system", "You are a code security expert specializing in generating Semgrep rules for vulnerability detection."),
-         ("user", "This is some information about a vulnerability in a function code:\n {info}.\n\nGenerate semgrep rules to detect vulnerabilities in C code. Output only the Semgrep rule in YAML format.")]
-    )
-
-    data=load_devign(f'./data/{args.dataset}/function.json')
-    for i, sample in enumerate(data):
-        if i>0:
-            break
-        print( 'label:', sample['label'])
-        message_rules=model.invoke([("user",'''You are a C language security expert. Please generate a Semgrep rule (in YAML format) based on the following vulnerability patch information:
+    test_messages=[("user",'''You are a C language security expert. Please generate a Semgrep rule (in YAML format) based on the following vulnerability patch information:
 
 Vulnerability type: Buffer Overflow (CWE-120)
 Affected function: process_data()
@@ -228,7 +216,20 @@ Goal: Detect all calls to memcpy that do not validate the destination buffer siz
 Language: C
 
 Output only the Semgrep rule in YAML format.
-''') ])
+''') ]
+
+    model=ChatOllama(model=args.model_name)
+    prompt_template_rules = ChatPromptTemplate.from_messages(
+        [("system", "You are a code security expert specializing in generating Semgrep rules for vulnerability detection."),
+         ("user", "This is some information about a vulnerability in a function code:\n {info}.\n\nGenerate semgrep rules to detect vulnerabilities in C code. Output only the Semgrep rule in YAML format.")]
+    )
+
+    data=load_devign(f'./data/{args.dataset}/function.json')
+    for i, sample in enumerate(data):
+        if i>0:
+            break
+        print( 'label:', sample['label'])
+        message_rules=model.invoke(test_messages)
 
         if message_rules:
             print(message_rules)
