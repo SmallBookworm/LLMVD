@@ -1,10 +1,16 @@
 # analysis tools
 joern semgrep
 
+# dataset
+1. devign: dict_keys(['project', 'commit_id', 'target', 'func'])  total(27318) vul(12460)
+2. primevul_train_paired: dict_keys(['idx', 'project', 'commit_id', 'project_url', 'commit_url', 'commit_message', 'target', 'func', 'func_hash', 'file_name', 'file_hash', 'cwe', 'cve', 'cve_desc', 'nvd_url']) total(7578) vul(3789)
+
 # run:
 local_huggingface_model: .venv/bin/python main.py --dataset devign --base_model Meta-Llama-3-8B
 
-ollama: .venv/bin/python main.py --dataset devign
+default model: .venv/bin/python main.py --dataset devign
+
+generate rules: python generate.py --dataset primevul_train_paired
 
 # metrics
 Accuracy: 0.6364

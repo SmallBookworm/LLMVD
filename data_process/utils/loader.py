@@ -55,6 +55,25 @@ def load_devign(json_path):
 
     return data
 
+def load_primevul(jsonl_path='./data/primevul/primevul_train_paired.jsonl'):
+
+    with open(jsonl_path, 'r') as f:
+        raw_data = [json.loads(line) for line in f]
+
+    # data = []
+    # for idx, raw_entry in enumerate(raw_data):
+    #     code, label = raw_entry['func'], raw_entry['target']
+    #     del raw_entry['func'], raw_entry['target']
+    #     entry = {
+    #         'index': idx,
+    #         'code': code,
+    #         'label': label,
+    #         **raw_entry
+    #     }
+    #     data.append(entry)
+
+    return raw_data
+
 
 def load_reveal(json_dir):
     data = []

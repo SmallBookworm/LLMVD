@@ -1,4 +1,4 @@
-from data_process.utils.loader import load_devign
+from data_process.utils.loader import load_devign, load_primevul
 from getresdata_csv import print_metrics_from_csv
 
 import tools.joern as joern
@@ -197,9 +197,7 @@ def test_semgreprun():
         else:
             print(result.get('error', 'No result or error found'))
 
-def generate_semgrep_rules():
-    args = parse_args()
-    test_messages=[("user",'''You are a C language security expert. Please generate a Semgrep rule (in YAML format) based on the following vulnerability patch information:
+test_messages=[("user",'''You are a C language security expert. Please generate a Semgrep rule (in YAML format) based on the following vulnerability patch information:
 
 Vulnerability type: Buffer Overflow (CWE-120)
 Affected function: process_data()
@@ -218,31 +216,83 @@ Language: C
 Output only the Semgrep rule in YAML format.
 ''') ]
 
+
+def generate_semgrep_rules():
+    args = parse_args()
+
+
     model=ChatOllama(model=args.model_name)
     prompt_template_rules = ChatPromptTemplate.from_messages(
         [("system", "You are a code security expert specializing in generating Semgrep rules for vulnerability detection."),
-         ("user", "This is some information about a vulnerability in a function code:\n {info}.\n\nGenerate semgrep rules to detect vulnerabilities in C code. Output only the Semgrep rule in YAML format.")]
+         ("user", '''Generate a Semgrep rule in YAML format to detect the vulnerable pattern described below. 
+Output ONLY the Semgrep rule in YAML format.
+
+Guidelines:
+- Focus on the key difference between vulnerable and fixed code.
+- Use `pattern` or `pattern-either` with minimal, precise code snippets.
+- Include `message`, `severity`, and `languages: [c]`.
+- Avoid matching entire functions; match only the risky expression or condition.
+
+Vulnerability Details:
+- CWE: {cwe}
+- CVE: {cve}
+- Description: {cve_desc}
+- Commit message: {commit_message}
+- Commit URl: {commit_url}
+Vulnerable code (before fix):
+{vul_code}
+
+Fixed code:
+{fix_code}
+
+Language: C
+''')]
     )
+    if args.dataset=='devign':
+        data=load_devign(f'./data/devign/function.json')
+    elif args.dataset=='primevul_train_paired':
+        data=load_primevul()
+    total=0
+    for i in range(0, len(data), 2):
 
-    data=load_devign(f'./data/{args.dataset}/function.json')
-    for i, sample in enumerate(data):
-        if i>0:
-            break
-        print( 'label:', sample['label'])
-        message_rules=model.invoke(test_messages)
+        
+        
+        message_generate=prompt_template_rules.invoke({
+            'cwe': data[i].get('cwe', 'N/A'),
+            'cve': data[i].get('cve', 'N/A'),
+            'cve_desc': data[i].get('cve_desc', 'N/A'),
+            'commit_message': data[i].get('commit_message', 'N/A'),
+            'commit_url': data[i].get('commit_url', 'N/A'),
+            'vul_code': data[i]['func'],
+            'fix_code': data[i+1]['func']
+        })
+        #test
+        if data[i]['commit_url']==data[i+1]['commit_url']:
+            continue
+        else:
+            print(data[i]['target'],'mismatch',data[i+1]['target'])
+            total+=1
 
+        create_directory('./temp/test_generate')
+        messages_path=f'./temp/test_generate/semgrep_generate_{data[i]['idx']}.text'
+        with open(messages_path, 'w') as f:
+            f.write(message_generate.to_messages()[-1].content)
+        print(f'Semgrep generate messages saved to {messages_path}')
+
+        message_rules=model.invoke(message_generate)
         if message_rules:
-            print(message_rules)
             rule_text=message_rules.content
             # 使用正则表达式去掉开头的 ```yaml 和结尾的 ```
             cleaned_yaml = re.sub(r'^```yaml\s*\n?', '', rule_text, flags=re.MULTILINE)
             cleaned_yaml = re.sub(r'\n?```$', '', cleaned_yaml, flags=re.MULTILINE)
-
-            rule_path=f'./temp/semgrep_rule_{i}.yaml'
+            directory=f'./rules/{data[i]['cwe'][0]}'
+            create_directory(directory)
+            rule_path=f'{directory}/semgrep_rule_{data[i]['idx']}.yaml'
             with open(rule_path, 'w') as f:
                 f.write(cleaned_yaml)
             print(f'Semgrep rule saved to {rule_path}')
+    return total
 
 if __name__ == "__main__":
-    generate_semgrep_rules()
+   print(generate_semgrep_rules()) 
 
