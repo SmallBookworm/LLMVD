@@ -1,7 +1,6 @@
 from data_process.utils.loader import load_devign, load_primevul
 from getresdata_csv import print_metrics_from_csv
 
-import tools.joern as joern
 import tools.semgrep as semgrep
 
 import pandas as pd
@@ -10,7 +9,8 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_ollama import ChatOllama
+from langchain_qwq import ChatQwen
+
 
 from prompts.generate_rule import Semgrep_rule
 
@@ -21,8 +21,10 @@ import re
 
 os.environ["MODEL_PATH"] = "/home/peng/.cache/modelscope/hub/models/LLM-Research/"
 
-if not os.environ.get("OPENAI_API_KEY"):
-  os.environ["OPENAI_API_KEY"] = getpass.getpass("Enter API key for OpenAI: ")
+os.environ["DASHSCOPE_API_BASE"] = "https://dashscope.aliyuncs.com/compatible-mode/v1"
+
+if not os.environ.get("DASHSCOPE_API_KEY"):
+  os.environ["DASHSCOPE_API_KEY"] = getpass.getpass("Enter API key for dashscope:")
 
 
 def parse_args():
@@ -71,19 +73,19 @@ class VulResult(BaseModel):
     )
 
 
-def generate_semgrep_rules():
-    args = parse_args()
-
-
-    model=ChatOllama(model=args.model_name)
+def generate_semgrep_rules(model, dataset):
     prompt_template_rules = ChatPromptTemplate.from_messages(Semgrep_rule)
-    if args.dataset=='devign':
-        data=load_devign(f'./data/devign/function.json')
-    elif args.dataset=='primevul_train_paired':
+
+    if dataset=='primevul_train_paired':
         data=load_primevul()
+    else:
+        print(f'Dataset {dataset} not supported yet.')
+        return 0
+
     total=0
     for i in range(0, len(data), 2):
-
+        if total>200:
+            break
         
         
         message_generate=prompt_template_rules.invoke({
@@ -102,9 +104,12 @@ def generate_semgrep_rules():
             f.write(message_generate.to_messages()[-1].content)
         print(f'Semgrep generate messages saved to {messages_path}')
         
-        message_rules=model.invoke(message_generate)
-        if message_rules:
-            rule_text=message_rules.content
+        response=model.invoke(message_generate)
+        if response:
+            # reasoning = response.additional_kwargs.get("reasoning_content", "")
+            # print(f"Limited reasoning: {reasoning}")
+
+            rule_text=response.content
             # 使用正则表达式去掉开头的 ```yaml 和结尾的 ```
             cleaned_yaml = re.sub(r'^```yaml\s*\n?', '', rule_text, flags=re.MULTILINE)
             cleaned_yaml = re.sub(r'\n?```$', '', cleaned_yaml, flags=re.MULTILINE)
@@ -117,6 +122,51 @@ def generate_semgrep_rules():
             total+=1
     return total
 
+def save_code(code, filepath='./temp/temp_code.c'):
+    with open(filepath, 'w') as f:
+        f.write(code)
+        
+def rule_num(path='./rules/'):
+    count=0
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            if file.endswith('.yaml'):
+                count+=1
+    return count
+
+def test_rule():
+    semgrep_runner = semgrep.SemgrepRunner()
+
+
+    data=load_primevul()
+    total=0
+    tp,tn=0,0
+    for i in range(0, len(data), 2):
+        sample=data[i]
+        if total>9:
+            break
+
+        filepath=f'./temp/temp_code.c'
+        save_code(sample['func'], filepath)
+
+        if sample['target'] == 1:
+            total+=1
+        else:
+            print('error')
+        result = semgrep_runner.run_rule(
+            rule_path=f'./rules/{sample["cwe"][0]}/semgrep_rule_{sample["idx"]}.yaml',
+            target_path=filepath,
+            output_path=f'./temp/semgrep/semgrep_output_{i}.json'
+        )
+        if 'result' in result:
+            print(result["result"].stdout)
+        else:
+            print(result.get('error', 'No result or error found'))
+
 if __name__ == "__main__":
-   print(generate_semgrep_rules()) 
+    # args = parse_args()
+    # model=ChatQwen(model="qwen3-max-2025-09-23", temperature=0.1)
+    # print(generate_semgrep_rules(model, args.dataset)) 
+    # print(f'Total semgrep rules: {rule_num()}')
+    test_rule()
 

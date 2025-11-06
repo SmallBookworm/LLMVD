@@ -15,6 +15,7 @@ data/
 #result
 output/
 temp/
+rules/
 
 #scala
 .metals/
