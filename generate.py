@@ -221,6 +221,42 @@ def test_rule_negative():
 
     print(f'Total negative samples: {total}, True Negatives: {tn}, Run Errors: {n_error}')
 
+def fix_rule(rules_path,model):
+    create_directory(f'{rules_path}/fixed_rules/')
+    prompt_template_fix = ChatPromptTemplate.from_messages([])
+
+    for root, dirs, files in os.walk(rules_path):
+        for file in files:
+            if file.endswith('.yaml'):
+                rule_path = os.path.join(root, file)
+                with open(rule_path, 'r') as f:
+                    rule_content = f.read()
+
+                # remove fix patterns in semgrep rules
+                rule_yaml=yaml.safe_load(rule_content)
+                
+                for rule in rule_yaml.get('rules', []):
+                    res=rule.pop('fix', None)  # 使用 pop 并提供默认值 None，避免 KeyError
+                    if res:
+                        print(f'Removed fix: {res},file: {rule_path}')
+                
+                # feedback model
+                message_fix=prompt_template_fix.invoke({
+                    'semgrep_rule': rule_content
+                })
+
+                response=model.invoke(message_fix)
+                if response:
+                    rule_text=response.content
+                    # 使用正则表达式去掉开头的 ```yaml 和结尾的 ```
+                    cleaned_yaml = re.sub(r'^```yaml\s*\n?', '', rule_text, flags=re.MULTILINE)
+                    cleaned_yaml = re.sub(r'\n?```$', '', cleaned_yaml, flags=re.MULTILINE)
+                    
+                    fixed_rule_path = rule_path.replace('/rules/', '/rules/fixed_rules/', 1)
+
+                    with open(fixed_rule_path, 'w') as f:
+                        f.write(cleaned_yaml)
+                    print(f'Fixed Semgrep rule saved to {fixed_rule_path}')
 
 if __name__ == "__main__":
     # args = parse_args()
@@ -229,3 +265,4 @@ if __name__ == "__main__":
     # print(f'Total semgrep rules: {rule_num()}')
     # test_rule_negative()
     semgrep.SemgrepRunner.read_semgrep_output('./temp/semgrep/negative/')
+    # fix_rule('./rules/', ChatOllama(model="ollama-gemini-1-5b", temperature=0.1))
