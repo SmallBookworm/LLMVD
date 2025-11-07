@@ -1,5 +1,6 @@
 import subprocess
 import os
+import json
 import logging
 from typing import Dict, Any, Optional
 
@@ -43,7 +44,7 @@ class SemgrepRunner:
             )
 
             if result.returncode != 0 and result.returncode != 1:
-                logging.warning(f"Semgrep failed: {result}")
+                logging.warning(f"Semgrep failed: {result.stderr}")
                 return {
                     "error": "semgrep_failed",
                     "stderr": result.stderr,
@@ -82,7 +83,7 @@ class SemgrepRunner:
             )
 
             if result.returncode != 0 and result.returncode != 1:
-                logging.warning(f"Semgrep failed: {result}")
+                logging.warning(f"Semgrep failed: {result.stderr}")
                 return {
                     "error": "semgrep_failed",
                     "stderr": result.stderr,
@@ -97,3 +98,37 @@ class SemgrepRunner:
             return {"error": "timeout", "message": "Semgrep timed out (>30s)"}
         except Exception as e:
             return {"error": "exception", "message": str(e)}
+    
+    @staticmethod
+    def read_semgrep_output(json_path):
+        #scan path
+        files = os.listdir(json_path)
+        total=0
+        res=0
+        ewr=0
+        for file in files:
+            if file.endswith('.json'):
+                total+=1
+                with open(os.path.join(json_path, file), 'r') as f:
+                    data = json.load(f)
+                if data.get('results'):
+                    res+=1
+                if data.get('errors'):
+                    if data.get('results'):
+                        ewr+=1
+                        print(f'Error File with result: {file}')
+                        for error in data['errors']:
+                            print(f"Error Type: {error.get('type')[0]}")
+        ew=0
+        for file in files:
+            if file.endswith('.json'):
+                with open(os.path.join(json_path, file), 'r') as f:
+                    data = json.load(f)
+                if data.get('errors'):
+                    if not data.get('results'):
+                        ew+=1
+                        print(f'Error File: {file}')
+                        for error in data['errors']:
+                            print(f"Error Type: {error.get('type')}")
+
+        print(f'Total:{total}, Results:{res}, Errors with Results:{ewr}, Errors without Results:{ew}')

@@ -18,6 +18,8 @@ import argparse
 import getpass
 import os
 import re
+import json
+import yaml
 
 os.environ["MODEL_PATH"] = "/home/peng/.cache/modelscope/hub/models/LLM-Research/"
 
@@ -134,16 +136,18 @@ def rule_num(path='./rules/'):
                 count+=1
     return count
 
-def test_rule():
+def test_rule_positive():
     semgrep_runner = semgrep.SemgrepRunner()
-
+    create_directory('./temp/semgrep/')
 
     data=load_primevul()
     total=0
-    tp,tn=0,0
+    # positive code (vul)
+    tp=0
+    p_error=0
     for i in range(0, len(data), 2):
         sample=data[i]
-        if total>9:
+        if total>200:
             break
 
         filepath=f'./temp/temp_code.c'
@@ -153,20 +157,75 @@ def test_rule():
             total+=1
         else:
             print('error')
+
+        rule_path=f'./rules/{sample["cwe"][0]}/semgrep_rule_{sample["idx"]}.yaml'
+        if not os.path.exists(rule_path):
+            print(f'Rule not found for CWE {sample["cwe"][0]} idx {sample["idx"]}')
+            break
+
         result = semgrep_runner.run_rule(
-            rule_path=f'./rules/{sample["cwe"][0]}/semgrep_rule_{sample["idx"]}.yaml',
+            rule_path=rule_path,
             target_path=filepath,
-            output_path=f'./temp/semgrep/semgrep_output_{i}.json'
+            output_path=f'./temp/semgrep/semgrep_output_{sample["idx"]}.json'
         )
         if 'result' in result:
-            print(result["result"].stdout)
+            output = json.loads(result['result'].stdout)
+            if output.get('results'):
+                tp+=1
         else:
-            print(result.get('error', 'No result or error found'))
+            # semgrep output stderr
+            p_error+=1
+
+    print(f'Total positive samples: {total}, True Positives: {tp}, Run Errors: {p_error}')
+
+def test_rule_negative():
+    semgrep_runner = semgrep.SemgrepRunner()
+    create_directory('./temp/semgrep/negative/')
+
+    data=load_primevul()
+    total=0
+    # negative code (non-vul)
+    tn=0
+    n_error=0
+    for i in range(1, len(data), 2):
+        sample=data[i]
+        if total>200:
+            break
+
+        filepath=f'./temp/temp_code.c'
+        save_code(sample['func'], filepath)
+
+        if sample['target'] == 0:
+            total+=1
+        else:
+            print('error')
+        cwe=data[i-1]['cwe'][0]
+        idx=data[i-1]['idx']
+        rule_path=f'./rules/{cwe}/semgrep_rule_{idx}.yaml'
+        if not os.path.exists(rule_path):
+            print(f'Rule not found for CWE {cwe} idx {idx}')
+            break
+
+        result = semgrep_runner.run_rule(
+            rule_path=rule_path,
+            target_path=filepath,
+            output_path=f'./temp/semgrep/negative/semgrep_output_{sample["idx"]}_{idx}.json'
+        )
+        if 'result' in result:
+            output = json.loads(result['result'].stdout)
+            if not output.get('results'):
+                tn+=1
+        else:
+            # semgrep output stderr
+            n_error+=1
+
+    print(f'Total negative samples: {total}, True Negatives: {tn}, Run Errors: {n_error}')
+
 
 if __name__ == "__main__":
     # args = parse_args()
     # model=ChatQwen(model="qwen3-max-2025-09-23", temperature=0.1)
     # print(generate_semgrep_rules(model, args.dataset)) 
     # print(f'Total semgrep rules: {rule_num()}')
-    test_rule()
-
+    # test_rule_negative()
+    semgrep.SemgrepRunner.read_semgrep_output('./temp/semgrep/negative/')
