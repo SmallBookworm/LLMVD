@@ -13,7 +13,7 @@ from langchain_qwq import ChatQwen
 from langchain_ollama import ChatOllama
 
 
-from prompts.generate_rule import Semgrep_rule
+from prompts.generate_rule import Semgrep_rule_prompt, fix_rule_prompt
 
 import argparse
 import getpass
@@ -83,7 +83,7 @@ class VulResult(BaseModel):
 
 
 def generate_semgrep_rules(model, dataset):
-    prompt_template_rules = ChatPromptTemplate.from_messages(Semgrep_rule)
+    prompt_template_rules = ChatPromptTemplate.from_messages(Semgrep_rule_prompt)
 
     if dataset == "primevul_train_paired":
         data = load_primevul()
@@ -240,27 +240,46 @@ def test_rule_negative():
 
 def fix_rule(rules_path, model):
     create_directory(f"{rules_path}/fixed_rules/")
-    prompt_template_fix = ChatPromptTemplate.from_messages([])
+    prompt_template_fix = ChatPromptTemplate.from_messages(fix_rule_prompt)
 
     for root, dirs, files in os.walk(rules_path):
         for file in files:
             if file.endswith(".yaml"):
+                idx=file.split("_")[-1].split(".")[0]
                 rule_path = os.path.join(root, file)
                 with open(rule_path, "r") as f:
                     rule_content = f.read()
 
+                # only fix fail rules, which are "rule error" without results when semgrep test positive cases.
+                with open(f'./temp/semgrep/semgrep_output_{idx}.json', "r") as f:
+                    test_output = f.read()
+                if test_output.strip() == "":
+                    print(f"Empty test output, skipping rule: {rule_path}")
+                    continue
+                test_output_json = json.loads(test_output)
+                if test_output_json.get("results") or not test_output_json.get("errors"):
+                    print(f"Rule works fine, no need to fix: {rule_path}")
+                    continue
+                
+                # read semgrep rule yaml
+                try:
+                    rule_yaml = yaml.safe_load(rule_content)
+                except yaml.YAMLError as e:
+                    print(f"Error parsing YAML for rule {rule_path}: {e}")
                 # remove fix patterns in semgrep rules
-                rule_yaml = yaml.safe_load(rule_content)
+                if rule_yaml:
+                    for rule in rule_yaml.get("rules", []):
+                        res = rule.pop(
+                            "fix", None
+                        )  # 使用 pop 并提供默认值 None，避免 KeyError
+                        if res:
+                            print(f"Removed fix: {res}")
+                            print(f"file: {rule_path}")
 
-                for rule in rule_yaml.get("rules", []):
-                    res = rule.pop(
-                        "fix", None
-                    )  # 使用 pop 并提供默认值 None，避免 KeyError
-                    if res:
-                        print(f"Removed fix: {res},file: {rule_path}")
+                
+                # feedback model. Is it better to remove spans in errors?
+                message_fix = prompt_template_fix.invoke({"semgrep_rule": rule_content, "test_output": {'errors': test_output_json.get("errors", [])}})
 
-                # feedback model
-                message_fix = prompt_template_fix.invoke({"semgrep_rule": rule_content})
 
                 response = model.invoke(message_fix)
                 if response:
@@ -276,10 +295,11 @@ def fix_rule(rules_path, model):
                     fixed_rule_path = rule_path.replace(
                         "/rules/", "/rules/fixed_rules/", 1
                     )
-
+                    create_directory(os.path.dirname(fixed_rule_path))
                     with open(fixed_rule_path, "w") as f:
                         f.write(cleaned_yaml)
                     print(f"Fixed Semgrep rule saved to {fixed_rule_path}")
+                    break
 
 
 if __name__ == "__main__":
@@ -288,5 +308,7 @@ if __name__ == "__main__":
     # print(generate_semgrep_rules(model, args.dataset))
     # print(f'Total semgrep rules: {rule_num()}')
     # test_rule_negative()
-    semgrep.SemgrepRunner.read_semgrep_output('./temp/semgrep/negative/')
-    # fix_rule("./rules/", ChatOllama(model="gemma3:27b"))
+    # test_rule_positive()
+    # semgrep.SemgrepRunner.read_semgrep_output('./temp/semgrep/negative/')
+
+    fix_rule("./rules/", ChatOllama(model="gemma3:27b"))
