@@ -10,6 +10,7 @@ from typing import Literal
 from pydantic import BaseModel, Field
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_qwq import ChatQwen
+from langchain_ollama import ChatOllama
 
 
 from prompts.generate_rule import Semgrep_rule
@@ -26,15 +27,16 @@ os.environ["MODEL_PATH"] = "/home/peng/.cache/modelscope/hub/models/LLM-Research
 os.environ["DASHSCOPE_API_BASE"] = "https://dashscope.aliyuncs.com/compatible-mode/v1"
 
 if not os.environ.get("DASHSCOPE_API_KEY"):
-  os.environ["DASHSCOPE_API_KEY"] = getpass.getpass("Enter API key for dashscope:")
+    os.environ["DASHSCOPE_API_KEY"] = getpass.getpass("Enter API key for dashscope:")
 
 
 def parse_args():
-    
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset", required=True, help="dataset name")
-    parser.add_argument("--model_name", default="gemma3:27b", type=str,
-                        help="The model to be used.")
+    parser.add_argument(
+        "--model_name", default="gemma3:27b", type=str, help="The model to be used."
+    )
     # parser.add_argument("--model_type", default="gemma3", type=str,
     #                     help="The model architecture to be used.")
     parser.add_argument("--output", default="./output", help="output path")
@@ -50,26 +52,31 @@ def create_directory(directory):
         print(f"Directory '{directory}' already exists")
 
 
-
-
-# system_template = '''You are a senior security analyst specializing in static code analysis. Your task is to: 
-# 1. Identify vulnerabilities from OWASP Top 10/CWE lists 
-# 2. Classify severity (Critical/High/Medium/Low) 
-# 3. Provide remediation guidance 
+# system_template = '''You are a senior security analyst specializing in static code analysis. Your task is to:
+# 1. Identify vulnerabilities from OWASP Top 10/CWE lists
+# 2. Classify severity (Critical/High/Medium/Low)
+# 3. Provide remediation guidance
 # 4. Highlight false positives'''
 
 
 system_template = "You are a code security expert who analyzes the given code to detect the security vulnerability."
 
 prompt_template = ChatPromptTemplate.from_messages(
-    [("system", system_template), ("user", "Detect whether the following code contains vulnerabilities:\n\n{code}")]
+    [
+        ("system", system_template),
+        (
+            "user",
+            "Detect whether the following code contains vulnerabilities:\n\n{code}",
+        ),
+    ]
 )
+
 
 class VulResult(BaseModel):
     """Result of vulnerability discovery."""
 
     # reason: str = Field(description="The reason of the detection result.")
-    # vulnerability: str = Field(description="The type of vulnerability. (If the code is secure, give 'none' )") 
+    # vulnerability: str = Field(description="The type of vulnerability. (If the code is secure, give 'none' )")
     label: Literal[0, 1] = Field(
         description="Vulnerability status indicator, only 0 or 1 (0: secure, 1: vulnerable)"
     )
@@ -78,87 +85,91 @@ class VulResult(BaseModel):
 def generate_semgrep_rules(model, dataset):
     prompt_template_rules = ChatPromptTemplate.from_messages(Semgrep_rule)
 
-    if dataset=='primevul_train_paired':
-        data=load_primevul()
+    if dataset == "primevul_train_paired":
+        data = load_primevul()
     else:
-        print(f'Dataset {dataset} not supported yet.')
+        print(f"Dataset {dataset} not supported yet.")
         return 0
 
-    total=0
+    total = 0
     for i in range(0, len(data), 2):
-        if total>200:
+        if total > 200:
             break
-        
-        
-        message_generate=prompt_template_rules.invoke({
-            'cwe': data[i].get('cwe', 'N/A'),
-            'cve': data[i].get('cve', 'N/A'),
-            'cve_desc': data[i].get('cve_desc', 'N/A'),
-            'commit_message': data[i].get('commit_message', 'N/A'),
-            'commit_url': data[i].get('commit_url', 'N/A'),
-            'vul_code': data[i]['func'],
-            'fix_code': data[i+1]['func']
-        })
 
-        create_directory('./temp/test_generate')
-        messages_path=f'./temp/test_generate/semgrep_generate_{data[i]['idx']}.text'
-        with open(messages_path, 'w') as f:
+        message_generate = prompt_template_rules.invoke(
+            {
+                "cwe": data[i].get("cwe", "N/A"),
+                "cve": data[i].get("cve", "N/A"),
+                "cve_desc": data[i].get("cve_desc", "N/A"),
+                "commit_message": data[i].get("commit_message", "N/A"),
+                "commit_url": data[i].get("commit_url", "N/A"),
+                "vul_code": data[i]["func"],
+                "fix_code": data[i + 1]["func"],
+            }
+        )
+
+        create_directory("./temp/test_generate")
+        messages_path = f"./temp/test_generate/semgrep_generate_{data[i]['idx']}.text"
+        with open(messages_path, "w") as f:
             f.write(message_generate.to_messages()[-1].content)
-        print(f'Semgrep generate messages saved to {messages_path}')
-        
-        response=model.invoke(message_generate)
+        print(f"Semgrep generate messages saved to {messages_path}")
+
+        response = model.invoke(message_generate)
         if response:
             # reasoning = response.additional_kwargs.get("reasoning_content", "")
             # print(f"Limited reasoning: {reasoning}")
 
-            rule_text=response.content
+            rule_text = response.content
             # 使用正则表达式去掉开头的 ```yaml 和结尾的 ```
-            cleaned_yaml = re.sub(r'^```yaml\s*\n?', '', rule_text, flags=re.MULTILINE)
-            cleaned_yaml = re.sub(r'\n?```$', '', cleaned_yaml, flags=re.MULTILINE)
-            directory=f'./rules/{data[i]['cwe'][0]}'
+            cleaned_yaml = re.sub(r"^```yaml\s*\n?", "", rule_text, flags=re.MULTILINE)
+            cleaned_yaml = re.sub(r"\n?```$", "", cleaned_yaml, flags=re.MULTILINE)
+            directory = f"./rules/{data[i]['cwe'][0]}"
             create_directory(directory)
-            rule_path=f'{directory}/semgrep_rule_{data[i]['idx']}.yaml'
-            with open(rule_path, 'w') as f:
+            rule_path = f"{directory}/semgrep_rule_{data[i]['idx']}.yaml"
+            with open(rule_path, "w") as f:
                 f.write(cleaned_yaml)
-            print(f'Semgrep rule saved to {rule_path}')
-            total+=1
+            print(f"Semgrep rule saved to {rule_path}")
+            total += 1
     return total
 
-def save_code(code, filepath='./temp/temp_code.c'):
-    with open(filepath, 'w') as f:
+
+def save_code(code, filepath="./temp/temp_code.c"):
+    with open(filepath, "w") as f:
         f.write(code)
-        
-def rule_num(path='./rules/'):
-    count=0
+
+
+def rule_num(path="./rules/"):
+    count = 0
     for root, dirs, files in os.walk(path):
         for file in files:
-            if file.endswith('.yaml'):
-                count+=1
+            if file.endswith(".yaml"):
+                count += 1
     return count
+
 
 def test_rule_positive():
     semgrep_runner = semgrep.SemgrepRunner()
-    create_directory('./temp/semgrep/')
+    create_directory("./temp/semgrep/")
 
-    data=load_primevul()
-    total=0
+    data = load_primevul()
+    total = 0
     # positive code (vul)
-    tp=0
-    p_error=0
+    tp = 0
+    p_error = 0
     for i in range(0, len(data), 2):
-        sample=data[i]
-        if total>200:
+        sample = data[i]
+        if total > 200:
             break
 
-        filepath=f'./temp/temp_code.c'
-        save_code(sample['func'], filepath)
+        filepath = f"./temp/temp_code.c"
+        save_code(sample["func"], filepath)
 
-        if sample['target'] == 1:
-            total+=1
+        if sample["target"] == 1:
+            total += 1
         else:
-            print('error')
+            print("error")
 
-        rule_path=f'./rules/{sample["cwe"][0]}/semgrep_rule_{sample["idx"]}.yaml'
+        rule_path = f'./rules/{sample["cwe"][0]}/semgrep_rule_{sample["idx"]}.yaml'
         if not os.path.exists(rule_path):
             print(f'Rule not found for CWE {sample["cwe"][0]} idx {sample["idx"]}')
             break
@@ -166,103 +177,116 @@ def test_rule_positive():
         result = semgrep_runner.run_rule(
             rule_path=rule_path,
             target_path=filepath,
-            output_path=f'./temp/semgrep/semgrep_output_{sample["idx"]}.json'
+            output_path=f'./temp/semgrep/semgrep_output_{sample["idx"]}.json',
         )
-        if 'result' in result:
-            output = json.loads(result['result'].stdout)
-            if output.get('results'):
-                tp+=1
+        if "result" in result:
+            output = json.loads(result["result"].stdout)
+            if output.get("results"):
+                tp += 1
         else:
             # semgrep output stderr
-            p_error+=1
+            p_error += 1
 
-    print(f'Total positive samples: {total}, True Positives: {tp}, Run Errors: {p_error}')
+    print(
+        f"Total positive samples: {total}, True Positives: {tp}, Run Errors: {p_error}"
+    )
+
 
 def test_rule_negative():
     semgrep_runner = semgrep.SemgrepRunner()
-    create_directory('./temp/semgrep/negative/')
+    create_directory("./temp/semgrep/negative/")
 
-    data=load_primevul()
-    total=0
+    data = load_primevul()
+    total = 0
     # negative code (non-vul)
-    tn=0
-    n_error=0
+    tn = 0
+    n_error = 0
     for i in range(1, len(data), 2):
-        sample=data[i]
-        if total>200:
+        sample = data[i]
+        if total > 200:
             break
 
-        filepath=f'./temp/temp_code.c'
-        save_code(sample['func'], filepath)
+        filepath = f"./temp/temp_code.c"
+        save_code(sample["func"], filepath)
 
-        if sample['target'] == 0:
-            total+=1
+        if sample["target"] == 0:
+            total += 1
         else:
-            print('error')
-        cwe=data[i-1]['cwe'][0]
-        idx=data[i-1]['idx']
-        rule_path=f'./rules/{cwe}/semgrep_rule_{idx}.yaml'
+            print("error")
+        cwe = data[i - 1]["cwe"][0]
+        idx = data[i - 1]["idx"]
+        rule_path = f"./rules/{cwe}/semgrep_rule_{idx}.yaml"
         if not os.path.exists(rule_path):
-            print(f'Rule not found for CWE {cwe} idx {idx}')
+            print(f"Rule not found for CWE {cwe} idx {idx}")
             break
 
         result = semgrep_runner.run_rule(
             rule_path=rule_path,
             target_path=filepath,
-            output_path=f'./temp/semgrep/negative/semgrep_output_{sample["idx"]}_{idx}.json'
+            output_path=f'./temp/semgrep/negative/semgrep_output_{sample["idx"]}_{idx}.json',
         )
-        if 'result' in result:
-            output = json.loads(result['result'].stdout)
-            if not output.get('results'):
-                tn+=1
+        if "result" in result:
+            output = json.loads(result["result"].stdout)
+            if not output.get("results"):
+                tn += 1
         else:
             # semgrep output stderr
-            n_error+=1
+            n_error += 1
 
-    print(f'Total negative samples: {total}, True Negatives: {tn}, Run Errors: {n_error}')
+    print(
+        f"Total negative samples: {total}, True Negatives: {tn}, Run Errors: {n_error}"
+    )
 
-def fix_rule(rules_path,model):
-    create_directory(f'{rules_path}/fixed_rules/')
+
+def fix_rule(rules_path, model):
+    create_directory(f"{rules_path}/fixed_rules/")
     prompt_template_fix = ChatPromptTemplate.from_messages([])
 
     for root, dirs, files in os.walk(rules_path):
         for file in files:
-            if file.endswith('.yaml'):
+            if file.endswith(".yaml"):
                 rule_path = os.path.join(root, file)
-                with open(rule_path, 'r') as f:
+                with open(rule_path, "r") as f:
                     rule_content = f.read()
 
                 # remove fix patterns in semgrep rules
-                rule_yaml=yaml.safe_load(rule_content)
-                
-                for rule in rule_yaml.get('rules', []):
-                    res=rule.pop('fix', None)  # 使用 pop 并提供默认值 None，避免 KeyError
+                rule_yaml = yaml.safe_load(rule_content)
+
+                for rule in rule_yaml.get("rules", []):
+                    res = rule.pop(
+                        "fix", None
+                    )  # 使用 pop 并提供默认值 None，避免 KeyError
                     if res:
-                        print(f'Removed fix: {res},file: {rule_path}')
-                
+                        print(f"Removed fix: {res},file: {rule_path}")
+
                 # feedback model
-                message_fix=prompt_template_fix.invoke({
-                    'semgrep_rule': rule_content
-                })
+                message_fix = prompt_template_fix.invoke({"semgrep_rule": rule_content})
 
-                response=model.invoke(message_fix)
+                response = model.invoke(message_fix)
                 if response:
-                    rule_text=response.content
+                    rule_text = response.content
                     # 使用正则表达式去掉开头的 ```yaml 和结尾的 ```
-                    cleaned_yaml = re.sub(r'^```yaml\s*\n?', '', rule_text, flags=re.MULTILINE)
-                    cleaned_yaml = re.sub(r'\n?```$', '', cleaned_yaml, flags=re.MULTILINE)
-                    
-                    fixed_rule_path = rule_path.replace('/rules/', '/rules/fixed_rules/', 1)
+                    cleaned_yaml = re.sub(
+                        r"^```yaml\s*\n?", "", rule_text, flags=re.MULTILINE
+                    )
+                    cleaned_yaml = re.sub(
+                        r"\n?```$", "", cleaned_yaml, flags=re.MULTILINE
+                    )
 
-                    with open(fixed_rule_path, 'w') as f:
+                    fixed_rule_path = rule_path.replace(
+                        "/rules/", "/rules/fixed_rules/", 1
+                    )
+
+                    with open(fixed_rule_path, "w") as f:
                         f.write(cleaned_yaml)
-                    print(f'Fixed Semgrep rule saved to {fixed_rule_path}')
+                    print(f"Fixed Semgrep rule saved to {fixed_rule_path}")
+
 
 if __name__ == "__main__":
     # args = parse_args()
     # model=ChatQwen(model="qwen3-max-2025-09-23", temperature=0.1)
-    # print(generate_semgrep_rules(model, args.dataset)) 
+    # print(generate_semgrep_rules(model, args.dataset))
     # print(f'Total semgrep rules: {rule_num()}')
     # test_rule_negative()
     semgrep.SemgrepRunner.read_semgrep_output('./temp/semgrep/negative/')
-    # fix_rule('./rules/', ChatOllama(model="ollama-gemini-1-5b", temperature=0.1))
+    # fix_rule("./rules/", ChatOllama(model="gemma3:27b"))
