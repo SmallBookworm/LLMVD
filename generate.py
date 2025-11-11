@@ -147,7 +147,7 @@ def rule_num(path="./rules/"):
     return count
 
 
-def test_rule_positive():
+def test_rule_positive(rule_root="./rules/"):
     semgrep_runner = semgrep.SemgrepRunner()
     create_directory("./temp/semgrep/")
 
@@ -169,9 +169,10 @@ def test_rule_positive():
         else:
             print("error")
 
-        rule_path = f'./rules/{sample["cwe"][0]}/semgrep_rule_{sample["idx"]}.yaml'
+        rule_path = rule_root+ f'{sample["cwe"][0]}/semgrep_rule_{sample["idx"]}.yaml'
+        print(f'Testing rule: {rule_path}')
         if not os.path.exists(rule_path):
-            print(f'Rule not found for CWE {sample["cwe"][0]} idx {sample["idx"]}')
+            print(f'Rule not found for {sample["cwe"][0]} idx {sample["idx"]}')
             break
 
         result = semgrep_runner.run_rule(
@@ -247,14 +248,21 @@ def fix_rule(rules_path, model):
             if file.endswith(".yaml"):
                 idx=file.split("_")[-1].split(".")[0]
                 rule_path = os.path.join(root, file)
+                fixed_rule_path = rule_path.replace(
+                        "/rules/", "/rules/fixed_rules/", 1
+                    )
                 with open(rule_path, "r") as f:
                     rule_content = f.read()
+                # save test output for reference
+                create_directory(os.path.dirname(fixed_rule_path))
+                with open(fixed_rule_path, "w") as f:
+                    f.write(rule_content)
 
                 # only fix fail rules, which are "rule error" without results when semgrep test positive cases.
                 with open(f'./temp/semgrep/semgrep_output_{idx}.json', "r") as f:
                     test_output = f.read()
                 if test_output.strip() == "":
-                    print(f"Empty test output, skipping rule: {rule_path}")
+                    print('\033[31m' + f"Empty test output, skipping rule: {rule_path}" + '\033[0m')
                     continue
                 test_output_json = json.loads(test_output)
                 if test_output_json.get("results") or not test_output_json.get("errors"):
@@ -292,14 +300,10 @@ def fix_rule(rules_path, model):
                         r"\n?```$", "", cleaned_yaml, flags=re.MULTILINE
                     )
 
-                    fixed_rule_path = rule_path.replace(
-                        "/rules/", "/rules/fixed_rules/", 1
-                    )
-                    create_directory(os.path.dirname(fixed_rule_path))
+                    
                     with open(fixed_rule_path, "w") as f:
                         f.write(cleaned_yaml)
                     print(f"Fixed Semgrep rule saved to {fixed_rule_path}")
-                    break
 
 
 if __name__ == "__main__":
@@ -308,7 +312,7 @@ if __name__ == "__main__":
     # print(generate_semgrep_rules(model, args.dataset))
     # print(f'Total semgrep rules: {rule_num()}')
     # test_rule_negative()
-    # test_rule_positive()
+    test_rule_positive('./rules/')
     # semgrep.SemgrepRunner.read_semgrep_output('./temp/semgrep/negative/')
 
-    fix_rule("./rules/", ChatOllama(model="gemma3:27b"))
+    # fix_rule("./rules", ChatOllama(model="gemma3:27b"))
