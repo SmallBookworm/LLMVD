@@ -3,8 +3,6 @@ import os.path as osp
 import re
 import json
 
-from .misc import save_dataset_dict
-
 
 def load_json(json_path):
     with open(json_path, 'r') as f:

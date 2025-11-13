@@ -1,5 +1,6 @@
 from data_process.utils.loader import load_devign, load_primevul
 from getresdata_csv import print_metrics_from_csv
+from data_process.utils.misc import langchain_to_openai_messages
 
 import tools.semgrep as semgrep
 
@@ -20,6 +21,7 @@ import getpass
 import os
 import re
 import json
+import jsonlines
 import yaml
 
 os.environ["MODEL_PATH"] = "/home/peng/.cache/modelscope/hub/models/LLM-Research/"
@@ -52,34 +54,41 @@ def create_directory(directory):
         print(f"Directory '{directory}' already exists")
 
 
-# system_template = '''You are a senior security analyst specializing in static code analysis. Your task is to:
-# 1. Identify vulnerabilities from OWASP Top 10/CWE lists
-# 2. Classify severity (Critical/High/Medium/Low)
-# 3. Provide remediation guidance
-# 4. Highlight false positives'''
+#generate rule generate batch jsonl
+def genertate_rule_batch(data, batch_path="./semgrep_generate.jsonl", model="qwen3-max"):
+    prompt_template_rules = ChatPromptTemplate.from_messages(Semgrep_rule_prompt)
+    total = 0
+    jsonl_data=[]
+    for i in range(0, len(data), 2):
 
+        message_generate = prompt_template_rules.invoke(
+            {
+                "cwe": data[i].get("cwe", "N/A"),
+                "cve": data[i].get("cve", "N/A"),
+                "cve_desc": data[i].get("cve_desc", "N/A"),
+                "commit_message": data[i].get("commit_message", "N/A"),
+                "commit_url": data[i].get("commit_url", "N/A"),
+                "vul_code": data[i]["func"],
+                "fix_code": data[i + 1]["func"],
+            }
+        )
 
-system_template = "You are a code security expert who analyzes the given code to detect the security vulnerability."
-
-prompt_template = ChatPromptTemplate.from_messages(
-    [
-        ("system", system_template),
-        (
-            "user",
-            "Detect whether the following code contains vulnerabilities:\n\n{code}",
-        ),
-    ]
-)
-
-
-class VulResult(BaseModel):
-    """Result of vulnerability discovery."""
-
-    # reason: str = Field(description="The reason of the detection result.")
-    # vulnerability: str = Field(description="The type of vulnerability. (If the code is secure, give 'none' )")
-    label: Literal[0, 1] = Field(
-        description="Vulnerability status indicator, only 0 or 1 (0: secure, 1: vulnerable)"
-    )
+        json_data={
+            "custom_id":f"{data[i]['idx']}",
+            "method":"POST",
+            "url":"/v1/chat/completions",
+            "body":{
+                "model":model,
+                "messages":langchain_to_openai_messages(message_generate.to_messages())
+            }
+        }
+        jsonl_data.append(json_data)
+        
+        total += 1
+    print(f'Total semgrep generation samples: {total}')
+    with jsonlines.open(batch_path, mode='w') as writer:
+        for oneline in jsonl_data:
+            writer.write(oneline)
 
 
 def generate_semgrep_rules(model, dataset):
@@ -308,11 +317,13 @@ def fix_rule(rules_path, model):
 
 if __name__ == "__main__":
     # args = parse_args()
-    # model=ChatQwen(model="qwen3-max-2025-09-23", temperature=0.1)
+    # model=ChatQwen(model="qwen3-max", temperature=0.1)
     # print(generate_semgrep_rules(model, args.dataset))
     # print(f'Total semgrep rules: {rule_num()}')
     # test_rule_negative()
-    test_rule_positive('./rules/')
+    # test_rule_positive('./rules/')
     # semgrep.SemgrepRunner.read_semgrep_output('./temp/semgrep/negative/')
 
     # fix_rule("./rules", ChatOllama(model="gemma3:27b"))
+
+    genertate_rule_batch(load_primevul(), batch_path="./temp/semgrep_generate.jsonl")

@@ -1,3 +1,8 @@
+# files
+main.py: detect vulnerabilities by LLMs
+generate.py: generate,test and fix rules 
+train.py: slice data by CWE.
+
 # analysis tools
 joern semgrep
 

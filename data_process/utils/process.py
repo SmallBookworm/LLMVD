@@ -129,3 +129,18 @@ def sampling_by_pos_ratio(data, pos_ratio=0.5, shuffle=True):
         df_sorted = df.sort_values(by='index')
         new_data = df_sorted.to_dict(orient='records')
     return new_data
+
+
+def list_by_cwe(data):
+    cwe_dict = {}
+    for entry in data:
+        if len(entry['cwe']) == 0:
+            print('No CWE assigned!')
+        elif len(entry['cwe']) > 1:
+            print(entry['cwe'])
+
+        cwe = entry['cwe'][0]
+        if cwe not in cwe_dict.keys():
+            cwe_dict[cwe] = []
+        cwe_dict[cwe].append(entry)
+    return cwe_dict
