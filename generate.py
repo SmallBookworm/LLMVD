@@ -133,8 +133,6 @@ def generate_semgrep_rules(model, dataset):
 
     total = 0
     for i in range(0, len(data), 2):
-        if total > 200:
-            break
 
         message_generate = prompt_template_rules.invoke(
             {
@@ -198,8 +196,6 @@ def test_rule_positive(rule_root="./rules/"):
     p_error = 0
     for i in range(0, len(data), 2):
         sample = data[i]
-        if total > 200:
-            break
 
         filepath = f"./temp/temp_code.c"
         save_code(sample["func"], filepath)
@@ -244,8 +240,6 @@ def test_rule_negative():
     n_error = 0
     for i in range(1, len(data), 2):
         sample = data[i]
-        if total > 200:
-            break
 
         filepath = f"./temp/temp_code.c"
         save_code(sample["func"], filepath)
@@ -356,12 +350,13 @@ def fix_rule(model, rules_path='./rules/'):
 
 
 if __name__ == "__main__":
-    # args = parse_args()
-    # model=ChatQwen(model="qwen3-max", temperature=0.1)
-    # print(generate_semgrep_rules(model, args.dataset))
-    # print(f'Total semgrep rules: {rule_num()}')
+    args = parse_args()
+    model=ChatQwen(model="qwen3-max", temperature=0.1)
+    print(generate_semgrep_rules(model, args.dataset))
+    print(f'Total semgrep rules: {rule_num()}')
+    
     # test_rule_negative()
-    test_rule_positive('./rules_qwen-plus/fixed_rules/')
+    # test_rule_positive('./rules_qwen-plus/fixed_rules/')
     # semgrep.SemgrepRunner.read_semgrep_output('./temp/semgrep/negative/')
 
     # fix_rule(ChatOllama(model="gemma3:27b"), './rules_qwen-plus/')
