@@ -144,3 +144,23 @@ def list_by_cwe(data):
             cwe_dict[cwe] = []
         cwe_dict[cwe].append(entry)
     return cwe_dict
+
+def list_by_idx(data):
+    idx_dict = {}
+    for entry in data:
+        idx = entry['idx']
+        idx_dict[idx] = entry
+    return idx_dict
+
+def get_cwe_idx_dict(data):
+    cwe_index = {}
+    for entry in data:
+        if len(entry['cwe']) == 0:
+            print('No CWE assigned!')
+
+        cwe = entry['cwe'][0]
+        idx = entry['idx']
+        if cwe not in cwe_index.keys():
+            cwe_index[cwe] = []
+        cwe_index[cwe].append(idx)
+    return cwe_index

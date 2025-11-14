@@ -1,5 +1,6 @@
 from data_process.utils.loader import load_devign, load_primevul
 from getresdata_csv import print_metrics_from_csv
+from data_process.utils.process import list_by_idx
 from data_process.utils.misc import langchain_to_openai_messages
 
 import tools.semgrep as semgrep
@@ -54,11 +55,13 @@ def create_directory(directory):
         print(f"Directory '{directory}' already exists")
 
 
-#generate rule generate batch jsonl
-def genertate_rule_batch(data, batch_path="./semgrep_generate.jsonl", model="qwen3-max"):
+# generate rule generate batch jsonl
+def genertate_rule_batch(
+    data, batch_path="./semgrep_generate.jsonl", model="qwen3-max"
+):
     prompt_template_rules = ChatPromptTemplate.from_messages(Semgrep_rule_prompt)
     total = 0
-    jsonl_data=[]
+    jsonl_data = []
     for i in range(0, len(data), 2):
 
         message_generate = prompt_template_rules.invoke(
@@ -73,22 +76,50 @@ def genertate_rule_batch(data, batch_path="./semgrep_generate.jsonl", model="qwe
             }
         )
 
-        json_data={
-            "custom_id":f"{data[i]['idx']}",
-            "method":"POST",
-            "url":"/v1/chat/completions",
-            "body":{
-                "model":model,
-                "messages":langchain_to_openai_messages(message_generate.to_messages())
-            }
+        json_data = {
+            "custom_id": f"{data[i]['idx']}",
+            "method": "POST",
+            "url": "/v1/chat/completions",
+            "body": {
+                "model": model,
+                "messages": langchain_to_openai_messages(
+                    message_generate.to_messages()
+                ),
+            },
         }
         jsonl_data.append(json_data)
-        
+
         total += 1
-    print(f'Total semgrep generation samples: {total}')
-    with jsonlines.open(batch_path, mode='w') as writer:
+    print(f"Total semgrep generation samples: {total}")
+    with jsonlines.open(batch_path, mode="w") as writer:
         for oneline in jsonl_data:
             writer.write(oneline)
+
+
+# get batch semgrep rules
+def get_semgrep_rules_from_batch_response(
+    batch_response_path, raw_data, output_rules_path="./rules/"
+):
+    idx_list = list_by_idx(raw_data)
+    with jsonlines.open(batch_response_path, mode="r") as reader:
+        for obj in reader:
+            custom_id = int(obj.get("custom_id"))
+            body = obj.get("response").get("body")
+            choices = body.get("choices", [])
+            if not choices:
+                print(f"No choices found for id {custom_id}")
+                continue
+            rule_text = choices[0].get("message", {}).get("content", "")
+            # 使用正则表达式去掉开头的 ```yaml 和结尾的 ```
+            cleaned_yaml = re.sub(r"^```yaml\s*\n?", "", rule_text, flags=re.MULTILINE)
+            cleaned_yaml = re.sub(r"\n?```$", "", cleaned_yaml, flags=re.MULTILINE)
+
+            directory = f"{output_rules_path}/{idx_list[custom_id]['cwe'][0]}/"
+            create_directory(directory)
+            rule_path = f"{directory}/semgrep_rule_{custom_id}.yaml"
+            with open(rule_path, "w") as f:
+                f.write(cleaned_yaml)
+            print(f"Semgrep rule saved to {rule_path}")
 
 
 def generate_semgrep_rules(model, dataset):
@@ -178,8 +209,8 @@ def test_rule_positive(rule_root="./rules/"):
         else:
             print("error")
 
-        rule_path = rule_root+ f'{sample["cwe"][0]}/semgrep_rule_{sample["idx"]}.yaml'
-        print(f'Testing rule: {rule_path}')
+        rule_path = rule_root + f'{sample["cwe"][0]}/semgrep_rule_{sample["idx"]}.yaml'
+        print(f"Testing rule: {rule_path}")
         if not os.path.exists(rule_path):
             print(f'Rule not found for {sample["cwe"][0]} idx {sample["idx"]}')
             break
@@ -248,18 +279,19 @@ def test_rule_negative():
     )
 
 
-def fix_rule(rules_path, model):
-    create_directory(f"{rules_path}/fixed_rules/")
+def fix_rule(model, rules_path='./rules/'):
+    create_directory(f"{rules_path}fixed_rules/")
     prompt_template_fix = ChatPromptTemplate.from_messages(fix_rule_prompt)
 
     for root, dirs, files in os.walk(rules_path):
         for file in files:
             if file.endswith(".yaml"):
-                idx=file.split("_")[-1].split(".")[0]
+                idx = file.split("_")[-1].split(".")[0]
                 rule_path = os.path.join(root, file)
-                fixed_rule_path = rule_path.replace(
-                        "/rules/", "/rules/fixed_rules/", 1
-                    )
+                fixed_rule_path = rules_path+"fixed_rules/"+os.path.relpath(
+                    rule_path, rules_path
+                )
+
                 with open(rule_path, "r") as f:
                     rule_content = f.read()
                 # save test output for reference
@@ -268,16 +300,22 @@ def fix_rule(rules_path, model):
                     f.write(rule_content)
 
                 # only fix fail rules, which are "rule error" without results when semgrep test positive cases.
-                with open(f'./temp/semgrep/semgrep_output_{idx}.json', "r") as f:
+                with open(f"./temp/semgrep/semgrep_output_{idx}.json", "r") as f:
                     test_output = f.read()
                 if test_output.strip() == "":
-                    print('\033[31m' + f"Empty test output, skipping rule: {rule_path}" + '\033[0m')
+                    print(
+                        "\033[31m"
+                        + f"Empty test output, skipping rule: {rule_path}"
+                        + "\033[0m"
+                    )
                     continue
                 test_output_json = json.loads(test_output)
-                if test_output_json.get("results") or not test_output_json.get("errors"):
+                if test_output_json.get("results") or not test_output_json.get(
+                    "errors"
+                ):
                     print(f"Rule works fine, no need to fix: {rule_path}")
                     continue
-                
+
                 # read semgrep rule yaml
                 try:
                     rule_yaml = yaml.safe_load(rule_content)
@@ -293,10 +331,13 @@ def fix_rule(rules_path, model):
                             print(f"Removed fix: {res}")
                             print(f"file: {rule_path}")
 
-                
                 # feedback model. Is it better to remove spans in errors?
-                message_fix = prompt_template_fix.invoke({"semgrep_rule": rule_content, "test_output": {'errors': test_output_json.get("errors", [])}})
-
+                message_fix = prompt_template_fix.invoke(
+                    {
+                        "semgrep_rule": rule_content,
+                        "test_output": {"errors": test_output_json.get("errors", [])},
+                    }
+                )
 
                 response = model.invoke(message_fix)
                 if response:
@@ -309,7 +350,6 @@ def fix_rule(rules_path, model):
                         r"\n?```$", "", cleaned_yaml, flags=re.MULTILINE
                     )
 
-                    
                     with open(fixed_rule_path, "w") as f:
                         f.write(cleaned_yaml)
                     print(f"Fixed Semgrep rule saved to {fixed_rule_path}")
@@ -321,9 +361,14 @@ if __name__ == "__main__":
     # print(generate_semgrep_rules(model, args.dataset))
     # print(f'Total semgrep rules: {rule_num()}')
     # test_rule_negative()
-    # test_rule_positive('./rules/')
+    test_rule_positive('./rules_qwen-plus/fixed_rules/')
     # semgrep.SemgrepRunner.read_semgrep_output('./temp/semgrep/negative/')
 
-    # fix_rule("./rules", ChatOllama(model="gemma3:27b"))
+    # fix_rule(ChatOllama(model="gemma3:27b"), './rules_qwen-plus/')
 
-    genertate_rule_batch(load_primevul(), batch_path="./temp/semgrep_generate.jsonl")
+    # genertate_rule_batch(load_primevul(), batch_path="./temp/semgrep_generate.jsonl", model="qwen-plus")
+    # get_semgrep_rules_from_batch_response(
+    #     batch_response_path="./temp/gemgrep_200_result.jsonl",
+    #     raw_data=load_primevul(),
+    #     output_rules_path="./rules_qwen-plus/",
+    # )

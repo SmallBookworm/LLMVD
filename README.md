@@ -24,5 +24,10 @@ Recall: 0.6667
 FPR: 0.4000
 F1: 0.6667
 
+# test data
+try 201 rules:
 naive (qwen-max):       Total positive samples: 201, True Positives: 110, Run Errors: 63
 fixed rules (gemma3): Total positive samples: 201, True Positives: 119, Run Errors: 50
+
+native (qwen-plus): Total positive samples: 201, True Positives: 90, Run Errors: 44
+fixed rules (gemma3): Total positive samples: 201, True Positives: 93, Run Errors: 32
