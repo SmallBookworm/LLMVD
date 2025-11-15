@@ -63,7 +63,7 @@ def genertate_rule_batch(
     total = 0
     jsonl_data = []
     for i in range(0, len(data), 2):
-
+        
         message_generate = prompt_template_rules.invoke(
             {
                 "cwe": data[i].get("cwe", "N/A"),
@@ -117,12 +117,15 @@ def get_semgrep_rules_from_batch_response(
             directory = f"{output_rules_path}/{idx_list[custom_id]['cwe'][0]}/"
             create_directory(directory)
             rule_path = f"{directory}/semgrep_rule_{custom_id}.yaml"
+            if os.path.exists(rule_path):
+                print(f"Rule already exists for id {custom_id}, skipping.")
+                continue
             with open(rule_path, "w") as f:
                 f.write(cleaned_yaml)
             print(f"Semgrep rule saved to {rule_path}")
 
 
-def generate_semgrep_rules(model, dataset):
+def generate_semgrep_rules(model, dataset, start=0, end=None):
     prompt_template_rules = ChatPromptTemplate.from_messages(Semgrep_rule_prompt)
 
     if dataset == "primevul_train_paired":
@@ -133,6 +136,10 @@ def generate_semgrep_rules(model, dataset):
 
     total = 0
     for i in range(0, len(data), 2):
+        if i < start:
+            continue
+        if end and i >= end:
+            break
 
         message_generate = prompt_template_rules.invoke(
             {
@@ -348,12 +355,37 @@ def fix_rule(model, rules_path='./rules/'):
                         f.write(cleaned_yaml)
                     print(f"Fixed Semgrep rule saved to {fixed_rule_path}")
 
+def vaildate_rules(data, rules_path='./rules/'):
+
+    total = rule_num(rules_path)
+
+    generate_num = 0
+    for i in range(0, len(data), 2):
+        if generate_num >= total:
+            print("All rules validated.")
+            print(f'i: {i}')
+            break
+        sample = data[i]
+        cwe = sample["cwe"][0]
+        idx = sample["idx"]
+        rule_path = f"{rules_path}{cwe}/semgrep_rule_{idx}.yaml"
+        if not os.path.exists(rule_path):
+            print(f"Rule not found for CWE {cwe} idx {idx}")
+            continue
+        with open(rule_path, "r") as f:
+            rule_content = f.read()
+        if len(rule_content.strip()) > 6:
+            generate_num += 1
+        else:
+            print(f"Empty rule content for CWE {cwe} idx {idx}")
+    print(f"Total rules: {total}, Generated rules: {generate_num}")
+        
 
 if __name__ == "__main__":
-    args = parse_args()
-    model=ChatQwen(model="qwen3-max", temperature=0.1)
-    print(generate_semgrep_rules(model, args.dataset))
-    print(f'Total semgrep rules: {rule_num()}')
+    # args = parse_args()
+    # model=ChatQwen(model="qwen3-max", temperature=0.1)
+    # print(generate_semgrep_rules(model, args.dataset))
+    # print(f'Total semgrep rules: {rule_num()}')
     
     # test_rule_negative()
     # test_rule_positive('./rules_qwen-plus/fixed_rules/')
@@ -361,7 +393,7 @@ if __name__ == "__main__":
 
     # fix_rule(ChatOllama(model="gemma3:27b"), './rules_qwen-plus/')
 
-    # genertate_rule_batch(load_primevul(), batch_path="./temp/semgrep_generate.jsonl", model="qwen-plus")
+    genertate_rule_batch(load_primevul())
     # get_semgrep_rules_from_batch_response(
     #     batch_response_path="./temp/gemgrep_200_result.jsonl",
     #     raw_data=load_primevul(),
