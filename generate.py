@@ -63,7 +63,7 @@ def genertate_rule_batch(
     total = 0
     jsonl_data = []
     for i in range(0, len(data), 2):
-        
+
         message_generate = prompt_template_rules.invoke(
             {
                 "cwe": data[i].get("cwe", "N/A"),
@@ -198,6 +198,7 @@ def test_rule_positive(rule_root="./rules/"):
 
     data = load_primevul()
     total = 0
+    cwe_status = {}
     # positive code (vul)
     tp = 0
     p_error = 0
@@ -207,33 +208,44 @@ def test_rule_positive(rule_root="./rules/"):
         filepath = f"./temp/temp_code.c"
         save_code(sample["func"], filepath)
 
-        if sample["target"] == 1:
-            total += 1
-        else:
-            print("error")
+
 
         rule_path = rule_root + f'{sample["cwe"][0]}/semgrep_rule_{sample["idx"]}.yaml'
         print(f"Testing rule: {rule_path}")
         if not os.path.exists(rule_path):
             print(f'Rule not found for {sample["cwe"][0]} idx {sample["idx"]}')
             break
+        
+        if sample["target"] == 1:
+            total += 1
+        else:
+            print("error")
 
         result = semgrep_runner.run_rule(
             rule_path=rule_path,
             target_path=filepath,
             output_path=f'./temp/semgrep/semgrep_output_{sample["idx"]}.json',
         )
+
+        cwe_name = sample["cwe"][0]
+        if cwe_name not in cwe_status:
+            cwe_status[cwe_name] = {"total": 0, "true_positive": [], "p_error": []}
+        cwe_status[cwe_name]["total"] += 1
+
         if "result" in result:
             output = json.loads(result["result"].stdout)
             if output.get("results"):
                 tp += 1
+                cwe_status[cwe_name]["true_positive"].append(sample["idx"])
         else:
             # semgrep output stderr
             p_error += 1
+            cwe_status[cwe_name]["p_error"].append(sample["idx"])
 
     print(
         f"Total positive samples: {total}, True Positives: {tp}, Run Errors: {p_error}"
     )
+    return cwe_status
 
 
 def test_rule_negative():
@@ -280,7 +292,7 @@ def test_rule_negative():
     )
 
 
-def fix_rule(model, rules_path='./rules/'):
+def fix_rule(model, rules_path="./rules/"):
     create_directory(f"{rules_path}fixed_rules/")
     prompt_template_fix = ChatPromptTemplate.from_messages(fix_rule_prompt)
 
@@ -289,8 +301,8 @@ def fix_rule(model, rules_path='./rules/'):
             if file.endswith(".yaml"):
                 idx = file.split("_")[-1].split(".")[0]
                 rule_path = os.path.join(root, file)
-                fixed_rule_path = rules_path+"fixed_rules/"+os.path.relpath(
-                    rule_path, rules_path
+                fixed_rule_path = (
+                    rules_path + "fixed_rules/" + os.path.relpath(rule_path, rules_path)
                 )
 
                 with open(rule_path, "r") as f:
@@ -355,7 +367,8 @@ def fix_rule(model, rules_path='./rules/'):
                         f.write(cleaned_yaml)
                     print(f"Fixed Semgrep rule saved to {fixed_rule_path}")
 
-def vaildate_rules(data, rules_path='./rules/'):
+
+def vaildate_rules(data, rules_path="./rules/"):
 
     total = rule_num(rules_path)
 
@@ -363,7 +376,7 @@ def vaildate_rules(data, rules_path='./rules/'):
     for i in range(0, len(data), 2):
         if generate_num >= total:
             print("All rules validated.")
-            print(f'i: {i}')
+            print(f"i: {i}")
             break
         sample = data[i]
         cwe = sample["cwe"][0]
@@ -379,21 +392,33 @@ def vaildate_rules(data, rules_path='./rules/'):
         else:
             print(f"Empty rule content for CWE {cwe} idx {idx}")
     print(f"Total rules: {total}, Generated rules: {generate_num}")
-        
+
 
 if __name__ == "__main__":
     # args = parse_args()
     # model=ChatQwen(model="qwen3-max", temperature=0.1)
     # print(generate_semgrep_rules(model, args.dataset))
     # print(f'Total semgrep rules: {rule_num()}')
-    
+
     # test_rule_negative()
-    # test_rule_positive('./rules_qwen-plus/fixed_rules/')
+    cwe_status = test_rule_positive("./rules/")
+    with open('./cwe_status.json', 'w') as f:
+        json.dump(cwe_status, f, indent=4)
+    total=0
+    tp=0
+    p_error=0
+    for cwe in cwe_status:
+        total+=cwe_status[cwe]['total']
+        tp+=len(cwe_status[cwe]['true_positive'])
+        p_error+=len(cwe_status[cwe]['p_error'])
+    print(f'Total positive samples: {total}, True Positives: {tp}, Run Errors: {p_error}')
+    for cwe in cwe_status:
+        print(f"CWE-{cwe}: Total: {cwe_status[cwe]['total']}, True Positives: {len(cwe_status[cwe]['true_positive'])}, Run Errors: {len(cwe_status[cwe]['p_error'])}")
     # semgrep.SemgrepRunner.read_semgrep_output('./temp/semgrep/negative/')
 
     # fix_rule(ChatOllama(model="gemma3:27b"), './rules_qwen-plus/')
 
-    genertate_rule_batch(load_primevul())
+    # genertate_rule_batch(load_primevul())
     # get_semgrep_rules_from_batch_response(
     #     batch_response_path="./temp/gemgrep_200_result.jsonl",
     #     raw_data=load_primevul(),
