@@ -393,14 +393,7 @@ def vaildate_rules(data, rules_path="./rules/"):
             print(f"Empty rule content for CWE {cwe} idx {idx}")
     print(f"Total rules: {total}, Generated rules: {generate_num}")
 
-
-if __name__ == "__main__":
-    # args = parse_args()
-    # model=ChatQwen(model="qwen3-max", temperature=0.1)
-    # print(generate_semgrep_rules(model, args.dataset))
-    # print(f'Total semgrep rules: {rule_num()}')
-
-    # test_rule_negative()
+def save_cwe_status():
     cwe_status = test_rule_positive("./rules/")
     with open('./cwe_status.json', 'w') as f:
         json.dump(cwe_status, f, indent=4)
@@ -414,13 +407,23 @@ if __name__ == "__main__":
     print(f'Total positive samples: {total}, True Positives: {tp}, Run Errors: {p_error}')
     for cwe in cwe_status:
         print(f"CWE-{cwe}: Total: {cwe_status[cwe]['total']}, True Positives: {len(cwe_status[cwe]['true_positive'])}, Run Errors: {len(cwe_status[cwe]['p_error'])}")
+
+if __name__ == "__main__":
+    # args = parse_args()
+    # model=ChatQwen(model="qwen3-max", temperature=0.1)
+    # print(generate_semgrep_rules(model, args.dataset))
+    print(f'Total semgrep rules: {rule_num()}')
+
+    # test_rule_negative()
+    # save_cwe_status()
+
     # semgrep.SemgrepRunner.read_semgrep_output('./temp/semgrep/negative/')
 
     # fix_rule(ChatOllama(model="gemma3:27b"), './rules_qwen-plus/')
 
     # genertate_rule_batch(load_primevul())
-    # get_semgrep_rules_from_batch_response(
-    #     batch_response_path="./temp/gemgrep_200_result.jsonl",
-    #     raw_data=load_primevul(),
-    #     output_rules_path="./rules_qwen-plus/",
-    # )
+    get_semgrep_rules_from_batch_response(
+        batch_response_path="./temp/semgrep_1583_result.jsonl",
+        raw_data=load_primevul(),
+        output_rules_path="./rules/",
+    )
