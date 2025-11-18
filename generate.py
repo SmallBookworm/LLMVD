@@ -194,7 +194,7 @@ def rule_num(path="./rules/"):
 
 def test_rule_positive(rule_root="./rules/"):
     semgrep_runner = semgrep.SemgrepRunner()
-    create_directory("./temp/semgrep/")
+    create_directory("./temp/semgrep/positive/")
 
     data = load_primevul()
     total = 0
@@ -208,14 +208,12 @@ def test_rule_positive(rule_root="./rules/"):
         filepath = f"./temp/temp_code.c"
         save_code(sample["func"], filepath)
 
-
-
         rule_path = rule_root + f'{sample["cwe"][0]}/semgrep_rule_{sample["idx"]}.yaml'
         print(f"Testing rule: {rule_path}")
         if not os.path.exists(rule_path):
             print(f'Rule not found for {sample["cwe"][0]} idx {sample["idx"]}')
             break
-        
+
         if sample["target"] == 1:
             total += 1
         else:
@@ -224,7 +222,7 @@ def test_rule_positive(rule_root="./rules/"):
         result = semgrep_runner.run_rule(
             rule_path=rule_path,
             target_path=filepath,
-            output_path=f'./temp/semgrep/semgrep_output_{sample["idx"]}.json',
+            output_path=f'./temp/semgrep/positive/semgrep_output_{sample["idx"]}.json',
         )
 
         cwe_name = sample["cwe"][0]
@@ -291,6 +289,83 @@ def test_rule_negative():
         f"Total negative samples: {total}, True Negatives: {tn}, Run Errors: {n_error}"
     )
 
+
+def test_rule(rule_path, dataset, output_path="./temp/semgrep/"):
+    semgrep_runner = semgrep.SemgrepRunner()
+    create_directory(output_path)
+
+    filepath = f"./temp/temp_code.c"
+    total = 0
+    # negative code (non-vul)
+    tn = 0
+    # positive
+    tp = 0
+    n_error = 0
+    for sample in dataset:
+        if total >= 100:
+            break
+        save_code(sample["func"], filepath)
+
+        result = semgrep_runner.run_rule(
+            rule_path=rule_path,
+            target_path=filepath,
+            output_path=f'{output_path}semgrep_output_{sample["idx"]}.json',
+        )
+        total += 1
+        if "result" in result:
+            output = json.loads(result["result"].stdout)
+            if sample["target"] == 0:
+                if not output.get("results"):
+                    tn += 1
+            else:
+                if output.get("results"):
+                    tp += 1
+        else:
+            # semgrep output stderr
+            n_error += 1
+    print(f"Total samples: {total}, True Positives: {tp}, True Negatives: {tn}, Run Errors: {n_error}")
+    return result
+
+def test_rules_batch(rule_path, dataset):
+    semgrep_runner = semgrep.SemgrepRunner()
+    create_directory("./temp/semgrep/test_rules_batch/")
+
+    filepath = "./temp/temp_code/"
+    create_directory(filepath)
+
+    total = 0
+    idx_dataset={}
+    for sample in dataset:
+        total+=1
+        cwe = sample["cwe"][0]
+        idx = sample["idx"]
+        code_path = f"{filepath}code_{cwe}_{idx}.c"
+        save_code(sample["func"], code_path)
+        idx_dataset[f"{idx}"] = sample
+
+    cwe_status={}
+    for root, dirs, files in os.walk(rule_path):
+        for dir in dirs:
+            cwe_status[dir] = { "false_positive":[], "true_positive":[], "positive_path":(), "error":()}
+            result = semgrep_runner.run_rule(
+                rule_path=f"{rule_path}{dir}/",
+                target_path=filepath,
+                output_path=f'./temp/semgrep/test_rules_batch/semgrep_output_{dir}.json',
+            )
+            if 'result' in result:
+                output = json.loads(result["result"].stdout)
+                for res in output.get("results", []):
+                    code_path = res.get("path", '')
+                    cwe_status[dir]["positive_path"] += (code_path)
+                    idx= code_path.split("_")[-1].split(".")[0]
+                    if idx_dataset.get(idx).get("target") == 1:
+                        cwe_status[dir]["true_positive"].append(int(idx))
+                    else:
+                        cwe_status[dir]["false_positive"].append(int(idx))
+            else:
+                print(f"Semgrep run error for CWE-{dir}")
+
+    return cwe_status
 
 def fix_rule(model, rules_path="./rules/"):
     create_directory(f"{rules_path}fixed_rules/")
@@ -393,37 +468,80 @@ def vaildate_rules(data, rules_path="./rules/"):
             print(f"Empty rule content for CWE {cwe} idx {idx}")
     print(f"Total rules: {total}, Generated rules: {generate_num}")
 
-def save_cwe_status():
-    cwe_status = test_rule_positive("./rules/")
-    with open('./cwe_status.json', 'w') as f:
-        json.dump(cwe_status, f, indent=4)
-    total=0
-    tp=0
-    p_error=0
+
+def save_cwe_status(cwe_status={}):
+    if not cwe_status:
+        cwe_status = test_rule_positive("./rules/")
+        with open("./cwe_status.json", "w") as f:
+            json.dump(cwe_status, f, indent=4)
+    total = 0
+    tp = 0
+    p_error = 0
     for cwe in cwe_status:
-        total+=cwe_status[cwe]['total']
-        tp+=len(cwe_status[cwe]['true_positive'])
-        p_error+=len(cwe_status[cwe]['p_error'])
-    print(f'Total positive samples: {total}, True Positives: {tp}, Run Errors: {p_error}')
+        if cwe_status[cwe]["total"] < 50:
+            continue
+        total += cwe_status[cwe]["total"]
+        tp += len(cwe_status[cwe]["true_positive"])
+        p_error += len(cwe_status[cwe]["p_error"])
+    print(
+        f"Total positive samples: {total}, True Positives: {tp}, Run Errors: {p_error}"
+    )
     for cwe in cwe_status:
-        print(f"CWE-{cwe}: Total: {cwe_status[cwe]['total']}, True Positives: {len(cwe_status[cwe]['true_positive'])}, Run Errors: {len(cwe_status[cwe]['p_error'])}")
+        if cwe_status[cwe]["total"] < 50:
+            continue
+        print(
+            f"CWE-{cwe}: Total: {cwe_status[cwe]['total']}, True Positives: {len(cwe_status[cwe]['true_positive'])}, Run Errors: {len(cwe_status[cwe]['p_error'])}"
+        )
+
+def move_rules_bystatus(cwe_status, rules_path="./rules/", target_path="./rules_selected/"):
+    create_directory(target_path)
+    for cwe in cwe_status:
+        source_dir = os.path.join(rules_path, cwe)
+        dest_dir = os.path.join(target_path, cwe)
+        create_directory(dest_dir)
+        for file in os.listdir(source_dir):
+            idx=file.split("_")[-1].split(".")[0]
+            if file.endswith(".yaml") and (int(idx) in cwe_status[cwe]["true_positive"]):
+                source_file = os.path.join(source_dir, file)
+                dest_file = os.path.join(dest_dir, file)
+                with open(source_file, "r") as f_src:
+                    content = f_src.read()
+                with open(dest_file, "w") as f_dest:
+                    f_dest.write(content)
+        print(f"Moved rules for CWE-{cwe} to {dest_dir}")
 
 if __name__ == "__main__":
     # args = parse_args()
     # model=ChatQwen(model="qwen3-max", temperature=0.1)
     # print(generate_semgrep_rules(model, args.dataset))
-    print(f'Total semgrep rules: {rule_num()}')
+    # print(f"Total semgrep rules: {rule_num(path='./rules_selected/')}")
 
     # test_rule_negative()
-    # save_cwe_status()
+    # with open("./cwe_status.json", "r") as f:
+    #     cwe_status = json.load(f)
+    # save_cwe_status(cwe_status)
+
+    # move_rules_bystatus(
+    #     cwe_status=json.load(open("./cwe_status.json", "r")),
+    #     rules_path="./rules/",
+    #     target_path="./rules_selected/"
+    # )
+    test_rules_batch(
+        rule_path="./rules_selected/",
+        dataset=load_primevul('./data/primevul/primevul_test_paired.jsonl')
+    )
+    # test_rule(
+    #     rule_path="./rules_selected/",
+    #     dataset=load_primevul()
+    # )
 
     # semgrep.SemgrepRunner.read_semgrep_output('./temp/semgrep/negative/')
 
     # fix_rule(ChatOllama(model="gemma3:27b"), './rules_qwen-plus/')
 
     # genertate_rule_batch(load_primevul())
-    get_semgrep_rules_from_batch_response(
-        batch_response_path="./temp/semgrep_1583_result.jsonl",
-        raw_data=load_primevul(),
-        output_rules_path="./rules/",
-    )
+    # get_semgrep_rules_from_batch_response(
+    #     batch_response_path="./temp/semgrep_1583_result.jsonl",
+    #     raw_data=load_primevul(),
+    #     output_rules_path="./rules/",
+    # )

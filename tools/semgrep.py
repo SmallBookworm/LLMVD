@@ -38,6 +38,7 @@ class SemgrepRunner:
             "--config=" + os.path.abspath(rule_path),
             "--json",
             "--json-output=" + os.path.abspath(output_path),
+            "--no-git-ignore"
         ]
 
         try:
