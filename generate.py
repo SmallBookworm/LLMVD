@@ -329,6 +329,7 @@ def test_rule(rule_path, dataset, output_path="./temp/semgrep/"):
     return result
 
 
+# test dataset with all rules, which divide by cwe
 def test_rules_batch(rule_path, dataset, cvs_name="semgrep_primevul.cvs"):
     semgrep_runner = semgrep.SemgrepRunner()
     create_directory("./temp/semgrep/test_rules_batch/")
@@ -347,44 +348,43 @@ def test_rules_batch(rule_path, dataset, cvs_name="semgrep_primevul.cvs"):
         save_code(sample["func"], code_path)
         if idx_dataset.get(f"{idx}"):
             print(f"same sample:{idx}")
-            print(str(idx_dataset.get(f"{idx}"))==str(sample))
+            print(str(idx_dataset.get(f"{idx}")) == str(sample))
         else:
             idx_dataset[f"{idx}"] = sample
-
 
     cwe_rules = {}
     top_level_dirs = next(os.walk(rule_path))[1]
     for cwe_dir in top_level_dirs:
-            print(cwe_dir)
-            cwe_rules[cwe_dir] = {
-                "false_positive": [],
-                "true_positive": [],
-                "positive_path": set(),
-                "result": {},
-                "error": set(),
-            }
-            result = semgrep_runner.run_rule(
-                rule_path=f"{rule_path}{cwe_dir}/",
-                target_path=filepath,
-                output_path=f"./temp/semgrep/test_rules_batch/semgrep_output_{cwe_dir}.json",
-            )
-            if "result" in result:
-                output = json.loads(result["result"].stdout)
-                for res in output.get("results", []):
-                    code_path = res.get("path", "")
-                    cwe_rules[cwe_dir]["positive_path"].add(code_path)
-                    idx = code_path.split("_")[-1].split(".")[0]
-                    cwe_rules[cwe_dir]["result"][idx] = res
-                    if idx_dataset.get(idx).get("target") == 1:
-                        cwe_rules[cwe_dir]["true_positive"].append(int(idx))
-                    else:
-                        cwe_rules[cwe_dir]["false_positive"].append(int(idx))
-            else:
-                print(f"Semgrep run error for {cwe_dir}")
+        print(cwe_dir)
+        cwe_rules[cwe_dir] = {
+            "false_positive": [],
+            "true_positive": [],
+            "positive_path": set(),
+            "result": {},
+            "error": set(),
+        }
+        result = semgrep_runner.run_rule(
+            rule_path=f"{rule_path}{cwe_dir}/",
+            target_path=filepath,
+            output_path=f"./temp/semgrep/test_rules_batch/semgrep_output_{cwe_dir}.json",
+        )
+        if "result" in result:
+            output = json.loads(result["result"].stdout)
+            for res in output.get("results", []):
+                code_path = res.get("path", "")
+                cwe_rules[cwe_dir]["positive_path"].add(code_path)
+                idx = code_path.split("_")[-1].split(".")[0]
+                cwe_rules[cwe_dir]["result"][idx] = res
+                if idx_dataset.get(idx).get("target") == 1:
+                    cwe_rules[cwe_dir]["true_positive"].append(int(idx))
+                else:
+                    cwe_rules[cwe_dir]["false_positive"].append(int(idx))
+        else:
+            print(f"Semgrep run error for {cwe_dir}")
 
     fp = set()
     tp = set()
-    path= set()
+    path = set()
     for cwe in cwe_rules:
         tp.update(cwe_rules[cwe]["true_positive"])
         fp.update(cwe_rules[cwe]["false_positive"])
@@ -399,12 +399,133 @@ def test_rules_batch(rule_path, dataset, cvs_name="semgrep_primevul.cvs"):
         cwe = sample["cwe"][0]
         prediction = 1 if (idx in tp or idx in fp) else 0
         # attention: when a rule detect a vul for a sample,  sample's cwe can be different from rule cwe
+        res={}
         if cwe_rules.get(cwe):
             res = cwe_rules[cwe]["result"].get(str(idx), {})
         temp_df = pd.DataFrame(
             {
                 "Idx": idx,
                 "CWE": cwe,
+                "Code": [sample["func"]],
+                "Label": [sample["target"]],
+                "Prediction": [prediction],
+                "Response": [str(res)],
+            }
+        )
+        temp_df.to_csv(csvfile, index=False, mode="w" if i == 0 else "a", header=i == 0)
+    print_metrics_from_csv(csvfile)
+
+    return cwe_rules
+
+
+# only use corresponding rules to test cwe samples
+def test_cwe_rules(rule_path, dataset, cvs_name="semgrep_cwe_rules_primevul.cvs"):
+    semgrep_runner = semgrep.SemgrepRunner()
+    create_directory("./temp/semgrep/test_cwe_rules/")
+
+    csvfile = f"./result/{cvs_name}"
+
+    # save code
+    cwe_to_samples = {}
+    filepath_base = "./temp/temp_cwe_code/"
+    create_directory(filepath_base)
+
+    for sample in dataset:
+        cwe = sample["cwe"][0]
+        if cwe not in cwe_to_samples:
+            cwe_to_samples[cwe] = []
+        cwe_to_samples[cwe].append(sample)
+
+    cwe_filepaths = {}  # 记录每个 CWE 对应的代码目录
+    for cwe, samples in cwe_to_samples.items():
+        cwe_dir = os.path.join(filepath_base, cwe)
+        create_directory(cwe_dir)
+        cwe_filepaths[cwe] = cwe_dir
+        for sample in samples:
+            idx = sample["idx"]
+            code_path = os.path.join(cwe_dir, f"code_{cwe}_{idx}.c")
+            save_code(sample["func"], code_path)
+
+    idx_dataset = {str(sample["idx"]): sample for sample in dataset}
+
+    cwe_rules = {}
+    top_level_dirs = next(os.walk(rule_path))[1]
+
+    for cwe_dir in top_level_dirs:
+        print(cwe_dir)
+        # 只处理 dataset 中实际出现的 CWE（可选）
+        # if cwe_dir not in cwe_to_samples:
+        #     continue
+
+        cwe_rules[cwe_dir] = {
+            "false_positive": [],
+            "true_positive": [],
+            "positive_path": set(),
+            "result": {},
+            "error": set(),
+        }
+
+        # 获取该 CWE 对应的样本代码目录
+        target_path = cwe_filepaths.get(cwe_dir)
+        if target_path is None or not os.path.exists(target_path):
+            print(f"No samples for {cwe_dir}, skipping.")
+            continue
+
+        result = semgrep_runner.run_rule(
+            rule_path=os.path.join(rule_path, cwe_dir),
+            target_path=target_path,  # ← 只扫描这个 CWE 的样本
+            output_path=f"./temp/semgrep/test_cwe_rules/semgrep_output_{cwe_dir}.json",
+        )
+
+        if "result" in result:
+            output = json.loads(result["result"].stdout)
+            for res in output.get("results", []):
+                code_path = res.get("path", "")
+                cwe_rules[cwe_dir]["positive_path"].add(code_path)
+                # 安全解析 idx：从文件名提取
+                filename = os.path.basename(code_path)
+                # 假设格式: code_CWE123_456.c → split by '_'
+                parts = filename.split("_")
+                if len(parts) < 3:
+                    print(f"Warning: unexpected filename {filename}")
+                    continue
+                idx = parts[-1].split(".")[0]  # '456.c' -> '456'
+                cwe_rules[cwe_dir]["result"][idx] = res
+                sample = idx_dataset.get(idx)
+                if sample is None:
+                    print(f"Warning: idx {idx} not found in dataset")
+                    continue
+                if sample["target"] == 1:
+                    cwe_rules[cwe_dir]["true_positive"].append(idx)  # ← 保持 str 类型！
+                else:
+                    cwe_rules[cwe_dir]["false_positive"].append(idx)
+        else:
+            print(f"Semgrep run error for {cwe_dir}")
+
+    fp = set()
+    tp = set()
+    path = set()
+    for cwe in cwe_rules:
+        tp.update(cwe_rules[cwe]["true_positive"])  # 已是 str
+        fp.update(cwe_rules[cwe]["false_positive"])  # 已是 str
+        path.update(cwe_rules[cwe]["positive_path"])
+    print(
+        f"Total:{len(dataset)}, true_positive:{len(tp)},false_positive:{len(fp)}, Precision:{len(tp)/(len(tp)+len(fp))}"
+    )
+
+    # There are repeated samples.
+    for i, sample in enumerate(dataset):
+        idx = str(sample["idx"])
+        cwe = sample["cwe"][0]
+        prediction = 1 if (idx in tp or idx in fp) else 0
+        # attention: when a rule detect a vul for a sample,  sample's cwe can be different from rule cwe
+        res={}
+        if cwe_rules.get(cwe):
+            res = cwe_rules[cwe]["result"].get(idx, {})
+        temp_df = pd.DataFrame(
+            {
+                "Idx": [int(idx)],
+                "CWE": [cwe],
                 "Code": [sample["func"]],
                 "Label": [sample["target"]],
                 "Prediction": [prediction],
@@ -582,10 +703,15 @@ if __name__ == "__main__":
     #     rules_path="./rules/",
     #     target_path="./rules_selected/"
     # )
-    test_rules_batch(
-        rule_path="./rules_selected/",
-        dataset=load_primevul("./data/primevul/primevul_test_paired.jsonl"),
-    )
+    # test_rules_batch(
+    #     rule_path="./rules_selected/",
+    #     dataset=load_primevul("./data/primevul/primevul_test_paired.jsonl"),
+    # )
+    # test_cwe_rules(
+    #     rule_path="./rules_selected/",
+    #     dataset=load_primevul("./data/primevul/primevul_test_paired.jsonl"),
+    # )
+    print_metrics_from_csv('./result/semgrep_primevul.cvs')
     # test_rule(
     #     rule_path="./rules_selected/",
     #     dataset=load_primevul()
