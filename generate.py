@@ -323,49 +323,99 @@ def test_rule(rule_path, dataset, output_path="./temp/semgrep/"):
         else:
             # semgrep output stderr
             n_error += 1
-    print(f"Total samples: {total}, True Positives: {tp}, True Negatives: {tn}, Run Errors: {n_error}")
+    print(
+        f"Total samples: {total}, True Positives: {tp}, True Negatives: {tn}, Run Errors: {n_error}"
+    )
     return result
 
-def test_rules_batch(rule_path, dataset):
+
+def test_rules_batch(rule_path, dataset, cvs_name="semgrep_primevul.cvs"):
     semgrep_runner = semgrep.SemgrepRunner()
     create_directory("./temp/semgrep/test_rules_batch/")
 
+    csvfile = f"./result/{cvs_name}"
     filepath = "./temp/temp_code/"
     create_directory(filepath)
 
     total = 0
-    idx_dataset={}
+    idx_dataset = {}
     for sample in dataset:
-        total+=1
+        total += 1
         cwe = sample["cwe"][0]
         idx = sample["idx"]
         code_path = f"{filepath}code_{cwe}_{idx}.c"
         save_code(sample["func"], code_path)
-        idx_dataset[f"{idx}"] = sample
+        if idx_dataset.get(f"{idx}"):
+            print(f"same sample:{idx}")
+            print(str(idx_dataset.get(f"{idx}"))==str(sample))
+        else:
+            idx_dataset[f"{idx}"] = sample
 
-    cwe_status={}
-    for root, dirs, files in os.walk(rule_path):
-        for dir in dirs:
-            cwe_status[dir] = { "false_positive":[], "true_positive":[], "positive_path":(), "error":()}
+
+    cwe_rules = {}
+    top_level_dirs = next(os.walk(rule_path))[1]
+    for cwe_dir in top_level_dirs:
+            print(cwe_dir)
+            cwe_rules[cwe_dir] = {
+                "false_positive": [],
+                "true_positive": [],
+                "positive_path": set(),
+                "result": {},
+                "error": set(),
+            }
             result = semgrep_runner.run_rule(
-                rule_path=f"{rule_path}{dir}/",
+                rule_path=f"{rule_path}{cwe_dir}/",
                 target_path=filepath,
-                output_path=f'./temp/semgrep/test_rules_batch/semgrep_output_{dir}.json',
+                output_path=f"./temp/semgrep/test_rules_batch/semgrep_output_{cwe_dir}.json",
             )
-            if 'result' in result:
+            if "result" in result:
                 output = json.loads(result["result"].stdout)
                 for res in output.get("results", []):
-                    code_path = res.get("path", '')
-                    cwe_status[dir]["positive_path"] += (code_path)
-                    idx= code_path.split("_")[-1].split(".")[0]
+                    code_path = res.get("path", "")
+                    cwe_rules[cwe_dir]["positive_path"].add(code_path)
+                    idx = code_path.split("_")[-1].split(".")[0]
+                    cwe_rules[cwe_dir]["result"][idx] = res
                     if idx_dataset.get(idx).get("target") == 1:
-                        cwe_status[dir]["true_positive"].append(int(idx))
+                        cwe_rules[cwe_dir]["true_positive"].append(int(idx))
                     else:
-                        cwe_status[dir]["false_positive"].append(int(idx))
+                        cwe_rules[cwe_dir]["false_positive"].append(int(idx))
             else:
-                print(f"Semgrep run error for CWE-{dir}")
+                print(f"Semgrep run error for {cwe_dir}")
 
-    return cwe_status
+    fp = set()
+    tp = set()
+    path= set()
+    for cwe in cwe_rules:
+        tp.update(cwe_rules[cwe]["true_positive"])
+        fp.update(cwe_rules[cwe]["false_positive"])
+        path.update(cwe_rules[cwe]["positive_path"])
+    print(
+        f"Total:{total}, true_positive:{len(tp)},false_positive:{len(fp)}, Precision:{len(tp)/(len(tp)+len(fp))}"
+    )
+
+    # There are repeated samples.
+    for i, sample in enumerate(dataset):
+        idx = sample["idx"]
+        cwe = sample["cwe"][0]
+        prediction = 1 if (idx in tp or idx in fp) else 0
+        # attention: when a rule detect a vul for a sample,  sample's cwe can be different from rule cwe
+        if cwe_rules.get(cwe):
+            res = cwe_rules[cwe]["result"].get(str(idx), {})
+        temp_df = pd.DataFrame(
+            {
+                "Idx": idx,
+                "CWE": cwe,
+                "Code": [sample["func"]],
+                "Label": [sample["target"]],
+                "Prediction": [prediction],
+                "Response": [str(res)],
+            }
+        )
+        temp_df.to_csv(csvfile, index=False, mode="w" if i == 0 else "a", header=i == 0)
+    print_metrics_from_csv(csvfile)
+
+    return cwe_rules
+
 
 def fix_rule(model, rules_path="./rules/"):
     create_directory(f"{rules_path}fixed_rules/")
@@ -493,15 +543,20 @@ def save_cwe_status(cwe_status={}):
             f"CWE-{cwe}: Total: {cwe_status[cwe]['total']}, True Positives: {len(cwe_status[cwe]['true_positive'])}, Run Errors: {len(cwe_status[cwe]['p_error'])}"
         )
 
-def move_rules_bystatus(cwe_status, rules_path="./rules/", target_path="./rules_selected/"):
+
+def move_rules_bystatus(
+    cwe_status, rules_path="./rules/", target_path="./rules_selected/"
+):
     create_directory(target_path)
     for cwe in cwe_status:
         source_dir = os.path.join(rules_path, cwe)
         dest_dir = os.path.join(target_path, cwe)
         create_directory(dest_dir)
         for file in os.listdir(source_dir):
-            idx=file.split("_")[-1].split(".")[0]
-            if file.endswith(".yaml") and (int(idx) in cwe_status[cwe]["true_positive"]):
+            idx = file.split("_")[-1].split(".")[0]
+            if file.endswith(".yaml") and (
+                int(idx) in cwe_status[cwe]["true_positive"]
+            ):
                 source_file = os.path.join(source_dir, file)
                 dest_file = os.path.join(dest_dir, file)
                 with open(source_file, "r") as f_src:
@@ -509,6 +564,7 @@ def move_rules_bystatus(cwe_status, rules_path="./rules/", target_path="./rules_
                 with open(dest_file, "w") as f_dest:
                     f_dest.write(content)
         print(f"Moved rules for CWE-{cwe} to {dest_dir}")
+
 
 if __name__ == "__main__":
     # args = parse_args()
@@ -528,7 +584,7 @@ if __name__ == "__main__":
     # )
     test_rules_batch(
         rule_path="./rules_selected/",
-        dataset=load_primevul('./data/primevul/primevul_test_paired.jsonl')
+        dataset=load_primevul("./data/primevul/primevul_test_paired.jsonl"),
     )
     # test_rule(
     #     rule_path="./rules_selected/",
