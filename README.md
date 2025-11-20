@@ -1,3 +1,8 @@
+
+# workflow
+generate:
+generate_semgrep_rules | genertate_rule_batch -> (get_semgrep_rules_from_batch_response) -> vaildate_rules -> fix_rule -> save_cwe_status (include test_rule_positive) -> move_rules_bystatus
+-> test_rules_batch | test_cwe_rules -> print_metrics_from_csv
 # files
 main.py: detect vulnerabilities by LLMs
 generate.py: generate,test and fix rules 
@@ -19,11 +24,23 @@ default model: .venv/bin/python main.py --dataset devign
 generate rules: python generate.py --dataset primevul_train_paired
 
 # metrics
-Accuracy: 0.6364
-Precision: 0.6667
-Recall: 0.6667
-FPR: 0.4000
-F1: 0.6667
+primevul:
+semgrep test all:
+Length: 870
+Accuracy: 0.4989
+Precision: 0.4994
+Recall: 0.9310
+FPR: 0.9333         
+F1: 0.6501
+semgrep test by cwe rules:
+Length: 870
+Accuracy: 0.5011
+Precision: 0.5040
+Recall: 0.1448
+FPR: 0.1425
+F1: 0.2250
+
+
 
 # test data
 try 201 rules:
