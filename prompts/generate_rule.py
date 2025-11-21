@@ -5,9 +5,10 @@ Output ONLY the Semgrep rule in YAML format.
 Guidelines:
 - Focus on the key difference between vulnerable and fixed code.
 - Do not create autofix rules, such as `fix` and `fix-regex`.
-- Use `pattern` or `pattern-either` with minimal, precise code snippets.
+- Use `pattern` or `pattern-either` with precise code snippets.
 - Include `message`, `severity`, and `languages: [c]`.
 - Avoid matching entire functions; match only the risky expression or condition.
+- Prefer `pattern-not` or `pattern-not-inside` to exclude safe wrappers or test code.
 
 Vulnerability Details:
 - CWE: {cwe}
