@@ -24,6 +24,8 @@ import re
 import json
 import jsonlines
 import yaml
+from pathlib import Path
+
 
 os.environ["MODEL_PATH"] = "/home/peng/.cache/modelscope/hub/models/LLM-Research/"
 
@@ -246,12 +248,13 @@ def test_rule_positive(rule_root="./rules/"):
     return cwe_status
 
 
-def test_rule_negative():
+def test_rule_negative(rule_root="./rules/"):
     semgrep_runner = semgrep.SemgrepRunner()
     create_directory("./temp/semgrep/negative/")
 
     data = load_primevul()
     total = 0
+    cwe_status={}
     # negative code (non-vul)
     tn = 0
     n_error = 0
@@ -261,35 +264,45 @@ def test_rule_negative():
         filepath = f"./temp/temp_code.c"
         save_code(sample["func"], filepath)
 
+        
+        cwe = data[i - 1]["cwe"][0]
+        idx = data[i - 1]["idx"]
+        rule_path = rule_root + f"{cwe}/semgrep_rule_{idx}.yaml"
+        if not os.path.exists(rule_path):
+            print(f"Rule not found for CWE {cwe} idx {idx}")
+            continue
+        
         if sample["target"] == 0:
             total += 1
         else:
             print("error")
-        cwe = data[i - 1]["cwe"][0]
-        idx = data[i - 1]["idx"]
-        rule_path = f"./rules/{cwe}/semgrep_rule_{idx}.yaml"
-        if not os.path.exists(rule_path):
-            print(f"Rule not found for CWE {cwe} idx {idx}")
-            break
-
+        
         result = semgrep_runner.run_rule(
             rule_path=rule_path,
             target_path=filepath,
             output_path=f'./temp/semgrep/negative/semgrep_output_{sample["idx"]}_{idx}.json',
         )
+
+        if cwe not in cwe_status:
+            cwe_status[cwe] = {"total": 0, "true_negative": [], "n_error": []}
+        cwe_status[cwe]["total"] += 1
+
         if "result" in result:
             output = json.loads(result["result"].stdout)
             if not output.get("results"):
                 tn += 1
+                cwe_status[cwe]["true_negative"].append(idx)
         else:
             # semgrep output stderr
             n_error += 1
+            cwe_status[cwe]["n_error"].append(idx)
 
     print(
         f"Total negative samples: {total}, True Negatives: {tn}, Run Errors: {n_error}"
     )
+    return cwe_status
 
-
+# single rule
 def test_rule(rule_path, dataset, output_path="./temp/semgrep/"):
     semgrep_runner = semgrep.SemgrepRunner()
     create_directory(output_path)
@@ -328,6 +341,14 @@ def test_rule(rule_path, dataset, output_path="./temp/semgrep/"):
     )
     return result
 
+def count_c_files(directory):
+    path = Path(directory)
+    return len(list(path.glob("*.c")))
+
+def count_yaml_files(directory):
+    path = Path(directory)
+    yaml_count = len(list(path.glob("*.yaml")))
+    return yaml_count
 
 # test dataset with all rules, which divide by cwe
 def test_rules_batch(rule_path, dataset, cvs_name="semgrep_primevul.cvs"):
@@ -419,6 +440,7 @@ def test_rules_batch(rule_path, dataset, cvs_name="semgrep_primevul.cvs"):
 
 
 # only use corresponding rules to test cwe samples
+# skip samples without cwe rules
 def test_cwe_rules(rule_path, dataset, cvs_name="semgrep_cwe_rules_primevul.cvs"):
     semgrep_runner = semgrep.SemgrepRunner()
     create_directory("./temp/semgrep/test_cwe_rules/")
@@ -458,6 +480,8 @@ def test_cwe_rules(rule_path, dataset, cvs_name="semgrep_cwe_rules_primevul.cvs"
         #     continue
 
         cwe_rules[cwe_dir] = {
+            "rules_num":count_yaml_files(os.path.join(rule_path, cwe_dir),),
+            "total": 0,
             "false_positive": [],
             "true_positive": [],
             "positive_path": set(),
@@ -477,6 +501,7 @@ def test_cwe_rules(rule_path, dataset, cvs_name="semgrep_cwe_rules_primevul.cvs"
             output_path=f"./temp/semgrep/test_cwe_rules/semgrep_output_{cwe_dir}.json",
         )
 
+        cwe_rules[cwe_dir]['total']=count_c_files(target_path)
         if "result" in result:
             output = json.loads(result["result"].stdout)
             for res in output.get("results", []):
@@ -640,11 +665,9 @@ def vaildate_rules(data, rules_path="./rules/"):
     print(f"Total rules: {total}, Generated rules: {generate_num}")
 
 
-def save_cwe_status(cwe_status={}):
-    if not cwe_status:
-        cwe_status = test_rule_positive("./rules/")
-        with open("./cwe_status.json", "w") as f:
-            json.dump(cwe_status, f, indent=4)
+def read_cwe_status(cwe_status):
+    key = "true_positive" if "true_positive" in cwe_status else "true_negative"
+    error = "p_error" if "p_error" in cwe_status else "n_error"
     total = 0
     tp = 0
     p_error = 0
@@ -652,21 +675,21 @@ def save_cwe_status(cwe_status={}):
         if cwe_status[cwe]["total"] < 50:
             continue
         total += cwe_status[cwe]["total"]
-        tp += len(cwe_status[cwe]["true_positive"])
-        p_error += len(cwe_status[cwe]["p_error"])
+        tp += len(cwe_status[cwe][key])
+        p_error += len(cwe_status[cwe][error])
     print(
-        f"Total positive samples: {total}, True Positives: {tp}, Run Errors: {p_error}"
+        f"Total samples: {total}, True : {tp}, Run Errors: {p_error}"
     )
     for cwe in cwe_status:
         if cwe_status[cwe]["total"] < 50:
             continue
         print(
-            f"CWE-{cwe}: Total: {cwe_status[cwe]['total']}, True Positives: {len(cwe_status[cwe]['true_positive'])}, Run Errors: {len(cwe_status[cwe]['p_error'])}"
+            f"CWE-{cwe}: Total: {cwe_status[cwe]['total']}, True : {len(cwe_status[cwe][key])}, Run Errors: {len(cwe_status[cwe][error])}"
         )
 
 
 def move_rules_bystatus(
-    cwe_status, rules_path="./rules/", target_path="./rules_selected/"
+    cwe_status, test_type="true_positive", rules_path="./rules/", target_path="./rules_selected/"
 ):
     create_directory(target_path)
     for cwe in cwe_status:
@@ -676,7 +699,7 @@ def move_rules_bystatus(
         for file in os.listdir(source_dir):
             idx = file.split("_")[-1].split(".")[0]
             if file.endswith(".yaml") and (
-                int(idx) in cwe_status[cwe]["true_positive"]
+                int(idx) in cwe_status[cwe][test_type]
             ):
                 source_file = os.path.join(source_dir, file)
                 dest_file = os.path.join(dest_dir, file)
@@ -688,42 +711,87 @@ def move_rules_bystatus(
 
 
 if __name__ == "__main__":
+    #generate
     # args = parse_args()
     # model=ChatQwen(model="qwen3-max", temperature=0.1)
     # print(generate_semgrep_rules(model, args.dataset))
     # print(f"Total semgrep rules: {rule_num(path='./rules_selected/')}")
-
-    # test_rule_negative()
-    # with open("./cwe_status.json", "r") as f:
-    #     cwe_status = json.load(f)
-    # save_cwe_status(cwe_status)
-
-    # move_rules_bystatus(
-    #     cwe_status=json.load(open("./cwe_status.json", "r")),
-    #     rules_path="./rules/",
-    #     target_path="./rules_selected/"
-    # )
-    # test_rules_batch(
-    #     rule_path="./rules_selected/",
-    #     dataset=load_primevul("./data/primevul/primevul_test_paired.jsonl"),
-    # )
-    # test_cwe_rules(
-    #     rule_path="./rules_selected/",
-    #     dataset=load_primevul("./data/primevul/primevul_test_paired.jsonl"),
-    # )
-    print_metrics_from_csv('./result/semgrep_primevul.cvs')
-    # test_rule(
-    #     rule_path="./rules_selected/",
-    #     dataset=load_primevul()
-    # )
-
-    # semgrep.SemgrepRunner.read_semgrep_output('./temp/semgrep/negative/')
-
-    # fix_rule(ChatOllama(model="gemma3:27b"), './rules_qwen-plus/')
-
     # genertate_rule_batch(load_primevul())
     # get_semgrep_rules_from_batch_response(
     #     batch_response_path="./temp/semgrep_1583_result.jsonl",
     #     raw_data=load_primevul(),
     #     output_rules_path="./rules/",
     # )
+
+    # vaildate and fix
+    # vaildate_rules()
+    # fix_rule(ChatOllama(model="gemma3:27b"), './rules_qwen-plus/')
+
+    # test with positive sample in train dataset and move
+    # cwe_status = test_rule_positive("./rules/")
+    # with open("./cwe_status.json", "w") as f:
+    #     json.dump(cwe_status, f, indent=4)
+    # with open("./cwe_status.json", "r") as f:
+    #     cwe_status = json.load(f)
+    # read_cwe_status(cwe_status)
+    # move_rules_bystatus(
+    #     cwe_status=json.load(open("./cwe_status.json", "r")),
+    #     rules_path="./rules/",
+    #     target_path="./rules_selected/"
+    # )
+
+    # test with positive sample in train dataset and move
+    # cwe_negative_status=test_rule_negative('./rules_selected/')
+    # with open("./cwe_negative_status.json", "w") as f:
+    #     json.dump(cwe_negative_status, f, indent=4)
+    # move_rules_bystatus(
+    #     cwe_status=json.load(open("./cwe_negative_status.json", "r")),
+    #     test_type="true_negative",
+    #     rules_path="./rules_selected/",
+    #     target_path="./rules_negative/"
+    # )
+    # semgrep.SemgrepRunner.read_semgrep_output('./temp/semgrep/negative/')
+    # with open("./cwe_negative_status.json", "r") as f:
+    #     cwe_status = json.load(f)
+    # read_cwe_status(cwe_status)
+
+    # test with test dataset
+    # test_rules_batch(
+    #     rule_path="./rules_negative/",
+    #     dataset=load_primevul("./data/primevul/primevul_test_paired.jsonl"),
+    #     cvs_name="semgrep_negative_primevul.cvs"
+    # )
+
+    # result=test_cwe_rules(
+    #     rule_path="./rules_selected/",
+    #     dataset=load_primevul("./data/primevul/primevul_test_paired.jsonl"),
+    #     # cvs_name="semgrep_negative_cwe_rules_primevul.cvs"
+    # )
+    # with open("./test_cwe_rules.json", "w") as f:
+    #     json.dump(result, f, indent=4)
+    with open("./test_cwe_rules.json", "r") as f:
+        result = json.load(f)
+    total_rules=0
+    total=0
+    for cwe in result:
+        if not result[cwe]['total']:
+            continue
+        result[cwe]['true_positive']= set(result[cwe]['true_positive'])
+        result[cwe]['false_positive']= set(result[cwe]['false_positive'])
+        print(
+        f"Total:{result[cwe]['total']}, true_positive:{len(result[cwe]['true_positive'])},false_positive:{len(result[cwe]['false_positive'])}, rule num:{result[cwe]['rules_num']}"
+    )
+        total_rules+=result[cwe]['rules_num']
+        total+=result[cwe]['total']
+        
+    print(f"total:{total}, rule num:{total_rules}")
+
+    
+
+    # print_metrics_from_csv('./result/semgrep_primevul.cvs')
+
+
+
+
+
+
