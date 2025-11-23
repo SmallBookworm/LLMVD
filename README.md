@@ -23,8 +23,9 @@ default model: .venv/bin/python main.py --dataset devign
 
 generate rules: python generate.py --dataset primevul_train_paired
 
-# metrics
+# test result
 ## primevul test paired:
+### True positive rules:
 semgrep test all:
 Length: 870
 Accuracy: 0.4989
@@ -40,8 +41,9 @@ Recall: 0.1448
 FPR: 0.1425
 F1: 0.2250
 
-
+### True negative rules:
 True positive: 1625, -> True Negatives: 1027, Run Errors: 0
+
 semgrep test all:
 Total:870, true_positive:322,false_positive:329, Precision:0.4946236559139785
 Length: 870
@@ -58,6 +60,9 @@ Precision: 0.5250
 Recall: 0.0483
 FPR: 0.0437
 F1: 0.0884
+
+## primevul train paired ?
+
 # test data
 try 201 rules:
 naive (qwen-max):       Total positive samples: 201, True Positives: 110, Run Errors: 63
