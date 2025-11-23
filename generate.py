@@ -57,6 +57,12 @@ def create_directory(directory):
     else:
         print(f"Directory '{directory}' already exists")
 
+def new_directory(directory):
+    if os.path.exists(directory):
+        print(f"Directory '{directory}' exists, remove it first.")
+        shutil.rmtree(directory)
+    os.makedirs(directory)
+    print(f"Directory '{directory}' created")
 
 # generate rule generate batch jsonl
 def genertate_rule_batch(
@@ -194,10 +200,10 @@ def rule_num(path="./rules/"):
                 count += 1
     return count
 
-
+# test in primevul dataset (train paired)
 def test_rule_positive(rule_root="./rules/"):
     semgrep_runner = semgrep.SemgrepRunner()
-    create_directory("./temp/semgrep/positive/")
+    new_directory("./temp/semgrep/positive/")
 
     data = load_primevul()
     total = 0
@@ -251,7 +257,7 @@ def test_rule_positive(rule_root="./rules/"):
 
 def test_rule_negative(rule_root="./rules/"):
     semgrep_runner = semgrep.SemgrepRunner()
-    create_directory("./temp/semgrep/negative/")
+    new_directory("./temp/semgrep/negative/")
 
     data = load_primevul()
     total = 0
@@ -317,11 +323,11 @@ def count_yaml_files(directory):
 # test dataset with all rules, which divide by cwe
 def test_rules_batch(rule_path, dataset, cvs_name="semgrep_primevul.cvs"):
     semgrep_runner = semgrep.SemgrepRunner()
-    create_directory("./temp/semgrep/test_rules_batch/")
+    new_directory("./temp/semgrep/test_rules_batch/")
 
     csvfile = f"./result/{cvs_name}"
     filepath = "./temp/temp_code/"
-    create_directory(filepath)
+    new_directory(filepath)
 
     total = 0
     idx_dataset = {}
@@ -363,9 +369,20 @@ def test_rules_batch(rule_path, dataset, cvs_name="semgrep_primevul.cvs"):
             for res in output.get("results", []):
                 code_path = res.get("path", "")
                 cwe_rules[cwe_dir]["positive_path"].add(code_path)
-                idx = code_path.split("_")[-1].split(".")[0]
+                try:
+                    filename = os.path.basename(code_path)
+                    # 假设格式: code_CWE123_456.c → split by '_'
+                    parts = filename.split("_")
+                    if len(parts) < 3:
+                        print(f"Warning: unexpected filename {filename}")
+                        continue
+                    idx = parts[-1].split(".")[0]
+                except Exception as e:
+                    print(f"Error parsing idx from path {code_path}: {e}")
+                    continue
                 cwe_rules[cwe_dir]["result"][idx] = res
-                if idx_dataset.get(idx).get("target") == 1:
+                sample = idx_dataset.get(idx)
+                if sample.get("target") == 1:
                     cwe_rules[cwe_dir]["true_positive"].append(int(idx))
                 else:
                     cwe_rules[cwe_dir]["false_positive"].append(int(idx))
@@ -412,14 +429,14 @@ def test_rules_batch(rule_path, dataset, cvs_name="semgrep_primevul.cvs"):
 # skip cwe rule without samples
 def test_cwe_rules(rule_path, dataset, cvs_name="semgrep_cwe_rules_primevul.cvs"):
     semgrep_runner = semgrep.SemgrepRunner()
-    create_directory("./temp/semgrep/test_cwe_rules/")
+    new_directory("./temp/semgrep/test_cwe_rules/")
 
     csvfile = f"./result/{cvs_name}"
 
     # save code
     cwe_to_samples = {}
     filepath_base = "./temp/temp_cwe_code/"
-    create_directory(filepath_base)
+    new_directory(filepath_base)
 
     for sample in dataset:
         cwe = sample["cwe"][0]
@@ -549,8 +566,8 @@ def test_each_rule_on_dataset(
     temp_code_dir = "./temp/temp_code_each_rule/"
     output_dir = "./temp/semgrep/test_each_rule/"
     result_csv = f"./result/{csv_name}"
-    create_directory(temp_code_dir)
-    create_directory(output_dir)
+    new_directory(temp_code_dir)
+    new_directory(output_dir)
 
     idx_to_sample = {}
     for sample in dataset:
@@ -656,17 +673,17 @@ def test_each_rule_on_dataset(
 
 
 def filter_rules_by_fpr(
-    rule_path, dataset, output_filtered_dir="./rules_fpr/", fpr_threshold=0.3
+    rule_path, dataset, output_filtered_dir="./rules_fpr/", fpr_threshold=0.01
 ):
     """
-    执行 test_each_rule_on_dataset，并将 FPR（FP/(TP+FP)）低于 threshold 的规则移到新文件夹。
-
+    Filter Semgrep rules based on False Positive Rate (FPR) on the given dataset. Run every rule singely.
     Args:
-        rule_path: 规则根目录
-        dataset: 数据集
-        csv_name: 评估结果 CSV 文件名
-        output_filtered_dir: 保存低 FPR 规则的目标目录
-        fpr_threshold: FPR 阈值（例如 0.3 表示 30%）
+        rule_path (str): Path to the directory containing Semgrep rule files.
+        dataset (list): List of samples, each sample is a dict with keys like 'idx', 'cwe', 'func', 'target'.
+        output_filtered_dir (str): Directory to save filtered rules.
+        fpr_threshold (float): Maximum allowed FPR to keep a rule.
+    Returns:
+        list: List of tuples containing (source_rule_path, destination_rule_path, fpr).
     """
     # Step 1: 运行评估
     results = test_each_rule_on_dataset(rule_path, dataset)
@@ -922,29 +939,18 @@ if __name__ == "__main__":
     # results = test_each_rule_on_dataset('./rules_selected/', load_primevul("./data/primevul/primevul_test_paired.jsonl"))
 
     # test with test dataset
-    # result=test_rules_batch(
-    #     rule_path="./rules_selected/",
-    #     dataset=load_primevul("./data/primevul/primevul_test_paired.jsonl"),
-    # )
-    # for cwe in result:
-    #     result[cwe]['positive_path']= list(result[cwe]['positive_path'])
-    #     result[cwe]['error']= list(result[cwe]['error'])
+    result=test_rules_batch(
+        rule_path="./rules_negative/",
+        dataset=load_primevul(),
+        cvs_name="rules_negative_semgrep_primevul_train.cvs"
+    )
+    for cwe in result:
+        result[cwe]['positive_path']= list(result[cwe]['positive_path'])
+        result[cwe]['error']= list(result[cwe]['error'])
 
-    # with open("./test_rules_batch.json", "w") as f:
-    #     json.dump(result, f, indent=4)
-
-    # total_rules=0
-    # total=0
-    # for cwe in result:
-    #     if not result[cwe]['total']:
-    #         continue
-    #     result[cwe]['true_positive']= set(result[cwe]['true_positive'])
-    #     result[cwe]['false_positive']= set(result[cwe]['false_positive'])
-    #     print(
-    #     f"Total:{result[cwe]['total']}, true_positive:{len(result[cwe]['true_positive'])},false_positive:{len(result[cwe]['false_positive'])}, rule num:{result[cwe]['rules_num']}"
-    # )
-    #     total_rules+=result[cwe]['rules_num']
-    #     total+=result[cwe]['total']
+    with open("./test_rules_negative_primevul_train_batch.json", "w") as f:
+        json.dump(result, f, indent=4)
+    # read_test_json("./test_rules_negative_primevul_train_batch.json")
 
     # result=test_cwe_rules(
     #     rule_path="./rules_selected/",
@@ -957,6 +963,6 @@ if __name__ == "__main__":
     # with open("./test_cwe_rules.json", "w") as f:
     #     json.dump(result, f, indent=4)
 
-    read_test_json("./test_rules_batch.json")
+    # read_test_json("./test_rules_batch.json")
 
-    print_metrics_from_csv('./result/semgrep_primevul.cvs')
+    # print_metrics_from_csv('./result/semgrep_primevul.cvs')
