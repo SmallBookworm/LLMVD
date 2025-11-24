@@ -23,7 +23,7 @@ import os
 import re
 import json
 import jsonlines
-import yaml
+from ruamel.yaml import YAML
 from pathlib import Path
 import shutil
 
@@ -50,12 +50,15 @@ def parse_args():
     return args
 
 
-def create_directory(directory):
+def create_directory(directory, print_info=True):
     if not os.path.exists(directory):
         os.makedirs(directory)
-        print(f"Directory '{directory}' created")
+        if print_info:
+            print(f"Directory '{directory}' created")
     else:
-        print(f"Directory '{directory}' already exists")
+        if print_info:
+            print(f"Directory '{directory}' already exists")
+
 
 def new_directory(directory):
     if os.path.exists(directory):
@@ -63,6 +66,7 @@ def new_directory(directory):
         shutil.rmtree(directory)
     os.makedirs(directory)
     print(f"Directory '{directory}' created")
+
 
 # generate rule generate batch jsonl
 def genertate_rule_batch(
@@ -200,6 +204,7 @@ def rule_num(path="./rules/"):
                 count += 1
     return count
 
+
 # test in primevul dataset (train paired)
 def test_rule_positive(rule_root="./rules/"):
     semgrep_runner = semgrep.SemgrepRunner()
@@ -236,7 +241,12 @@ def test_rule_positive(rule_root="./rules/"):
 
         cwe_name = sample["cwe"][0]
         if cwe_name not in cwe_status:
-            cwe_status[cwe_name] = {"total": 0, "true_positive": [], "p_error": []}
+            cwe_status[cwe_name] = {
+                "total": 0,
+                "true_positive": [],
+                "p_error": [],
+                "failed_info": [],
+            }
         cwe_status[cwe_name]["total"] += 1
 
         if "result" in result:
@@ -248,6 +258,7 @@ def test_rule_positive(rule_root="./rules/"):
             # semgrep output stderr
             p_error += 1
             cwe_status[cwe_name]["p_error"].append(sample["idx"])
+            cwe_status[cwe_name]["failed_info"].append(result)
 
     print(
         f"Total positive samples: {total}, True Positives: {tp}, Run Errors: {p_error}"
@@ -255,6 +266,7 @@ def test_rule_positive(rule_root="./rules/"):
     return cwe_status
 
 
+# negative test output with sample idx and rule idx (from positive sample)
 def test_rule_negative(rule_root="./rules/"):
     semgrep_runner = semgrep.SemgrepRunner()
     new_directory("./temp/semgrep/negative/")
@@ -290,7 +302,12 @@ def test_rule_negative(rule_root="./rules/"):
         )
 
         if cwe not in cwe_status:
-            cwe_status[cwe] = {"total": 0, "true_negative": [], "n_error": []}
+            cwe_status[cwe] = {
+                "total": 0,
+                "true_negative": [],
+                "n_error": [],
+                "failed_info": [],
+            }
         cwe_status[cwe]["total"] += 1
 
         if "result" in result:
@@ -302,6 +319,7 @@ def test_rule_negative(rule_root="./rules/"):
             # semgrep output stderr
             n_error += 1
             cwe_status[cwe]["n_error"].append(idx)
+            cwe_status[cwe]["failed_info"].append(result)
 
     print(
         f"Total negative samples: {total}, True Negatives: {tn}, Run Errors: {n_error}"
@@ -725,57 +743,115 @@ def filter_rules_by_fpr(
     return filtered_rules
 
 
-def fix_rule(model, rules_path="./rules/"):
-    create_directory(f"{rules_path}fixed_rules/")
+# remove fix patterns in semgrep rules
+def fix_yaml(rule_content, rule_path):
+    result = {
+        "fixed": False,
+        "removed": [],
+        "fixed_content": rule_content,
+        "error": None,
+    }
+    # read semgrep rule yaml
+    yaml = YAML()
+    rule_yaml = None
+    try:
+        rule_yaml = yaml.load(rule_content)
+    except Exception as e:
+        result["error"] = f"Error parsing YAML: {e}"
+        print(f"Error parsing YAML for rule {rule_path}: {e}")
+    # remove fix patterns in semgrep rules
+    if rule_yaml and "rules" in rule_yaml:
+        print(f"Fixing rule: {rule_path}")
+        for rule in rule_yaml.get("rules", []):
+            res = rule.pop("fix", None)  # 使用 pop 并提供默认值 None，避免 KeyError
+            if res:
+                result["fixed"] = True
+                result["removed"].append(res)
+                print(f"Removed fix: {res}")
+        result["fixed_content"] = yaml.dump(rule_yaml)
+        return result
+    return result
+
+
+# need errors in rule test output
+# some test func code is wrong, so we get Syntax error in semgrep output. Did not skip in this function.
+def fix_rule(
+    model,
+    rules_path="./rules/",
+    fixed_path="./rules_fixed/",
+    test_output_result="./temp/semgrep/positive/",
+    remove_fix_pattern=False,
+):
+    new_directory(fixed_path)
+    # test rules grammar
+    semgrep_runner = semgrep.SemgrepRunner()
+    # any code file for semgrep test
+    filepath = f"./temp/temp_code.c"
+
+    total = 0
+    fix_yaml_count = 0
     prompt_template_fix = ChatPromptTemplate.from_messages(fix_rule_prompt)
 
     for root, dirs, files in os.walk(rules_path):
         for file in files:
             if file.endswith(".yaml"):
+                total += 1
                 idx = file.split("_")[-1].split(".")[0]
                 rule_path = os.path.join(root, file)
-                fixed_rule_path = (
-                    rules_path + "fixed_rules/" + os.path.relpath(rule_path, rules_path)
-                )
+                fixed_rule_path = fixed_path + os.path.relpath(rule_path, rules_path)
 
                 with open(rule_path, "r") as f:
                     rule_content = f.read()
                 # save test output for reference
-                create_directory(os.path.dirname(fixed_rule_path))
+                create_directory(os.path.dirname(fixed_rule_path), print_info=False)
                 with open(fixed_rule_path, "w") as f:
                     f.write(rule_content)
 
                 # only fix fail rules, which are "rule error" without results when semgrep test positive cases.
-                with open(f"./temp/semgrep/semgrep_output_{idx}.json", "r") as f:
+                test_json_path = test_output_result + f"semgrep_output_{idx}.json"
+                if not os.path.exists(test_json_path):
+                    print(f"Test output not found.")
+                    error_info = ""
+                    result = semgrep_runner.run_rule(
+                        rule_path=rule_path,
+                        target_path=filepath,
+                        output_path=test_json_path,
+                    )
+                    if "result" not in result:
+                        # print(f"error: {result['message']}")
+                        if "stderr" in result:
+                            # print(f"error running semgrep for rule: { result['stderr']}")
+                            error_info = result["stderr"]
+                        else:
+                            error_info = result["message"]
+                    with open(test_json_path, "w") as f:
+                        f.write(
+                            json.dumps(
+                                {
+                                    "results": [],
+                                    "errors": error_info,
+                                }
+                            )
+                        )
+
+                with open(test_json_path, "r") as f:
                     test_output = f.read()
                 if test_output.strip() == "":
                     print(
-                        "\033[31m"
-                        + f"Empty test output, skipping rule: {rule_path}"
-                        + "\033[0m"
+                        "\033[31m" + f"Empty test output, rule: {rule_path}" + "\033[0m"
                     )
-                    continue
+                    return 0
                 test_output_json = json.loads(test_output)
+                # there can be results and erros in same time 
                 if test_output_json.get("results") or not test_output_json.get(
                     "errors"
                 ):
-                    print(f"Rule works fine, no need to fix: {rule_path}")
+                    # print(f"Rule works fine, no need to fix: {rule_path}")
                     continue
 
-                # read semgrep rule yaml
-                try:
-                    rule_yaml = yaml.safe_load(rule_content)
-                except yaml.YAMLError as e:
-                    print(f"Error parsing YAML for rule {rule_path}: {e}")
-                # remove fix patterns in semgrep rules
-                if rule_yaml:
-                    for rule in rule_yaml.get("rules", []):
-                        res = rule.pop(
-                            "fix", None
-                        )  # 使用 pop 并提供默认值 None，避免 KeyError
-                        if res:
-                            print(f"Removed fix: {res}")
-                            print(f"file: {rule_path}")
+                # todo
+                if remove_fix_pattern:
+                    fixed_rule_content = fix_yaml(rule_content, rule_path)
 
                 # feedback model. Is it better to remove spans in errors?
                 message_fix = prompt_template_fix.invoke(
@@ -798,7 +874,131 @@ def fix_rule(model, rules_path="./rules/"):
 
                     with open(fixed_rule_path, "w") as f:
                         f.write(cleaned_yaml)
-                    print(f"Fixed Semgrep rule saved to {fixed_rule_path}")
+                    fix_yaml_count += 1
+                    # print(f"Fixed Semgrep rule saved to {fixed_rule_path}")
+    print(f"Total rules: {total}, fixed rules: {fix_yaml_count}")
+
+
+def simple_test_rule(rule_path, test_json_path, filepath="./temp/temp_code.c"):
+    """
+    simple test semgrep rule, save output to test_json_path
+    Args:
+        rule_path: path of semgrep rule
+        test_json_path: path to save semgrep test output
+        filepath: path of code file to test semgrep rule
+    """
+    # test rules grammar
+    semgrep_runner = semgrep.SemgrepRunner()
+
+    error_info = ""
+    result = semgrep_runner.run_rule(
+        rule_path=rule_path,
+        target_path=filepath,
+        output_path=test_json_path,
+    )
+    if "result" not in result:
+        # print(f"error: {result['message']}")
+        if "stderr" in result:
+            # print(f"error running semgrep for rule: { result['stderr']}")
+            error_info = result["stderr"]
+        else:
+            error_info = result["message"]
+    with open(test_json_path, "w") as f:
+        f.write(
+            json.dumps(
+                {
+                    "results": [],
+                    "errors": error_info,
+                }
+            )
+        )
+
+
+# get rules
+def get_rule_data(rules_path="./rules/", test_output_result="./temp/semgrep/positive/"):
+    data = []
+    for root, dirs, files in os.walk(rules_path):
+        for file in files:
+            if file.endswith(".yaml"):
+                idx = file.split("_")[-1].split(".")[0]
+                rule_path = os.path.join(root, file)
+
+                with open(rule_path, "r") as f:
+                    rule_content = f.read()
+
+                test_json_path = test_output_result + f"semgrep_output_{idx}.json"
+                if not os.path.exists(test_json_path):
+                    print(f"Test output not found. Path: {test_json_path}")
+                    simple_test_rule(
+                        rule_path=rule_path,
+                        test_json_path=test_json_path,
+                    )
+                with open(test_output_result + f"semgrep_output_{idx}.json", "r") as f:
+                    test_output = f.read()
+                if test_output.strip() == "":
+                    print(
+                        "\033[31m" + f"Empty test output, rule: {rule_path}" + "\033[0m"
+                    )
+                    return 0
+                test_output_json = json.loads(test_output)
+
+                data.append(
+                    {
+                        "idx": int(idx),
+                        "semgrep_rule": rule_content,
+                        "test_output": test_output_json,
+                    }
+                )
+    return data
+
+# only fix rules error
+def get_rule_fix_batch(data, batch_path="./semgrep_fix.jsonl", model="qwen-plus"):
+    prompt_template_fix = ChatPromptTemplate.from_messages(fix_rule_prompt)
+    total = 0
+    fix_num = 0
+    jsonl_data = []
+    for rule in data:
+        total += 1
+        # there can be results and erros in the same time. some errors are about Syntax error for code.
+        if  rule["test_output"].get("results") or not rule["test_output"].get("errors"):
+            # print(f"No errors for rule idx {rule['idx']}, skipping.")
+            continue
+        # some test func code is wrong, so we get Syntax error in semgrep output.
+        errors_info=[]
+        if type(rule["test_output"].get("errors")) is str:
+            errors_info = rule["test_output"].get("errors")
+        else:
+            for err in rule["test_output"].get("errors", []):
+                    # if (type(err['type']) is list) and err['type'][0]:
+                    #     print(f"Rule idx {rule['idx']} error: PartialParsing")
+                    if (type(err['type']) is str) and 'Rule' in err['type']:
+                        errors_info.append(err)
+
+        if not errors_info:
+            continue
+
+        message_fix = prompt_template_fix.invoke(
+            {
+                "semgrep_rule": rule["semgrep_rule"],
+                "test_output": {"errors": errors_info},
+            }
+        )
+
+        json_data = {
+            "custom_id": f"{rule['idx']}",
+            "method": "POST",
+            "url": "/v1/chat/completions",
+            "body": {
+                "model": model,
+                "messages": langchain_to_openai_messages(message_fix.to_messages()),
+            },
+        }
+        jsonl_data.append(json_data)
+        fix_num += 1
+    print(f"Total rules: {total}. Total fix rules: {fix_num}")
+    with jsonlines.open(batch_path, mode="w") as writer:
+        for oneline in jsonl_data:
+            writer.write(oneline)
 
 
 def vaildate_rules(data, rules_path="./rules/"):
@@ -846,25 +1046,24 @@ def read_test_json(test_json_path):
         total_rules += result[cwe]["rules_num"]
         total += result[cwe]["total"]
 
-    print(f"test total:{total}, rule num:{total_rules}, true_positive:{len(tp)},false_positive:{len(fp)}, Precision:{len(tp)/(len(tp)+len(fp))}")
+    print(
+        f"test total:{total}, rule num:{total_rules}, true_positive:{len(tp)},false_positive:{len(fp)}, Precision:{len(tp)/(len(tp)+len(fp))}"
+    )
 
 
 def read_cwe_status(cwe_status):
-    key = "true_positive" if "true_positive" in cwe_status else "true_negative"
-    error = "p_error" if "p_error" in cwe_status else "n_error"
+    first = list(cwe_status.keys())[0]
+    key = "true_positive" if "true_positive" in cwe_status[first] else "true_negative"
+    error = "p_error" if "p_error" in cwe_status[first] else "n_error"
     total = 0
     tp = 0
     p_error = 0
     for cwe in cwe_status:
-        if cwe_status[cwe]["total"] < 50:
-            continue
         total += cwe_status[cwe]["total"]
         tp += len(cwe_status[cwe][key])
         p_error += len(cwe_status[cwe][error])
     print(f"Total samples: {total}, True : {tp}, Run Errors: {p_error}")
     for cwe in cwe_status:
-        if cwe_status[cwe]["total"] < 50:
-            continue
         print(
             f"CWE-{cwe}: Total: {cwe_status[cwe]['total']}, True : {len(cwe_status[cwe][key])}, Run Errors: {len(cwe_status[cwe][error])}"
         )
@@ -905,7 +1104,15 @@ if __name__ == "__main__":
 
     # vaildate and fix
     # vaildate_rules()
+    # cwe_status = test_rule_positive()
+    # with open("./cwe_status.json", "w") as f:
+    #     json.dump(cwe_status, f, indent=4)
     # fix_rule(ChatOllama(model="gemma3:27b"), './rules_qwen-plus/')
+    get_rule_fix_batch(
+        data=get_rule_data(),
+        batch_path="./semgrep_fix_batch.jsonl",
+        model="qwen-plus"
+    )
 
     # test with positive sample in train dataset and move
     # cwe_status = test_rule_positive("./rules/")
@@ -939,18 +1146,19 @@ if __name__ == "__main__":
     # results = test_each_rule_on_dataset('./rules_selected/', load_primevul("./data/primevul/primevul_test_paired.jsonl"))
 
     # test with test dataset
-    result=test_rules_batch(
-        rule_path="./rules_negative/",
-        dataset=load_primevul(),
-        cvs_name="rules_negative_semgrep_primevul_train.cvs"
-    )
-    for cwe in result:
-        result[cwe]['positive_path']= list(result[cwe]['positive_path'])
-        result[cwe]['error']= list(result[cwe]['error'])
+    # result=test_rules_batch(
+    #     rule_path="./rules_negative/",
+    #     dataset=load_primevul(),
+    #     cvs_name="rules_negative_semgrep_primevul_train.cvs"
+    # )
+    # for cwe in result:
+    #     result[cwe]['positive_path']= list(result[cwe]['positive_path'])
+    #     result[cwe]['error']= list(result[cwe]['error'])
 
-    with open("./test_rules_negative_primevul_train_batch.json", "w") as f:
-        json.dump(result, f, indent=4)
+    # with open("./test_rules_negative_primevul_train_batch.json", "w") as f:
+    #     json.dump(result, f, indent=4)
     # read_test_json("./test_rules_negative_primevul_train_batch.json")
+    # print_metrics_from_csv('./result/rules_negative_semgrep_primevul_train.cvs')
 
     # result=test_cwe_rules(
     #     rule_path="./rules_selected/",

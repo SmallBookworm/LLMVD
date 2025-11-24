@@ -1,8 +1,10 @@
+# Thinking
+detect wby your cpu and gpu. fuck up you pc.
 
 # workflow
 generate:
-generate_semgrep_rules | genertate_rule_batch -> (get_semgrep_rules_from_batch_response) -> vaildate_rules -> fix_rule -> test_rule_positive and save_cwe_status -> move_rules_bystatus
--> test_rule_negative -> move_rules_bystatus -> test_rules_batch | test_cwe_rules -> print_metrics_from_csv
+generate_semgrep_rules | genertate_rule_batch -> (get_semgrep_rules_from_batch_response) -> vaildate_rules -> test_rule_positive -> fix_rule -> test_rule_positive and save_cwe_status (train dataset) -> move_rules_bystatus
+-> test_rule_negative (train dataset) -> move_rules_bystatus -> test_rules_batch | test_cwe_rules (test dataset) -> print_metrics_from_csv
 # files
 main.py: detect vulnerabilities by LLMs
 generate.py: generate,test and fix rules 
@@ -22,6 +24,11 @@ local_huggingface_model: .venv/bin/python main.py --dataset devign --base_model 
 default model: .venv/bin/python main.py --dataset devign
 
 generate rules: python generate.py --dataset primevul_train_paired
+
+# semgrep output 
+## errors
+Error types: {'PartialParsing', 'InvalidRuleSchemaError', 'Other syntax error', 'Rule parse error', 'SemgrepError', 'Syntax error'}
+
 
 # test result
 ## primevul test paired:
@@ -61,7 +68,15 @@ Recall: 0.0483
 FPR: 0.0437
 F1: 0.0884
 
-## primevul train paired ?
+## primevul train paired ? !
+True Negatives: 1027
+semgrep test all:
+Length: 7578, positive samples num:3789, negative samples num:3789, true_positive:2092, false_positive:1438
+Accuracy: 0.5863
+Precision: 0.5926
+Recall: 0.5521
+FPR: 0.3795
+F1: 0.5717
 
 # test data
 try 201 rules:
@@ -70,3 +85,8 @@ fixed rules (gemma3): Total positive samples: 201, True Positives: 119, Run Erro
 
 native (qwen-plus): Total positive samples: 201, True Positives: 90, Run Errors: 44
 fixed rules (gemma3): Total positive samples: 201, True Positives: 93, Run Errors: 32
+
+# to do
+1. fix rules that get false negative result in first positive test and false positive.
+2. remove_fix_pattern in rule yaml file by python code.
+3. when semgrep output errors unrelated to rule (errors about code), we should detect code vul by other method.  (only a few, maybe 151 functions in primevul)

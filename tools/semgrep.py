@@ -50,6 +50,7 @@ class SemgrepRunner:
                 logging.warning(f"Semgrep failed: {result.stderr}")
                 return {
                     "error": "semgrep_failed",
+                    "message": "Semgrep execution failed",
                     "stderr": result.stderr,
                     "stdout": result.stdout,
                     "returncode": result.returncode,
@@ -77,7 +78,7 @@ class SemgrepRunner:
 
         try:
             result = subprocess.run(
-                cmd, capture_output=True, text=True, timeout=30  # 防止死循环
+                cmd, capture_output=True, text=True, timeout=40  # 防止死循环
             )
 
             if result.returncode != 0 and result.returncode != 1:
@@ -92,8 +93,10 @@ class SemgrepRunner:
             return {"result": result}
 
         except subprocess.TimeoutExpired:
+            logging.warning("Semgrep validation timed out (>30s)")
             return {"error": "timeout", "message": "Semgrep timed out (>30s)"}
         except Exception as e:
+            logging.warning(f"Semgrep validation exception: {str(e)}")
             return {"error": "exception", "message": str(e)}
 
     @staticmethod

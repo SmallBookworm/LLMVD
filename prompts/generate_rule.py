@@ -29,7 +29,7 @@ fix_rule_prompt=[
     {"role": "system", "content": "You are a code security expert specializing in generating Semgrep rules for vulnerability detection."},
     {
         "role": "user",
-        "content": '''Given the following Semgrep rule and its test output, identify  the root cause of the failure and fix the rule. Return ONLY the corrected Semgrep rule in YAML format.
+        "content": '''Given the following Semgrep rule and its test output, identify  the cause of the failure and fix the rule. Return ONLY the corrected Semgrep rule in YAML format.
 Semgrep Rule:
 {semgrep_rule}
 Test Output:
