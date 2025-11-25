@@ -206,9 +206,9 @@ def rule_num(path="./rules/"):
 
 
 # test in primevul dataset (train paired)
-def test_rule_positive(rule_root="./rules/"):
+def test_rule_positive(rule_root="./rules/", output_path="./temp/semgrep/positive/", strict =True):
     semgrep_runner = semgrep.SemgrepRunner()
-    new_directory("./temp/semgrep/positive/")
+    new_directory(output_path)
 
     data = load_primevul()
     total = 0
@@ -226,7 +226,10 @@ def test_rule_positive(rule_root="./rules/"):
         print(f"Testing rule: {rule_path}")
         if not os.path.exists(rule_path):
             print(f'Rule not found for {sample["cwe"][0]} idx {sample["idx"]}')
-            break
+            if strict:
+                break
+            else:
+                continue
 
         if sample["target"] == 1:
             total += 1
@@ -236,7 +239,7 @@ def test_rule_positive(rule_root="./rules/"):
         result = semgrep_runner.run_rule(
             rule_path=rule_path,
             target_path=filepath,
-            output_path=f'./temp/semgrep/positive/semgrep_output_{sample["idx"]}.json',
+            output_path= output_path + f'./temp/semgrep/positive/semgrep_output_{sample["idx"]}.json',
         )
 
         cwe_name = sample["cwe"][0]
@@ -445,7 +448,7 @@ def test_rules_batch(rule_path, dataset, cvs_name="semgrep_primevul.cvs"):
 
 # only use corresponding rules to test cwe samples
 # skip cwe rule without samples
-def test_cwe_rules(rule_path, dataset, cvs_name="semgrep_cwe_rules_primevul.cvs"):
+def test_cwe_rules(rule_path, dataset, cvs_name="semgrep_cwe_primevul.cvs"):
     semgrep_runner = semgrep.SemgrepRunner()
     new_directory("./temp/semgrep/test_cwe_rules/")
 
@@ -945,6 +948,7 @@ def get_rule_data(rules_path="./rules/", test_output_result="./temp/semgrep/posi
                 data.append(
                     {
                         "idx": int(idx),
+                        "rule_path": rule_path,
                         "semgrep_rule": rule_content,
                         "test_output": test_output_json,
                     }
@@ -1000,6 +1004,22 @@ def get_rule_fix_batch(data, batch_path="./semgrep_fix.jsonl", model="qwen-plus"
         for oneline in jsonl_data:
             writer.write(oneline)
 
+def move_rules_byoutput(data, target_path="./rules_final/", positive=True, no_errors=True):
+    positive_num=0
+    no_error_num=0
+
+    for rule in data:
+        source_path = Path(rule["rule_path"])
+        dest_path = Path(target_path, *source_path.parts[1:])
+        if  positive and rule["test_output"].get("results"):
+            positive_num+=1
+            create_directory(os.path.dirname(dest_path), print_info=False)
+            shutil.copy2(source_path, dest_path)
+        elif no_errors and not rule["test_output"].get("errors"):
+            no_error_num+=1
+            create_directory(os.path.dirname(dest_path), print_info=False)
+            shutil.copy2(source_path, dest_path)
+    print(f"Total rules: {len(data)}, Positive rules: {positive_num}, No error rules: {no_error_num}, all moved rules: {positive_num+no_error_num}")
 
 def vaildate_rules(data, rules_path="./rules/"):
 
@@ -1104,15 +1124,33 @@ if __name__ == "__main__":
 
     # vaildate and fix
     # vaildate_rules()
-    # cwe_status = test_rule_positive()
-    # with open("./cwe_status.json", "w") as f:
-    #     json.dump(cwe_status, f, indent=4)
+    cwe_status = test_rule_positive()
+    with open("./cwe_status.json", "w") as f:
+        json.dump(cwe_status, f, indent=4)
     # fix_rule(ChatOllama(model="gemma3:27b"), './rules_qwen-plus/')
-    get_rule_fix_batch(
-        data=get_rule_data(),
-        batch_path="./semgrep_fix_batch.jsonl",
-        model="qwen-plus"
-    )
+    # get_rule_fix_batch(
+    #     data=get_rule_data(),
+    #     batch_path="./semgrep_fix_batch.jsonl",
+    #     model="qwen-plus"
+    # )
+    # get_semgrep_rules_from_batch_response(batch_response_path='./temp/batch_result/semgrep_fix_batch_result.jsonl',
+    #     raw_data=load_primevul(),
+    #     output_rules_path="./rules_fixed/")
+    
+    # cwe_status = test_rule_positive("./rules_fixed/", output_path="./temp/semgrep/fixed/", strict=False)
+    # with open("./cwe_fixed_status.json", "w") as f:
+    #     json.dump(cwe_status, f, indent=4)
+
+    # move_rules_bystatus(
+    #     cwe_status=cwe_status,
+    #     rules_path="./rules_fixed/",
+    #     target_path="./rules_fixed_selected/"
+    # )
+    print(rule_num(path="./rules_fixed_selected/"))
+    data=get_rule_data()
+    move_rules_byoutput(data=data, target_path="./rules_fixed_selected/", positive=True, no_errors=True)
+    print(rule_num(path="./rules_fixed_selected/"))
+
 
     # test with positive sample in train dataset and move
     # cwe_status = test_rule_positive("./rules/")
@@ -1146,24 +1184,24 @@ if __name__ == "__main__":
     # results = test_each_rule_on_dataset('./rules_selected/', load_primevul("./data/primevul/primevul_test_paired.jsonl"))
 
     # test with test dataset
-    # result=test_rules_batch(
-    #     rule_path="./rules_negative/",
-    #     dataset=load_primevul(),
-    #     cvs_name="rules_negative_semgrep_primevul_train.cvs"
-    # )
-    # for cwe in result:
-    #     result[cwe]['positive_path']= list(result[cwe]['positive_path'])
-    #     result[cwe]['error']= list(result[cwe]['error'])
+    result=test_rules_batch(
+        rule_path="./rules_fixed_selected/",
+        dataset=load_primevul(),
+        cvs_name="semgrep_rules_fixed_selected_primevul_train.cvs"
+    )
+    for cwe in result:
+        result[cwe]['positive_path']= list(result[cwe]['positive_path'])
+        result[cwe]['error']= list(result[cwe]['error'])
 
-    # with open("./test_rules_negative_primevul_train_batch.json", "w") as f:
-    #     json.dump(result, f, indent=4)
-    # read_test_json("./test_rules_negative_primevul_train_batch.json")
-    # print_metrics_from_csv('./result/rules_negative_semgrep_primevul_train.cvs')
+    with open("./test_rules_fixed_selected_primevul_train_batch.json", "w") as f:
+        json.dump(result, f, indent=4)
+    read_test_json("./test_rules_fixed_selected_primevul_train_batch.json")
+    print_metrics_from_csv('./result/semgrep_rules_fixed_selected_primevul_train.cvs')
 
     # result=test_cwe_rules(
     #     rule_path="./rules_selected/",
     #     dataset=load_primevul("./data/primevul/primevul_test_paired.jsonl"),
-    #     # cvs_name="semgrep_negative_cwe_rules_primevul.cvs"
+    #     # cvs_name="semgrep_cwe_rules_negative_primevul.cvs"
     # )
     # for cwe in result:
     #     result[cwe]['positive_path']= list(result[cwe]['positive_path'])
