@@ -3,7 +3,7 @@ detect wby your cpu and gpu. fuck up you pc.
 
 # workflow
 generate:
-generate_semgrep_rules | genertate_rule_batch -> (get_semgrep_rules_from_batch_response) -> vaildate_rules -> test_rule_positive -> fix_rule -> test_rule_positive and save_cwe_status (train dataset) -> move_rules_bystatus
+generate_semgrep_rules | genertate_rule_batch -> (get_semgrep_rules_from_batch_response) -> vaildate_rules -> test_rule_positive (train dataset) -> fix_rule -> move_rules_bystatus
 -> test_rule_negative (train dataset) -> move_rules_bystatus -> test_rules_batch | test_cwe_rules (test dataset) -> print_metrics_from_csv
 # files
 main.py: detect vulnerabilities by LLMs
@@ -68,8 +68,11 @@ Recall: 0.0483
 FPR: 0.0437
 F1: 0.0884
 
+### fixed rules
+
+
 ## primevul train paired ? !
-True Negatives: 1027
+### True Negatives: 1027
 semgrep test all:
 Length: 7578, positive samples num:3789, negative samples num:3789, true_positive:2092, false_positive:1438
 Accuracy: 0.5863
@@ -77,6 +80,24 @@ Precision: 0.5926
 Recall: 0.5521
 FPR: 0.3795
 F1: 0.5717
+### (fixed rules:666 + positive:1625) -> negative:1411
+test total:734678, rule num:1411, true_positive:2765,false_positive:2225, Precision:0.5541082164328658
+Length: 7578, positive samples num:3789, negative samples num:3789, true_positive:2765, false_positive:2225
+Accuracy: 0.5713
+Precision: 0.5541
+Recall: 0.7297
+FPR: 0.5872
+F1: 0.6299
+
+## primevul test
+### (fixed rules:666 + positive:1625) -> negative:1411
+test total:2404436, rule num:1411, true_positive:265,false_positive:5551, Precision:0.04556396148555708
+Length: 24788, positive samples num:549, negative samples num:24239, true_positive:265, false_positive:5551
+Accuracy: 0.7646
+Precision: 0.0456
+Recall: 0.4827
+FPR: 0.2290
+F1: 0.0833
 
 # test data
 try 201 rules:

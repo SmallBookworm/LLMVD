@@ -239,7 +239,7 @@ def test_rule_positive(rule_root="./rules/", output_path="./temp/semgrep/positiv
         result = semgrep_runner.run_rule(
             rule_path=rule_path,
             target_path=filepath,
-            output_path= output_path + f'./temp/semgrep/positive/semgrep_output_{sample["idx"]}.json',
+            output_path= output_path + f'/semgrep_output_{sample["idx"]}.json',
         )
 
         cwe_name = sample["cwe"][0]
@@ -354,9 +354,10 @@ def test_rules_batch(rule_path, dataset, cvs_name="semgrep_primevul.cvs"):
     idx_dataset = {}
     for sample in dataset:
         total += 1
-        cwe = sample["cwe"][0]
         idx = sample["idx"]
-        code_path = f"{filepath}code_{cwe}_{idx}.c"
+        code_path = f"{filepath}code_{total}_{idx}.c"
+        if os.path.exists(code_path):
+            print(f"code already exists: {code_path}")
         save_code(sample["func"], code_path)
         if idx_dataset.get(f"{idx}"):
             print(f"same sample:{idx}")
@@ -424,7 +425,10 @@ def test_rules_batch(rule_path, dataset, cvs_name="semgrep_primevul.cvs"):
     # There are repeated samples.
     for i, sample in enumerate(dataset):
         idx = sample["idx"]
-        cwe = sample["cwe"][0]
+        if sample["cwe"] and type(sample["cwe"]) == list:
+            cwe = sample["cwe"][0]
+        else:
+            cwe = "N/A"
         prediction = 1 if (idx in tp or idx in fp) else 0
         # attention: when a rule detect a vul for a sample,  sample's cwe can be different from rule cwe
         res = {}
@@ -893,7 +897,7 @@ def simple_test_rule(rule_path, test_json_path, filepath="./temp/temp_code.c"):
     # test rules grammar
     semgrep_runner = semgrep.SemgrepRunner()
 
-    error_info = ""
+    error_info = "no error info?"
     result = semgrep_runner.run_rule(
         rule_path=rule_path,
         target_path=filepath,
@@ -918,7 +922,7 @@ def simple_test_rule(rule_path, test_json_path, filepath="./temp/temp_code.c"):
 
 
 # get rules
-def get_rule_data(rules_path="./rules/", test_output_result="./temp/semgrep/positive/"):
+def get_rule_data(rules_path="./rules/", test_output_result="./temp/semgrep/positive/", auto_test=True):
     data = []
     for root, dirs, files in os.walk(rules_path):
         for file in files:
@@ -930,7 +934,7 @@ def get_rule_data(rules_path="./rules/", test_output_result="./temp/semgrep/posi
                     rule_content = f.read()
 
                 test_json_path = test_output_result + f"semgrep_output_{idx}.json"
-                if not os.path.exists(test_json_path):
+                if auto_test and not os.path.exists(test_json_path):
                     print(f"Test output not found. Path: {test_json_path}")
                     simple_test_rule(
                         rule_path=rule_path,
@@ -1005,6 +1009,14 @@ def get_rule_fix_batch(data, batch_path="./semgrep_fix.jsonl", model="qwen-plus"
             writer.write(oneline)
 
 def move_rules_byoutput(data, target_path="./rules_final/", positive=True, no_errors=True):
+    '''
+    Docstring for move_rules_byoutput
+    
+    :param data: from get_rule_data(), auto_test=False
+    :param target_path: Description
+    :param positive: Description
+    :param no_errors: Description
+    '''
     positive_num=0
     no_error_num=0
 
@@ -1124,9 +1136,9 @@ if __name__ == "__main__":
 
     # vaildate and fix
     # vaildate_rules()
-    cwe_status = test_rule_positive()
-    with open("./cwe_status.json", "w") as f:
-        json.dump(cwe_status, f, indent=4)
+    # cwe_status = test_rule_positive()
+    # with open("./cwe_status.json", "w") as f:
+    #     json.dump(cwe_status, f, indent=4)
     # fix_rule(ChatOllama(model="gemma3:27b"), './rules_qwen-plus/')
     # get_rule_fix_batch(
     #     data=get_rule_data(),
@@ -1141,39 +1153,32 @@ if __name__ == "__main__":
     # with open("./cwe_fixed_status.json", "w") as f:
     #     json.dump(cwe_status, f, indent=4)
 
+    # with open("./cwe_fixed_status.json", "r") as f:
+    #     cwe_status= json.load(f)
     # move_rules_bystatus(
     #     cwe_status=cwe_status,
     #     rules_path="./rules_fixed/",
     #     target_path="./rules_fixed_selected/"
     # )
-    print(rule_num(path="./rules_fixed_selected/"))
-    data=get_rule_data()
-    move_rules_byoutput(data=data, target_path="./rules_fixed_selected/", positive=True, no_errors=True)
-    print(rule_num(path="./rules_fixed_selected/"))
-
-
-    # test with positive sample in train dataset and move
-    # cwe_status = test_rule_positive("./rules/")
-    # with open("./cwe_status.json", "w") as f:
-    #     json.dump(cwe_status, f, indent=4)
-    # with open("./cwe_status.json", "r") as f:
+    # with open("./cwe_fixed_status.json", "r") as f:
     #     cwe_status = json.load(f)
     # read_cwe_status(cwe_status)
-    # move_rules_bystatus(
-    #     cwe_status=json.load(open("./cwe_status.json", "r")),
-    #     rules_path="./rules/",
-    #     target_path="./rules_selected/"
-    # )
+    # print(rule_num(path="./rules_fixed_selected/"))
+    # data=get_rule_data(auto_test=True)
+    
+    # move_rules_byoutput(data=data, target_path="./rules_fixed_selected/", positive=True, no_errors=False)
+    # print(rule_num(path="./rules_fixed_selected/"))
+
 
     # test with negative sample in train dataset and move
-    # cwe_negative_status=test_rule_negative('./rules_selected/')
-    # with open("./cwe_negative_status.json", "w") as f:
+    # cwe_negative_status=test_rule_negative('./rules_fixed_selected/')
+    # with open("./cwe_fixed_negative_status.json", "w") as f:
     #     json.dump(cwe_negative_status, f, indent=4)
     # move_rules_bystatus(
-    #     cwe_status=json.load(open("./cwe_negative_status.json", "r")),
+    #     cwe_status=json.load(open("./cwe_fixed_negative_status.json", "r")),
     #     test_type="true_negative",
-    #     rules_path="./rules_selected/",
-    #     target_path="./rules_negative/"
+    #     rules_path="./rules_fixed_selected/",
+    #     target_path="./rules_fixed_negative/"
     # )
     # semgrep.SemgrepRunner.read_semgrep_output('./temp/semgrep/negative/')
     # with open("./cwe_negative_status.json", "r") as f:
@@ -1184,19 +1189,33 @@ if __name__ == "__main__":
     # results = test_each_rule_on_dataset('./rules_selected/', load_primevul("./data/primevul/primevul_test_paired.jsonl"))
 
     # test with test dataset
+    # result=test_rules_batch(
+    #     rule_path="./rules_fixed_negative/",
+    #     dataset=load_primevul(),
+    #     cvs_name="semgrep_rules_fixed_negative_primevul_train.cvs"
+    # )
+    # for cwe in result:
+    #     result[cwe]['positive_path']= list(result[cwe]['positive_path'])
+    #     result[cwe]['error']= list(result[cwe]['error'])
+
+    # with open("./test_rules_fixed_negative_primevul_train_batch.json", "w") as f:
+    #     json.dump(result, f, indent=4)
+    # read_test_json("./test_rules_fixed_negative_primevul_train_batch.json")
+    # print_metrics_from_csv('./result/semgrep_rules_fixed_negative_primevul_train.cvs')
+    
     result=test_rules_batch(
-        rule_path="./rules_fixed_selected/",
-        dataset=load_primevul(),
-        cvs_name="semgrep_rules_fixed_selected_primevul_train.cvs"
+    rule_path="./rules_fixed_negative/",
+    dataset=load_primevul("./data/primevul/primevul_test.jsonl"),
+    cvs_name="semgrep_rules_fixed_negative_primevul_test.cvs"
     )
     for cwe in result:
         result[cwe]['positive_path']= list(result[cwe]['positive_path'])
         result[cwe]['error']= list(result[cwe]['error'])
 
-    with open("./test_rules_fixed_selected_primevul_train_batch.json", "w") as f:
+    with open("./test_rules_fixed_negative_primevul_test_batch.json", "w") as f:
         json.dump(result, f, indent=4)
-    read_test_json("./test_rules_fixed_selected_primevul_train_batch.json")
-    print_metrics_from_csv('./result/semgrep_rules_fixed_selected_primevul_train.cvs')
+    read_test_json("./test_rules_fixed_negative_primevul_test_batch.json")
+    print_metrics_from_csv('./result/semgrep_rules_fixed_negative_primevul_test.cvs')
 
     # result=test_cwe_rules(
     #     rule_path="./rules_selected/",
