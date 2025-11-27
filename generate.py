@@ -76,7 +76,8 @@ def genertate_rule_batch(
     total = 0
     jsonl_data = []
     for i in range(0, len(data), 2):
-
+        if  data[i].get("cwe", "N/A") !=  data[i + 1]["cwe"]:
+            print(f"Warning: CWE mismatch at idx {data[i]['idx']} and {data[i+1]['idx']}")
         message_generate = prompt_template_rules.invoke(
             {
                 "cwe": data[i].get("cwe", "N/A"),
