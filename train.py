@@ -1,6 +1,7 @@
 from data_process.utils.loader import load_primevul
 from data_process.utils.process import list_by_cwe
 import pathlib
+from statsmodels.stats.proportion import proportion_confint
 
 
 def get_cwe_statistics(data, length_threshold=90):
@@ -38,13 +39,15 @@ if __name__ == "__main__":
     rule_dict = get_rules_statistics('./rules_fixed_negative/')
     total_rules = sum(len(rule_dict[cwe]) for cwe in rule_dict)
     total_samples = sum(len(cwe_list[cwe]) for cwe in cwe_list)
-    print(f"Total rules: {total_rules}, total samples: {total_samples}")
-    for cwe in rule_dict:
-        if cwe in cwe_list:
-            samples_num=len(cwe_list[cwe])
+    average_percentage = total_rules / total_samples
+    for cwe in cwe_list:
+        samples_num=len(cwe_list[cwe])
+        if cwe in rule_dict:
             rules_num=len(rule_dict[cwe])
-            print(f"{cwe}: {samples_num} samples, {rules_num} rules. percentage: {(rules_num/samples_num)*100 if rules_num>0 else 'N/A'}%")
+            ci = proportion_confint(rules_num, samples_num, method='wilson')
+            if samples_num>10 and ci[1] <average_percentage:
+                print(f"{cwe}: {samples_num} samples, {rules_num} rules. percentage: {(rules_num/samples_num)*100 if rules_num>0 else 'N/A'}%. Wilson 95% CI: {ci}")
         else:
-            print(f"{cwe}: 0 samples, {len(rule_dict[cwe])} rules.")
-    print(f'Total: {total_samples} samples, {total_rules} rules. average percentage:{(total_rules/total_samples)*100 if total_samples>0 else "N/A"}%')
+            print(f"{cwe}: {samples_num} samples, 0 rules. Wilson 95% CI: {proportion_confint(0, samples_num, method='wilson')}")
+    print(f'Total: {total_samples} samples, {total_rules} rules. average percentage:{average_percentage*100 if total_samples>0 else "N/A"}%')
     print(f"total CWEs with rules: {len(rule_dict)}, total CWEs in dataset: {len(cwe_list)}")

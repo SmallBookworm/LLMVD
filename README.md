@@ -1,5 +1,5 @@
 # Thinking
-detect wby your cpu and gpu. fuck up you pc.
+rules are useful? train for what
 
 # workflow
 generate:
