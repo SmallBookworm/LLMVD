@@ -17,6 +17,7 @@ output/
 temp/
 rules/
 rules_*/
+result*/
 
 #scala
 .metals/

@@ -134,12 +134,14 @@ def sampling_by_pos_ratio(data, pos_ratio=0.5, shuffle=True):
 def list_by_cwe(data):
     cwe_dict = {}
     for entry in data:
-        if len(entry['cwe']) == 0:
+        if not entry['cwe']:
             print('No CWE assigned!')
-        elif len(entry['cwe']) > 1:
-            print(entry['cwe'])
+            cwe='N/A'
+        else:
+            if len(entry['cwe']) > 1:
+                print(entry['cwe'])
 
-        cwe = entry['cwe'][0]
+            cwe = entry['cwe'][0]
         if cwe not in cwe_dict.keys():
             cwe_dict[cwe] = []
         cwe_dict[cwe].append(entry)
