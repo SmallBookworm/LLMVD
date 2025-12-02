@@ -5,10 +5,10 @@ os.environ["MODEL_PATH"] = "/home/peng/.cache/modelscope/hub/models/"
 
 def try_qwen():
     # Load model directly
+    model_name="deepseek-ai/deepseek-coder-1.3b-instruct"
 
-
-    tokenizer = AutoTokenizer.from_pretrained(os.environ["MODEL_PATH"] + "deepseek-ai/DeepSeek-Coder-V2-Lite-Instruct")
-    model = AutoModelForCausalLM.from_pretrained(os.environ["MODEL_PATH"] + "deepseek-ai/DeepSeek-Coder-V2-Lite-Instruct")
+    tokenizer = AutoTokenizer.from_pretrained(os.environ["MODEL_PATH"] + model_name)
+    model = AutoModelForCausalLM.from_pretrained(os.environ["MODEL_PATH"] + model_name, device_map="auto")
     messages = [
         {"role": "user", "content": "Who are you?"},
     ]
@@ -19,7 +19,7 @@ def try_qwen():
         return_dict=True,
         return_tensors="pt",
     ).to(model.device)
-
+    print(f"device:{model.device}")
     outputs = model.generate(**inputs, max_new_tokens=128)
     print(tokenizer.decode(outputs[0][inputs["input_ids"].shape[-1]:]))
 
