@@ -34,3 +34,18 @@ def generate_chatml_train_data(dataset, output_path='./models/data/chatml_train_
             writer.write(item)
     print(f'Success to save chatML train data to {output_path}.')
     return result
+
+# divide dataset by token length
+def divide_data_by_length(dataset, tokenizer, max_length=2048):
+    short_data = []
+    long_data = []
+    for sample in dataset:
+        input_text = sample['func'] if 'func' in sample else ''
+        # instruction_text = sample['instruction'] if 'instruction' in sample else ''
+        # full_text = instruction_text + '\n' + input_text
+        tokenized = tokenizer(input_text, return_tensors='pt')
+        if tokenized['input_ids'].shape[1] <= max_length:
+            short_data.append(sample)
+        else:
+            long_data.append(sample)
+    return short_data, long_data
