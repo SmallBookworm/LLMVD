@@ -2,6 +2,8 @@
 rules are useful? train for what
 
 # workflow
+![overview](./assert/workflow.svg "overview")
+
 generate:
 generate_semgrep_rules | genertate_rule_batch -> (get_semgrep_rules_from_batch_response) -> vaildate_rules -> test_rule_positive (train dataset) -> fix_rule -> move_rules_bystatus
 -> test_rule_negative (train dataset) -> move_rules_bystatus -> test_rules_batch | test_cwe_rules (test dataset) -> print_metrics_from_csv
