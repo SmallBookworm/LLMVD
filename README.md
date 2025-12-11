@@ -28,9 +28,9 @@ default model: .venv/bin/python main.py --dataset devign
 generate rules: python generate.py --dataset primevul_train_paired
 
 # semgrep output 
-## errors
-Error types: {'PartialParsing', 'InvalidRuleSchemaError', 'Other syntax error', 'Rule parse error', 'SemgrepError', 'Syntax error'}
-
+## error types:
+ {'PartialParsing', 'InvalidRuleSchemaError', 'Other syntax error', 'Rule parse error', 'SemgrepError', 'Syntax error'}
+rule errors: 'InvalidRuleSchemaError', 'Rule parse error'
 
 # test result
 ## primevul test paired:
