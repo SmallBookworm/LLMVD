@@ -22,7 +22,7 @@ Vulnerable code (before fix):
 Fixed code:
 {fix_code}
 
-Language: C
+Language: C/C++
 '''}]
 
 fix_rule_prompt=[

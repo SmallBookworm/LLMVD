@@ -356,7 +356,7 @@ def test_rules_batch(rule_path, dataset, cvs_name="semgrep_primevul.cvs"):
     for sample in dataset:
         total += 1
         idx = sample["idx"]
-        code_path = f"{filepath}code_{total}_{idx}.c"
+        code_path = f"{filepath}code_{total}_{idx}.cpp"
         if os.path.exists(code_path):
             print(f"code already exists: {code_path}")
         save_code(sample["func"], code_path)
