@@ -420,7 +420,7 @@ def test_rules_batch(rule_path, dataset, cvs_name="semgrep_primevul.cvs"):
         fp.update(cwe_rules[cwe]["false_positive"])
         path.update(cwe_rules[cwe]["positive_path"])
     print(
-        f"Total:{total}, true_positive:{len(tp)},false_positive:{len(fp)}, Precision:{len(tp)/(len(tp)+len(fp))}"
+        f"Total:{total}, true_positive:{len(tp)},false_positive:{len(fp)}, Precision:{len(tp)/(len(tp)+len(fp) if (len(tp)+len(fp)) > 0 else 1)}"
     )
 
     # There are repeated samples.

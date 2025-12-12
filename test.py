@@ -1,3 +1,4 @@
+import json
 from data_process.utils.loader import load_devign, load_primevul
 from getresdata_csv import print_metrics_from_csv
 
@@ -293,6 +294,30 @@ Language: C
             print(f'Semgrep rule saved to {rule_path}')
     return total
 
+def write_dataset_to_files(dataset, max=0, base_path='./temp/dataset/'):
+    create_directory(base_path)
+
+    for i in range(0, min(len(dataset), max), 2):
+        sample_path = os.path.join(base_path, str(i))
+        create_directory(sample_path)
+        sample = dataset[i]
+        file_path = os.path.join(sample_path, f'sample_{i}_label_{sample["idx"]}.json')
+        data=[sample]
+        with open(file_path, 'w') as f:
+            json.dump(data, f, indent=4)
+        c_filepath = os.path.join(sample_path, f'sample_{i}_label_{sample["idx"]}.cpp')
+        with open(c_filepath, 'w') as f:
+            f.write(sample['func'])
+        
+        file_path_2 = os.path.join(sample_path, f'sample_{i+1}_label_{dataset[i+1]["idx"]}.json')
+        data_2=[dataset[i+1]]
+        with open(file_path_2, 'w') as f:
+            json.dump(data_2, f, indent=4)
+        c_filepath_2 = os.path.join(sample_path, f'sample_{i+1}_label_{dataset[i+1]["idx"]}.cpp')
+        with open(c_filepath_2, 'w') as f:
+            f.write(dataset[i+1]['func'])
+    print(f'Dataset samples saved to {base_path}')
+
 if __name__ == "__main__":
-   print(generate_semgrep_rules()) 
+   write_dataset_to_files(load_primevul(), 100)
 
