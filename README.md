@@ -1,5 +1,5 @@
 # Thinking
-rules are useful? train for what
+useful rules. rain for what
 
 # workflow
 ![overview](./assert/workflow.svg "overview")
