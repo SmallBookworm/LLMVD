@@ -34,7 +34,7 @@ def load_splitted_json(json_dir, prefix=''):
 
     return dataset_dict
 
-
+# For test, we need idx, func, target
 def load_devign(json_path):
     with open(json_path, 'r') as f:
         raw_data = json.load(f)
@@ -44,9 +44,9 @@ def load_devign(json_path):
         code, label = raw_entry['func'], raw_entry['target']
         del raw_entry['func'], raw_entry['target']
         entry = {
-            'index': idx,
-            'code': code,
-            'label': label,
+            'idx': idx,
+            'func': code,
+            'target': label,
             **raw_entry
         }
         data.append(entry)

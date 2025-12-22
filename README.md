@@ -18,6 +18,7 @@ joern semgrep
 # dataset
 1. devign: dict_keys(['project', 'commit_id', 'target', 'func'])  total(27318) vul(12460)
 2. primevul_train_paired: dict_keys(['idx', 'project', 'commit_id', 'project_url', 'commit_url', 'commit_message', 'target', 'func', 'func_hash', 'file_name', 'file_hash', 'cwe', 'cve', 'cve_desc', 'nvd_url']) total(7578) vul(3789).
+primevul_test total(24788) vul(549)
 In primevul dataset, there are repeated samples. For example, same idx samples(two 349259 samples, two 439495 samples) in primevul_test_paired.
 
 # run:
@@ -82,7 +83,17 @@ Precision: 0.5926
 Recall: 0.5521
 FPR: 0.3795
 F1: 0.5717
-### (fixed rules:666 + positive:1625) -> negative:1411
+
+### fixed rules:666 + positive:1625 =2291 (rules_fixed_selected)
+test total:817992, rule num:2291, true_positive:3146,false_positive:3010, Precision:0.5110461338531515
+Length: 7578, positive samples num:3789, negative samples num:3789, true_positive:3146, false_positive:3012
+Accuracy: 0.5177
+Precision: 0.5109
+Recall: 0.8303
+FPR: 0.7949
+F1: 0.6326
+
+### (fixed rules:666 + positive:1625) -> negative:1411 (rules_fixed_negative)
 test total:734678, rule num:1411, true_positive:2765,false_positive:2225, Precision:0.5541082164328658
 Length: 7578, positive samples num:3789, negative samples num:3789, true_positive:2765, false_positive:2225
 Accuracy: 0.5713
@@ -92,6 +103,14 @@ FPR: 0.5872
 F1: 0.6299
 
 ## primevul test
+### (fixed rules:666 + positive:1625)
+test total:2677104, rule num:2291, true_positive:456,false_positive:12867, Precision:0.03422652555730691
+Length: 24788, positive samples num:549, negative samples num:24239, true_positive:456, false_positive:12867
+Accuracy: 0.4772
+Precision: 0.0342
+Recall: 0.8306
+FPR: 0.5308
+F1: 0.0657
 ### (fixed rules:666 + positive:1625) -> negative:1411
 test total:2404436, rule num:1411, true_positive:265,false_positive:5551, Precision:0.04556396148555708
 Length: 24788, positive samples num:549, negative samples num:24239, true_positive:265, false_positive:5551
