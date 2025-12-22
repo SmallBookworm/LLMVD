@@ -207,6 +207,7 @@ def rule_num(path="./rules/"):
 
 
 # test in primevul dataset (train paired)
+# strict mode: if rule not found, stop testing
 def test_rule_positive(rule_root="./rules/", output_path="./temp/semgrep/positive/", strict =True):
     semgrep_runner = semgrep.SemgrepRunner()
     new_directory(output_path)
@@ -356,7 +357,7 @@ def test_rules_batch(rule_path, dataset, cvs_name="semgrep_primevul.cvs"):
     for sample in dataset:
         total += 1
         idx = sample["idx"]
-        code_path = f"{filepath}code_{total}_{idx}.cpp"
+        code_path = f"{filepath}code_{total}_{idx}.c"
         if os.path.exists(code_path):
             print(f"code already exists: {code_path}")
         save_code(sample["func"], code_path)
@@ -394,7 +395,7 @@ def test_rules_batch(rule_path, dataset, cvs_name="semgrep_primevul.cvs"):
                 cwe_rules[cwe_dir]["positive_path"].add(code_path)
                 try:
                     filename = os.path.basename(code_path)
-                    # 假设格式: code_CWE123_456.c → split by '_'
+                    # code_CWE123_456.c → split by '_'
                     parts = filename.split("_")
                     if len(parts) < 3:
                         print(f"Warning: unexpected filename {filename}")
@@ -451,7 +452,7 @@ def test_rules_batch(rule_path, dataset, cvs_name="semgrep_primevul.cvs"):
     return cwe_rules
 
 
-# only use corresponding rules to test cwe samples
+# only use corresponding cwe rules to test cwe samples
 # skip cwe rule without samples
 def test_cwe_rules(rule_path, dataset, cvs_name="semgrep_cwe_primevul.cvs"):
     semgrep_runner = semgrep.SemgrepRunner()
@@ -1217,6 +1218,7 @@ if __name__ == "__main__":
         json.dump(result, f, indent=4)
     read_test_json("./test_rules_fixed_negative_primevul_test_batch.json")
     print_metrics_from_csv('./result/semgrep_rules_fixed_negative_primevul_test.cvs')
+
 
     # result=test_cwe_rules(
     #     rule_path="./rules_selected/",
