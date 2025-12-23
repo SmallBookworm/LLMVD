@@ -1126,20 +1126,20 @@ def move_rules_bystatus(
         print(f"Moved rules for CWE-{cwe} to {dest_dir}")
 
 
-def test_devign():
+def test_devign(rule_filename="rules_fixed_negative"):
     result=test_rules_batch(
-    rule_path="./rules_fixed_negative/",
+    rule_path=f"./{rule_filename}/",
     dataset=load_devign("./data/devign/function.json"),
-    cvs_name="semgrep_rules_fixed_negative_devign.cvs"
+    cvs_name=f"semgrep_{rule_filename}_devign.cvs"
     )
     for cwe in result:
         result[cwe]['positive_path']= list(result[cwe]['positive_path'])
         result[cwe]['error']= list(result[cwe]['error'])
 
-    with open("./test_rules_fixed_negative_devign_batch.json", "w") as f:
+    with open(f"./test_{rule_filename}_devign_batch.json", "w") as f:
         json.dump(result, f, indent=4)
-    read_test_json("./test_rules_fixed_negative_devign_batch.json")
-    print_metrics_from_csv('./result/semgrep_rules_fixed_negative_devign.cvs')
+    read_test_json(f"./test_{rule_filename}_devign_batch.json")
+    print_metrics_from_csv(f'./result/semgrep_{rule_filename}_devign.cvs')
 
 def test_primevul_test():
     result=test_rules_batch(
