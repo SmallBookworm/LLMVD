@@ -1141,20 +1141,20 @@ def test_devign(rule_filename="rules_fixed_negative"):
     read_test_json(f"./test_{rule_filename}_devign_batch.json")
     print_metrics_from_csv(f'./result/semgrep_{rule_filename}_devign.cvs')
 
-def test_primevul_test():
+def test_primevul(rule_filename="rules_fixed_negative", dataset_name="primevul_test"):
     result=test_rules_batch(
-    rule_path="./rules_fixed_negative/",
-    dataset=load_primevul("./data/primevul/primevul_test.jsonl"),
-    cvs_name="semgrep_rules_fixed_negative_primevul_test.cvs"
+    rule_path=f"./{rule_filename}/",
+    dataset=load_primevul(f"./data/primevul/{dataset_name}.jsonl"),
+    cvs_name=f"semgrep_{rule_filename}_{dataset_name}.cvs"
     )
     for cwe in result:
         result[cwe]['positive_path']= list(result[cwe]['positive_path'])
         result[cwe]['error']= list(result[cwe]['error'])
 
-    with open("./test_rules_fixed_negative_primevul_test_batch.json", "w") as f:
+    with open(f"./test_{rule_filename}_{dataset_name}_batch.json", "w") as f:
         json.dump(result, f, indent=4)
-    read_test_json("./test_rules_fixed_negative_primevul_test_batch.json")
-    print_metrics_from_csv('./result/semgrep_rules_fixed_negative_primevul_test.cvs')
+    read_test_json(f"./test_{rule_filename}_{dataset_name}_batch.json")
+    print_metrics_from_csv(f'./result/semgrep_{rule_filename}_{dataset_name}.cvs')
 
 if __name__ == "__main__":
     # generate
@@ -1238,7 +1238,8 @@ if __name__ == "__main__":
     # read_test_json("./test_rules_fixed_negative_primevul_train_batch.json")
     # print_metrics_from_csv('./result/semgrep_rules_fixed_negative_primevul_train.cvs')
     
-    test_devign()
+    print(rule_num())
+    test_primevul('rules','primevul_train_paired')
 
 
     # result=test_cwe_rules(

@@ -5,8 +5,7 @@ useful rules. rain for what
 ![overview](./assert/workflow.svg "overview")
 
 generate:
-generate_semgrep_rules | genertate_rule_batch -> (get_semgrep_rules_from_batch_response) -> vaildate_rules -> test_rule_positive (train dataset) -> fix_rule -> move_rules_bystatus
--> test_rule_negative (train dataset) -> move_rules_bystatus -> test_rules_batch | test_cwe_rules (test dataset) -> print_metrics_from_csv
+generate_semgrep_rules | genertate_rule_batch -> (get_semgrep_rules_from_batch_response) -> vaildate_rules -> test_rule_positive (train dataset, get_rule_data) -> fix_rule -> test_rule_positive -> move_rules_bystatus -> test_rule_negative (train dataset) -> move_rules_bystatus -> test_rules_batch | test_cwe_rules (test dataset) -> print_metrics_from_csv
 # files
 main.py: detect vulnerabilities by LLMs
 generate.py: generate,test and fix rules 
@@ -75,6 +74,15 @@ F1: 0.0884
 
 
 ## primevul train paired ? !
+### native 3789
+test total:841158, rule num:3789, true_positive:205,false_positive:157, Precision:0.5662983425414365
+Length: 7578, positive samples num:3789, negative samples num:3789, true_positive:205, false_positive:157
+Accuracy: 0.5063
+Precision: 0.5663
+Recall: 0.0541
+FPR: 0.0414
+F1: 0.0988
+
 ### True Negatives: 1027
 semgrep test all:
 Length: 7578, positive samples num:3789, negative samples num:3789, true_positive:2092, false_positive:1438
@@ -84,7 +92,7 @@ Recall: 0.5521
 FPR: 0.3795
 F1: 0.5717
 
-### fixed rules:666 + positive:1625 =2291 (rules_fixed_selected)
+### fixed rules:666 (positive) + positive:1625 =2291 (rules_fixed_selected)
 test total:817992, rule num:2291, true_positive:3146,false_positive:3010, Precision:0.5110461338531515
 Length: 7578, positive samples num:3789, negative samples num:3789, true_positive:3146, false_positive:3012
 Accuracy: 0.5177
