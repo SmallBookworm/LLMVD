@@ -37,6 +37,11 @@ def generate_chatml_train_data(dataset, output_path='./models/data/chatml_train_
 
 # divide dataset by token length
 def divide_data_by_length(dataset, tokenizer, max_length=2048):
+    '''
+    divide dataset into short and long based on token length
+    
+    :param max_length: maximum token length
+    '''
     short_data = []
     long_data = []
     for sample in dataset:

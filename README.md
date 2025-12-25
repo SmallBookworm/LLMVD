@@ -52,7 +52,6 @@ F1: 0.2250
 
 ### True negative rules:
 True positive: 1625, -> True Negatives: 1027, Run Errors: 0
-
 semgrep test all:
 Total:870, true_positive:322,false_positive:329, Precision:0.4946236559139785
 Length: 870
