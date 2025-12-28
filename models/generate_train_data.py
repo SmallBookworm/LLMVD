@@ -1,4 +1,5 @@
 from data_process.utils.loader import load_primevul
+from data_process.utils.process import get_cwe_idx_dict, list_by_idx
 import json
 import jsonlines
 
@@ -54,3 +55,21 @@ def divide_data_by_length(dataset, tokenizer, max_length=2048):
         else:
             long_data.append(sample)
     return short_data, long_data
+
+# get train data by cwe_status.json 
+def get_train_data_by_cwe_status(cwe_status_path='./cwe_status.json', test_type="true_negative"):
+    with open(cwe_status_path, 'r') as f:
+        cwe_status = json.load(f)
+    
+    dataset = load_primevul('./data/primevul/primevul_train_paired.jsonl')
+    cwe_index_dict = get_cwe_idx_dict(dataset)
+
+    filtered_data = []
+    for cwe in cwe_status:
+        for idx in cwe_status[cwe][test_type]:
+            for i in range(len(dataset)):
+                sample = dataset[i]
+                if sample['cwe'][0] == cwe and sample['idx'] == idx:
+                    filtered_data.append(sample)
+                    filtered_data.append(dataset[i+1])  # add the paired sample
+    return filtered_data
