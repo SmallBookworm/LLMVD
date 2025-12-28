@@ -24,17 +24,16 @@ dataset length: 7578
 if __name__ == "__main__":
     model_name="Qwen/Qwen2.5-Coder-7B-Instruct"
 
+    negative_data=get_train_data_by_cwe_status(cwe_status_path='./cwe_fixed_negative_status.json', test_type="true_negative")
     # res = generate_chatml_train_data(load_primevul(), output_path='./models/data/chatml_train_data.jsonl')
     # limit data to 4096 tokens
     max_token_length = 4096
     tokenizer = AutoTokenizer.from_pretrained(os.environ["MODEL_PATH"] + model_name)
-    short_res, long_res = divide_data_by_length(load_primevul(), tokenizer, max_length=max_token_length)
+    short_res, long_res = divide_data_by_length(negative_data, tokenizer, max_length=max_token_length)
     print(f"dataset length: {len(short_res)},{len(long_res)}")
-    generate_train_data(short_res, output_path='./models/data/primevul_train_paired_4096_data.json')
+    generate_train_data(short_res, output_path='./models/data/primevul_fixed_negative_4096_data.json')
     # generate_train_data(load_primevul('./data/primevul/primevul_test_paired.jsonl'), output_path='./models/data/primevul_test_paired_data.json')
-    with open('./models/data/primevul_train_paired_4096_data.json', 'r') as f:
+    with open('./models/data/primevul_fixed_negative_4096_data.json', 'r') as f:
         data = json.load(f)
     print(f"json length: {len(data)}")
-    print(f"dataset length: {len(load_primevul('./data/primevul/primevul_train_paired.jsonl'))}")
-    for sample in long_res:
-        print(f"{sample['cwe']}")
+    print(f"dataset length: {len(negative_data)}")
