@@ -1038,7 +1038,7 @@ def move_rules_byoutput(data, target_path="./rules_final/", positive=True, no_er
             shutil.copy2(source_path, dest_path)
     print(f"Total rules: {len(data)}, Positive rules: {positive_num}, No error rules: {no_error_num}, all moved rules: {positive_num+no_error_num}")
 
-def vaildate_rules(data, rules_path="./rules/"):
+def validate_rules(data, rules_path="./rules/"):
 
     total = rule_num(rules_path)
 

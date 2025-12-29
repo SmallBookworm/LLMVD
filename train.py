@@ -7,6 +7,27 @@ import os
 
 os.environ["MODEL_PATH"] = "/home/peng/.cache/modelscope/hub/models/"
 
+def get_rules_idx(rules_path):
+    rule_files = []
+    for root, _, files in os.walk(rules_path):
+        for file in files:
+            if file.endswith(".yaml") or file.endswith(".yml"):
+                rule_files.append(file)
+    rules_idx = []
+    for rule_file in rule_files:
+        idx = rule_file.split("_")[-1].split(".")[0]
+        rules_idx.append(int(idx))
+    return rules_idx
+
+def validate_negative_data(negative_data, rules_path="./rules_fixed_negative/"):
+    rules_idx=get_rules_idx(rules_path)
+    print(f"rules_idx length: {len(rules_idx)}")
+    for data in negative_data:
+        data_idx = data['idx']
+        if data_idx in rules_idx:
+            print(f"Found same idx in rules: {data_idx}")
+    print(f"negative_data length: {len(negative_data)}")
+
 '''
 32768
 dataset length: 7570,8
@@ -36,4 +57,5 @@ if __name__ == "__main__":
     with open('./models/data/primevul_fixed_negative_4096_data.json', 'r') as f:
         data = json.load(f)
     print(f"json length: {len(data)}")
-    print(f"dataset length: {len(negative_data)}")
+
+    validate_negative_data(negative_data, rules_path="./rules_fixed_negative/")

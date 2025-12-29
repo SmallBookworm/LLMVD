@@ -5,7 +5,7 @@ useful rules. rain for what
 ![overview](./assert/workflow.svg "overview")
 
 generate:
-generate_semgrep_rules | genertate_rule_batch -> (get_semgrep_rules_from_batch_response) -> vaildate_rules -> test_rule_positive (train dataset, get_rule_data) -> fix_rule -> test_rule_positive -> move_rules_bystatus -> test_rule_negative (train dataset) -> move_rules_bystatus -> test_rules_batch | test_cwe_rules (test dataset) -> print_metrics_from_csv
+generate_semgrep_rules | genertate_rule_batch -> (get_semgrep_rules_from_batch_response) -> validate_rules -> test_rule_positive (train dataset, get_rule_data) -> fix_rule -> test_rule_positive -> move_rules_bystatus -> test_rule_negative (train dataset) -> move_rules_bystatus -> test_rules_batch | test_cwe_rules (test dataset) -> print_metrics_from_csv
 # files
 main.py: detect vulnerabilities by LLMs
 generate.py: generate,test and fix rules 
