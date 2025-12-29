@@ -19,3 +19,22 @@ register_template(
     replace_eos=True,
 )
 ```
+
+Qwen2.5-Coder-7B-Instruct
+default generation
+{
+  "bos_token_id": 151643,
+  "pad_token_id": 151643,
+  "do_sample": true,
+  "eos_token_id": [
+    151645,
+    151643
+  ],
+  "repetition_penalty": 1.1,
+  "temperature": 0.7,
+  "top_p": 0.8,
+  "top_k": 20,
+  "transformers_version": "4.44.0"
+}
+
+we set temperature to 0.1

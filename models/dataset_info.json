@@ -1,0 +1,14 @@
+{
+    "primevul_test_paired_data": {
+        "file_name": "primevul_test_paired_data.json"
+    },
+    "primevul_train_paired_data": {
+        "file_name": "primevul_train_paired_data.json"
+    },
+    "primevul_train_paired_4096_data": {
+        "file_name": "primevul_train_paired_4096_data.json"
+    },
+    "primevul_fixed_negative_4096_data": {
+        "file_name": "primevul_fixed_negative_4096_data.json"
+    }
+}

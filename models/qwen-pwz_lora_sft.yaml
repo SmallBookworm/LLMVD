@@ -1,6 +1,6 @@
 ### model
 model_name_or_path: /home/peng/.cache/modelscope/hub/models/Qwen/Qwen2.5-Coder-7B-Instruct
-quantization_bit: 8  # choices: [8 (bnb/hqq/eetq), 4 (bnb/hqq), 3 (hqq), 2 (hqq)]
+quantization_bit: 4  # choices: [8 (bnb/hqq/eetq), 4 (bnb/hqq), 3 (hqq), 2 (hqq)]
 quantization_method: bnb  # choices: [bnb, hqq, eetq]
 
 ### method
@@ -11,17 +11,16 @@ lora_rank: 8
 lora_target: all
 
 ### dataset
-dataset: primevul_train_pair_2048
-dataset_dir: models/data/
-template: qwen
-cutoff_len: 2048
-max_samples: 100000
+dataset: primevul_fixed_negative_4096_data
+template: qwen-pwz
+cutoff_len: 4096
+max_samples: 10000
 overwrite_cache: true
-preprocessing_num_workers: 16
-dataloader_num_workers: 4
+preprocessing_num_workers: 8
+dataloader_num_workers: 2
 
 ### output
-output_dir: saves/Qwen2.5-Coder/lora_2048_sft
+output_dir: saves/Qwen2.5-Coder-7B-Instruct/lora/sft_primevul_fixed_negative_4096_data
 logging_steps: 10
 save_steps: 500
 plot_loss: true
@@ -39,7 +38,6 @@ warmup_ratio: 0.1
 bf16: true
 ddp_timeout: 180000000
 resume_from_checkpoint: null
-
 
 ### eval
 # eval_dataset: alpaca_en_demo
