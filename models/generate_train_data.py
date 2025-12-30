@@ -103,3 +103,19 @@ def get_train_data_by_sample(dataset, num_samples=10):
         return dataset
 
     return random.sample(dataset, num_samples)
+
+
+# split dataset
+def split_dataset(dataset_path="./models/data/devign_32768_data.json", split_num=2):
+    with open(dataset_path, "r") as f:
+        dataset = json.load(f)
+
+    block_size = int(len(dataset) / split_num)
+    for i in range(split_num):
+        start_idx = i * block_size
+        end_idx = (i + 1) * block_size if i != split_num - 1 else len(dataset)
+        split_data = dataset[start_idx:end_idx]
+        output_path = dataset_path.replace(".json", f"_part{i}.json")
+        with open(output_path, "w") as f:
+            json.dump(split_data, f, indent=4)
+        print(f"Success to save split data to {output_path}.")

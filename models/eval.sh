@@ -1,0 +1,25 @@
+llamafactory-cli train \
+    --stage sft \
+    --model_name_or_path /home/.cache/modelscope/hub/models/Qwen/Qwen2.5-Coder-7B-Instruct \
+    --preprocessing_num_workers 16 \
+    --finetuning_type lora \
+    --quantization_method bnb \
+    --template qwen-pwz \
+    --flash_attn auto \
+    --dataset_dir data \
+    --eval_dataset devign_32768_data_part0 \
+    --cutoff_len 32768 \
+    --max_samples 100000 \
+    --per_device_eval_batch_size 1 \
+    --predict_with_generate True \
+    --report_to none \
+    --max_new_tokens 512 \
+    --top_p 0.8 \
+    --temperature 0.1 \
+    --output_dir saves/Qwen2.5-Coder-7B-Instruct/lora/eval_2025-12-30-16-13-45-devign_32768_data_part0-sft_paired \
+    --trust_remote_code True \
+    --ddp_timeout 180000000 \
+    --do_predict True \
+    --adapter_name_or_path saves/Qwen2.5-Coder-7B-Instruct/lora/sft_primevul_train_paired \
+    --quantization_bit 4 \
+    --double_quantization True
