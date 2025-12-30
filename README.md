@@ -33,6 +33,7 @@ generate rules: python generate.py --dataset primevul_train_paired
 rule errors: 'InvalidRuleSchemaError', 'Rule parse error'
 
 # test result
+1. static analysis layer
 ## primevul test paired:
 ### True positive rules:
 semgrep test all:
@@ -134,6 +135,23 @@ fixed rules (gemma3): Total positive samples: 201, True Positives: 119, Run Erro
 
 native (qwen-plus): Total positive samples: 201, True Positives: 90, Run Errors: 44
 fixed rules (gemma3): Total positive samples: 201, True Positives: 93, Run Errors: 32
+
+2. model learning layer
+## primevul_train_paired_data (32768 cutoff)
+jsonl length: 7570
+Total items: 7570
+### Qwen2.5-Coder-7B-Instruct (origin)
+Failed generations: 0
+True Positives: 300, False Positives: 265, True Negatives: 3520, False Negatives: 3485
+Accuracy: 0.5046, Precision: 0.5310, Recall: 0.0793, F1 Score: 0.1379, FPR: 0.0700
+### Qwen2.5-Coder-7B-Instruct/lora/sft_primevul_train_paired
+Failed generations: 0
+True Positives: 2149, False Positives: 1743, True Negatives: 2042, False Negatives: 1636
+Accuracy: 0.5536, Precision: 0.5522, Recall: 0.5678, F1 Score: 0.5599, FPR: 0.4605
+### Qwen2.5-Coder-7B-Instruct/lora/sft_primevul_fixed_negative_4096_data
+Failed generations: 0
+True Positives: 2034, False Positives: 1719, True Negatives: 2066, False Negatives: 1751
+Accuracy: 0.5416, Precision: 0.5420, Recall: 0.5374, F1 Score: 0.5397, FPR: 0.4542
 
 # to do
 1. fix rules that get false negative result in first positive test and false positive.
