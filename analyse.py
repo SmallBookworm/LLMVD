@@ -8,7 +8,7 @@ def load_generated_jsonl(file_path):
     return data
 
 # Accuracy, Precision, Recall, F1 Score, FPR
-def statics_on_generated_jsonl(data):
+def statistics_on_generated_jsonl(data):
     total = len(data)
     fail_generate_count=0
     true_positive=0
@@ -64,4 +64,4 @@ def statics_on_generated_jsonl(data):
 if __name__ == "__main__":
     data = load_generated_jsonl("../LLaMA-Factory/saves/Qwen2.5-Coder-7B-Instruct/lora/eval_2025-12-29-21-01-14-train_paired-sft_fixed_negative/generated_predictions.jsonl")
     print(f"jsonl length: {len(data)}")
-    statics_on_generated_jsonl(data)
+    statistics_on_generated_jsonl(data)
