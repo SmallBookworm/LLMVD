@@ -8,8 +8,8 @@ def load_generated_jsonl(file_path):
     return data
 
 # Accuracy, Precision, Recall, F1 Score, FPR
-def statistics_on_generated_jsonl(data):
-    total = len(data)
+def statistics_on_generated_jsonl(data_list=[]):
+    total = 0
     fail_generate_count=0
     true_positive=0
     false_positive=0
@@ -17,23 +17,25 @@ def statistics_on_generated_jsonl(data):
     false_negative=0
     
     # VULNERABLE or SAFE ("VULNERABLE\n" "SAFE\n" in label)
-    for item in data:
-        label = 1 if "VULNERABLE" in item.get("label") else 0
-        if item.get("predict") == "VULNERABLE":
-            prediction = 1
-        elif item.get("predict") == "SAFE":
-            prediction = 0
-        else:
-            fail_generate_count += 1
-            continue
-        if label == 1 and prediction == 1:
-            true_positive += 1
-        elif label == 0 and prediction == 1:
-            false_positive += 1
-        elif label == 0 and prediction == 0:
-            true_negative += 1
-        elif label == 1 and prediction == 0:
-            false_negative += 1
+    for data in data_list:
+        total += len(data)
+        for item in data:
+            label = 1 if "VULNERABLE" in item.get("label") else 0
+            if item.get("predict") == "VULNERABLE":
+                prediction = 1
+            elif item.get("predict") == "SAFE":
+                prediction = 0
+            else:
+                fail_generate_count += 1
+                continue
+            if label == 1 and prediction == 1:
+                true_positive += 1
+            elif label == 0 and prediction == 1:
+                false_positive += 1
+            elif label == 0 and prediction == 0:
+                true_negative += 1
+            elif label == 1 and prediction == 0:
+                false_negative += 1
     
     real_total = true_positive + false_positive + true_negative + false_negative
     accuracy = (true_positive + true_negative) / real_total if real_total > 0 else 0
@@ -62,6 +64,7 @@ def statistics_on_generated_jsonl(data):
     }
 
 if __name__ == "__main__":
-    data = load_generated_jsonl("../LLaMA-Factory/saves/Qwen2.5-Coder-7B-Instruct/lora/eval_2025-12-29-21-01-14-train_paired-sft_fixed_negative/generated_predictions.jsonl")
-    print(f"jsonl length: {len(data)}")
-    statistics_on_generated_jsonl(data)
+    data0 = load_generated_jsonl("../LLaMA-Factory/saves/Qwen2.5-Coder-7B-Instruct/lora/eval_2025-12-30-16-13-45-devign_32768_data_part0-sft_paired/generated_predictions.jsonl")
+    data1 = load_generated_jsonl("../LLaMA-Factory/saves/Qwen2.5-Coder-7B-Instruct/lora/eval_2025-12-30-16-17-45-devign_32768_data_part1-sft_paired/generated_predictions.jsonl")
+    print(f"jsonl length: {len(data0) + len(data1)}")
+    statistics_on_generated_jsonl([data0, data1])
