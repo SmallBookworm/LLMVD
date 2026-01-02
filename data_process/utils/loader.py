@@ -76,10 +76,10 @@ def load_primevul(jsonl_path='./data/primevul/primevul_train_paired.jsonl'):
 def load_reveal(json_dir):
     data = []
     with open(osp.join(json_dir, 'non-vulnerables.json'), 'r') as f:
-        data += [{**raw_entry, 'label': 0, 'index': idx}
+        data += [{**raw_entry, 'func': raw_entry.get('code'), 'target': 0, 'idx': idx}
                  for idx, raw_entry in enumerate(json.load(f))]
     with open(osp.join(json_dir, 'vulnerables.json'), 'r') as f:
-        data += [{**raw_entry, 'label': 1, 'index': idx}
+        data += [{**raw_entry, 'func': raw_entry.get('code'), 'target': 1, 'idx': idx}
                  for idx, raw_entry in enumerate(json.load(f))]
     return data
 
