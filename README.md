@@ -153,6 +153,13 @@ Failed generations: 0
 True Positives: 2034, False Positives: 1719, True Negatives: 2066, False Negatives: 1751
 Accuracy: 0.5416, Precision: 0.5420, Recall: 0.5374, F1 Score: 0.5397, FPR: 0.4542
 
+### negative_rules and Qwen2.5-Coder-7B-Instruct/lora/sft_primevul_fixed_negative_4096_data
+total from csv: 4990
+Total items: 7578
+Failed generations: 0
+True Positives: 3396, False Positives: 3051, True Negatives: 738, False Negatives: 393
+Accuracy: 0.5455, Precision: 0.5268, Recall: 0.8963, F1 Score: 0.6635, FPR: 0.8052
+
 ## primevul_test_paired_data (32768 cutoff)
 jsonl length: 870
 Total items: 870
