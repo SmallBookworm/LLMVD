@@ -1238,10 +1238,10 @@ if __name__ == "__main__":
     # read_test_json("./test_rules_fixed_negative_primevul_train_batch.json")
     # print_metrics_from_csv('./result/semgrep_rules_fixed_negative_primevul_train.cvs')
     
-    print(rule_num())
-    test_primevul('rules','primevul_train_paired')
-
-
+    # print(rule_num())
+    # test_primevul('rules','primevul_train_paired')
+    test_primevul('rules_fixed_negative','primevul_test_paired')
+    
     # result=test_cwe_rules(
     #     rule_path="./rules_selected/",
     #     dataset=load_primevul("./data/primevul/primevul_test_paired.jsonl"),

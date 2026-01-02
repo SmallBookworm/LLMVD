@@ -19,6 +19,7 @@ joern semgrep
 2. primevul_train_paired: dict_keys(['idx', 'project', 'commit_id', 'project_url', 'commit_url', 'commit_message', 'target', 'func', 'func_hash', 'file_name', 'file_hash', 'cwe', 'cve', 'cve_desc', 'nvd_url']) total(7578) vul(3789).
 primevul_test total(24788) vul(549)
 In primevul dataset, there are repeated samples. For example, same idx samples(two 349259 samples, two 439495 samples) in primevul_test_paired.
+3. reveal: total(22734) vul(2240)
 
 # run:
 local_huggingface_model: .venv/bin/python main.py --dataset devign --base_model Meta-Llama-3-8B
@@ -70,8 +71,13 @@ Recall: 0.0483
 FPR: 0.0437
 F1: 0.0884
 
-### fixed rules
-
+### negative:1411 (rules_fixed_negative)
+Length: 870, positive samples num:435, negative samples num:435, true_positive:340, false_positive:350
+Accuracy: 0.4885
+Precision: 0.4928
+Recall: 0.7816
+FPR: 0.8046
+F1: 0.6044
 
 ## primevul train paired ? !
 ### native 3789
@@ -153,12 +159,24 @@ Failed generations: 0
 True Positives: 2034, False Positives: 1719, True Negatives: 2066, False Negatives: 1751
 Accuracy: 0.5416, Precision: 0.5420, Recall: 0.5374, F1 Score: 0.5397, FPR: 0.4542
 
-### negative_rules and Qwen2.5-Coder-7B-Instruct/lora/sft_primevul_fixed_negative_4096_data
+### negative_rules and Qwen2.5-Coder-7B-Instruct/lora/sft_primevul_fixed_negative_4096_data (model only for negative samples)
 total from csv: 4990
 Total items: 7578
 Failed generations: 0
 True Positives: 3396, False Positives: 3051, True Negatives: 738, False Negatives: 393
 Accuracy: 0.5455, Precision: 0.5268, Recall: 0.8963, F1 Score: 0.6635, FPR: 0.8052
+
+### negative_rules and Qwen2.5-Coder-7B-Instruct/lora/sft_primevul_fixed_negative_4096_data (model only for positive samples)
+Total items: 7570,real total7570
+True Positives: 1403, False Positives: 900, True Negatives: 2885, False Negatives: 2382
+Accuracy: 0.5664, Precision: 0.6092, Recall: 0.3707, F1 Score: 0.4609, FPR: 0.2378
+### negative_rules and Qwen2.5-Coder-7B-Instruct/lora/sft_primevul_train_paired (model only for positive samples)
+Total items: 7570,real total7570
+1json length: 7570,2json length: 7578
+Problem count (different prompts): 0
+Total items: 7570,real total7570
+True Positives: 1501, False Positives: 938, True Negatives: 2847, False Negatives: 2284
+Accuracy: 0.5744, Precision: 0.6154, Recall: 0.3966, F1 Score: 0.4823, FPR: 0.2478
 
 ## primevul_test_paired_data (32768 cutoff)
 jsonl length: 870
@@ -175,14 +193,12 @@ Accuracy: 0.5471, Precision: 0.5461, Recall: 0.5586, F1 Score: 0.5523, FPR: 0.46
 Failed generations: 0
 True Positives: 231, False Positives: 199, True Negatives: 236, False Negatives: 204
 Accuracy: 0.5368, Precision: 0.5372, Recall: 0.5310, F1 Score: 0.5341, FPR: 0.4575
-
-## devign
-jsonl length: 27309
-Total items: 27309
-### Qwen2.5-Coder-7B-Instruct/lora/sft_primevul_train_paired
-Failed generations: 0
-True Positives: 8679, False Positives: 10428, True Negatives: 4427, False Negatives: 3775
-Accuracy: 0.4799, Precision: 0.4542, Recall: 0.6969, F1 Score: 0.5500, FPR: 0.7020
+### negative_rules and Qwen2.5-Coder-7B-Instruct/lora/sft_primevul_fixed_negative_4096_data (model only for positive samples)
+True Positives: 164, False Positives: 153, True Negatives: 282, False Negatives: 271
+Accuracy: 0.5126, Precision: 0.5174, Recall: 0.3770, F1 Score: 0.4362, FPR: 0.3517
+### negative_rules and Qwen2.5-Coder-7B-Instruct/lora/sft_primevul_train_paired (model only for positive samples)
+True Positives: 187, False Positives: 156, True Negatives: 279, False Negatives: 248
+Accuracy: 0.5356, Precision: 0.5452, Recall: 0.4299, F1 Score: 0.4807, FPR: 0.3586
 
 ## primevul_fixed_negative_train_data_by_cvs (after rules, 2588)
 jsonl length: 2588
@@ -195,6 +211,15 @@ Accuracy: 0.5274, Precision: 0.4329, Recall: 0.6270, F1 Score: 0.5122, FPR: 0.53
 Failed generations: 0
 True Positives: 631, False Positives: 826, True Negatives: 738, False Negatives: 393
 Accuracy: 0.5290, Precision: 0.4331, Recall: 0.6162, F1 Score: 0.5087, FPR: 0.5281
+
+## devign
+jsonl length: 27309
+Total items: 27309
+### Qwen2.5-Coder-7B-Instruct/lora/sft_primevul_train_paired
+Failed generations: 0
+True Positives: 8679, False Positives: 10428, True Negatives: 4427, False Negatives: 3775
+Accuracy: 0.4799, Precision: 0.4542, Recall: 0.6969, F1 Score: 0.5500, FPR: 0.7020
+
 
 # to do
 1. fix rules that get false negative result in first positive test and false positive.

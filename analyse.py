@@ -275,9 +275,9 @@ def change_csv_to_jsonl(csv_path):
 if __name__ == "__main__":
 
     data1 = load_generated_jsonl(
-        "../LLaMA-Factory/saves/Qwen2.5-Coder-7B-Instruct/lora/eval_2025-12-29-20-01-14-train_paired-sft_paired/generated_predictions.jsonl"
+        "../LLaMA-Factory/saves/Qwen2.5-Coder-7B-Instruct/lora/eval_2026-01-01-14-16-14-test_paired-sft_train_paired/generated_predictions.jsonl"
     )
-    data2=change_csv_to_jsonl("./result/semgrep_rules_fixed_negative_primevul_train.cvs")
+    data2=change_csv_to_jsonl("./result/semgrep_rules_fixed_negative_primevul_test_paired.cvs")
     print(f"1json length: {len(data1)},2json length: {len(data2)}")
     # print(data2[10])
     # print(data1[10])
