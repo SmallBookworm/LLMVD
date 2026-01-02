@@ -177,6 +177,18 @@ Failed generations: 0
 True Positives: 8679, False Positives: 10428, True Negatives: 4427, False Negatives: 3775
 Accuracy: 0.4799, Precision: 0.4542, Recall: 0.6969, F1 Score: 0.5500, FPR: 0.7020
 
+## primevul_fixed_negative_train_data_by_cvs (after rules, 2588)
+jsonl length: 2588
+Total items: 2588
+### Qwen2.5-Coder-7B-Instruct/lora/sft_primevul_train_paired
+Failed generations: 0
+True Positives: 642, False Positives: 841, True Negatives: 723, False Negatives: 382
+Accuracy: 0.5274, Precision: 0.4329, Recall: 0.6270, F1 Score: 0.5122, FPR: 0.5377
+### Qwen2.5-Coder-7B-Instruct/lora/sft_primevul_fixed_negative_4096_data
+Failed generations: 0
+True Positives: 631, False Positives: 826, True Negatives: 738, False Negatives: 393
+Accuracy: 0.5290, Precision: 0.4331, Recall: 0.6162, F1 Score: 0.5087, FPR: 0.5281
+
 # to do
 1. fix rules that get false negative result in first positive test and false positive.
 2. remove_fix_pattern in rule yaml file by python code.

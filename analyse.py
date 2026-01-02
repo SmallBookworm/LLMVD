@@ -64,7 +64,6 @@ def statistics_on_generated_jsonl(data_list=[]):
     }
 
 if __name__ == "__main__":
-    data0 = load_generated_jsonl("../LLaMA-Factory/saves/Qwen2.5-Coder-7B-Instruct/lora/eval_2025-12-30-16-13-45-devign_32768_data_part0-sft_paired/generated_predictions.jsonl")
-    data1 = load_generated_jsonl("../LLaMA-Factory/saves/Qwen2.5-Coder-7B-Instruct/lora/eval_2025-12-30-16-17-45-devign_32768_data_part1-sft_paired/generated_predictions.jsonl")
-    print(f"jsonl length: {len(data0) + len(data1)}")
-    statistics_on_generated_jsonl([data0, data1])
+    data0 = load_generated_jsonl("../LLaMA-Factory/saves/Qwen2.5-Coder-7B-Instruct/lora/eval_2026-01-01-22-27-40-cvs-sft_paired/generated_predictions.jsonl")
+    print(f"jsonl length: {len(data0)}")
+    statistics_on_generated_jsonl([data0])

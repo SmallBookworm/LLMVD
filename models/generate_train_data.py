@@ -3,6 +3,7 @@ from data_process.utils.process import get_cwe_idx_dict, list_by_idx
 import json
 import jsonlines
 import random
+import pandas as pd
 
 
 def generate_train_data(dataset, output_path="./models/data/train_data.json"):
@@ -70,6 +71,33 @@ def divide_data_by_length(dataset, tokenizer, max_length=2048):
         else:
             long_data.append(sample)
     return short_data, long_data
+
+#generate train data by cvs result
+# temp_df = pd.DataFrame(
+#             {
+#                 "Idx": idx,
+#                 "CWE": cwe,
+#                 "Code": [sample["func"]],
+#                 "Label": [sample["target"]],
+#                 "Prediction": [prediction], 1/0
+#                 "Response": [str(res)],
+#             }
+#         )
+def get_train_data_by_cvs_result(data, 
+    cvs_path="./result/semgrep_rules_fixed_negative_primevul_train.cvs"
+):
+    df = pd.read_csv(cvs_path)
+    filtered_data = []
+    for i in range(len(data)):
+        sample = data[i]
+        semgrep_result = df[df['Idx'] == int(sample['idx'])]
+        if not semgrep_result.empty:
+            prediction = semgrep_result['Prediction'].values[0]
+            if prediction == 0:  # only keep SAFE samples
+                filtered_data.append(sample)
+    print(f"Filtered data length from {len(data)} to {len(filtered_data)} based on CVS results.")
+    return filtered_data
+
 
 
 # get train data by cwe_status.json
