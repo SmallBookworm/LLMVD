@@ -134,7 +134,27 @@ Recall: 0.4827
 FPR: 0.2290
 F1: 0.0833
 
-# test data
+## devign
+### negative:1411
+test total:2649846, rule num:1411, true_positive:4414,false_positive:5205, Precision:0.458883459819108
+Length: 27318, positive samples num:12460, negative samples num:14858, true_positive:4414, false_positive:5205
+Accuracy: 0.5149
+Precision: 0.4589
+Recall: 0.3543
+FPR: 0.3503
+F1: 0.3998
+
+## reveal
+### negative:1411
+test total:2205198, rule num:1411, true_positive:751,false_positive:4887, Precision:0.13320326356864137
+Length: 22734, positive samples num:2240, negative samples num:20494, true_positive:751, false_positive:4887
+Accuracy: 0.7195
+Precision: 0.1332
+Recall: 0.3353
+FPR: 0.2385
+F1: 0.1907
+
+# try generate rules data
 try 201 rules:
 naive (qwen-max):       Total positive samples: 201, True Positives: 110, Run Errors: 63
 fixed rules (gemma3): Total positive samples: 201, True Positives: 119, Run Errors: 50
@@ -215,11 +235,20 @@ Accuracy: 0.5290, Precision: 0.4331, Recall: 0.6162, F1 Score: 0.5087, FPR: 0.52
 ## devign
 jsonl length: 27309
 Total items: 27309
+### Qwen2.5-Coder-7B-Instruct (origin)
+Failed generations: 0
+True Positives: 924, False Positives: 654, True Negatives: 14201, False Negatives: 11530
+Accuracy: 0.5538, Precision: 0.5856, Recall: 0.0742, F1 Score: 0.1317, FPR: 0.0440
 ### Qwen2.5-Coder-7B-Instruct/lora/sft_primevul_train_paired
 Failed generations: 0
 True Positives: 8679, False Positives: 10428, True Negatives: 4427, False Negatives: 3775
 Accuracy: 0.4799, Precision: 0.4542, Recall: 0.6969, F1 Score: 0.5500, FPR: 0.7020
+### Qwen2.5-Coder-7B-Instruct/lora/sft_primevul_fixed_negative_4096_data
+Failed generations: 0
+True Positives: 8780, False Positives: 10774, True Negatives: 4081, False Negatives: 3674
+Accuracy: 0.4709, Precision: 0.4490, Recall: 0.7050, F1 Score: 0.5486, FPR: 0.7253
 
+## reveal
 
 # to do
 1. fix rules that get false negative result in first positive test and false positive.

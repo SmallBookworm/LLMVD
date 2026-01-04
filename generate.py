@@ -1,4 +1,4 @@
-from data_process.utils.loader import load_devign, load_primevul
+from data_process.utils.loader import load_devign, load_primevul, load_reveal
 from getresdata_csv import print_metrics_from_csv
 from data_process.utils.process import list_by_idx
 from data_process.utils.misc import langchain_to_openai_messages
@@ -1141,6 +1141,21 @@ def test_devign(rule_filename="rules_fixed_negative"):
     read_test_json(f"./test_{rule_filename}_devign_batch.json")
     print_metrics_from_csv(f'./result/semgrep_{rule_filename}_devign.cvs')
 
+def test_reveal(rule_filename="rules_fixed_negative"):
+    result=test_rules_batch(
+    rule_path=f"./{rule_filename}/",
+    dataset=load_reveal("./data/reveal/"),
+    cvs_name=f"semgrep_{rule_filename}_reveal.cvs"
+    )
+    for cwe in result:
+        result[cwe]['positive_path']= list(result[cwe]['positive_path'])
+        result[cwe]['error']= list(result[cwe]['error'])
+
+    with open(f"./test_{rule_filename}_reveal_batch.json", "w") as f:
+        json.dump(result, f, indent=4)
+    read_test_json(f"./test_{rule_filename}_reveal_batch.json")
+    print_metrics_from_csv(f'./result/semgrep_{rule_filename}_reveal.cvs')
+
 def test_primevul(rule_filename="rules_fixed_negative", dataset_name="primevul_test"):
     result=test_rules_batch(
     rule_path=f"./{rule_filename}/",
@@ -1240,7 +1255,8 @@ if __name__ == "__main__":
     
     # print(rule_num())
     # test_primevul('rules','primevul_train_paired')
-    test_primevul('rules_fixed_negative','primevul_test_paired')
+    # test_primevul('rules_fixed_negative','primevul_test_paired')
+    test_reveal()
     
     # result=test_cwe_rules(
     #     rule_path="./rules_selected/",
