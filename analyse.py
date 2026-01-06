@@ -275,10 +275,10 @@ def change_csv_to_jsonl(csv_path):
 if __name__ == "__main__":
 
     data0 = load_generated_jsonl(
-        "../LLaMA-Factory/saves/Qwen2.5-Coder-7B-Instruct/lora/eval_2026-01-04-14-55-18-devign_32768_data_part0-sft_fixed_negative/generated_predictions.jsonl"
+        "../LLaMA-Factory/saves/Qwen2.5-Coder-7B-Instruct/lora/eval_2026-01-04-14-55-18-reveal_32768_data_part0-sft_fixed_negative/generated_predictions.jsonl"
     )
     data1 = load_generated_jsonl(
-        "../LLaMA-Factory/saves/Qwen2.5-Coder-7B-Instruct/lora/eval_2026-01-04-14-55-18-devign_32768_data_part1-sft_fixed_negative/generated_predictions.jsonl"
+        "../LLaMA-Factory/saves/Qwen2.5-Coder-7B-Instruct/lora/eval_2026-01-04-14-55-18-reveal_32768_data_part1-sft_fixed_negative/generated_predictions.jsonl"
     )
     # data2=change_csv_to_jsonl("./result/semgrep_rules_fixed_negative_primevul_test_paired.cvs")
     # print(f"1json length: {len(data1)},2json length: {len(data2)}")

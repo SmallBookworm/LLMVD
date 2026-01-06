@@ -5,7 +5,7 @@ useful rules. rain for what
 ![overview](./assert/workflow.svg "overview")
 
 generate:
-generate_semgrep_rules | genertate_rule_batch -> (get_semgrep_rules_from_batch_response) -> validate_rules -> test_rule_positive (train dataset, get_rule_data) -> fix_rule -> test_rule_positive -> move_rules_bystatus -> test_rule_negative (train dataset) -> move_rules_bystatus -> test_rules_batch | test_cwe_rules (test dataset) -> print_metrics_from_csv
+generate_semgrep_rules | genertate_rule_batch -> (get_semgrep_rules_from_batch_response) -> validate_rules -> test_rule_positive (train dataset, get_rule_data) -> fix_rule -> test_rule_positive -> move_rules_bystatus -> test_rule_negative (train dataset) -> move_rules_bystatus -> test_each_rule_on_dataset -> filter_rules_by_precision -> test_rules_batch | test_cwe_rules (test dataset) -> print_metrics_from_csv
 # files
 main.py: detect vulnerabilities by LLMs
 generate.py: generate,test and fix rules 
@@ -17,6 +17,7 @@ joern semgrep
 # dataset
 1. devign: dict_keys(['project', 'commit_id', 'target', 'func'])  total(27318) vul(12460)
 2. primevul_train_paired: dict_keys(['idx', 'project', 'commit_id', 'project_url', 'commit_url', 'commit_message', 'target', 'func', 'func_hash', 'file_name', 'file_hash', 'cwe', 'cve', 'cve_desc', 'nvd_url']) total(7578) vul(3789).
+primevul_test_paired: total(870)
 primevul_test total(24788) vul(549)
 In primevul dataset, there are repeated samples. For example, same idx samples(two 349259 samples, two 439495 samples) in primevul_test_paired.
 3. reveal: total(22734) vul(2240)
@@ -79,6 +80,14 @@ Recall: 0.7816
 FPR: 0.8046
 F1: 0.6044
 
+### rules_fixed_negative_precision: 1218
+Length: 870, positive samples num:435, negative samples num:435, true_positive:8, false_positive:5
+Accuracy: 0.5034
+Precision: 0.6154
+Recall: 0.0184
+FPR: 0.0115
+F1: 0.0357
+
 ## primevul train paired ? !
 ### native 3789
 test total:841158, rule num:3789, true_positive:205,false_positive:157, Precision:0.5662983425414365
@@ -115,6 +124,13 @@ Precision: 0.5541
 Recall: 0.7297
 FPR: 0.5872
 F1: 0.6299
+### negative:1411 (rules_fixed_negative) -> rules_fixed_negative_precision: 1218 
+Length: 7578, positive samples num:3789, negative samples num:3789, true_positive:1257, false_positive:0
+Accuracy: 0.6659
+Precision: 1.0000
+Recall: 0.3317
+FPR: 0.0000
+F1: 0.4982
 
 ## primevul test
 ### (fixed rules:666 + positive:1625)
@@ -249,7 +265,11 @@ True Positives: 8780, False Positives: 10774, True Negatives: 4081, False Negati
 Accuracy: 0.4709, Precision: 0.4490, Recall: 0.7050, F1 Score: 0.5486, FPR: 0.7253
 
 ## reveal
-
+Total items: 22728
+### Qwen2.5-Coder-7B-Instruct/lora/sft_primevul_fixed_negative_4096_data
+Failed generations: 0
+True Positives: 1689, False Positives: 16689, True Negatives: 3801, False Negatives: 549
+Accuracy: 0.2416, Precision: 0.0919, Recall: 0.7547, F1 Score: 0.1639, FPR: 0.8145
 # to do
 1. fix rules that get false negative result in first positive test and false positive.
 2. remove_fix_pattern in rule yaml file by python code.

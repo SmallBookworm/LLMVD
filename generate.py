@@ -26,7 +26,8 @@ import jsonlines
 from ruamel.yaml import YAML
 from pathlib import Path
 import shutil
-
+import concurrent.futures
+from tqdm import tqdm
 
 os.environ["MODEL_PATH"] = "/home/peng/.cache/modelscope/hub/models/LLM-Research/"
 
@@ -582,15 +583,29 @@ def test_cwe_rules(rule_path, dataset, cvs_name="semgrep_cwe_primevul.cvs"):
 
 
 # test dataset with every rules
+
+def _run_single_rule(semgrep_runner, temp_code_dir, output_dir, rule_file):
+    """Helper function to run a single rule — must be picklable if using ProcessPool."""
+    rule_idx = rule_file.split("_")[-1].split(".")[0]
+    output_json_path = os.path.join(output_dir, f"semgrep_output_{rule_idx}.json")
+    
+    result = semgrep_runner.run_rule(
+        rule_path=rule_file,
+        target_path=temp_code_dir,
+        output_path=output_json_path,
+    )
+    return rule_file, result, rule_idx, output_json_path
+
 def test_each_rule_on_dataset(
-    rule_path, dataset, csv_name="semgrep_each_rule_result.csv"
+    rule_path, dataset, csv_name="semgrep_each_rule_result.csv", max_workers=2
 ):
     """
-    Test each Semgrep rule individually on the provided dataset.
+    Test each Semgrep rule individually on the provided dataset (parallelized).
     Args:
         rule_path (str): Path to the directory containing Semgrep rule files.
-        dataset (list): List of samples, each sample is a dict with keys like 'idx', 'cwe', 'func', 'target'.
-        csv_name (str): Name of the output CSV file to store results.
+        dataset (list): List of samples...
+        csv_name (str): Output CSV name.
+        max_workers (int): Number of parallel Semgrep runs (default: 2).
     """
     semgrep_runner = semgrep.SemgrepRunner()
     temp_code_dir = "./temp/temp_code_each_rule/"
@@ -617,81 +632,99 @@ def test_each_rule_on_dataset(
 
     all_rule_results = {}
 
-    for rule_file in rule_files:
-        rule_idx = rule_file.split("_")[-1].split(".")[0]
-        rule_key = os.path.abspath(rule_file)
-        print(f"Testing rule: {rule_file}")
 
-        output_json_path = os.path.join(output_dir, f"semgrep_output_{rule_idx}.json")
-        result = semgrep_runner.run_rule(
-            rule_path=rule_file,
-            target_path=temp_code_dir,
-            output_path=output_json_path,
-        )
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
 
-        rule_result = {
-            "rule_file": rule_file,
-            "total_samples": len(dataset),
-            "detected_paths": set(),
-            "true_positive": [],
-            "false_positive": [],
-            "error": False,
-            "raw_output": None,
+        future_to_rule = {
+            executor.submit(_run_single_rule, semgrep_runner, temp_code_dir, output_dir, rule_file): rule_file
+            for rule_file in rule_files
         }
 
-        if "result" not in result:
-            print(f"⚠️  Semgrep error for rule: {rule_file}")
-            rule_result["error"] = True
+
+        for future in tqdm(concurrent.futures.as_completed(future_to_rule), total=len(future_to_rule)):
+            rule_file = future_to_rule[future]
+            rule_key = os.path.abspath(rule_file)
+            try:
+                _, result, rule_idx, output_json_path = future.result()
+            except Exception as e:
+                print(f"❌ Exception running rule {rule_file}: {e}")
+                # save by key, do not need thread lock
+                all_rule_results[rule_key] = {
+                    "rule_file": rule_file,
+                    "error": True,
+                    "total_samples": len(dataset),
+                    "scanned_samples": 0,
+                    "detected_paths": set(),
+                    "true_positive": [],
+                    "false_positive": [],
+                    "raw_output": None,
+                }
+                continue
+
+            rule_result = {
+                "rule_file": rule_file,
+                "total_samples": len(dataset),
+                "scanned_samples": 0,
+                "detected_paths": set(),
+                "true_positive": [],
+                "false_positive": [],
+                "error": False,
+                "raw_output": None,
+            }
+
+            if "result" not in result:
+                print(f"⚠️  Semgrep error for rule: {rule_file}")
+                rule_result["error"] = True
+                all_rule_results[rule_key] = rule_result
+                continue
+
+            try:
+                output = json.loads(result["result"].stdout)
+                rule_result["raw_output"] = output
+                rule_result["scanned_samples"] = len(output.get("paths").get("scanned", []))
+                for res in output.get("results", []):
+                    path = res.get("path", "")
+                    rule_result["detected_paths"].add(path)
+
+                    filename = os.path.basename(path)
+                    try:
+                        idx = filename.split("_")[-1].split(".")[0]
+                    except Exception:
+                        print(f"⚠️  Cannot parse idx from path: {path}")
+                        continue
+
+                    sample = idx_to_sample.get(idx)
+                    if not sample:
+                        print(f"⚠️  Sample idx={idx} not found in dataset.")
+                        continue
+
+                    if sample["target"] == 1:
+                        rule_result["true_positive"].append(int(idx))
+                    else:
+                        rule_result["false_positive"].append(int(idx))
+
+            except Exception as e:
+                print(f"❌ Error parsing Semgrep output for {rule_file}: {e}")
+                rule_result["error"] = True
+
             all_rule_results[rule_key] = rule_result
-            continue
 
-        try:
-            output = json.loads(result["result"].stdout)
-            rule_result["raw_output"] = output
-            for res in output.get("results", []):
-                path = res.get("path", "")
-                rule_result["detected_paths"].add(path)
-
-                filename = os.path.basename(path)
-                try:
-                    idx = filename.split("_")[-1].split(".")[0]
-                except Exception:
-                    print(f"⚠️  Cannot parse idx from path: {path}")
-                    continue
-
-                sample = idx_to_sample.get(idx)
-                if not sample:
-                    print(f"⚠️  Sample idx={idx} not found in dataset.")
-                    continue
-
-                # 判断 TP / FP
-                if sample["target"] == 1:
-                    rule_result["true_positive"].append(int(idx))
-                else:
-                    rule_result["false_positive"].append(int(idx))
-
-        except Exception as e:
-            print(f"❌ Error parsing Semgrep output for {rule_file}: {e}")
-            rule_result["error"] = True
-
-        all_rule_results[rule_key] = rule_result
-
-        # Optional: Write sample-level predictions for this rule (aggregatable)
 
     summary_rows = []
+    
     for rule_key, res in all_rule_results.items():
-        tp = len(res["true_positive"])
-        fp = len(res["false_positive"])
+        tp=len(set(res["true_positive"]))
+        fp=len(set(res["false_positive"]))
         precision = tp / (tp + fp) if (tp + fp) > 0 else 0
         summary_rows.append(
             {
                 "Rule_File": res["rule_file"],
-                "Total_Samples": res["total_samples"],
+                "Scanned_Samples": res["scanned_samples"],
                 "True_Positive": tp,
                 "False_Positive": fp,
+                "Detected_Count": len(res["detected_paths"]),
                 "Precision": precision,
                 "Error": res["error"],
-                "Detected_Count": len(res["detected_paths"]),
             }
         )
 
@@ -699,16 +732,32 @@ def test_each_rule_on_dataset(
     summary_df.to_csv(result_csv, index=False)
     print(f"✅ Summary saved to {result_csv}")
 
+    # statistics
+    negatives_samples = sum(1 for s in dataset if s["target"] == 0)
+    positves_samples = sum(1 for s in dataset if s["target"] == 1)
+    all_tp=set()
+    all_fp=set()
+    for res in all_rule_results.values():
+        all_tp.update(res["true_positive"])
+        all_fp.update(res["false_positive"])
+    accuracy = len(all_tp) / len(dataset)
+    precision = len(all_tp) / (len(all_tp) + len(all_fp) if (len(all_tp) + len(all_fp)) > 0 else 1)
+    recall = len(all_tp) / positves_samples if positves_samples > 0 else 0.0
+    f1_score = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+    fpr = len(all_fp) / negatives_samples if negatives_samples > 0 else 0.0
+    print(f"Length: {len(dataset)}, true_positive: {len(all_tp)}, false_positive: {len(all_fp)}. Overall Accuracy: {accuracy:.3f}, Precision: {precision:.3f}, Recall: {recall:.3f}, F1-Score: {f1_score:.3f}, FPR: {fpr:.3f}")
+
     return all_rule_results
 
 
 def filter_rules_by_fpr(
-    rule_path, dataset, output_filtered_dir="./rules_fpr/", fpr_threshold=0.01
+    rule_path, csv_path, dataset, output_filtered_dir="./rules_fpr/", fpr_threshold=0.01
 ):
     """
     Filter Semgrep rules based on False Positive Rate (FPR) on the given dataset. Run every rule singely.
     Args:
         rule_path (str): Path to the directory containing Semgrep rule files.
+        csv_path (str): Path to the CSV file containing Semgrep rule evaluation results.
         dataset (list): List of samples, each sample is a dict with keys like 'idx', 'cwe', 'func', 'target'.
         output_filtered_dir (str): Directory to save filtered rules.
         fpr_threshold (float): Maximum allowed FPR to keep a rule.
@@ -716,7 +765,7 @@ def filter_rules_by_fpr(
         list: List of tuples containing (source_rule_path, destination_rule_path, fpr).
     """
     # Step 1: 运行评估
-    results = test_each_rule_on_dataset(rule_path, dataset)
+    csv_results = pd.read_csv(csv_path)
 
     # Step 2: 创建输出目录
     os.makedirs(output_filtered_dir, exist_ok=True)
@@ -727,18 +776,18 @@ def filter_rules_by_fpr(
 
     filtered_rules = []
 
-    for rule_abs_path, res in results.items():
-        if res["error"]:
-            print(f"⚠️ Skipping rule due to error: {rule_abs_path}")
+    for index, row in csv_results.iterrows():
+        if row["Error"]:
+            print(f"⚠️ Skipping rule due to error: {row['Rule_File']}")
             continue
 
-        tp = len(res["true_positive"])
-        fp = len(res["false_positive"])
+        tp = row["True_Positive"]
+        fp = row["False_Positive"]
         total_positives = tp + fp
 
         fpr = fp / negatives_samples if negatives_samples > 0 else 0.0
 
-        rule_src = rule_abs_path
+        rule_src = row["Rule_File"]
         rule_filename = os.path.basename(rule_src)
 
         if fpr < fpr_threshold:
@@ -748,12 +797,62 @@ def filter_rules_by_fpr(
             shutil.copy2(rule_src, dst_path)
             filtered_rules.append((rule_src, dst_path, fpr))
             print(f"✅ Kept rule (FPR={fpr:.3f}): {rule_filename}")
+        else:
+            print(f"❌ Discarded rule (FPR={fpr:.3f}): {rule_filename}")
 
     print(
         f"\n🎉 Total {len(filtered_rules)} rules kept (FPR < {fpr_threshold*100:.0f}%) and copied to {output_filtered_dir}"
     )
     return filtered_rules
 
+def filter_rules_by_precision(
+    rule_path, csv_path, output_filtered_dir="./rules_precision/", precision_threshold=1
+):
+    """
+    Filter Semgrep rules based on Precision on the given dataset. Run every rule singely.
+    Args:
+        rule_path (str): Path to the directory containing Semgrep rule files.
+        csv_path (str): Path to the CSV file containing Semgrep rule evaluation results.
+        output_filtered_dir (str): Directory to save filtered rules.
+        precision_threshold (float): Minimum required Precision to keep a rule.
+    Returns:
+        list: List of tuples containing (source_rule_path, destination_rule_path, precision).
+    """
+    # Step 1: 运行评估
+    csv_results = pd.read_csv(csv_path)
+
+    # Step 2: 创建输出目录
+    os.makedirs(output_filtered_dir, exist_ok=True)
+
+    filtered_rules = []
+
+    for index, row in csv_results.iterrows():
+        if row["Error"]:
+            print(f"⚠️ Skipping rule due to error: {row['Rule_File']}")
+            continue
+
+        tp = row["True_Positive"]
+        fp = row["False_Positive"]
+
+        precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+
+        rule_src = row["Rule_File"]
+        rule_filename = os.path.basename(rule_src)
+
+        if precision >= precision_threshold:
+            dst_path = rule_src.replace(rule_path, output_filtered_dir)
+            os.makedirs(os.path.dirname(dst_path), exist_ok=True)
+
+            shutil.copy2(rule_src, dst_path)
+            filtered_rules.append((rule_src, dst_path, precision))
+            print(f"✅ Kept rule (Precision={precision:.3f}): {rule_filename}")
+        else:
+            print(f"❌ Discarded rule (Precision={precision:.3f}): {rule_filename}")
+
+    print(
+        f"\n🎉 Total {len(filtered_rules)} rules kept (Precision >= {precision_threshold*100:.0f}%) and copied to {output_filtered_dir}"
+    )
+    return filtered_rules
 
 # remove fix patterns in semgrep rules
 def fix_yaml(rule_content, rule_path):
@@ -1236,7 +1335,13 @@ if __name__ == "__main__":
     # read_cwe_status(cwe_status)
 
     # test each rule on dataset
-    # results = test_each_rule_on_dataset('./rules_selected/', load_primevul("./data/primevul/primevul_test_paired.jsonl"))
+    # results1 = test_each_rule_on_dataset('./rules_fixed_negative/', load_primevul("./data/primevul/primevul_test_paired.jsonl"), csv_name="semgrep_each_rule_fixed_negative_primevul_test_paired_2.csv", max_workers=4)
+    # results2 = test_each_rule_on_dataset('./rules_fixed_negative/', load_primevul(), csv_name="semgrep_each_rule_fixed_negative_primevul_train_paired_2.csv", max_workers=4)
+    # filter_rules_by_precision(
+    #     rule_path="./rules_fixed_negative/",
+    #     csv_path="./result/semgrep_each_rule_fixed_negative_primevul_train_paired_2.csv",
+    #     output_filtered_dir="./rules_fixed_negative_precision/",
+    #     precision_threshold=1)
 
     # test with test dataset
     # result=test_rules_batch(
@@ -1254,9 +1359,9 @@ if __name__ == "__main__":
     # print_metrics_from_csv('./result/semgrep_rules_fixed_negative_primevul_train.cvs')
     
     # print(rule_num())
-    # test_primevul('rules','primevul_train_paired')
-    # test_primevul('rules_fixed_negative','primevul_test_paired')
-    test_reveal()
+    # test_primevul('rules_fixed_negative_precision','primevul_train_paired')
+    test_primevul('rules_fixed_negative_precision','primevul_test')
+    # test_reveal()
     
     # result=test_cwe_rules(
     #     rule_path="./rules_selected/",
