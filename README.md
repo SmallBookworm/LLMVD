@@ -149,6 +149,13 @@ Precision: 0.0456
 Recall: 0.4827
 FPR: 0.2290
 F1: 0.0833
+### rules_fixed_negative_precision: 1218
+Length: 24788, positive samples num:549, negative samples num:24239, true_positive:12, false_positive:46
+Accuracy: 0.9765
+Precision: 0.2069
+Recall: 0.0219
+FPR: 0.0019
+F1: 0.0395
 
 ## devign
 ### negative:1411
@@ -194,15 +201,19 @@ Accuracy: 0.5536, Precision: 0.5522, Recall: 0.5678, F1 Score: 0.5599, FPR: 0.46
 Failed generations: 0
 True Positives: 2034, False Positives: 1719, True Negatives: 2066, False Negatives: 1751
 Accuracy: 0.5416, Precision: 0.5420, Recall: 0.5374, F1 Score: 0.5397, FPR: 0.4542
+### Qwen2.5-Coder-7B-Instruct/lora/sft_primevul_precision_4096_data
+Failed generations: 0
+True Positives: 287, False Positives: 138, True Negatives: 3647, False Negatives: 3498
+Accuracy: 0.5197, Precision: 0.6753, Recall: 0.0758, F1 Score: 0.1363, FPR: 0.0365
 
-### negative_rules and Qwen2.5-Coder-7B-Instruct/lora/sft_primevul_fixed_negative_4096_data (model only for negative samples)
+### negative_rules and Qwen2.5-Coder-7B-Instruct/lora/sft_primevul_fixed_negative_4096_data (model only for negative samples after rules test)
 total from csv: 4990
 Total items: 7578
 Failed generations: 0
 True Positives: 3396, False Positives: 3051, True Negatives: 738, False Negatives: 393
 Accuracy: 0.5455, Precision: 0.5268, Recall: 0.8963, F1 Score: 0.6635, FPR: 0.8052
 
-### negative_rules and Qwen2.5-Coder-7B-Instruct/lora/sft_primevul_fixed_negative_4096_data (model only for positive samples)
+### negative_rules and Qwen2.5-Coder-7B-Instruct/lora/sft_primevul_fixed_negative_4096_data (model only for positive samples after rules test)
 Total items: 7570,real total7570
 True Positives: 1403, False Positives: 900, True Negatives: 2885, False Negatives: 2382
 Accuracy: 0.5664, Precision: 0.6092, Recall: 0.3707, F1 Score: 0.4609, FPR: 0.2378
@@ -229,6 +240,10 @@ Accuracy: 0.5471, Precision: 0.5461, Recall: 0.5586, F1 Score: 0.5523, FPR: 0.46
 Failed generations: 0
 True Positives: 231, False Positives: 199, True Negatives: 236, False Negatives: 204
 Accuracy: 0.5368, Precision: 0.5372, Recall: 0.5310, F1 Score: 0.5341, FPR: 0.4575
+### Qwen2.5-Coder-7B-Instruct/lora/sft_primevul_precision_4096_data
+Failed generations: 0
+True Positives: 24, False Positives: 15, True Negatives: 420, False Negatives: 411
+Accuracy: 0.5103, Precision: 0.6154, Recall: 0.0552, F1 Score: 0.1013, FPR: 0.0345
 ### negative_rules and Qwen2.5-Coder-7B-Instruct/lora/sft_primevul_fixed_negative_4096_data (model only for positive samples)
 True Positives: 164, False Positives: 153, True Negatives: 282, False Negatives: 271
 Accuracy: 0.5126, Precision: 0.5174, Recall: 0.3770, F1 Score: 0.4362, FPR: 0.3517
@@ -263,6 +278,10 @@ Accuracy: 0.4799, Precision: 0.4542, Recall: 0.6969, F1 Score: 0.5500, FPR: 0.70
 Failed generations: 0
 True Positives: 8780, False Positives: 10774, True Negatives: 4081, False Negatives: 3674
 Accuracy: 0.4709, Precision: 0.4490, Recall: 0.7050, F1 Score: 0.5486, FPR: 0.7253
+### Qwen2.5-Coder-7B-Instruct/lora/sft_primevul_precision_4096_data
+Failed generations: 0
+True Positives: 1445, False Positives: 1778, True Negatives: 13077, False Negatives: 11009
+Accuracy: 0.5318, Precision: 0.4483, Recall: 0.1160, F1 Score: 0.1843, FPR: 0.1197
 
 ## reveal
 Total items: 22728

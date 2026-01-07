@@ -58,7 +58,6 @@ def generate_negative_data():
     short_res, long_res = divide_data_by_length(negative_data, tokenizer, max_length=max_token_length)
     print(f"dataset length: {len(short_res)},{len(long_res)}")
     generate_train_data(short_res, output_path='./models/data/primevul_fixed_negative_4096_data.json')
-    # generate_train_data(load_primevul('./data/primevul/primevul_test_paired.jsonl'), output_path='./models/data/primevul_test_paired_data.json')
     with open('./models/data/primevul_fixed_negative_4096_data.json', 'r') as f:
         data = json.load(f)
     print(f"json length: {len(data)}")
@@ -92,14 +91,13 @@ def generate_precision_data(csv_path="./result/semgrep_each_rule_fixed_negative_
     short_res, long_res = divide_data_by_length(precision_data, tokenizer, max_length=max_token_length)
     print(f"dataset length: {len(short_res)},{len(long_res)}")
     generate_train_data(short_res, output_path='./models/data/primevul_precision_4096_data.json')
-    # generate_train_data(load_primevul('./data/primevul/primevul_test_paired.jsonl'), output_path='./models/data/primevul_test_paired_data.json')
     with open('./models/data/primevul_precision_4096_data.json', 'r') as f:
         data = json.load(f)
     print(f"json length: {len(data)}")
 
     validate_negative_data(precision_data, rules_path="./rules_fixed_negative_precision/")
 
-def generate_primevul_test_data():
+def generate_primevul_test_paired_data():
     model_name="Qwen/Qwen2.5-Coder-7B-Instruct"
 
     # limit data to 32768 tokens
@@ -114,6 +112,20 @@ def generate_primevul_test_data():
 
     print(f"data length: {len(load_primevul('./data/primevul/primevul_test_paired.jsonl'))}")
 
+def generate_primevul_train_data():
+    model_name="Qwen/Qwen2.5-Coder-7B-Instruct"
+
+    # limit data to 1024 tokens
+    max_token_length = 1024
+    tokenizer = AutoTokenizer.from_pretrained(os.environ["MODEL_PATH"] + model_name)
+    short_res, long_res = divide_data_by_length(load_primevul('./data/primevul/primevul_train.jsonl'), tokenizer, max_length=max_token_length)
+    print(f"dataset length: {len(short_res)},{len(long_res)}")
+    generate_train_data(short_res, output_path='./models/data/primevul_train_1024_data.json')
+    with open('./models/data/primevul_train_1024_data.json', 'r') as f:
+        data = json.load(f)
+    print(f"json length: {len(data)}")
+
+    print(f"data length: {len(load_primevul('./data/primevul/primevul_train.jsonl'))}")
 def generate_devign_data():
     model_name="Qwen/Qwen2.5-Coder-7B-Instruct"
 
@@ -165,7 +177,8 @@ if __name__ == "__main__":
     # print(f"json length: {len(data)}")
     # generate_primevul_test_data()
     # generate_cvs_data()
-    generate_precision_data()
+    # generate_precision_data()
+    generate_primevul_train_data()
     
     # generate_reveal_data()
     # split_dataset(dataset_path="./models/data/reveal_32768_data.json", split_num=2)
