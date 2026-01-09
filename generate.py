@@ -1361,8 +1361,9 @@ if __name__ == "__main__":
     # print(rule_num())
     # test_primevul('rules_fixed_negative_precision','primevul_train_paired')
     # test_primevul('rules_fixed_negative_precision','primevul_test')
-    read_test_json(f"./test_rules_fixed_negative_precision_primevul_train_paired_batch.json")
-    # test_reveal()
+    # read_test_json(f"./test_rules_fixed_negative_precision_primevul_train_paired_batch.json")
+    test_devign("rules_fixed_negative_precision")
+    test_reveal("rules_fixed_negative_precision")
     
     # result=test_cwe_rules(
     #     rule_path="./rules_selected/",

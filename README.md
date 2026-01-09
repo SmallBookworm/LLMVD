@@ -166,6 +166,14 @@ Precision: 0.4589
 Recall: 0.3543
 FPR: 0.3503
 F1: 0.3998
+### rules_fixed_negative_precision: 1218
+test total:2158122, rule num:1218, true_positive:113,false_positive:90, Precision:0.5566502463054187
+Length: 27318, positive samples num:12460, negative samples num:14858, true_positive:113, false_positive:90
+Accuracy: 0.5447
+Precision: 0.5567
+Recall: 0.0091
+FPR: 0.0061
+F1: 0.0178
 
 ## reveal
 ### negative:1411
@@ -176,6 +184,14 @@ Precision: 0.1332
 Recall: 0.3353
 FPR: 0.2385
 F1: 0.1907
+### rules_fixed_negative_precision: 1218
+test total:1795986, rule num:1218, true_positive:44,false_positive:53, Precision:0.4536082474226804
+Length: 22734, positive samples num:2240, negative samples num:20494, true_positive:44, false_positive:53
+Accuracy: 0.9011
+Precision: 0.4536
+Recall: 0.0196
+FPR: 0.0026
+F1: 0.0377
 
 # try generate rules data
 try 201 rules:
@@ -316,6 +332,13 @@ Accuracy: 0.4709, Precision: 0.4490, Recall: 0.7050, F1 Score: 0.5486, FPR: 0.72
 Failed generations: 0
 True Positives: 1445, False Positives: 1778, True Negatives: 13077, False Negatives: 11009
 Accuracy: 0.5318, Precision: 0.4483, Recall: 0.1160, F1 Score: 0.1843, FPR: 0.1197
+### Qwen2.5-Coder-7B-Instruct/lora/sft_aftertrainpaired_primevul_precision_4096_data
+Failed generations: 0
+True Positives: 4051, False Positives: 4519, True Negatives: 10336, False Negatives: 8403
+Accuracy: 0.5268, Precision: 0.4727, Recall: 0.3253, F1 Score: 0.3854, FPR: 0.3042
+### precision rules and Qwen2.5-Coder-7B-Instruct/lora/sft_aftertrainpaired_primevul_precision_4096_data (model only for negative samples after rules test)
+True Positives: 4117, False Positives: 4579, True Negatives: 10276, False Negatives: 8337
+Accuracy: 0.5270, Precision: 0.4734, Recall: 0.3306, F1 Score: 0.3893, FPR: 0.3082
 
 ## reveal
 Total items: 22728
@@ -323,6 +346,13 @@ Total items: 22728
 Failed generations: 0
 True Positives: 1689, False Positives: 16689, True Negatives: 3801, False Negatives: 549
 Accuracy: 0.2416, Precision: 0.0919, Recall: 0.7547, F1 Score: 0.1639, FPR: 0.8145
+### Qwen2.5-Coder-7B-Instruct/lora/sft_aftertrainpaired_primevul_precision_4096_data
+Failed generations: 0
+True Positives: 625, False Positives: 5534, True Negatives: 14956, False Negatives: 1613
+Accuracy: 0.6855, Precision: 0.1015, Recall: 0.2793, F1 Score: 0.1489, FPR: 0.2701
+### precision rules and Qwen2.5-Coder-7B-Instruct/lora/sft_aftertrainpaired_primevul_precision_4096_data (model only for negative samples after rules test)
+True Positives: 653, False Positives: 5572, True Negatives: 14918, False Negatives: 1585
+Accuracy: 0.6851, Precision: 0.1049, Recall: 0.2918, F1 Score: 0.1543, FPR: 0.2719
 # to do
 1. fix rules that get false negative result in first positive test and false positive.
 2. remove_fix_pattern in rule yaml file by python code.
