@@ -72,6 +72,14 @@ Recall: 0.0483
 FPR: 0.0437
 F1: 0.0884
 
+### native 3789 (rules)
+Length: 870, positive samples num:435, negative samples num:435, true_positive:8, false_positive:8
+Accuracy: 0.5000
+Precision: 0.5000
+Recall: 0.0184
+FPR: 0.0184
+F1: 0.0355
+
 ### negative:1411 (rules_fixed_negative)
 Length: 870, positive samples num:435, negative samples num:435, true_positive:340, false_positive:350
 Accuracy: 0.4885
@@ -79,6 +87,14 @@ Precision: 0.4928
 Recall: 0.7816
 FPR: 0.8046
 F1: 0.6044
+
+### fixed rules:666 (positive) + positive:1625 =2291 (rules_fixed_selected)
+Length: 870, positive samples num:435, negative samples num:435, true_positive:410, false_positive:411
+Accuracy: 0.4989
+Precision: 0.4994
+Recall: 0.9425
+FPR: 0.9448
+F1: 0.6529
 
 ### rules_fixed_negative_precision: 1218
 Length: 870, positive samples num:435, negative samples num:435, true_positive:8, false_positive:5
