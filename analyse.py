@@ -353,17 +353,17 @@ def change_csv_to_jsonl(csv_path):
 if __name__ == "__main__":
 
     data0 = load_generated_jsonl(
-        "../LLaMA-Factory/saves/Qwen2.5-Coder-7B-Instruct/lora/eval_2026-01-09-13-00-25-reveal_32768_data_part0-sft_after/generated_predictions.jsonl"
+        "../LLaMA-Factory/saves/Qwen2.5-Coder-7B-Instruct/lora/eval_2025-12-30-16-13-45-devign_32768_data_part0-sft_paired/generated_predictions.jsonl"
     )
     data1 = load_generated_jsonl(
-        "../LLaMA-Factory/saves/Qwen2.5-Coder-7B-Instruct/lora/eval_2026-01-09-13-00-25-reveal_32768_data_part1-sft_after/generated_predictions.jsonl"
+        "../LLaMA-Factory/saves/Qwen2.5-Coder-7B-Instruct/lora/eval_2025-12-30-16-17-45-devign_32768_data_part1-sft_paired/generated_predictions.jsonl"
     )
     # data2=change_csv_to_jsonl("./result/semgrep_rules_fixed_negative_primevul_test_paired.cvs")
     # print(f"1json length: {len(data1)},2json length: {len(data2)}")
     # print(data2[10])
     # print(data1[10])
     # print(f"jsonl length: {len(data0)}")
-    statistics_on_generated_jsonl([data0, data1])
+    # statistics_on_generated_jsonl([data0, data1])
     # statistics_on_jsonl_and_csv(
     #     csv_path="./result/semgrep_rules_fixed_negative_primevul_train.cvs",
     #     data_list=[data0],
@@ -373,5 +373,5 @@ if __name__ == "__main__":
     #     csv_path="./result/semgrep_rules_fixed_negative_precision_primevul_test_paired.cvs",
     #     data_list=[data0],
     # )
-    # data2=change_csv_to_jsonl("./result/semgrep_rules_fixed_negative_precision_reveal.cvs")
-    # prediction_reject_between_jsonl(data2, data0 + data1)
+    data2=change_csv_to_jsonl("./result/semgrep_rules_fixed_negative_precision_devign.cvs")
+    prediction_reject_between_jsonl(data2, data0 + data1)
