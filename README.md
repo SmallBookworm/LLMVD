@@ -32,5 +32,3 @@ rule errors: 'InvalidRuleSchemaError', 'Rule parse error'
 1. fix rules that get false negative result in first positive test and false positive.
 2. remove_fix_pattern in rule yaml file by python code.
 3. when semgrep output errors unrelated to rule (errors about code), we should detect code vul by other method.  (only a few, maybe 151 functions in primevul)
-
-uv pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu128

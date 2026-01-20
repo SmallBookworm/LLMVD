@@ -1,8 +1,9 @@
-llamafactory-cli webchat ./models/deepseek.yaml 
+# fine-tune
+uv pip install torch torchvision --index-url https://download.pytorch.org/whl/nightly/cu128
 
-FORCE_TORCHRUN=1 llamafactory-cli train ./models/qwen_lora_sft.yaml
+[LLaMA Factory](https://github.com/hiyouga/LlamaFactory/tree/main)
 
-1. src/llamafactory/data/template.py 中使用 register_template 方法为自定义模型注册 chat_template。
+src/llamafactory/data/template.py 中使用 register_template 方法为自定义模型注册 chat_template。
 ```python
 register_template(
     name="qwen-pwz",
@@ -19,9 +20,11 @@ register_template(
     replace_eos=True,
 )
 ```
+# model set
+Qwen2.5-Coder-7B-Instruct: 
 
-Qwen2.5-Coder-7B-Instruct
-default generation
+generation_config.json
+```
 {
   "bos_token_id": 151643,
   "pad_token_id": 151643,
@@ -36,5 +39,11 @@ default generation
   "top_k": 20,
   "transformers_version": "4.44.0"
 }
+```
 
 we set temperature to 0.1
+
+# command
+llamafactory-cli webui
+
+FORCE_TORCHRUN=1 llamafactory-cli train ./models/llamafactory_yaml/qwen_lora_sft.yaml

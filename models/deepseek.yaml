@@ -1,4 +1,0 @@
-model_name_or_path: /home/peng/.cache/modelscope/hub/models/Qwen/Qwen2.5-Coder-7B-Instruct
-adapter_name_or_path: saves/qwen/lora/sft
-template: deepseek
-infer_backend: huggingface  # choices: [huggingface, vllm, sglang, ktransformers]
