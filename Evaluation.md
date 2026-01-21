@@ -281,6 +281,8 @@ Accuracy: 0.5126, Precision: 0.5174, Recall: 0.3770, F1 Score: 0.4362, FPR: 0.35
 True Positives: 187, False Positives: 156, True Negatives: 279, False Negatives: 248
 Accuracy: 0.5356, Precision: 0.5452, Recall: 0.4299, F1 Score: 0.4807, FPR: 0.3586
 
+### vulllm
+
 
 ## primevul_fixed_negative_train_data_by_cvs (after rules, 2588)
 jsonl length: 2588
@@ -337,3 +339,10 @@ Accuracy: 0.6855, Precision: 0.1015, Recall: 0.2793, F1 Score: 0.1489, FPR: 0.27
 ### precision rules and Qwen2.5-Coder-7B-Instruct/lora/sft_aftertrainpaired_primevul_precision_4096_data (model only for negative samples after rules test)
 True Positives: 653, False Positives: 5572, True Negatives: 14918, False Negatives: 1585
 Accuracy: 0.6851, Precision: 0.1049, Recall: 0.2918, F1 Score: 0.1543, FPR: 0.2719
+
+## primevul test
+### Qwen2.5-Coder-7B-Instruct/lora/sft_aftertrainpaired_primevul_precision_4096_data
+Total items: 24788
+Failed generations: 0
+True Positives: 103, False Positives: 5763, True Negatives: 18476, False Negatives: 446
+Accuracy: 0.7495, Precision: 0.0176, Recall: 0.1876, F1 Score: 0.0321, FPR: 0.2378

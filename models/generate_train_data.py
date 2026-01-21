@@ -21,6 +21,20 @@ def generate_train_data(dataset, output_path="./models/data/train_data.json"):
     print(f"Success to save train data to {output_path}.")
     return result
 
+def generate_compare_data(dataset, instruction, output_path="./models/data/test_data.json"):
+    result = []
+    for sample in dataset:
+        one_data = {
+            "instruction": instruction,
+            "input": sample["func"],
+            "output": sample["target"],
+        }
+        result.append(one_data)
+
+    with open(output_path, "w") as f:
+        json.dump(result, f, indent=4)
+    print(f"Success to save compare data to {output_path}.")
+    return result
 
 # chatML format
 def generate_chatml_train_data(
