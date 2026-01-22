@@ -9,7 +9,7 @@ generate_semgrep_rules | genertate_rule_batch -> (get_semgrep_rules_from_batch_r
 # files
 1. main.py: detect vulnerabilities by LLMs
 2. generate.py: generate,test and fix rules 
-3. train.py: slice data by CWE.
+3. train.py: generate train or test data in Alpaca format. For different system in other paper, we use their own instruction.
 4. /models: transform data format. fine-tune and evaluate model (be used by llamafactory)
 
 # analysis tools

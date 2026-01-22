@@ -27,7 +27,10 @@ def generate_compare_data(dataset, instruction, output_path="./models/data/test_
         one_data = {
             "instruction": instruction,
             "input": sample["func"],
-            "output": sample["target"],
+            "output": "VULNERABLE" if sample["target"] == 1 else "BENIGN",
+            "file_name": "",
+            "dataset": "PrimeVul_test_paired",
+            "cwe": ""
         }
         result.append(one_data)
 
