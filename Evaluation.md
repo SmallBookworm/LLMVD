@@ -281,8 +281,6 @@ Accuracy: 0.5126, Precision: 0.5174, Recall: 0.3770, F1 Score: 0.4362, FPR: 0.35
 True Positives: 187, False Positives: 156, True Negatives: 279, False Negatives: 248
 Accuracy: 0.5356, Precision: 0.5452, Recall: 0.4299, F1 Score: 0.4807, FPR: 0.3586
 
-### vulllm
-
 
 ## primevul_fixed_negative_train_data_by_cvs (after rules, 2588)
 jsonl length: 2588
