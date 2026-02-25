@@ -1,6 +1,3 @@
-# Thinking
-useful rules. train for what
-
 # workflow
 ![overview](./assert/workflow.svg "overview")
 
