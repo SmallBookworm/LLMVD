@@ -1,3 +1,7 @@
+SFT PrimeVul model -> sft_primevul_train_paired
+SFT PrimeVul complex vulnerability model -> sft_primevul_precision_4096_data
+two-stage model -> sft_aftertrainpaired_primevul_precision_4096_data
+
 
 # test result
 1. static analysis layer
@@ -230,11 +234,21 @@ Problem count (different prompts): 0
 Total items: 7570,real total7570
 True Positives: 2605, False Positives: 1719, True Negatives: 2066, False Negatives: 1180
 Accuracy: 0.6170, Precision: 0.6025, Recall: 0.6882, F1 Score: 0.6425, FPR: 0.4542
+### precision rules and Qwen2.5-Coder-7B-Instruct (origin)
+Problem count (different prompts): 0
+Total items: 7570,real total7570
+True Positives: 1451, False Positives: 265, True Negatives: 3520, False Negatives: 2334
+Accuracy: 0.6567, Precision: 0.8456, Recall: 0.3834, F1 Score: 0.5275, FPR: 0.0700
 ### precision rules and Qwen2.5-Coder-7B-Instruct/lora/sft_primevul_train_paired (model only for negative samples after rules test)
 Problem count (different prompts): 0
 Total items: 7570,real total7570
 True Positives: 2691, False Positives: 1743, True Negatives: 2042, False Negatives: 1094
 Accuracy: 0.6252, Precision: 0.6069, Recall: 0.7110, F1 Score: 0.6548, FPR: 0.4605
+### precision rules and Qwen2.5-Coder-7B-Instruct/lora/sft_primevul_precision_4096_data (model only for negative samples after rules test)
+Problem count (different prompts): 0
+Total items: 7570,real total7570
+True Positives: 1467, False Positives: 138, True Negatives: 3647, False Negatives: 2318
+Accuracy: 0.6756, Precision: 0.9140, Recall: 0.3876, F1 Score: 0.5443, FPR: 0.0365
 ### precision rules and Qwen2.5-Coder-7B-Instruct/lora/sft_aftertrainpaired_primevul_precision_4096_data (model only for negative samples after rules test)
 Problem count (different prompts): 0
 Total items: 7570,real total7570
@@ -264,6 +278,17 @@ Accuracy: 0.5103, Precision: 0.6154, Recall: 0.0552, F1 Score: 0.1013, FPR: 0.03
 Failed generations: 0
 True Positives: 91, False Positives: 57, True Negatives: 378, False Negatives: 344
 Accuracy: 0.5391, Precision: 0.6149, Recall: 0.2092, F1 Score: 0.3122, FPR: 0.1310
+
+### precision rules and Qwen2.5-Coder-7B-Instruct (origin)
+Problem count (different prompts): 0
+Total items: 870,real total870
+True Positives: 25, False Positives: 25, True Negatives: 410, False Negatives: 410
+Accuracy: 0.5000, Precision: 0.5000, Recall: 0.0575, F1 Score: 0.1031, FPR: 0.0575
+### precision rules and Qwen2.5-Coder-7B-Instruct/lora/sft_primevul_precision_4096_data (model only for negative samples after rules test)
+Problem count (different prompts): 0
+Total items: 870,real total870
+True Positives: 31, False Positives: 20, True Negatives: 415, False Negatives: 404
+Accuracy: 0.5126, Precision: 0.6078, Recall: 0.0713, F1 Score: 0.1276, FPR: 0.0460
 ### precision rules and Qwen2.5-Coder-7B-Instruct/lora/sft_aftertrainpaired_primevul_precision_4096_data (model only for negative samples after rules test)
 Total items: 870,real total870
 True Positives: 97, False Positives: 62, True Negatives: 373, False Negatives: 338
