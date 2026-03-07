@@ -11,10 +11,12 @@ data_files = {
 dataset = load_dataset("json", data_files=data_files)
 
 
-
-model_name = "microsoft/codebert-base"
+model_name = "/home/peng/.cache/modelscope/hub/models/microsoft/codebert-base"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=2)
+
+# 查看分类头是否可训练
+print(model.classifier)  # 应为 True
 
 def tokenize_function(examples):
     # PrimeVul 使用 'func' 字段作为代码输入
@@ -39,7 +41,7 @@ tokenized_datasets = tokenized_datasets.rename_column("target", "labels")
 tokenized_datasets.set_format(type="torch", columns=["input_ids", "attention_mask", "labels"])
 
 from transformers import TrainingArguments, Trainer
-from sklearn.metrics import f1_score, accuracy_score
+from sklearn.metrics import f1_score, accuracy_score, precision_score, recall_score
 import numpy as np
 
 def compute_metrics(eval_pred):
@@ -47,12 +49,15 @@ def compute_metrics(eval_pred):
     preds = np.argmax(predictions, axis=1)
     return {
         "f1": f1_score(labels, preds),
-        "accuracy": accuracy_score(labels, preds)
+        "accuracy": accuracy_score(labels, preds),
+        "precision": precision_score(labels, preds),
+        "recall": recall_score(labels, preds),
+        "fpr": np.sum((preds == 1) & (labels == 0)) / np.sum(labels == 0)  # False Positive Rate
     }
 
 training_args = TrainingArguments(
     output_dir="./codebert-primevul-local",
-    evaluation_strategy="epoch",
+    eval_strategy="epoch",
     save_strategy="epoch",
     learning_rate=2e-5,
     per_device_train_batch_size=8,

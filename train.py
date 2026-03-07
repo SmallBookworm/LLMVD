@@ -30,6 +30,20 @@ def validate_negative_data(negative_data, rules_path="./rules_fixed_negative/"):
             print(f"Found same idx in rules: {data_idx}")
     print(f"negative_data length: {len(negative_data)}")
 
+# generate different data format for compare
+def generate_different_data(data, instruction, output_path):
+    compare_data = []
+    for sample in data:
+        compare_sample = {
+            "instruction": instruction,
+            "input": sample["func"],
+            "output": str(sample["target"]),
+            "index": sample["idx"]
+        }
+        compare_data.append(compare_sample)
+    with open(output_path, 'w') as f:
+        json.dump(compare_data, f, indent=4)
+    print(f"Success to save compare data to {output_path}.")
 '''
 primevul
 32768
@@ -212,7 +226,7 @@ if __name__ == "__main__":
     # generate_precision_data()
     # generate_primevul_train_data()
     # generate_primevul_test_data()
-    generate_primevul_compare_data()
+    # generate_primevul_compare_data()
     
     # generate_reveal_data()
     # split_dataset(dataset_path="./models/data/primevul_test_32768_data.json", split_num=2)
@@ -222,3 +236,6 @@ if __name__ == "__main__":
     # with open('./models/data/primevul_test_32768_data_part1.json', 'r') as f:
     #     data2 = json.load(f)
     # print(f"1json length: {len(data2)}")
+    generate_different_data(load_primevul('./data/primevul/primevul_test_paired.jsonl'), instruction="Detect whether the following code contains vulnerabilities.", output_path='./models/data/primevul_0-512_test.json')
+    generate_different_data(load_primevul('./data/primevul/primevul_train_paired.jsonl'), instruction="Detect whether the following code contains vulnerabilities.", output_path='./models/data/primevul_0-512_train.json')
+    generate_different_data(load_primevul('./data/primevul/primevul_valid_paired.jsonl'), instruction="Detect whether the following code contains vulnerabilities.", output_path='./models/data/primevul_0-512_validate.json')
