@@ -374,7 +374,10 @@ if __name__ == "__main__":
     #     data_list=[data0],
     # )
     data0 = load_generated_jsonl(
-        "../LLaMA-Factory/saves/Qwen2.5-Coder-7B-Instruct/lora/eval_2026-01-01-14-16-14-test_paired-origin/generated_predictions.jsonl"
+        "../LLaMA-Factory/saves/Qwen2.5-Coder-7B-Instruct/lora/eval_2026-01-01-14-16-14-devign_32768_data_part0-origin/generated_predictions.jsonl"
     )
-    data2=change_csv_to_jsonl("./result/semgrep_rules_fixed_negative_precision_primevul_test_paired.cvs")
-    prediction_reject_between_jsonl(data2, data0)
+    data1 = load_generated_jsonl(
+        "../LLaMA-Factory/saves/Qwen2.5-Coder-7B-Instruct/lora/eval_2026-01-01-14-16-14-devign_32768_data_part1-origin/generated_predictions.jsonl"
+    )
+    data2=change_csv_to_jsonl("./result/semgrep_rules_fixed_negative_precision_devign.cvs")
+    prediction_reject_between_jsonl(data2, data0+data1)
