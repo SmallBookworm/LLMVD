@@ -33,12 +33,14 @@ def validate_negative_data(negative_data, rules_path="./rules_fixed_negative/"):
 # generate different data format for compare
 def generate_different_data(data, instruction, output_path):
     compare_data = []
+    i=0
     for sample in data:
+        i+=1
         compare_sample = {
             "instruction": instruction,
             "input": sample["func"],
             "output": str(sample["target"]),
-            "index": sample["idx"]
+            "index": sample["idx"] if sample["idx"] else i
         }
         compare_data.append(compare_sample)
     with open(output_path, 'w') as f:
@@ -215,6 +217,16 @@ def generate_primevul_test_data():
     print(f"json length: {len(data)}")
 
     print(f"data length: {len(load_primevul('./data/primevul/primevul_test.jsonl'))}")
+
+def generate_ReGVD_test_data():
+    # devign
+    generate_different_data(load_devign('./data/devign/function.json'), instruction="Detect whether the following code contains vulnerabilities.", output_path='./models/data/devign_0-512_test.json')
+    
+    # primevul
+    # generate_different_data(load_primevul('./data/primevul/primevul_test_paired.jsonl'), instruction="Detect whether the following code contains vulnerabilities.", output_path='./models/data/primevul_0-512_test.json')
+    # generate_different_data(load_primevul('./data/primevul/primevul_train_paired.jsonl'), instruction="Detect whether the following code contains vulnerabilities.", output_path='./models/data/primevul_0-512_train.json')
+    # generate_different_data(load_primevul('./data/primevul/primevul_valid_paired.jsonl'), instruction="Detect whether the following code contains vulnerabilities.", output_path='./models/data/primevul_0-512_validate.json')
+    
 # {"messages": [{"role": "system", "content": "You are a helpful assistant"}, {"role": "user", "content": "谁在文艺复兴时期绘制人体?"}, {"role": "assistant", "content": "文艺复兴时期是一个关于艺术、文化和学术的复兴运动，在这个时期，许多艺术家都绘制了人体。"}]}
 if __name__ == "__main__":
     # split_dataset(dataset_path="./models/data/devign_32768_data.json", split_num=2)
@@ -236,6 +248,4 @@ if __name__ == "__main__":
     # with open('./models/data/primevul_test_32768_data_part1.json', 'r') as f:
     #     data2 = json.load(f)
     # print(f"1json length: {len(data2)}")
-    generate_different_data(load_primevul('./data/primevul/primevul_test_paired.jsonl'), instruction="Detect whether the following code contains vulnerabilities.", output_path='./models/data/primevul_0-512_test.json')
-    generate_different_data(load_primevul('./data/primevul/primevul_train_paired.jsonl'), instruction="Detect whether the following code contains vulnerabilities.", output_path='./models/data/primevul_0-512_train.json')
-    generate_different_data(load_primevul('./data/primevul/primevul_valid_paired.jsonl'), instruction="Detect whether the following code contains vulnerabilities.", output_path='./models/data/primevul_0-512_validate.json')
+    generate_ReGVD_test_data()

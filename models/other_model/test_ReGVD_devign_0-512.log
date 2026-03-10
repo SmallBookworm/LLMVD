@@ -1,0 +1,13 @@
+03/10/2026 22:16:54 - WARNING - __main__ -   Process rank: -1, device: cuda, n_gpu: 2, distributed training: False, 16-bits training: False
+Some weights of RobertaForSequenceClassification were not initialized from the model checkpoint at /home/peng/.cache/modelscope/hub/models/microsoft/codebert-base and are newly initialized: ['classifier.dense.bias', 'classifier.dense.weight', 'classifier.out_proj.bias', 'classifier.out_proj.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+03/10/2026 22:16:54 - INFO - __main__ -   Training/evaluation parameters Namespace(train_data_file='data/devign/alpaca/devign_0-512_train.json', output_dir='outputs/ReGVD/devign_0-512/', eval_data_file='data/devign/alpaca/devign_0-512_validate.json', test_data_file='data/devign/alpaca/devign_0-512_test.json', model_type='roberta', model_name_or_path='/home/peng/.cache/modelscope/hub/models/microsoft/codebert-base', mlm=False, mlm_probability=0.15, config_name='', tokenizer_name='/home/peng/.cache/modelscope/hub/models/microsoft/codebert-base', cache_dir='', block_size=512, do_train=False, do_eval=False, do_test=True, evaluate_during_training=False, do_lower_case=False, train_batch_size=4, eval_batch_size=64, gradient_accumulation_steps=1, learning_rate=5e-05, weight_decay=0.0, adam_epsilon=1e-08, max_grad_norm=1.0, num_train_epochs=1.0, max_steps=-1, warmup_steps=0, logging_steps=50, save_steps=50, save_total_limit=None, eval_all_checkpoints=False, no_cuda=False, overwrite_output_dir=False, overwrite_cache=False, seed=42, epoch=42, fp16=False, fp16_opt_level='O1', local_rank=-1, server_ip='', server_port='', csv_path='outputs/ReGVD/devign_0-512/results.csv', model='GNNs', hidden_size=256, feature_dim_size=768, num_GNN_layers=2, num_classes=2, gnn='ReGCN', format='uni', window_size=3, remove_residual=False, att_op='mul', training_percent=1.0, alpha_weight=1.0, n_gpu=2, device=device(type='cuda'), per_gpu_train_batch_size=2, per_gpu_eval_batch_size=32, start_epoch=0, start_step=0)
+03/10/2026 22:17:18 - INFO - __main__ -   ***** Running Test *****
+03/10/2026 22:17:18 - INFO - __main__ -     Num examples = 27318
+03/10/2026 22:17:18 - INFO - __main__ -     Batch size = 64
+03/10/2026 22:18:35 - INFO - __main__ -   ***** Test results *****
+03/10/2026 22:18:35 - INFO - __main__ -     eval_f1 = 0.5746
+03/10/2026 22:18:35 - INFO - __main__ -     eval_fpr = 0.7007
+03/10/2026 22:18:35 - INFO - __main__ -     eval_precision = 0.4697
+03/10/2026 22:18:35 - INFO - __main__ -     eval_recall = 0.74
+03/10/2026 22:18:35 - INFO - __main__ -     test_acc = 0.5003
