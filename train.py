@@ -128,22 +128,40 @@ def generate_primevul_test_paired_data():
 
     print(f"data length: {len(load_primevul('./data/primevul/primevul_test_paired.jsonl'))}")
 
-def generate_primevul_compare_data(model_name="Qwen/Qwen2.5-Coder-7B-Instruct"):
+def generate_primevul_compare_data(model_name="unsloth/QwQ-32B-Preview-bnb-4bit"):
 
     # limit data to 32768 tokens
     max_token_length = 32768
     tokenizer = AutoTokenizer.from_pretrained(os.environ["MODEL_PATH"] + model_name)
-    short_res, long_res = divide_data_by_length(load_primevul('./data/primevul/primevul_train_paired.jsonl'), tokenizer, max_length=max_token_length)
+    short_res, long_res = divide_data_by_length(load_primevul('./data/primevul/primevul_test_paired.jsonl'), tokenizer, max_length=max_token_length)
     print(f"dataset length: {len(short_res)},{len(long_res)}")
     instruction="You are a security code vulnerability analyzer. Your task is to carefully analyze the provided code snippet. Note that the provided code snippet might not be complete, but it has all the important context.\nYour output must be EXACTLY ONE WORD:\n\nIf you detect any potential security vulnerability in the specified code segment, return: VULNERABLE\nIf the code segment appears to be secure and free from obvious vulnerabilities, return: BENIGN\n\nIMPORTANT GUIDELINES:\n\nConsider common vulnerability types such as:\n\n- Buffer overflows\n- Improper input validation\n- Integer Overflow\n- Memory corruption potential\n- Double free\n- Use after free\n\nYour response must be either 'VULNERABLE' or 'BENIGN' - no additional explanation\n\nOutput format:\nOne word: VULNERABLE or BENIGN\n"
 
 
-    generate_compare_data(short_res, instruction=instruction, output_path='./models/data/primevul_train_paired_compare_llmxcpg_data.json')
-    with open('./models/data/primevul_train_paired_compare_llmxcpg_data.json', 'r') as f:
+    generate_compare_data(short_res, instruction=instruction, output_path='./models/data/primevul_test_paired_compare_llmxcpg_data.json')
+    with open('./models/data/primevul_test_paired_compare_llmxcpg_data.json', 'r') as f:
         data = json.load(f)
     print(f"json length: {len(data)}")
 
-    print(f"data length: {len(load_primevul('./data/primevul/primevul_train_paired.jsonl'))}")
+    print(f"data length: {len(load_primevul('./data/primevul/primevul_test_paired.jsonl'))}")
+
+def generate_devign_compare_data(model_name="unsloth/QwQ-32B-Preview-bnb-4bit"):
+
+    # limit data to 32768 tokens
+    max_token_length = 32768
+    tokenizer = AutoTokenizer.from_pretrained(os.environ["MODEL_PATH"] + model_name)
+    short_res, long_res = divide_data_by_length(load_devign('./data/devign/function.json'), tokenizer, max_length=max_token_length)
+    print(f"dataset length: {len(short_res)},{len(long_res)}")
+    instruction="You are a security code vulnerability analyzer. Your task is to carefully analyze the provided code snippet. Note that the provided code snippet might not be complete, but it has all the important context.\nYour output must be EXACTLY ONE WORD:\n\nIf you detect any potential security vulnerability in the specified code segment, return: VULNERABLE\nIf the code segment appears to be secure and free from obvious vulnerabilities, return: BENIGN\n\nIMPORTANT GUIDELINES:\n\nConsider common vulnerability types such as:\n\n- Buffer overflows\n- Improper input validation\n- Integer Overflow\n- Memory corruption potential\n- Double free\n- Use after free\n\nYour response must be either 'VULNERABLE' or 'BENIGN' - no additional explanation\n\nOutput format:\nOne word: VULNERABLE or BENIGN\n"
+
+
+    generate_compare_data(short_res, instruction=instruction, output_path='./models/data/devign_compare_llmxcpg_data.json')
+    with open('./models/data/devign_compare_llmxcpg_data.json', 'r') as f:
+        data = json.load(f)
+    print(f"json length: {len(data)}")
+
+    print(f"data length: {len(load_devign('./data/devign/function.json'))}")
+
 
 def generate_primevul_train_data():
     model_name="Qwen/Qwen2.5-Coder-7B-Instruct"
@@ -248,4 +266,5 @@ if __name__ == "__main__":
     # with open('./models/data/primevul_test_32768_data_part1.json', 'r') as f:
     #     data2 = json.load(f)
     # print(f"1json length: {len(data2)}")
-    generate_ReGVD_test_data()
+    # generate_ReGVD_test_data()
+    generate_devign_compare_data()
