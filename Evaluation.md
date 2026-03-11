@@ -298,6 +298,11 @@ Problem count (different prompts): 0
 Total items: 870,real total870
 True Positives: 245, False Positives: 205, True Negatives: 230, False Negatives: 190
 Accuracy: 0.5460, Precision: 0.5444, Recall: 0.5632, F1 Score: 0.5537, FPR: 0.4713
+### Llama-3-8B
+Total items: 870
+Failed generations: 28
+True Positives: 259, False Positives: 263, True Negatives: 158, False Negatives: 162
+Accuracy: 0.4952, Precision: 0.4962, Recall: 0.6152, F1 Score: 0.5493, FPR: 0.6247
 
 ### negative_rules and Qwen2.5-Coder-7B-Instruct/lora/sft_primevul_fixed_negative_4096_data (model only for positive samples)
 True Positives: 164, False Positives: 153, True Negatives: 282, False Negatives: 271
@@ -358,6 +363,8 @@ Accuracy: 0.5270, Precision: 0.4734, Recall: 0.3306, F1 Score: 0.3893, FPR: 0.30
 ### precision rules and Qwen2.5-Coder-7B-Instruct/lora/sft_primevul_train_paired (model only for negative samples after rules test)
 True Positives: 8726, False Positives: 10464, True Negatives: 4391, False Negatives: 3728
 Accuracy: 0.4803, Precision: 0.4547, Recall: 0.7007, F1 Score: 0.5515, FPR: 0.7044
+### Llama-3-8B
+Accuracy: 0.5107, Precision: 0.4557, Recall: 0.4082, F1 Score: 0.4307, FPR: 0.4043
 
 ## reveal
 Total items: 22728
