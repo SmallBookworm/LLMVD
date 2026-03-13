@@ -364,7 +364,10 @@ Accuracy: 0.5270, Precision: 0.4734, Recall: 0.3306, F1 Score: 0.3893, FPR: 0.30
 True Positives: 8726, False Positives: 10464, True Negatives: 4391, False Negatives: 3728
 Accuracy: 0.4803, Precision: 0.4547, Recall: 0.7007, F1 Score: 0.5515, FPR: 0.7044
 ### Llama-3-8B
-Accuracy: 0.5107, Precision: 0.4557, Recall: 0.4082, F1 Score: 0.4307, FPR: 0.4043
+Total items: 27309
+Failed generations: 63
+True Positives: 5126, False Positives: 6053, True Negatives: 8771, False Negatives: 7296
+Accuracy: 0.5101, Precision: 0.4585, Recall: 0.4127, F1 Score: 0.4344, FPR: 0.4083
 
 ## reveal
 Total items: 22728
