@@ -138,8 +138,8 @@ def generate_primevul_compare_data(model_name="unsloth/QwQ-32B-Preview-bnb-4bit"
     instruction="You are a security code vulnerability analyzer. Your task is to carefully analyze the provided code snippet. Note that the provided code snippet might not be complete, but it has all the important context.\nYour output must be EXACTLY ONE WORD:\n\nIf you detect any potential security vulnerability in the specified code segment, return: VULNERABLE\nIf the code segment appears to be secure and free from obvious vulnerabilities, return: BENIGN\n\nIMPORTANT GUIDELINES:\n\nConsider common vulnerability types such as:\n\n- Buffer overflows\n- Improper input validation\n- Integer Overflow\n- Memory corruption potential\n- Double free\n- Use after free\n\nYour response must be either 'VULNERABLE' or 'BENIGN' - no additional explanation\n\nOutput format:\nOne word: VULNERABLE or BENIGN\n"
 
 
-    generate_compare_data(short_res, instruction=instruction, output_path='./models/data/primevul_test_paired_compare_llmxcpg_data.json')
-    with open('./models/data/primevul_test_paired_compare_llmxcpg_data.json', 'r') as f:
+    generate_compare_data(short_res, instruction=instruction, output_path='./models/data/primevul_test/primevul_test_paired_compare_llmxcpg_data.json')
+    with open('./models/data/primevul_test/primevul_test_paired_compare_llmxcpg_data.json', 'r') as f:
         data = json.load(f)
     print(f"json length: {len(data)}")
 
@@ -256,7 +256,7 @@ if __name__ == "__main__":
     # generate_precision_data()
     # generate_primevul_train_data()
     # generate_primevul_test_data()
-    # generate_primevul_compare_data()
+    generate_primevul_compare_data()
     
     # generate_reveal_data()
     # split_dataset(dataset_path="./models/data/primevul_test_32768_data.json", split_num=2)
@@ -267,4 +267,4 @@ if __name__ == "__main__":
     #     data2 = json.load(f)
     # print(f"1json length: {len(data2)}")
     # generate_ReGVD_test_data()
-    generate_devign_compare_data()
+    # generate_devign_compare_data()

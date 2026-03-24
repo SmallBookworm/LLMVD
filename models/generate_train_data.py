@@ -4,6 +4,7 @@ import json
 import jsonlines
 import random
 import pandas as pd
+import os
 
 
 def generate_train_data(dataset, output_path="./models/data/train_data.json"):
@@ -22,17 +23,30 @@ def generate_train_data(dataset, output_path="./models/data/train_data.json"):
     return result
 
 def generate_compare_data(dataset, instruction, output_path="./models/data/test_data.json"):
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
     result = []
+    i = 0
     for sample in dataset:
+        i += 1
+        file_name = f"primeVul_test_paired_{sample["idx"]}_{i}.c"
         one_data = {
             "instruction": instruction,
             "input": sample["func"],
             "output": "VULNERABLE" if sample["target"] == 1 else "BENIGN",
-            "file_name": "",
-            "dataset": "PrimeVul_test_paired",
+            "file_name": file_name,
+            "dataset": "PrimeVul",
             "cwe": ""
         }
         result.append(one_data)
+        file_path = os.path.join(os.path.dirname(output_path), "./compare_data/", file_name)
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        if os.path.exists(file_path):
+            with open(file_path, "r") as f:                
+                existing_content = f.read()
+            if existing_content != sample["func"]:
+                print(f"Warning: file {file_path} already exists with different content. Overwriting.")
+        with open(file_path, "w") as f:
+            f.write(sample["func"])
 
     with open(output_path, "w") as f:
         json.dump(result, f, indent=4)
