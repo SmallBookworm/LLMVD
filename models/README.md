@@ -20,6 +20,11 @@ register_template(
     replace_eos=True,
 )
 ```
+
+# [LLMxCPG](https://github.com/qcri/llmxcpg/)
+1. construct dataset by `generate_primevul_compare_data()` in `train.py`.
+2. query LLM (LLMxCPG-Q) for code slice and then construct slice.
+3. detect the slice json file by LLM (LLMxCPG-D).
 # model set
 Qwen2.5-Coder-7B-Instruct: 
 
