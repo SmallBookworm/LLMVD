@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2017-9150-bpf-verifier-leak
+    message: "Unprivileged BPF verifier log may leak kernel pointer addresses via print_bpf_insn without checking allow_ptr_leaks."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          if (log_level) {
+              verbose("%d: ", ...);
+              print_bpf_insn(env, ...);
+          }
+      - pattern-either:
+          - pattern: |
+              if (log_level) {
+                  verbose("%d: ", ...);
+                  print_bpf_insn(...);
+              }
+    metadata:
+      cwe: ["CWE-200"]
+      cve: "CVE-2017-9150"

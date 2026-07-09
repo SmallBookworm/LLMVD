@@ -1,0 +1,25 @@
+rules:
+  - id: cve-2012-2745-missing-replacement-session-keyring-clear
+    message: "Missing initialization of replacement_session_keyring to NULL in copy_creds(), which may lead to use-after-free and kernel panic (CVE-2012-2745)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      int copy_creds(struct task_struct *p, unsigned long clone_flags)
+      {
+        ...
+        if (... && (clone_flags & CLONE_THREAD)) {
+          ...
+          return 0;
+        }
+        ...
+      }
+    pattern-not: |
+      int copy_creds(struct task_struct *p, unsigned long clone_flags)
+      {
+        ...
+        p->replacement_session_keyring = NULL;
+        ...
+      }
+    fix-regex:
+      regex: ""
+      replacement: ""

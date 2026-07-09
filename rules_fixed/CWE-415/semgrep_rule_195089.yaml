@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2021-32613-double-free-macho-parser
+    message: "Potential double free vulnerability due to missing page_size validation. If page_size is zero, division operations may lead to undefined behavior and possible double free (CWE-415)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          ut64 page_size = $OBJ->chained_starts[$I]->page_size;
+          ...
+          (R_MAX(...) - ...) / page_size;
+    metadata:
+      cwe: "CWE-415"
+      cve: "CVE-2021-32613"

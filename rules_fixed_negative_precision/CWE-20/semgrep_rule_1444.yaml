@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2015-6563-openssh-pam-username-leak
+    message: "Extraneous username sent to PAM during MONITOR_REQ_PAM_INIT_CTX, enabling impersonation attacks (CVE-2015-6563)."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              buffer_put_cstring(&m, authctxt->user);
+              mm_request_send(pmonitor->m_recvfd, MONITOR_REQ_PAM_INIT_CTX, &m);
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2015-6563"

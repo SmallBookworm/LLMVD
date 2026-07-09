@@ -1,0 +1,27 @@
+rules:
+  - id: rtmp_packet_size_mismatch
+    message: "Heap-based buffer overflow due to missing RTMP packet size mismatch check. This can lead to out-of-bounds memory access."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!prev_pkt[$CHANNEL_ID].read) {
+              ...
+          } else {
+              ...
+          }
+      - pattern: |
+          if (prev_pkt[$CHANNEL_ID].read && size != prev_pkt[$CHANNEL_ID].size) {
+              ...
+          }
+    metavariable-regex:
+      - metavariable: $CHANNEL_ID
+        regex: "channel_id"
+    pattern-not: |
+      if (prev_pkt[channel_id].read && size != prev_pkt[channel_id].size) {
+          av_log(...);
+          ff_rtmp_packet_destroy(...);
+          prev_pkt[channel_id].read = 0;
+      }
+    fix-regex:
+      enabled: false

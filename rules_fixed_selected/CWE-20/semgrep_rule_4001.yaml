@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2019-13221-lookup1-values-unchecked-math
+    message: "Potential use of invalid 'r' value due to missing bounds checks in lookup1_values; may lead to undefined behavior (CVE-2019-13221)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if ((int) floor(pow((float) r+1, dim)) <= entries)
+         ++r;
+      assert(pow((float) r+1, dim) > entries);
+      assert((int) floor(pow((float) r, dim)) <= entries);

@@ -1,0 +1,29 @@
+rules:
+  - id: unbound-cve-2019-18934
+    message: "Potential shell injection in ipsecmod due to lack of input validation before calling system(). This can lead to remote code execution if unbound is compiled with --enable-ipsecmod and the feature is enabled."
+    severity: ERROR
+    languages: [c]
+    cwe: ["CWE-78"]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              system(...);
+          - pattern: |
+              if (system($STR) != 0) { ... }
+    pattern-inside: |
+      call_hook(struct module_qstate* $QSTATE, struct ipsecmod_qstate* $IQ, ...)
+      {
+        ...
+        char $BUF[...];
+        ...
+        $S = $BUF;
+        $SLEN = sizeof($BUF);
+        ...
+        sldns_str_print(&$S, &$SLEN, ..., ...);
+        ...
+        system($BUF);
+        ...
+      }
+    metavariable-regex:
+      metavariable: $BUF
+      regex: str

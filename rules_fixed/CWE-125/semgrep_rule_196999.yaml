@@ -1,0 +1,10 @@
+rules:
+  - id: cwe-125-panasonic-load-raw-bounds-check
+    message: "Missing row bounds check in panasonic_load_raw() may lead to heap-based buffer overflow (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if ((RAW($ROW, $COL) = $PRED) > 4098 && $COL < width)
+    fix-regex:
+      regex: '($$.*?$$ > 4098 && .*?)\)'
+      replacement: '\1 && $ROW < height)'

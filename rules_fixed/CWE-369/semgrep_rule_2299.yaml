@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2015-7513-kvm-pit-zero-divide
+    message: "Missing reload of all PIT counters during state restoration may lead to divide-by-zero (CVE-2015-7513)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          kvm_pit_load_count($kvm, 0, $ps->channels[0].count, 0);
+      - pattern: |
+          kvm_pit_load_count($kvm, 0, $count, 0);
+    metavariable-pattern:
+      $count: 
+        pattern: $ps->channels[0].count
+    fix: ""

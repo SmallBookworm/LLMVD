@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2017-5506-double-free
+    message: "Potential double free vulnerability due to missing overflow check before memory access in EXIF parsing."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ((ssize_t) (offset+number_bytes) < offset)
+            continue;
+          if ((size_t) (offset+number_bytes) > length)
+             continue;
+      - pattern: |
+          if ((offset+number_bytes) < offset)
+            continue;
+          if ((size_t) (offset+number_bytes) > length)
+             continue;

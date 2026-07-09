@@ -1,0 +1,23 @@
+rules:
+  - id: cwe-125-out-of-bounds-array-access-ath6kl
+    message: "Out-of-bounds array access possible via unchecked network-derived index 'ev->traffic_class' into 'wmi->stream_exist_for_ac' which has only WMM_NUM_AC (4) elements."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          wmi->stream_exist_for_ac[ev->traffic_class] = ...;
+      - pattern: |
+          wmi->fat_pipe_exist &= ~(1 << ev->traffic_class);
+      - pattern: |
+          ath6kl_indicate_tx_activity(..., ev->traffic_class, ...);
+    metavariable-pattern:
+      metavariable: ev
+      pattern: |
+        struct wmi_pstream_timeout_event *ev;
+    pattern-not-inside: |
+      if (ev->traffic_class >= WMM_NUM_AC) {
+          ...
+          return ...;
+      }
+      ...
+      $S

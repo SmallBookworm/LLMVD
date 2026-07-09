@@ -1,0 +1,28 @@
+rules:
+  - id: cwe-362-uninitialized-ipc-object
+    message: "IPC object is added to IDR before being fully initialized, leading to a potential race condition (CWE-362)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          id = idr_alloc(..., $NEW, ...);
+          ...
+          $NEW->cuid = ...;
+          $NEW->uid = ...;
+          $NEW->gid = ...;
+          $NEW->cgid = ...;
+      - pattern: |
+          id = idr_alloc(..., $NEW, ...);
+          ...
+          current_euid_egid(...);
+          $NEW->cuid = ...;
+          $NEW->uid = ...;
+          $NEW->gid = ...;
+          $NEW->cgid = ...;
+    metavariable-pattern:
+      - metavariable: $NEW
+        pattern:
+          patterns:
+            - pattern-inside: |
+                struct kern_ipc_perm *$NEW;
+            - pattern: $NEW

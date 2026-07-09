@@ -1,0 +1,19 @@
+rules:
+  - id: picolcd_raw_event_buffer_overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (report->id == ...) {
+                ...
+              } else if (report->id == ...) {
+                ...
+              } else {
+                ...
+                memcpy(data->pending->raw_data, raw_data+1, size-1);
+                ...
+              }
+          - pattern: |
+              memcpy(data->pending->raw_data, raw_data+1, size-1);
+    message: "Missing size check before memcpy in picolcd_raw_event may lead to buffer overflow (CVE-2014-3186)."
+    severity: ERROR
+    languages: [c]

@@ -1,0 +1,13 @@
+rules:
+  - id: xhci_recursive_kick_vulnerability
+    message: "Missing guard against recursive calls to xhci_kick_epctx may lead to infinite recursion (CVE-2017-9375, CWE-835)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      xhci_kick_epctx($EPCTX, $STREAMID);
+    pattern-not: |
+      if ($EPCTX->kick_active) { return; }
+      xhci_kick_epctx($EPCTX, $STREAMID);
+    fix-regex:
+      regex: ""
+      replacement: ""

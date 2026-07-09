@@ -1,0 +1,26 @@
+rules:
+  - id: cve-2012-2870-xslt-generate-id-double-free
+    message: "Potential double-free or use-after-free in xsltGenerateIdFunction due to improper memory management of XPath object."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ((nodelist == NULL) || (nodelist->nodeNr <= 0)) {
+              xmlXPathFreeObject(obj);
+              valuePush(...);
+              return;
+          }
+          ...
+          xmlXPathFreeObject(obj);
+      - pattern: |
+          if ((nodelist == NULL) || (nodelist->nodeNr <= 0)) {
+              xmlXPathFreeObject(obj);
+              ...;
+              return;
+          }
+          ...
+          if (obj)
+              xmlXPathFreeObject(obj);
+    metavariable-regex:
+      metavariable: obj
+      regex: obj

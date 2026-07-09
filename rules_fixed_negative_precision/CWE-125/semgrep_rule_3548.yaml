@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2018-16790-buffer-overread
+    message: "Heap-based buffer over-read in BSON binary type handling due to incorrect bounds check (CVE-2018-16790, CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (l >= (len - o)) {
+            ...
+          }
+      - pattern: |
+          if (l > (len - o)) {
+            ...
+          }
+    metavariable-pattern:
+      metavariable: $l
+      pattern: uint32_t
+    focus-metavariable: $l

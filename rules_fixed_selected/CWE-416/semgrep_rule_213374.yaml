@@ -1,0 +1,25 @@
+rules:
+  - id: cve-2017-16943-use-after-free
+    message: Potential use-after-free vulnerability in receive_msg function due to unsafe store_release call. This could lead to remote code execution or denial of service via BDAT commands.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          if (!store_extend(...))
+            {
+            ...
+            store_release($PTR);
+            ...
+            }
+      - pattern-not: |
+          if (!store_extend(...))
+            {
+            ...
+            BOOL release_ok = store_last_get[store_pool] == $PTR;
+            ...
+            if (release_ok) store_release($PTR);
+            ...
+            }
+    metavariable-regex:
+      metavariable: $PTR
+      regex: 'next->text'

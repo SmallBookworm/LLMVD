@@ -1,0 +1,24 @@
+rules:
+  - id: cwe-787-stack-buffer-overflow-fuji-makernote
+    message: "Stack-based buffer overflow in Fuji makernote parser due to unsafe strncpy usage. This may lead to denial of service or arbitrary code execution."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          strncpy($BUF, $SRC, $LEN);
+          ...
+          $BUF[$LEN] = 0;
+      - pattern: |
+          strncpy($BUF, $SRC, $LEN);
+          ...
+          $BUF[$INDEX] = 0;
+    metavariable-pattern:
+      patterns:
+        - pattern: $BUF
+          metavariable: $BUF
+          patterns:
+            - pattern: ynum
+        - pattern: $LEN
+          metavariable: $LEN
+          patterns:
+            - pattern: strnlen(...)

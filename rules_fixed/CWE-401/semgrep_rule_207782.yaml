@@ -1,0 +1,39 @@
+rules:
+  - id: memory-leak-i2400m-op-rfkill-sw-toggle
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: $cmd = kzalloc(...)
+              - pattern-inside: |
+                  if (IS_ERR($ack_skb)) {
+                    ...
+                    goto error_msg_to_dev;
+                  }
+                  ...
+                  error_cmd:
+                    kfree($cmd);
+                    ...
+                  error_msg_to_dev:
+                    ...
+                  return ...;
+          - patterns:
+              - pattern: $cmd = kzalloc(...)
+              - pattern-inside: |
+                  if (IS_ERR($ack_skb)) {
+                    ...
+                    goto error_msg_to_dev;
+                  }
+                  ...
+                  error_cmd:
+                    ...
+                  error_msg_to_dev:
+                    ...
+                  return ...;
+                  ...
+                  kfree($cmd);
+    message: "Memory leak detected: allocated 'cmd' buffer is not freed on all error paths in i2400m_op_rfkill_sw_toggle()."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-401"
+      cve: "CVE-2019-19051"

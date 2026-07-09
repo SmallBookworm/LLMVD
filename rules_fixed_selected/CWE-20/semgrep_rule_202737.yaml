@@ -1,0 +1,20 @@
+rules:
+  - id: qcow2_l1_size_unbounded_allocation
+    message: "Missing validation of L1 table size may lead to unbounded allocation (CVE-2014-0144)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          s->l1_size = header.l1_size;
+          ...
+          if (s->l1_size > 0) {
+              s->l1_table = g_malloc0(...);
+          }
+      - pattern: |
+          s->l1_size = header.l1_size;
+          ...
+          s->l1_table = g_malloc0(...);
+    metavariable-pattern:
+      metavariable: s
+      pattern: $S
+    focus-metavariable: s->l1_size

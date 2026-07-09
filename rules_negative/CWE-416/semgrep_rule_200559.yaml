@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2020-25669-use-after-free-sunkbd
+    message: "Use-after-free vulnerability in sunkbd_reinit due to missing cancellation of work before freeing sunkbd structure."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          wait_event_interruptible_timeout($X->wait, $X->reset >= 0, $HZ);
+          serio_write($X->serio, ...);
+      - pattern: |
+          struct sunkbd *sunkbd = container_of($WORK, struct sunkbd, tq);
+          ...
+          serio_write(sunkbd->serio, ...);
+    metadata:
+      cwe: ["CWE-416"]
+      cve: "CVE-2020-25669"

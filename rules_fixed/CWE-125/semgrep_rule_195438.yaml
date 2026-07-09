@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2018-6340-out-of-bounds-read
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: char $BUF[30] = {0};
+              - pattern: |
+                  $LEN = snprintf($BUF, sizeof($BUF), "%s:%d", $HOST, $PORT);
+              - pattern: String($BUF, $LEN, CopyString)
+    message: "snprintf with fixed-size buffer may lead to out-of-bounds read when constructing String (CWE-125, CVE-2018-6340)."
+    severity: ERROR
+    languages: [c]

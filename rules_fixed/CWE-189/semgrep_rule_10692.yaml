@@ -1,0 +1,28 @@
+rules:
+  - id: systemd-journald-integer-overflow
+    message: "Potential integer overflow due to missing size check on journal data field. This could lead to heap-based buffer overflow (CVE-2013-4391)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (remaining < e - p + 1 + sizeof(uint64_t) + 1) {
+                ...
+                break;
+              }
+              ...
+              memcpy(&l_le, e + 1, sizeof(uint64_t));
+              l = le64toh(l_le);
+              if (remaining < (size_t)(e - p + 1 + sizeof(uint64_t) + l + 1) || ...)
+          - pattern: |
+              if (remaining < e - p + 1 + sizeof(uint64_t) + 1) {
+                ...
+                break;
+              }
+              ...
+              memcpy(&l_le, e + 1, sizeof(uint64_t));
+              l = le64toh(l_le);
+              if ((uint64_t) remaining < (uint64_t)(e - p + 1 + sizeof(uint64_t) + l + 1) || ...)
+    metadata:
+      cwe: ["CWE-189"]
+      cve: "CVE-2013-4391"

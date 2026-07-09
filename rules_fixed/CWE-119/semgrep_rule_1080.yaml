@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2013-1428-buffer-overflow
+    message: "Potential stack-based buffer overflow due to missing length check before memcpy into fixed-size buffer (CVE-2013-1428)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          memcpy($BUF.data, $SRC, $LEN);
+    where:
+      - pattern-not: |
+          if ($LEN > sizeof($BUF.data)) { ... }
+      - metavariable-regex:
+          metavariable: $BUF
+          regex: outpkt
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2013-1428"

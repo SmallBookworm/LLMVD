@@ -1,0 +1,16 @@
+rules:
+  - id: haproxy-http-request-forward-body-integer-overflow
+    message: "Integer overflow in http_request_forward_body may lead to buffer overflow (CVE-2014-6269)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (unlikely(!(s->rep->flags & CF_READ_ATTACHED)))
+                  msg->sov -= msg->next;
+          - pattern: |
+              if (unlikely(!(s->rep->flags & CF_READ_ATTACHED)))
+                  msg->sov -= msg->next + MIN(msg->chunk_len, req->buf->i);
+    metadata:
+      cwe: "CWE-189"
+      cve: "CVE-2014-6269"

@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2016-6516-double-fetch-dedupe
+    message: "Double-fetch vulnerability in ioctl_file_dedupe_range may lead to heap overflow (CVE-2016-6516, CWE-119). The user-provided 'dest_count' is used to allocate memory but not re-validated before use in vfs_dedupe_file_range."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (get_user($COUNT, &$ARGP->dest_count)) { ... }
+          ...
+          $SAME = memdup_user($ARGP, $SIZE);
+          ...
+          vfs_dedupe_file_range($FILE, $SAME);
+      - pattern: |
+          get_user($COUNT, &$ARGP->dest_count);
+          ...
+          $SAME = memdup_user($ARGP, $SIZE);
+          ...
+          vfs_dedupe_file_range($FILE, $SAME);
+    metavariable-pattern:
+      $SAME: "struct file_dedupe_range *"
+    focus-metavariable: $SAME

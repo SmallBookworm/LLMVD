@@ -1,0 +1,17 @@
+rules:
+  - id: null_pointer_dereference_webp_vp8x
+    message: "Potential NULL pointer dereference in VP8XChunk constructor. The 'bitstream' pointer is used without a NULL check, which may lead to a crash (CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          XMP_Uns8* bitstream = $DATA;
+          ... ((bitstream[$A] << $B) | bitstream[$C]) ...
+      - pattern: |
+          XMP_Uns8* bitstream = $DATA;
+          ... (bitstream[$D] << $E) ...
+    metavariable-pattern:
+      metavariable: bitstream
+      patterns:
+        - pattern: |
+            (XMP_Uns8*)parent->chunks[WEBP_CHUNK_IMAGE][0]->data.data()

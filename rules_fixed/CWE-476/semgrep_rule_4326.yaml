@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2017-16359-pointer-wraparound
+    message: "Potential pointer wraparound vulnerability due to unsafe pointer arithmetic. Use addition overflow check instead of subtraction with UINTPTR_MAX."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if ($PTR + $OFFSET < $PTR) {
+        ...
+      }
+    pattern-not: |
+      if ($OFFSET < 1 || $PTR + $OFFSET < $PTR) {
+        ...
+      }

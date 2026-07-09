@@ -1,0 +1,29 @@
+rules:
+  - id: csp-bypass-serviceworker-registration
+    message: "Missing Content Security Policy (CSP) check before ServiceWorker registration may allow CSP bypass (CVE-2016-1682)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!m_provider->validateScopeAndScriptURL(...)) {
+              ...
+              return;
+          }
+          m_provider->registerServiceWorker(...);
+      - pattern: |
+          if (!m_provider->validateScopeAndScriptURL(...)) {
+              ...
+              return;
+          }
+          ...
+          m_provider->registerServiceWorker(...);
+    metavariable-pattern:
+      metavariable: $BODY
+      pattern-not: |
+          ContentSecurityPolicy* csp = executionContext->contentSecurityPolicy();
+          if (csp) {
+              if (!csp->allowWorkerContextFromSource(...)) {
+                  ...
+                  return;
+              }
+          }

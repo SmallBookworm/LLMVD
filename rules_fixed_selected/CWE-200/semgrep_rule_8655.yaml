@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2018-9499-uninitialized-data-read
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $SIZE = $DATA.readInt32();
+              $VECTOR.insertAt((size_t)0, $SIZE);
+              $DATA.read($VECTOR.editArray(), $SIZE);
+    message: "Uninitialized data read vulnerability (CVE-2018-9499). Missing error checks after insertAt and read may lead to information disclosure."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-200"
+      references:
+        - "https://android.googlesource.com/platform/frameworks/av/+/bf7a67c33c0f044abeef3b9746f434b7f3295bb1"
+        - "https://nvd.nist.gov/vuln/detail/CVE-2018-9499"

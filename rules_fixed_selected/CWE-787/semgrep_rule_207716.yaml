@@ -1,0 +1,21 @@
+rules:
+  - id: cwe-787-buffer-overflow-libidn2
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (rc == IDN2_OK)
+                {
+                  ...
+                  strcpy (output, (char *) output_u8);
+                  ...
+                }
+          - pattern: |
+              if (rc == IDN2_OK)
+                {
+                  ...
+                  strcpy (output, (const char *) output_u8);
+                  ...
+                }
+    message: "Potential heap-based buffer overflow due to missing length check before strcpy. Ensure output length is restricted to 63 characters as per libidn2 fix for CVE-2019-18224."
+    severity: ERROR
+    languages: [c]

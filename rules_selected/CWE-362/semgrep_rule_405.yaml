@@ -1,0 +1,11 @@
+rules:
+  - id: cwe-362-chmod-symlink-race
+    message: Use of chmod() on a temporary file may allow symlink attacks. Use fchmod() instead to avoid race conditions.
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern: |
+          chmod($TMP_FILE, ...);
+    metadata:
+      cwe: "CWE-362"
+      cve: "CVE-2011-4029"

@@ -1,0 +1,25 @@
+rules:
+  - id: negative_array_index_in_fofi_type1_parse
+    message: "Potential negative array index 'code' used to access 'encoding' array without validation, leading to memory corruption."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (code < 256) {
+                ...
+                encoding[code] = ...;
+              }
+          - pattern: |
+              if (code < 256 && ...) {
+                ...
+                encoding[code] = ...;
+              }
+    metavariable-pattern:
+      metavariable: code
+      pattern: code
+    pattern-not: |
+      if (code < 256 && code >= 0) {
+        ...
+        encoding[code] = ...;
+      }

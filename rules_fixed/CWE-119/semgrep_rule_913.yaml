@@ -1,0 +1,15 @@
+rules:
+  - id: cwe-119-uio-mmap-physical-size-check-missing
+    message: Missing size validation before calling io_remap_pfn_range may lead to memory corruption (CWE-119).
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              io_remap_pfn_range($vma, $start, $pfn, $size, $prot)
+          - pattern: |
+              remap_pfn_range($vma, $start, $pfn, $size, $prot)
+    metavariable-pattern:
+      $size:
+        pattern-not: fbdev->fb_len
+        pattern-not-regex: .*len.*

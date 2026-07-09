@@ -1,0 +1,8 @@
+rules:
+  - id: nbd_buffer_overflow_cve_2011_0530
+    message: "Buffer overflow vulnerability due to insufficient size check before memcpy. The check 'len > BUFSIZE' should be 'len > BUFSIZE - sizeof(struct nbd_reply)' to account for reply header."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (len > BUFSIZE)
+        err(...);

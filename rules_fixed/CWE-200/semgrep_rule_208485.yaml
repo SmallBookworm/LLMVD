@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2016-7128-exif-tiff-thumbnail-info-leak
+    message: "Potential information disclosure due to missing bounds check when reading thumbnail data from a crafted TIFF image. This may allow remote attackers to obtain sensitive information from process memory."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!ImageInfo->Thumbnail.data && ImageInfo->Thumbnail.offset && ImageInfo->Thumbnail.size && ImageInfo->read_thumbnail) {
+                  ImageInfo->Thumbnail.data = safe_emalloc(ImageInfo->Thumbnail.size, 1, 0);
+                  php_stream_seek(ImageInfo->infile, ImageInfo->Thumbnail.offset, SEEK_SET);
+                  fgot = php_stream_read(ImageInfo->infile, ImageInfo->Thumbnail.data, ImageInfo->Thumbnail.size);
+                  if (fgot < ImageInfo->Thumbnail.size) {
+                      EXIF_ERRLOG_THUMBEOF(ImageInfo);
+                  }
+                  exif_thumbnail_build(ImageInfo TSRMLS_CC);
+              }
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2016-7128"

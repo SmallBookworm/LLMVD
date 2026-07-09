@@ -1,0 +1,38 @@
+rules:
+  - id: cve-2017-15390-idn-spoofing
+    message: "Insufficient policy enforcement in IDN spoof checking may allow domain spoofing via homograph attacks."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              new icu::RegexMatcher(
+                  icu::UnicodeString(
+                      R"(...)",
+                      -1, US_INV),
+                  0, $STATUS);
+          - pattern: |
+              dangerous_pattern = new icu::RegexMatcher(
+                  icu::UnicodeString(
+                      R"([^\p{scx=kana}\p{scx=hira}\p{scx=hani}])"
+                     R"([\u30ce\u30f3\u30bd\u30be])"
+                     R"([^\p{scx=kana}\p{scx=hira}\p{scx=hani}]|)"
+                     R"([^\p{scx=kana}\p{scx=hira}]\u30fc|^\u30fc|)"
+                     R"([^\p{scx=kana}][\u30fd\u30fe]|^[\u30fd\u30fe]|)"
+                     R"(^[\p{scx=kana}]+[\u3078-\u307a][\p{scx=kana}]+$|)"
+                     R"(^[\p{scx=hira}]+[\u30d8-\u30da][\p{scx=hira}]+$|)"
+                     R"([a-z]\u30fb|\u30fb[a-z]|)"
+                     R"(^[\u0585\u0581]+[a-z]|[a-z][\u0585\u0581]+$|)"
+                     R"([a-z][\u0585\u0581]+[a-z]|)"
+                     R"(^[og]+[\p{scx=armn}]|[\p{scx=armn}][og]+$|)"
+                     R"([\p{scx=armn}][og]+[\p{scx=armn}]|)"
+                     R"([\p{sc=cans}].*[a-z]|[a-z].*[\p{sc=cans}]|)"
+                      R"([\p{sc=tfng}].*[a-z]|[a-z].*[\p{sc=tfng}]|)"
+                      R"([^\p{scx=latn}\p{scx=grek}\p{scx=cyrl}][\u0300-\u0339]|)"
+                      R"([^\p{scx=arab}][\u064b-\u0655\u0670]|)"
+                     R"([^\p{scx=hebr}]\u05b4)",
+                     -1, US_INV),
+                  0, $STATUS);
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2017-15390"

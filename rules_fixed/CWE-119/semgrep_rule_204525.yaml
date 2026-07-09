@@ -1,0 +1,37 @@
+rules:
+  - id: openjpeg-color-esycc-to-rgb-buffer-overflow
+    message: "Potential heap-buffer-overflow in color_esycc_to_rgb when component dimensions (dx/dy) differ. Missing validation may lead to out-of-bounds reads."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              void color_esycc_to_rgb(...) {
+                ...
+                if (image->numcomps < 3) return;
+                ...
+                for ($X; $Y; $Z) {
+                  ... = image->comps[0].data[...];
+                  ... = image->comps[1].data[...];
+                  ... = image->comps[2].data[...];
+                  ...
+                }
+                ...
+              }
+          - pattern: |
+              void color_esycc_to_rgb(...) {
+                ...
+                if (image->numcomps < 3) { ... }
+                ...
+                for ($X; $Y; $Z) {
+                  ... = image->comps[0].data[...];
+                  ... = image->comps[1].data[...];
+                  ... = image->comps[2].data[...];
+                  ...
+                }
+                ...
+              }
+    metavariable-regex:
+      metavariable: image
+      regex: "^[a-zA-Z_][a-zA-Z0-9_]*$"
+    focus-metavariable: image

@@ -1,0 +1,20 @@
+rules:
+  - id: integer-overflow-in-vrend_create_shader
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((pkt_length * 4 + ...) > ...)
+          - pattern-inside: |
+              ... = ...;
+          - pattern: |
+              $PKT_LENGTH * 4 + ...
+    metavariable: PKT_LENGTH
+    metavariable-regex:
+      metavariable: $PKT_LENGTH
+      regex: pkt_length
+    message: "Potential integer overflow in vrend_create_shader due to unchecked multiplication and addition of untrusted pkt_length"
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-190"
+      cve: "CVE-2017-6355"

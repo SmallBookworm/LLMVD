@@ -1,0 +1,33 @@
+rules:
+  - id: cwe-200-uninitialized-padding-netlink
+    message: Uninitialized padding fields in netlink message structure may leak kernel memory contents.
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $pmsg->prefix_family = ...;
+              $pmsg->prefix_ifindex = ...;
+          - pattern: |
+              $pmsg->prefix_family = ...;
+              ...
+              $pmsg->prefix_ifindex = ...;
+          - pattern: |
+              $pmsg->prefix_ifindex = ...;
+              ...
+              $pmsg->prefix_len = ...;
+          - pattern: |
+              $pmsg->prefix_len = ...;
+              ...
+              $pmsg->prefix_type = ...;
+        metavariable-regex:
+          metavariable: $pmsg
+          regex: '.*pmsg.*'
+    pattern-not: |
+      $pmsg->prefix_pad1 = 0;
+      ...
+      $pmsg->prefix_pad2 = 0;
+      ...
+      $pmsg->prefix_pad3 = 0;
+    fix-regex:
+      regex: ""

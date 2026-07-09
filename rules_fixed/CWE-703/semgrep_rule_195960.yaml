@@ -1,0 +1,8 @@
+rules:
+  - id: null_pointer_dereference_in_sample_table_access
+    message: "Potential NULL pointer dereference due to missing null check on m_Locator.m_SampleTable before accessing GetOffset()"
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (!cursors[$I].m_EndReached &&
+          cursors[$I].m_Locator.m_Sample.GetOffset() <= $MIN_OFFSET)

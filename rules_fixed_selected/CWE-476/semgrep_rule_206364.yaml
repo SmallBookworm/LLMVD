@@ -1,0 +1,19 @@
+rules:
+  - id: opencv-null-ptr-deref-cve-2019-14493
+    message: "Missing null pointer check for 'ptr' before use may lead to NULL pointer dereference (CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      bool parse(char * ptr)
+      {
+          ...
+          $PTR = skipSpaces($PTR, ...);
+          ...
+      }
+    pattern-not: |
+      bool parse(char * ptr)
+      {
+          if (!ptr)
+              ...
+          ...
+      }

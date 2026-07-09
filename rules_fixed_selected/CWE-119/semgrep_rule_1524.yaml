@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2015-2666-stack-buffer-overflow
+    message: "Potential stack-based buffer overflow due to missing bounds check on mc_saved_count before calling _save_mc()."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while ($LEFTOVER) {
+                ...
+                _save_mc($MC_SAVED_TMP, $UCODE_PTR, &$MC_SAVED_COUNT);
+                ...
+              }
+          - pattern: |
+              while ($LEFTOVER && ...) {
+                ...
+                if (...) continue;
+                _save_mc($MC_SAVED_TMP, $UCODE_PTR, &$MC_SAVED_COUNT);
+                ...
+              }
+    metavariable-pattern:
+      metavariable: $MC_SAVED_COUNT
+      pattern: mc_saved_count
+    focus-metavariable: $MC_SAVED_COUNT

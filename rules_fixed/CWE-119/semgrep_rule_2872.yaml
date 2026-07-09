@@ -1,0 +1,14 @@
+rules:
+  - id: cxusb_dma_stack_buffer_read
+    message: "DMA read operation uses stack buffer which may span multiple pages when CONFIG_VMAP_STACK is enabled, leading to potential buffer overflow (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          dvb_usb_generic_rw(..., $rbuf, $rlen, ...);
+      - pattern: |
+          dvb_usb_generic_rw(..., rbuf, ..., ...);
+    metavariable-pattern:
+      $rbuf:
+        pattern-not: st->data
+    fix: ""

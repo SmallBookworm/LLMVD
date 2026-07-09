@@ -1,0 +1,25 @@
+rules:
+  - id: freetype-mac-read-post-resource-buffer-overflow
+    message: "Heap-based buffer overflow in Mac_Read_POST_Resource due to missing check for comment resources (flags >> 8 == 0). This may lead to arbitrary code execution or denial of service."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ( ( flags >> 8 ) == type )
+                ...
+              else
+                ...
+          - pattern: |
+              if ( rlen > 2 )
+                ...
+      - pattern-not: |
+          if ( ( flags >> 8 ) == 0 )
+            continue;
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern: Mac_Read_POST_Resource(...)
+    fix-regex:
+      regex: '.*'
+      replacement: ''
+      enabled: false

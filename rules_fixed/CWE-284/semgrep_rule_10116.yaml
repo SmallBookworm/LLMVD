@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2016-1675-reporterror-int64-to-int32
+    patterns:
+      - pattern: |
+          ReportError(..., $X)
+    pattern-where:
+      - metavariable: $X
+        pattern: |
+          $EXPR
+      - metavariable: $EXPR
+        pattern-not: |
+          static_cast<int32_t>($ARG)
+        pattern-not-inside: |
+          static_cast<int32_t>($EXPR)
+    message: "Potential integer truncation vulnerability when passing int64_t to ReportError without explicit cast to int32_t (CVE-2016-1675)."
+    severity: WARNING
+    languages: [c++]

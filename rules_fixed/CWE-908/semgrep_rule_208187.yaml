@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2019-11038-uninitialized-read-gdimagecreatefromxbm
+    message: |
+      Uninitialized read vulnerability in gdImageCreateFromXbm(). 
+      The return value of sscanf(h, "%x", &b) is not checked, which may lead to using an uninitialized variable 'b'.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: sscanf($H, "%x", &$B);
+              - pattern-inside: |
+                  {
+                    ...
+                    sscanf($H, "%x", &$B);
+                    ...
+                    $B & ...;
+                    ...
+                  }
+    metadata:
+      cwe: "CWE-908"
+      cve: "CVE-2019-11038"

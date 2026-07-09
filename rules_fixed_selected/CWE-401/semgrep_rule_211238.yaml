@@ -1,0 +1,15 @@
+rules:
+  - id: spi_gpio_probe_memory_leak
+    message: "Memory leak in spi_gpio_probe: spi_master_put() is not called if devm_add_action_or_reset() fails."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $STATUS = devm_add_action_or_reset(..., $MASTER);
+          if ($STATUS)
+            return $STATUS;
+    metadata:
+      cwe: ["CWE-401"]
+      references:
+        - https://github.com/torvalds/linux/commit/d3b0ffa1d75d5305ebe34735598993afbb8a869d
+        - https://nvd.nist.gov/vuln/detail/CVE-2019-19070

@@ -1,0 +1,20 @@
+rules:
+  - id: enlightenment_env_sanitization_missing
+    message: "Insufficient environment sanitization in setuid root helper may allow privilege escalation."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              NOENV("IFS");
+              NOENV("LD_PRELOAD");
+              NOENV("PYTHONPATH");
+              NOENV("LD_LIBRARY_PATH");
+          - pattern: |
+              unsetenv("IFS");
+              unsetenv("LD_PRELOAD");
+              unsetenv("PYTHONPATH");
+              unsetenv("LD_LIBRARY_PATH");
+    metavariable-regex:
+      metavariable: $...
+      regex: .*

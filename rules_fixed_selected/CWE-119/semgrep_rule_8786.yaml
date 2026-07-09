@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2016-2476-uninitialized-omx-structure
+    message: "Uninitialized OMX structure may lead to buffer overflows (CWE-119). Missing InitOMXParams() call on 'presentation' structure."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      OMX_AUDIO_PARAM_ANDROID_AACPRESENTATIONTYPE $X;
+      ...
+      $X.$FIELD = ...;
+    pattern-not: |
+      OMX_AUDIO_PARAM_ANDROID_AACPRESENTATIONTYPE $X;
+      ...
+      InitOMXParams(&$X);
+      ...
+      $X.$FIELD = ...;

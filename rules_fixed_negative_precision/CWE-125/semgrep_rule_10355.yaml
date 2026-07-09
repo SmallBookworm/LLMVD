@@ -1,0 +1,16 @@
+rules:
+  - id: cwe-125-exempi-postscript-buffer-overread
+    message: "Stack-based buffer over-read in PostScript_MetaHandler::ParsePSFile due to missing bounds check in while loop condition (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while(!IsNewline(*$PTR))
+                  ++$PTR;
+          - pattern: |
+              while(!IsNewline(*$PTR))
+                  $PTR++;
+    metadata:
+      cwe: ["CWE-125"]
+      cve: "CVE-2018-7729"

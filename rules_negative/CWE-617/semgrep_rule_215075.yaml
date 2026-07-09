@@ -1,0 +1,11 @@
+rules:
+  - id: cwe-617-assert-channel-check
+    patterns:
+      - pattern: |
+          assert($N > 0);
+    message: "Use of assert for input validation may lead to denial of service (CWE-617). Assertions can be disabled in production builds, leading to unchecked invalid inputs."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-617"
+      cve: "CVE-2018-14044"

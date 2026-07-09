@@ -1,0 +1,33 @@
+rules:
+  - id: cwe-125-pe-debug-out-of-bounds-read
+    message: "Potential heap-based out-of-bounds read in PE debug info parsing due to missing length check before accessing NB10 header."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (strncmp ((const char*) $DBG_DATA, "NB10", 4) == 0) {
+              ...
+              $TYPE $HDR;
+              init_cv_nb10_header (&$HDR);
+              get_nb10 ($DBG_DATA, &$HDR);
+              ...
+          }
+      - pattern: |
+          if (!strncmp ((const char*) $DBG_DATA, "NB10", 4)) {
+              ...
+              $TYPE $HDR;
+              init_cv_nb10_header (&$HDR);
+              get_nb10 ($DBG_DATA, &$HDR);
+              ...
+          }
+    metavariable-pattern:
+      metavariable: $DBG_DATA
+      pattern-not: |
+          if ($LEN_CHECK) {
+              ...
+              get_nb10 ($DBG_DATA, ...);
+              ...
+          }
+    fix-regex:
+      regex: ""
+      replacement: ""

@@ -1,0 +1,18 @@
+rules:
+  - id: imagemagick-infinite-loop-cve-2018-10177
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (loop_iters == 0)
+                skipping_loop=loop_level;
+          - pattern: |
+              if (loop_iters == 0)
+                ...
+                skipping_loop=loop_level;
+    message: "Infinite loop vulnerability detected in MNG LOOP chunk handling. When loop_iters is zero, the loop should be skipped to prevent denial of service. Fixed version uses 'loop_iters <= 0'."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-835: Loop with Unreachable Exit Condition ('Infinite Loop')"
+      cve: "CVE-2018-10177"
+      confidence: HIGH

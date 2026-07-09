@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2011-5327-off-by-one-tl_tpgs_check
+    message: "Off-by-one error in array bounds check may lead to memory corruption. Use '>=' instead of '>' when validating tpgt against TL_TPGS_PER_HBA."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          if ($TPGT > TL_TPGS_PER_HBA) {
+            ...
+          }
+    metavariable-pattern:
+      $TPGT: 
+        pattern-either:
+          - pattern: tpgt
+    fix: ""

@@ -1,0 +1,16 @@
+rules:
+  - id: tflite-split-v-oob-read
+    patterns:
+      - pattern-either:
+          - pattern: |
+              const int input_size = SizeOfDimension(input, axis_value);
+          - pattern-inside: |
+              ...
+              SizeOfDimension(input, axis_value)
+              ...
+    message: "Potential out-of-bounds read in SizeOfDimension due to missing axis bounds check. Ensure axis_value is validated against [0, NumDimensions(input))."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2021-29606"

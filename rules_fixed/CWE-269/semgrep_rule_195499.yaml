@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2017-6903-openal-pk3-check
+    message: "Missing check for .pk3 extension in OpenAL driver name allows loading of malicious auto-downloaded files as native code. This can lead to sandbox escape (CVE-2017-6903, CWE-269)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          Cvar_Get("s_alDriver", ..., CVAR_ARCHIVE | CVAR_LATCH)
+      - pattern: |
+          Cvar_Get("s_alDriver", ..., CVAR_LATCH | CVAR_ARCHIVE)
+    metavariable-pattern:
+      metavariable: $FLAGS
+      patterns:
+        - pattern: CVAR_ARCHIVE | CVAR_LATCH
+        - pattern: CVAR_LATCH | CVAR_ARCHIVE
+    pattern-not: |
+      if (COM_CompareExtension(s_alDriver->string, ".pk3"))
+      {
+          ...
+          return qfalse;
+      }

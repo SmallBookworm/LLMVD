@@ -1,0 +1,30 @@
+rules:
+  - id: sctp-auth-hmac-bounds-check-missing
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (...; ...; ...) {
+                ...
+                id = hmacs->shmac_idents[...];
+                ...
+                if (!sctp_hmac_list[id].hmac_name)
+                  return ...;
+                ...
+              }
+          - pattern: |
+              for (...; ...; ...) {
+                ...
+                id = hmacs->shmac_idents[...];
+                ...
+                if (SCTP_AUTH_HMAC_ID_SHA1 == id)
+                  ...;
+                if (!sctp_hmac_list[id].hmac_name)
+                  return ...;
+                ...
+              }
+    message: "Missing bounds check on HMAC identifier index before array access. This may lead to out-of-bounds read (CWE-200)."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2008-4445"

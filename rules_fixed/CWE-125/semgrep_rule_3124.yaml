@@ -1,0 +1,31 @@
+rules:
+  - id: cve-2016-10070-buffer-overflow
+    message: "Heap-based buffer overflow in CalcMinMax due to missing quantum_info cleanup before reuse. This may lead to out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - patterns:
+        - pattern: |
+            CalcMinMax(..., $BImgBuff, ..., &quantum_info->minimum, &quantum_info->maximum);
+        - pattern: |
+            CalcMinMax(..., $BImgBuff, ..., &MinVal, &MaxVal);
+        - metavariable-comparison:
+            metavariable: $BImgBuff
+            comparison: eq
+      - patterns:
+        - pattern: |
+            if (CellType==miDOUBLE || CellType==miSINGLE)
+            {
+              CalcMinMax(..., $BImgBuff, ..., &quantum_info->minimum, &quantum_info->maximum);
+            }
+        - pattern: |
+            if (CellType==miDOUBLE || CellType==miSINGLE)
+            {
+              CalcMinMax(..., $BImgBuff, ..., &MinVal, &MaxVal);
+            }
+        - metavariable-comparison:
+            metavariable: $BImgBuff
+            comparison: eq
+    metavariable-pattern:
+      metavariable: $BImgBuff
+      pattern: (unsigned char *) AcquireQuantumMemory(...)

@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2015-2698-iakerb-export-context-dereference
+    message: |
+      Missing dereference of 'context_handle' before casting to iakerb_ctx_id_t.
+      This can lead to memory corruption (CWE-119) as seen in CVE-2015-2698.
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      (iakerb_ctx_id_t)$context_handle
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2015-2698"

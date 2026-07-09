@@ -1,0 +1,27 @@
+rules:
+  - id: memory-leak-in-create-resource-pool
+    message: "Memory allocated with kzalloc is not freed on error path, leading to a memory leak (CWE-401)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (construct(..., ..., $POOL))
+            return &$POOL->base;
+          ...
+          return NULL;
+      - pattern: |
+          if (construct(..., ..., $POOL))
+            return &$POOL->base;
+          BREAK_TO_DEBUGGER();
+          return NULL;
+    metavariable-pattern:
+      $POOL:
+        pattern: $X
+        metavariable: $X
+    pattern-not: |
+      if (construct(..., ..., $POOL))
+        return &$POOL->base;
+      ...
+      kfree($POOL);
+      ...
+      return NULL;

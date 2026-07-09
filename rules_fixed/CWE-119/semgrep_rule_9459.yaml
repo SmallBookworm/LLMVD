@@ -1,0 +1,12 @@
+rules:
+  - id: virtio_console_dma_from_stack
+    patterns:
+      - pattern: |
+          sg_init_one(&$sg, $buf, $count);
+          __send_to_port($port, &$sg, 1, $count, (void *)$buf, false);
+    message: "Direct use of stack buffer in scatterlist for DMA may cause memory corruption when CONFIG_VMAP_STACK is enabled. Use kmemdup to allocate buffer on heap instead."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2017-8067"

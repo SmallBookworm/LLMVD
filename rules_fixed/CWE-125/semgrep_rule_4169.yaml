@@ -1,0 +1,29 @@
+rules:
+  - id: cve-2018-16227-buffer-overread
+    message: "Missing bounds check before accessing Mesh Flags subfield in IEEE 802.11 parser may cause buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (ndo->ndo_Hflag && FC_TYPE($fc) == T_DATA &&
+                  DATA_FRAME_IS_QOS(FC_SUBTYPE($fc))) {
+                $meshdrlen = extract_mesh_header_length($p + $hdrlen);
+                ...
+              }
+    metavariable-pattern:
+      metavariable: $p
+      pattern: p
+    fix-regex:
+      regex: ""
+      replacement: ""
+    # Ensure the vulnerable pattern lacks the intermediate bounds check
+    pattern-not: |
+      if (ndo->ndo_Hflag && FC_TYPE($fc) == T_DATA &&
+          DATA_FRAME_IS_QOS(FC_SUBTYPE($fc))) {
+        if (caplen < $hdrlen + 1) {
+          ...
+        }
+        $meshdrlen = extract_mesh_header_length($p + $hdrlen);
+        ...
+      }

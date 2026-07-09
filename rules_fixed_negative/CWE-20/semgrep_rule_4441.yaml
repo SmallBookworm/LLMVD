@@ -1,0 +1,45 @@
+rules:
+  - id: kvm_arm64_pstate_validation_missing
+    message: "Missing validation of PSTATE.M execution mode against VM and hardware capabilities in KVM_SET_ONE_REG handling. This may allow attackers to redirect hypervisor control flow or cause a denial of service."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (off == KVM_REG_ARM_CORE_REG(regs.pstate)) {
+            u32 mode = (*(u32 *)valp) & PSR_AA32_MODE_MASK;
+            switch (mode) {
+            case PSR_AA32_MODE_USR:
+            case PSR_AA32_MODE_FIQ:
+            case PSR_AA32_MODE_IRQ:
+            case PSR_AA32_MODE_SVC:
+            case PSR_AA32_MODE_ABT:
+            case PSR_AA32_MODE_UND:
+            case PSR_MODE_EL0t:
+            case PSR_MODE_EL1t:
+            case PSR_MODE_EL1h:
+              break;
+            default:
+              ...
+            }
+          }
+      - pattern: |
+          if (off == KVM_REG_ARM_CORE_REG(regs.pstate)) {
+            u64 mode = (*(u64 *)valp) & PSR_AA32_MODE_MASK;
+            switch (mode) {
+            case PSR_AA32_MODE_USR:
+            case PSR_AA32_MODE_FIQ:
+            case PSR_AA32_MODE_IRQ:
+            case PSR_AA32_MODE_SVC:
+            case PSR_AA32_MODE_ABT:
+            case PSR_AA32_MODE_UND:
+            case PSR_MODE_EL0t:
+            case PSR_MODE_EL1t:
+            case PSR_MODE_EL1h:
+              break;
+            default:
+              ...
+            }
+          }
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2018-18021"

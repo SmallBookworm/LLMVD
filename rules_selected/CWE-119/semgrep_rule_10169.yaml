@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2016-2506-drmextractor-buffer-overflow
+    message: "Missing overflow check before writing to buffer may lead to memory corruption (CVE-2016-2506)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!strcasecmp(..., MEDIA_MIMETYPE_VIDEO_AVC) && ...) {
+                  ...
+                  CHECK(dstOffset + 4 <= (*buffer)->size());
+                  ...
+              }
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2016-2506"

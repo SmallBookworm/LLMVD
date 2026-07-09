@@ -1,0 +1,13 @@
+rules:
+  - id: poppler-integer-overflow-parser-makestream
+    message: "Potential integer overflow in Parser::makeStream when computing pos + length. Missing overflow check before addition."
+    severity: ERROR
+    languages: [c]
+    cwe: ["CWE-190"]
+    pattern: |
+      lexer->setPos(pos + length);
+    pattern-not: |
+      if (unlikely(pos > LONG_LONG_MAX - length)) {
+          return nullptr;
+      }
+      lexer->setPos(pos + length);

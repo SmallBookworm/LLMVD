@@ -1,0 +1,8 @@
+rules:
+  - id: fribidi-buffer-overflow-CVE-2019-18397
+    message: "Buffer overflow vulnerability in fribidi_get_par_embedding_levels_ex due to dynamic allocation of base_level_per_iso_level. Fixed by using a stack-allocated array instead."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      fribidi_malloc(sizeof(base_level_per_iso_level[0]) *
+                     FRIBIDI_BIDI_MAX_EXPLICIT_LEVEL)

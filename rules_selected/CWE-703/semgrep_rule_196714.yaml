@@ -1,0 +1,29 @@
+rules:
+  - id: cve-2017-11448-uninitialized-jpeg-pixels
+    message: "Uninitialized memory in JPEG pixel buffer may lead to information disclosure. Ensure jpeg_pixels is zeroed after allocation."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          $MEMORY_INFO = AcquireVirtualMemory(...);
+          ...
+          $JPEG_PIXELS = (JSAMPLE *) GetVirtualMemoryBlob($MEMORY_INFO);
+          (void) ResetMagickMemory($JPEG_PIXELS, 0, ...);
+      - pattern-either:
+          - pattern: |
+              $MEMORY_INFO = AcquireVirtualMemory(...);
+              ...
+              $JPEG_PIXELS = (JSAMPLE *) GetVirtualMemoryBlob($MEMORY_INFO);
+              ...
+              scanline[0] = (JSAMPROW) $JPEG_PIXELS;
+          - pattern: |
+              $MEMORY_INFO = AcquireVirtualMemory(...);
+              ...
+              $JPEG_PIXELS = (JSAMPLE *) GetVirtualMemoryBlob($MEMORY_INFO);
+              ...
+              jpeg_read_scanlines(..., scanline, ...);
+    metadata:
+      cwe: "CWE-703"
+      cve: "CVE-2017-11448"
+      references:
+        - "https://github.com/ImageMagick/ImageMagick/commit/f6463ca9588579633bbaed9460899d892aa3c64a"

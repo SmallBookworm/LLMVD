@@ -1,0 +1,15 @@
+rules:
+  - id: cwe-119-stack-buffer-overflow-header-read
+    message: "Potential stack-based buffer overflow in header_read due to fixed-size header buffer without proper bounds checking."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($PSF->headindex + $BYTES > SIGNED_SIZEOF ($PSF->header))
+              { ... }
+          - pattern: |
+              memcpy ($PTR, $PSF->header + $PSF->headindex, $BYTES);
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2017-7586"

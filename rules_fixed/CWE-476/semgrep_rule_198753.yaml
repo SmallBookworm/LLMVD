@@ -1,0 +1,14 @@
+rules:
+  - id: null_pointer_dereference_gs_no_glyph
+    message: "Potential null pointer dereference due to missing check for GS_NO_GLYPH before using glyph value."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (glyph <= GS_MIN_CID_GLYPH) {
+        ...
+        zfont_get_to_unicode_map(...)
+        ...
+      }
+    metadata:
+      cwe: ["CWE-476"]
+      cve: "CVE-2020-16307"

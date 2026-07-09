@@ -1,0 +1,20 @@
+rules:
+  - id: nfp_abm_u32_knode_replace_memory_leak
+    message: "Memory leak in nfp_abm_u32_knode_replace: missing error assignment before goto err_delete on allocation failure"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!match) {
+              match = kzalloc(..., ...);
+              if (!match)
+                  return -ENOMEM;
+              ...
+          }
+      - pattern: |
+          if (!match) {
+              match = kzalloc(..., ...);
+              if (!match)
+                  return ...;
+              ...
+          }

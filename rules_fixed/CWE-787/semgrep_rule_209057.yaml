@@ -1,0 +1,42 @@
+rules:
+  - id: virglrenderer_buffer_overflow_vrend_renderer_transfer_write_iov
+    message: "Heap-based buffer overflow vulnerability in vrend_renderer_transfer_write_iov. Missing check that iov[0] contains enough data for the requested transfer size."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (need_temp) {
+            ...
+          } else {
+            data = (char*)iov[0].iov_base + info->offset;
+          }
+      - pattern: |
+          if (need_temp) {
+            ...
+          } else {
+            ...;
+            data = (char*)iov[0].iov_base + info->offset;
+          }
+    metavariable-pattern:
+      metavariable: need_temp
+      pattern: "need_temp"
+    mode: taint
+    patterns:
+      - pattern-sources:
+          - pattern-either:
+              - pattern: need_temp
+      - pattern-sinks:
+          - pattern-either:
+              - pattern: |
+                  if (need_temp) {
+                    ...
+                  } else {
+                    data = (char*)iov[0].iov_base + info->offset;
+                  }
+              - pattern: |
+                  if (need_temp) {
+                    ...
+                  } else {
+                    ...;
+                    data = (char*)iov[0].iov_base + info->offset;
+                  }

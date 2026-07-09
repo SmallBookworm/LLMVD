@@ -1,0 +1,13 @@
+rules:
+  - id: heap_buffer_overread_fiber_args
+    message: "Heap-based buffer over-read due to missing stack extension when passing many arguments to fiber"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (len >= c->stend - c->stack) {
+            mrb_raise(...);
+          }
+      - pattern: |
+          if (len >= c->stend - c->stack)
+            mrb_raise(...);

@@ -1,0 +1,28 @@
+rules:
+  - id: tflite-batchtospace-division-by-zero
+    message: "Division by zero vulnerability in BatchToSpaceNd: block_shape[dim] may be zero before division."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for ($$$; $$$; $$$) {
+                $$$
+                $OUTPUT_BATCH_SIZE = $OUTPUT_BATCH_SIZE / $BLOCK_SHAPE[$DIM];
+                $$$
+              }
+          - pattern: |
+              for ($$$; $$$; $$$) {
+                $$$
+                ... % $BLOCK_SHAPE[$DIM] ...
+                $OUTPUT_BATCH_SIZE = $OUTPUT_BATCH_SIZE / $BLOCK_SHAPE[$DIM];
+                $$$
+              }
+    pattern-not-inside: |
+      for ($$$; $$$; $$$) {
+        $$$
+        TF_LITE_ENSURE($$$, $BLOCK_SHAPE[$DIM] != 0);
+        $$$
+        $OUTPUT_BATCH_SIZE = $OUTPUT_BATCH_SIZE / $BLOCK_SHAPE[$DIM];
+        $$$
+      }

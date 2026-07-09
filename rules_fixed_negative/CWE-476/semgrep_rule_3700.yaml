@@ -1,0 +1,10 @@
+rules:
+  - id: cwe-476-null-deref-jsvar-trace
+    message: "Potential NULL pointer dereference in jswGetBasicObjectName usage. Missing null check before use may lead to denial of service (CVE-2018-11591)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      jsiConsolePrintf("%s ", jswGetBasicObjectName(...));
+    fix-regex:
+      regex: jsiConsolePrintf\("%s ", jswGetBasicObjectName\(([^)]+)\)\);
+      replacement: jsiConsolePrintf("%s ", jswGetBasicObjectName($1)?jswGetBasicObjectName($1):"unknown ArrayBuffer");

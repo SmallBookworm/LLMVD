@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2014-7815-vnc-bits-per-pixel-validation
+    message: "Missing validation of 'bits_per_pixel' may lead to denial of service (CVE-2014-7815). Ensure it is one of the allowed values (8, 16, 32)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          vs->client_pf.bytes_per_pixel = bits_per_pixel / 8;
+      - pattern: |
+          vs->client_pf.depth = bits_per_pixel == 32 ? 24 : bits_per_pixel;
+    metavariable-regex:
+      metavariable: bits_per_pixel
+      regex: .*bits_per_pixel.*
+    pattern-not-inside: |
+      switch (bits_per_pixel) {
+      case 8:
+      case 16:
+      case 32:
+          break;
+      default:
+          vnc_client_error(...);
+          return;
+      }

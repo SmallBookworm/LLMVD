@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2017-13190-libhevc-memory-allocation-check
+    message: "Potential use of uninitialized or invalid ps_codec_obj after memory allocation failure. Missing proper null check before accessing ps_codec_obj->pv_codec_handle."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if((IV_FAIL == $RET) && (NULL != $PS_CODEC_OBJ))
+              {
+                ...
+                return IV_FAIL;
+              }
+              $PS_CODEC = (codec_t *)$PS_CODEC_OBJ->pv_codec_handle;
+          - pattern: |
+              if(IV_FAIL == $RET)
+              {
+                ...
+                return IV_FAIL;
+              }
+              $PS_CODEC = (codec_t *)$PS_CODEC_OBJ->pv_codec_handle;
+    metavariable-pattern:
+      metavariable: $PS_CODEC_OBJ
+      pattern: ps_codec_obj

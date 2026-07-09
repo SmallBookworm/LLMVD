@@ -1,0 +1,7 @@
+rules:
+  - id: gnutls-x509-v1-ca-flag-flip
+    message: "Improper disabling of GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT flag using XOR may allow unintended X.509 v1 CA certificates to be treated as intermediates."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      flags ^= GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT

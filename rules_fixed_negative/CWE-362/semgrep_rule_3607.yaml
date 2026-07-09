@@ -1,0 +1,17 @@
+rules:
+  - id: spectre_rsb_missing_rsb_ctxsw
+    message: "Missing unconditional RSB fill on context switch, which may allow SpectreRSB attacks (CVE-2018-15572)."
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ((!boot_cpu_has(X86_FEATURE_PTI) &&
+               !boot_cpu_has(X86_FEATURE_SMEP)) || is_skylake_era()) {
+              setup_force_cpu_cap(X86_FEATURE_RSB_CTXSW);
+              ...
+          }
+      - pattern: |
+          if ((... && ...) || ...) {
+              setup_force_cpu_cap(X86_FEATURE_RSB_CTXSW);
+              ...
+          }

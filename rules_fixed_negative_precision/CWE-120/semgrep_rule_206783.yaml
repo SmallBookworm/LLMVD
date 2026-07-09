@@ -1,0 +1,13 @@
+rules:
+  - id: unsafe_snprintf_usage
+    message: "Unsafe usage of snprintf() that may lead to buffer overflow (CWE-120). Use slirp_fmt() instead."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          m->m_len = snprintf(...)
+      - pattern: |
+          m->m_len += snprintf(...)
+    metadata:
+      cwe: "CWE-120"
+      cve: "CVE-2020-8608"

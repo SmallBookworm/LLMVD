@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2018-19060-null-dereference
+    message: "Potential NULL pointer dereference when accessing embedded file name without validation. This may lead to denial of service (CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $S1 = $FILESPEC->getFileName();
+          if (($S1->getChar(0) & 0xff) == 0xfe && ($S1->getChar(1) & 0xff) == 0xff) { ... }
+      - pattern: |
+          $S1 = $FILESPEC->getFileName();
+          ... $S1->getLength() ...
+      - pattern: |
+          $S1 = $FILESPEC->getFileName();
+          ... $S1->getChar(...) ...
+    metavariable-pattern:
+      metavariable: $S1
+      patterns:
+        - pattern-not: |
+            if (!$S1) { ... }

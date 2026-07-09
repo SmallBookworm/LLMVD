@@ -1,0 +1,15 @@
+rules:
+  - id: omxcodec_missing_null_check
+    message: "Missing null check for memory allocation result may lead to denial of service (CVE-2016-3899, CWE-284)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          sp<IMemory> mem = $DEALER->allocate($SIZE);
+          CHECK(mem.get() != NULL);
+      - pattern: |
+          sp<IMemory> mem = $DEALER->allocate($SIZE);
+          ... 
+          $PTR = mem->pointer();
+    fix-regex:
+      regex: ""

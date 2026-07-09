@@ -1,0 +1,15 @@
+rules:
+  - id: sqlite-not-null-generated-column-integrity-check
+    message: "Missing handling of generated columns in colUsed bitmask may lead to incorrect integrity check (CVE-2019-19646, CWE-754)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          pItem->colUsed |= ((Bitmask)1)<<(...);
+      - pattern: |
+          pItem->colUsed |= (1ULL<<(...));
+    metavariable-pattern:
+      metavariable: $pItem
+      pattern: |
+        &pSrc->a[...]
+    focus-metavariable: $pItem

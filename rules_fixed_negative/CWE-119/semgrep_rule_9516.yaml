@@ -1,0 +1,21 @@
+rules:
+  - id: gdImageFillToBorder-negative-color-check
+    message: "Missing check for negative 'color' parameter in gdImageFillToBorder may lead to infinite recursion and stack overflow (CVE-2016-9933)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (border < 0) {
+        ...
+        return;
+      }
+    pattern-not: |
+      if (border < 0 || color < 0) {
+        ...
+        return;
+      }
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern: gdImageFillToBorder
+    fix-regex:
+      regex: ''
+      replacement: ''

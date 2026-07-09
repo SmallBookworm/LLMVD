@@ -1,0 +1,10 @@
+rules:
+  - id: cwe-347-opensaml-missing-metadatafilter-initialization
+    message: "DynamicMetadataProvider constructor does not initialize MetadataFilter plugins, leading to missing signature validation and other security checks (CWE-347)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      DynamicMetadataProvider::DynamicMetadataProvider(...) : AbstractMetadataProvider(...)
+    metadata:
+      cwe: ["CWE-347"]
+      cve: "CVE-2017-16853"

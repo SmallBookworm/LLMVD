@@ -1,0 +1,26 @@
+rules:
+  - id: cve-2019-19526-use-after-free-pn533
+    message: "Missing call to pn533_unregister_device before freeing resources may lead to use-after-free (CWE-416)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (IS_ERR($PRIV)) {
+              ...
+              goto error;
+          }
+          ...
+          if ($COND)
+              goto error;
+      - pattern: |
+          $PRIV = pn533_register_device(...);
+          if (IS_ERR($PRIV)) {
+              ...
+              goto error;
+          }
+          ...
+          if ($RC)
+              goto error;
+    metavariable-regex:
+      metavariable: $COND
+      regex: "rc"

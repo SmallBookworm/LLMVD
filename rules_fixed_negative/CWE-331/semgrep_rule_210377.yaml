@@ -1,0 +1,26 @@
+rules:
+  - id: cwe-331-libtpms-rsa-prime-adjust
+    message: "Use of vulnerable RSA prime adjustment logic may lead to reduced key strength (CWE-331). Ensure SEED_COMPAT_LEVEL_RSA_PRIME_ADJUST_FIX is active."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          switch ($SEED_COMPAT_LEVEL) {
+          case SEED_COMPAT_LEVEL_ORIGINAL:
+              RsaAdjustPrimeCandidate_PreRev155($PRIME);
+              break;
+          case SEED_COMPAT_LEVEL_RSA_PRIME_ADJUST_FIX:
+              RsaAdjustPrimeCandidate_New($PRIME);
+              break;
+          default:
+              FAIL(FATAL_ERROR_INTERNAL);
+          }
+      - pattern: |
+          switch ($SEED_COMPAT_LEVEL) {
+          case SEED_COMPAT_LEVEL_ORIGINAL:
+              RsaAdjustPrimeCandidate_PreRev155($PRIME);
+              break;
+          case SEED_COMPAT_LEVEL_RSA_PRIME_ADJUST_FIX:
+              RsaAdjustPrimeCandidate_New($PRIME);
+              break;
+          }

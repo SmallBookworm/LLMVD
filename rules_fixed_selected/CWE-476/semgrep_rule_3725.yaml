@@ -1,0 +1,13 @@
+rules:
+  - id: cwe-476-null-dereference-platform-get-resource
+    message: "platform_get_resource() may return NULL. Dereferencing without a null check leads to a potential NULL pointer dereference (CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $RES = platform_get_resource(...);
+          ... 
+          devm_ioremap(..., $RES->start, ...);
+    metavariable-pattern:
+      $RES:
+        type: "struct resource *"

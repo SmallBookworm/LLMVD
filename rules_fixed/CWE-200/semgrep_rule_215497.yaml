@@ -1,0 +1,16 @@
+rules:
+  - id: cwe-200-uninitialized-struct-memory-leak
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $$sax->fsa_digipeater[0] = $value;
+          - pattern: |
+              $$sax->fsa_digipeater[$index] = $value;
+      - pattern-not: |
+          memset($$sax->fsa_digipeater, 0, sizeof($$sax->fsa_digipeater));
+    message: "Uninitialized struct memory may be leaked to user space. Missing memset before assignment to fsa_digipeater."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2009-3001"

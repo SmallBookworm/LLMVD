@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2019-8912-use-after-free-af_alg_release
+    message: "af_alg_release() does not set sock->sk to NULL after sock_put(), leading to use-after-free (CWE-416)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (sock->sk)
+                  sock_put(sock->sk);
+          - pattern: |
+              if (sock->sk)
+                  sock_put(sock->sk);
+              return 0;
+    metavariable-regex:
+      metavariable: sock
+      regex: "sock"

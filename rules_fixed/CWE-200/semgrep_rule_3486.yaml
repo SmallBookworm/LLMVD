@@ -1,0 +1,13 @@
+rules:
+  - id: mosquitto-acl-file-bypass
+    message: "ACL file is not copied to the listener when per_listener_settings is enabled, leading to ACL bypass (CVE-2018-20145)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      config->listeners[config->listener_count-1].security_options.password_file = config->default_listener.security_options.password_file;
+      config->listeners[config->listener_count-1].security_options.psk_file = config->default_listener.security_options.psk_file;
+      config->listeners[config->listener_count-1].security_options.auth_plugin_configs = config->default_listener.security_options.auth_plugin_configs;
+      config->listeners[config->listener_count-1].security_options.auth_plugin_config_count = config->default_listener.security_options.auth_plugin_config_count;
+      config->listeners[config->listener_count-1].security_options.allow_anonymous = config->default_listener.security_options.allow_anonymous;
+    patterns:
+      - pattern-not: config->listeners[config->listener_count-1].security_options.acl_file = config->default_listener.security_options.acl_file;

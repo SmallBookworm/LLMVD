@@ -1,0 +1,28 @@
+rules:
+  - id: gfs2-use-after-free-rgrp
+    message: "Potential use-after-free in GFS2 rgrp handling due to premature assignment of gl_object before successful insertion into rgrp tree."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: $RGD->rd_gl->gl_object = $RGD;
+              - pattern-inside: |
+                  ...
+                  $RGD->rd_gl->gl_object = $RGD;
+                  ...
+                  rgd_insert($RGD);
+              - pattern: rgd_insert($RGD)
+          - patterns:
+              - pattern: $RGD->rd_gl->gl_object = $RGD;
+              - pattern-inside: |
+                  ...
+                  $RGD->rd_gl->gl_object = $RGD;
+                  ...
+                  spin_lock(...);
+                  ...
+                  rgd_insert($RGD);
+              - pattern: rgd_insert($RGD)
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2016-10905"

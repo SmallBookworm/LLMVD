@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2019-14763-double-locking-in-f_hidg_write
+    message: "Double-locking vulnerability in f_hidg_write may cause deadlock. The spinlock write_spinlock is held while calling usb_ep_queue(), which can lead to a deadlock when dummy_hcd is used."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          spin_lock_irqsave(&$HIDG->write_spinlock, $FLAGS);
+          ...
+          usb_ep_queue($EP, $REQ, $GFP);
+          ...
+          spin_unlock_irqrestore(&$HIDG->write_spinlock, $FLAGS);
+      - pattern: |
+          spin_lock_irqsave(&$HIDG.write_spinlock, $FLAGS);
+          ...
+          usb_ep_queue($EP, $REQ, $GFP);
+          ...
+          spin_unlock_irqrestore(&$HIDG.write_spinlock, $FLAGS);
+    metavariable-regex:
+      metavariable: $HIDG
+      regex: 'hidg'

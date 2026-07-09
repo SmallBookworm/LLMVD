@@ -1,0 +1,20 @@
+rules:
+  - id: imagemagick-spliceimage-out-of-bounds-read
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (x=0; x < splice_geometry.x; x++)
+              {
+                ...
+              }
+          - pattern: |
+              for (x=0; x < splice_geometry.x; x++)
+              {
+                ...
+              }
+    message: "Potential out-of-bounds read in SpliceImage due to unchecked use of splice_geometry.x as loop bound. Fixed by clamping with MagickMin."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2015-8897"

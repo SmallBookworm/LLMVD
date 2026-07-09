@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2019-18198-fib6-suppress-missing-noref-check
+    message: "Missing FIB_LOOKUP_NOREF check before calling ip6_rt_put may cause use-after-free or reference underflow."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      ip6_rt_put($RT);
+    pattern-not: |
+      if (!(... & FIB_LOOKUP_NOREF))
+        ip6_rt_put($RT);
+    metavariable-regex:
+      metavariable: $RT
+      regex: 'rt'
+    paths:
+      include:
+        - "net/ipv6/fib6_rules.c"

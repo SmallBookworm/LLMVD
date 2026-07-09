@@ -1,0 +1,17 @@
+rules:
+  - id: imagemagick-mat-memory-leak-cve-2017-18027
+    message: "Memory leak in ReadMATImage due to missing image2 cleanup before reassignment. This may lead to denial of service (CWE-772)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          image2 = image;
+          ...
+          image2 = decompress_block(...);
+      - pattern: |
+          image2 = image;
+          ...
+          if (MATLAB_HDR.DataType == miCOMPRESSED)
+          {
+            image2 = decompress_block(...);
+          }

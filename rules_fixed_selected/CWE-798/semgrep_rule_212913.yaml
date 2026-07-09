@@ -1,0 +1,14 @@
+rules:
+  - id: tpm2_import_fixed_aes_key
+    message: "tpm2_import uses a fixed AES key for the inner wrapper, which can lead to key disclosure via MITM (CVE-2021-3565)."
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          memset($KEY.buffer, 0xFF, $KEY.size);
+      - pattern: |
+          memset($KEY->buffer, 0xFF, $KEY->size);
+    metavariable-pattern:
+      $KEY:
+        pattern-either:
+          - pattern: enc_sensitive_key

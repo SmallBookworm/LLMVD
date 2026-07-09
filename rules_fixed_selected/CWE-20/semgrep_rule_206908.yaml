@@ -1,0 +1,20 @@
+rules:
+  - id: privsep_init_failure_not_exiting
+    message: "Failure in privsep_init() does not cause the program to exit, potentially leaving the daemon running as root."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (privsep_init() < 0)
+              perror(...);
+      - pattern: |
+          if (privsep_init() < 0)
+              ...
+          ...
+          if (drop_root_privileges(...) < 0) {
+              ...
+              exit(1);
+          }
+    metavariable-regex:
+      metavariable: $...
+      regex: "^(?!exit\\s*\\(\\s*1\\s*\\)\\s*;).*$"

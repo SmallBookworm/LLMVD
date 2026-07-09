@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2011-1019-cap-net-admin-module-load
+    message: "CAP_NET_ADMIN can load arbitrary kernel modules via dev_load, bypassing CAP_SYS_MODULE requirement (CVE-2011-1019)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!dev && capable(CAP_NET_ADMIN))
+                  request_module("%s", name);
+    metadata:
+      cwe: ["CWE-264"]
+      cve: "CVE-2011-1019"

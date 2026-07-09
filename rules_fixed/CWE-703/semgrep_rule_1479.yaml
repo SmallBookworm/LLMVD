@@ -1,0 +1,26 @@
+rules:
+  - id: cve-2015-3417-use-after-free-h264
+    message: "Missing memset of delayed_pic before freeing DPB may lead to use-after-free (CVE-2015-3417)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (free_rbsp && h->DPB) {
+              ...
+              av_freep(&h->DPB);
+          }
+      - pattern: |
+          if (free_rbsp && $H->DPB) {
+              ...
+              av_freep(&$H->DPB);
+          }
+    metavariable-pattern:
+      metavariable: $H
+      pattern: h
+    pattern-not: |
+      if (free_rbsp && ...->DPB) {
+          ...
+          memset(...->delayed_pic, ..., sizeof(...->delayed_pic));
+          ...
+          av_freep(&...->DPB);
+      }

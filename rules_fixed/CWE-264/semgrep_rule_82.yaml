@@ -1,0 +1,28 @@
+rules:
+  - id: cve-2015-5252-samba-symlink-bypass
+    message: "Detected vulnerable pattern in Samba's symlink verification that may allow file access outside the share (CVE-2015-5252)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: |
+                  if (conn_rootdir == NULL) {
+                      ...
+                      status = NT_STATUS_ACCESS_DENIED;
+                      goto err;
+                  }
+              - pattern: |
+                  if (strncmp(conn_rootdir, resolved_name, strlen(conn_rootdir)) != 0)
+          - patterns:
+              - pattern: |
+                  if (conn_rootdir == NULL) {
+                      ...
+                      status = NT_STATUS_ACCESS_DENIED;
+                      goto err;
+                  }
+              - pattern: |
+                  if (memcmp(conn_rootdir, resolved_name, rootdir_len) != 0)
+    metadata:
+      cwe: ["CWE-264"]
+      cve: "CVE-2015-5252"

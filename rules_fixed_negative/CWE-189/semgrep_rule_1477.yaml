@@ -1,0 +1,9 @@
+rules:
+  - id: integer-overflow-ljpeg-start
+    message: "Potential integer overflow due to signed 'int' used for length variable 'len', which can lead to buffer overflow (CWE-189)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      int $LEN;
+      ...
+      $LEN = (data[2] << 8 | data[3]) - 2;

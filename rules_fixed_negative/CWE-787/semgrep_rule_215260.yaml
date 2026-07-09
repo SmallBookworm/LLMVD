@@ -1,0 +1,27 @@
+rules:
+  - id: tmux-cve-2020-27347-buffer-overflow
+    message: "Buffer overflow in input_csi_dispatch_sgr_colon due to missing bounds check on empty colon-separated SGR arguments"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (*out != '\0') {
+              ...
+              if (errstr != NULL || n == nitems(p)) {
+                  ...
+                  return;
+              }
+          } else
+              n++;
+      - pattern: |
+          if (*out != '\0') {
+              ...
+              if (errstr != NULL || n == nitems(p)) {
+                  ...
+                  return;
+              }
+          } else
+              n++;
+          ...
+          log_debug(...);
+    fix: ""

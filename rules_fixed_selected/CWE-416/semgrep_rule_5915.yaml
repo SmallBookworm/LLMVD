@@ -1,0 +1,14 @@
+rules:
+  - id: use-after-free-cve-2013-2857
+    message: "Potential use-after-free vulnerability due to improper error event handling when image source URL is non-null but empty after trimming."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!attr.isNull()) {
+              ... 
+              m_element->dispatchEvent(...);
+          }
+    metadata:
+      cwe: ["CWE-416"]
+      cve: "CVE-2013-2857"

@@ -1,0 +1,38 @@
+rules:
+  - id: cve-2017-8825-null-dereference
+    message: "Potential null dereference in mailimf_group_parse due to missing mailbox_list initialization on MAILIMF_ERROR_PARSE path."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          switch ($R) {
+            case MAILIMF_ERROR_PARSE:
+              ...
+              break;
+            ...
+          }
+      - pattern: |
+          switch ($R) {
+            case MAILIMF_ERROR_PARSE:
+              $R2 = mailimf_cfws_parse(...);
+              if ($R2 != MAILIMF_NO_ERROR && $R2 != MAILIMF_ERROR_PARSE) {
+                ...
+                goto ...;
+              }
+              break;
+            ...
+          }
+    metavariable-pattern:
+      metavariable: $R
+      pattern: mailimf_mailbox_list_parse(...)
+    pattern-not-inside: |
+      switch ($R) {
+        case MAILIMF_ERROR_PARSE:
+          ...
+          $LIST = clist_new();
+          if ($LIST == NULL) { ... }
+          $MAILBOX_LIST = mailimf_mailbox_list_new($LIST);
+          if ($MAILBOX_LIST == NULL) { ... }
+          break;
+        ...
+      }

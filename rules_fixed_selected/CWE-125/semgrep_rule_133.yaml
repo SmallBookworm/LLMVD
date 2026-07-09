@@ -1,0 +1,27 @@
+rules:
+  - id: cve-2017-9740-buffer-overread
+    message: "Potential heap-based buffer over-read in cmap format 4 handling due to missing bounds check before u16() access."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          u16($PTR + $IDX)
+      - pattern: |
+          s16($PTR + $IDX)
+    metavariable-pattern:
+      metavariable: PTR
+      pattern-either:
+        - pattern: idRangeOffset + ...
+        - pattern: table + ...
+    focus-metavariable: IDX
+    pattern-not-inside: |
+      if (... > font->data + font->length) {
+        ...
+        return ...;
+      }
+    pattern-inside: |
+      switch (u16(table))
+      {
+      case 4:
+        ...
+      }

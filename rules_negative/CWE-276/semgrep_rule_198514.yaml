@@ -1,0 +1,11 @@
+rules:
+  - id: cwe-276-xen-tss-invalidate-io-bitmap
+    message: "tss_invalidate_io_bitmap() directly modifies TSS I/O bitmap without using PV-ops, leading to desynchronization with Xen (CVE-2020-15852, XSA-329)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          tss->x86_tss.io_bitmap_base = IO_BITMAP_OFFSET_INVALID;
+    metadata:
+      cwe: ["CWE-276"]
+      cve: "CVE-2020-15852"

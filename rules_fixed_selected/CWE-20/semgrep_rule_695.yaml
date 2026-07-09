@@ -1,0 +1,44 @@
+rules:
+  - id: rose_facilities_overflow
+    message: "Missing bounds check on facilities parsing may lead to heap or stack overflow (CVE-2011-4913)"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (*p == FAC_NATIONAL_DIGIS) {
+              ...
+              for (...; ...; ...) {
+                  if (... & AX25_HBIT)
+                      memcpy(&facilities->dest_digis[facilities->dest_ndigis++], ..., AX25_ADDR_LEN);
+                  else
+                      memcpy(&facilities->source_digis[facilities->source_ndigis++], ..., AX25_ADDR_LEN);
+              }
+          }
+      - pattern: |
+          if (*p == FAC_NATIONAL_DIGIS) {
+              ...
+              for (...; ...; ...) {
+                  if (... & AX25_HBIT)
+                      memcpy(..., ..., AX25_ADDR_LEN);
+                  else
+                      memcpy(..., ..., AX25_ADDR_LEN);
+                  ...
+              }
+          }
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern-not: |
+          if (*p == FAC_NATIONAL_DIGIS) {
+              ...
+              for (...; ...; ...) {
+                  if (... & AX25_HBIT) {
+                      if (facilities->dest_ndigis >= ROSE_MAX_DIGIS)
+                          return ...;
+                      memcpy(..., ..., AX25_ADDR_LEN);
+                  } else {
+                      if (facilities->source_ndigis >= ROSE_MAX_DIGIS)
+                          return ...;
+                      memcpy(..., ..., AX25_ADDR_LEN);
+                  }
+              }
+          }

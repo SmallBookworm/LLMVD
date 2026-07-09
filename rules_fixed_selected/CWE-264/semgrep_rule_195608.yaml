@@ -1,0 +1,17 @@
+rules:
+  - id: missing-initgroups-call
+    message: "Supplementary groups are not dropped when changing user, which may allow privilege escalation via group permissions."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (pw->pw_gid == 0 || setgid(pw->pw_gid) < 0) { ... }
+          if (uid == 0 || setuid(uid) < 0) { ... }
+      - pattern: |
+          if (uid == 0 || setuid(uid) < 0) { ... }
+          if (pw->pw_gid == 0 || setgid(pw->pw_gid) < 0) { ... }
+    pattern-not: |
+      if (initgroups(pw->pw_name, pw->pw_gid) < 0) { ... }
+    metavariable-regex:
+      metavariable: $pw
+      regex: pw

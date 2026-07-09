@@ -1,0 +1,22 @@
+rules:
+  - id: cwe-125-libass-wrap-lines-smart-oob-read
+    message: "Potential out-of-bounds read in wrap_lines_smart due to missing n_lines decrement when moving linebreak into existing break or first symbol (CVE-2016-7969)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (DIFF(l1_new, l2_new) < DIFF(l1, l2)) {
+              w->linebreak = 1;
+              s2->linebreak = 0;
+              ...
+          }
+      - pattern: |
+          if (DIFF(l1_new, l2_new) < DIFF(l1, l2)) {
+              ...;
+              w->linebreak = 1;
+              s2->linebreak = 0;
+              ...
+          }
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: wrap_lines_smart

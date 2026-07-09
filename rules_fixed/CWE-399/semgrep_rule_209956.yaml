@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2014-8116-file-indirect-buffer-check
+    message: "Missing null check after file_pop_buffer may lead to denial of service (CVE-2014-8116)"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $RBUF = file_pop_buffer($MS, $PB);
+              if ($RBUF == NULL)
+                return -1;
+          - pattern: |
+              $RBUF = file_pop_buffer($MS, $PB);
+              if ($RBUF == ((void *)0))
+                return -1;
+    metavariable-regex:
+      metavariable: $RBUF
+      regex: rbuf

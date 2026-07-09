@@ -1,0 +1,28 @@
+rules:
+  - id: cve-2014-4027-uninitialized-memory
+    message: "Uninitialized memory in rd_build_device_space may leak sensitive information. Pages allocated with alloc_pages must be explicitly zeroed."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (...; ...; ...) {
+                ...
+                pg = alloc_pages(..., 0);
+                ...
+                sg_assign_page(..., pg);
+                ...
+                // Missing memset after kmap
+              }
+          - pattern: |
+              for (...; ...; ...) {
+                ...
+                pg = alloc_pages(..., 0);
+                if (!pg) { ... }
+                sg_assign_page(..., pg);
+                ...
+                // Missing explicit zeroing of page content
+              }
+    metavariable-pattern:
+      metavariable: pg
+      pattern: pg

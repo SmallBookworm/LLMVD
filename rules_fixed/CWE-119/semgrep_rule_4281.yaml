@@ -1,0 +1,28 @@
+rules:
+  - id: cve-2016-5688-wpg-setimageextent-check
+    message: Missing SetImageExtent return-value check may lead to heap-based buffer overflow (CWE-119).
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              image->columns = ...;
+              image->rows = ...;
+              ...
+              if (UnpackWPGRaster(...) < 0) { ... }
+          - pattern: |
+              image->columns = ...;
+              image->rows = ...;
+              ...
+              switch (...)
+              {
+                ...
+                case ...:
+                  ...
+                  InsertRow(...);
+                  ...
+              }
+    paths:
+      exclude:
+        - "*fixed*"
+        - "*patched*"

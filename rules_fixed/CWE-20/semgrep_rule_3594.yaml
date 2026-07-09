@@ -1,0 +1,24 @@
+rules:
+  - id: yurex_read_out_of_bounds_uaccess
+    message: "Potential out-of-bounds user access in yurex_read due to missing bounds check against 'count' parameter."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (*$ppos < $bytes_read) {
+            if (copy_to_user($buffer, _, $bytes_read - *$ppos))
+              ...
+            else {
+              ... = $bytes_read - *$ppos;
+              *$ppos += $bytes_read;
+            }
+          }
+      - pattern: |
+          if (*$ppos < $bytes_read) {
+            copy_to_user($buffer, _, $bytes_read - *$ppos);
+            ... = $bytes_read - *$ppos;
+            *$ppos += $bytes_read;
+          }
+    metavariable-regex:
+      metavariable: $bytes_read
+      regex: (bytes_read|len)

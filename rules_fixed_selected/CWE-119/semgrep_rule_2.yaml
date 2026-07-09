@@ -1,0 +1,15 @@
+rules:
+  - id: gnutls_session_get_data_buffer_overflow
+    message: "Missing update of session_data_size before returning GNUTLS_E_SHORT_MEMORY_BUFFER may lead to buffer overflow (CVE-2011-4128, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (psession.size > *session_data_size)
+            {
+              ret = GNUTLS_E_SHORT_MEMORY_BUFFER;
+              goto error;
+            }
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2011-4128"

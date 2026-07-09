@@ -1,0 +1,14 @@
+rules:
+  - id: faad2-buffer-overflow-faad_resetbits
+    patterns:
+      - pattern: |
+          ld->bytes_left = ld->buffer_size - words*4;
+    message: "Potential buffer overflow due to unchecked subtraction that may result in negative bytes_left, leading to out-of-bounds read in getdword_n. See CVE-2019-15296."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      references:
+        - https://hackerone.com/reports/502816
+        - https://hackerone.com/reports/507858
+        - https://github.com/knik0/faad2/commit/942c3e0aee748ea6fe97cb2c1aa5893225316174

@@ -1,0 +1,19 @@
+rules:
+  - id: android_hevc_decoder_error_handling_missing
+    message: Missing error handling for unsupported resolution or memory allocation failure in HEVC decoder may lead to denial of service.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          IV_API_CALL_STATUS_T status;
+          status = ivdec_api_function(...);
+          ...
+          bool resChanged = (IVD_RES_CHANGED == (s_dec_op.u4_error_code & 0xFF));
+      - pattern: |
+          IV_API_CALL_STATUS_T status;
+          status = ivdec_api_function(...);
+          ...
+          if (resChanged) { ... }
+    metavariable-regex:
+      - metavariable: $...
+        regex: "(?!.*unsupportedResolution.*|.*allocationFailed.*)"

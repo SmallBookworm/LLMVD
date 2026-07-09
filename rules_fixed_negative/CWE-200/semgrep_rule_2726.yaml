@@ -1,0 +1,18 @@
+rules:
+  - id: xen-blkback-uninitialized-stack-data-leak
+    message: "Potential information leak due to copying uninitialized stack data via response ring. Use direct assignment to shared ring instead of memcpy from a local struct."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              struct blkif_response resp;
+              ...
+              memcpy(RING_GET_RESPONSE(...), &resp, sizeof(resp));
+          - pattern: |
+              struct blkif_response resp;
+              ...
+              memcpy(RING_GET_RESPONSE(...), &resp, ...);
+    metadata:
+      cwe: ["CWE-200"]
+      cve: "CVE-2017-10911"

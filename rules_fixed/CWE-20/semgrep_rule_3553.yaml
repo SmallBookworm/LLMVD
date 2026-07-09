@@ -1,0 +1,29 @@
+rules:
+  - id: imagemagick-pict-missing-length-check
+    message: Missing length validation before reading image data may lead to denial of service (CVE-2018-16644).
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $LENGTH = ReadBlobMSBShort($IMAGE);
+              if ($LENGTH != ...)
+                { ... }
+          - pattern: |
+              $LENGTH = ReadBlobMSBShort($IMAGE);
+              for (...; ... < (ssize_t) ($LENGTH - 2); ...)
+                ...
+          - pattern: |
+              $LENGTH = ReadBlobMSBLong($IMAGE);
+              if ($LENGTH > 154)
+                ...
+          - pattern: |
+              $LENGTH = ReadBlobMSBShort($IMAGE);
+              for (...; ... <= (ssize_t) $LENGTH; ...)
+                ...
+    metavariable-pattern:
+      metavariable: $LENGTH
+      pattern:
+        regex: "length"
+    fix-regex:
+      enabled: false

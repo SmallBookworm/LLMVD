@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2013-6381-qeth-snmp-buffer-overflow
+    message: |
+      Missing bounds check on user-provided length in qeth_snmp_command may lead to buffer overflow.
+      Ensure req_len is validated against available buffer size before use.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (copy_from_user(&req_len, ..., sizeof(int)))
+                  return ...;
+              ureq = memdup_user(udata, req_len + ...);
+          - pattern: |
+              if (copy_from_user(&req_len, ..., sizeof(int)))
+                  return ...;
+              ... = kzalloc(..., GFP_KERNEL);
+              ... = qeth_get_adapter_cmd(..., ..., QETH_SNMP_SETADP_CMDLENGTH + req_len);
+              memcpy(..., ..., req_len);
+    metavariable-pattern:
+      req_len:
+        type: int

@@ -1,0 +1,26 @@
+rules:
+  - id: imagemagick-cals-memory-leak
+    patterns:
+      - pattern-either:
+          - pattern: |
+              write_info=CloneImageInfo(image_info);
+              ...
+              if (group4_image == (Image *) NULL)
+                {
+                  (void) CloseBlob(image);
+                  return(MagickFalse);
+                }
+          - pattern: |
+              write_info=CloneImageInfo(image_info);
+              ...
+              if (group4 == (unsigned char *) NULL)
+                {
+                  (void) CloseBlob(image);
+                  return(MagickFalse);
+                }
+    message: "Memory leak in WriteCALSImage: write_info is not destroyed on error paths."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-401"
+      cve: "CVE-2017-12669"

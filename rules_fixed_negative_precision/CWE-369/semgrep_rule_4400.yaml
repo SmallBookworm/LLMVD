@@ -1,0 +1,11 @@
+rules:
+  - id: cwe-369-divide-by-zero-imagemagick
+    message: "Potential divide-by-zero vulnerability due to missing zero-check on image->columns before division."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (quantum != (extent / image->columns))
+        return(MagickFalse);
+    metadata:
+      cwe: "CWE-369"
+      cve: "CVE-2016-7530"

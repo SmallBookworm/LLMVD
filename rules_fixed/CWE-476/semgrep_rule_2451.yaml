@@ -1,0 +1,25 @@
+rules:
+  - id: cve-2017-15102-null-deref-legousbtower
+    message: "Potential NULL pointer dereference due to race condition in tower_probe. Device is registered before firmware version check, allowing use-after-free if probe fails later."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          usb_set_intfdata($INTERFACE, $DEV);
+          ...
+          usb_register_dev($INTERFACE, ...);
+          ...
+          usb_control_msg(...);
+          ...
+          goto error;
+      - pattern: |
+          usb_register_dev($INTERFACE, ...);
+          ...
+          usb_control_msg(...);
+          ...
+          goto error;
+    metavariable-regex:
+      - metavariable: $INTERFACE
+        regex: interface
+      - metavariable: $DEV
+        regex: dev

@@ -1,0 +1,17 @@
+rules:
+  - id: wavpack-dsdiff-heap-overread
+    message: "Heap-based buffer over-read in ParseDsdiffHeaderConfig due to missing validation of PROP chunk size before allocation."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!strncmp(dff_chunk_header.ckID, "PROP", 4)) {
+              char *prop_chunk = malloc((size_t)dff_chunk_header.ckDataSize);
+          }
+      - pattern: |
+          else if (!strncmp(dff_chunk_header.ckID, "PROP", 4)) {
+              char *prop_chunk = malloc((size_t)dff_chunk_header.ckDataSize);
+          }
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2018-7253"

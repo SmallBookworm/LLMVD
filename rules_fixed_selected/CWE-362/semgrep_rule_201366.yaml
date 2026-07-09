@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2019-11190-install-exec-creds-too-late
+    message: "install_exec_creds() is called too late in load_elf_binary(), creating a race condition that may allow ASLR bypass (CVE-2019-11190)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              setup_new_exec($BPRM);
+              ... 
+              install_exec_creds($BPRM);
+          - pattern: |
+              setup_new_exec($BPRM);
+              ...
+              setup_arg_pages(...);
+              ...
+              install_exec_creds($BPRM);
+    metavariable-regex:
+      metavariable: $BPRM
+      regex: bprm

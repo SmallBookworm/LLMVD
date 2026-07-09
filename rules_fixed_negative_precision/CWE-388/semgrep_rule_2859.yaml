@@ -1,0 +1,13 @@
+rules:
+  - id: cp2112_gpio_direction_input_error_handling
+    message: "Improper error handling for zero-length report in cp2112_gpio_direction_input may return success instead of -EIO"
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      return $RET <= 0 ? $RET : -EIO;
+    fix-regex:
+      regex: '(<= 0)'
+      replacement: '< 0'
+    metadata:
+      cwe: ["CWE-388"]
+      cve: "CVE-2017-8072"

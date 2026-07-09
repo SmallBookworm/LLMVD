@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2018-10852-sssd-sudo-socket-permissions
+    message: "SSSD sudo responder uses a public socket with overly permissive access, allowing unauthorized users to read sudo rules (CVE-2018-10852)."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern: |
+          sss_process_init(...,
+                           $_$cmds,
+                           $_$socket_name, -1, NULL, -1,
+                           ...);
+    metadata:
+      cwe: ["CWE-200"]
+      cve: "CVE-2018-10852"
+      references:
+        - https://pagure.io/SSSD/sssd/issue/3766
+        - https://github.com/SSSD/sssd/commit/ed90a20a0f0e936eb00d268080716c0384ffb01d

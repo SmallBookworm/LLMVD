@@ -1,0 +1,15 @@
+rules:
+  - id: cwe-415-double-free-arduino-json
+    message: "Potential double-free or use-after-free vulnerability due to missing null-termination check after unescape in QuotedString::extractFrom"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (c == '\\') {
+            c = unescapeChar(*readPtr++);
+          }
+      - pattern: |
+          c = unescapeChar(*readPtr++);
+    metadata:
+      cwe: "CWE-415"
+      cve: "CVE-2015-4590"

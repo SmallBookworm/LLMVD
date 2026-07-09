@@ -1,0 +1,18 @@
+rules:
+  - id: abrt-containerized-chroot-race
+    message: "Potential race condition in containerized environment handling leading to privilege escalation via chroot and execve"
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          dd_create_basic_files(..., NULL);
+      - pattern: |
+          dd_create_basic_files(..., rootdir);
+    metavariable-pattern:
+      metavariable: rootdir
+      pattern-not: |
+        (rootdir != NULL) ? ... : NULL
+    fixes:
+      - regex: .*
+        replacement: ""
+        count: 0

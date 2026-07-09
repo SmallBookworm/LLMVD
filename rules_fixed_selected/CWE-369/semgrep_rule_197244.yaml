@@ -1,0 +1,18 @@
+rules:
+  - id: tensorflow-quantizedbiasadd-division-by-zero
+    message: "Potential division by zero in QuantizedBiasAdd due to missing check for zero-sized bias tensor."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              OP_REQUIRES(context, bias.shape().dim_size(0) == input.shape().dim_size(...), ...);
+              ...
+              QuantizedAddUsingEigen<...>(..., bias, ...);
+          - pattern: |
+              OP_REQUIRES(context, bias.shape().dim_size(0) == input.shape().dim_size(...), ...);
+              ...
+              meta::QuantizedBiasAdd(..., bias_ui8_array.data(), bias_ui8_array.size(), ...);
+    metavariable-pattern:
+      bias: 
+        pattern: bias

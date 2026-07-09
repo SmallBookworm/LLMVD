@@ -1,0 +1,22 @@
+rules:
+  - id: iowarrior-use-after-free-disconnect
+    message: "Use-after-free vulnerability in iowarrior_disconnect due to accessing 'dev->opened' outside of mutex protection. This can lead to a race condition where the device structure is freed before being accessed."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              mutex_unlock(&dev->mutex);
+              ...
+              if (dev->opened) { ... }
+          - pattern: |
+              mutex_unlock(&dev->mutex);
+              ...
+              if (dev->opened) { ... }
+              ...
+              iowarrior_delete(dev);
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2019-19528"
+      references:
+        - https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=edc4746f253d907d048de680a621e121517f484b

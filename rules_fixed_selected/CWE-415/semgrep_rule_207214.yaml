@@ -1,0 +1,10 @@
+rules:
+  - id: cwe-415-double-free-driver-override-show
+    message: "Missing device lock in driver_override_show may lead to a double free (CWE-415) due to a race condition when accessing driver_override."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      sprintf($BUF, "%s\n", $DEV->driver_override);
+    metavariable-pattern:
+      $DEV: 
+        type: "struct amba_device *"

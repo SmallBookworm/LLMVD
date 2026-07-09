@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2016-10142-ipv6-atomic-fragments
+    message: "Setting RTAX_FEATURE_ALLFRAG when MTU < IPV6_MIN_MTU enables generation of IPv6 atomic fragments, which can lead to DoS via forged ICMPv6 PTB messages (CVE-2016-10142)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (mtu < IPV6_MIN_MTU) {
+        ...
+        features |= RTAX_FEATURE_ALLFRAG;
+        ...
+      }

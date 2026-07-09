@@ -1,0 +1,16 @@
+rules:
+  - id: cirrus_invalidate_region-buffer-overflow
+    message: "Heap-based buffer overflow in cirrus_invalidate_region due to missing address masking before loop boundary check. This may lead to arbitrary code execution (CVE-2007-1320, CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          off_cur_end = off_cur + $BYTESPERLINE;
+          ...
+          while (off_cur < off_cur_end) {
+            cpu_physical_memory_set_dirty(...);
+            off_cur += TARGET_PAGE_SIZE;
+          }
+    metavariable-regex:
+      metavariable: $BYTESPERLINE
+      regex: "bytesperline"

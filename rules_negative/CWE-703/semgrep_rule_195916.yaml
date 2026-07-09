@@ -1,0 +1,11 @@
+rules:
+  - id: cwe-703-heap-buffer-overflow-bytearray-get
+    patterns:
+      - pattern-either:
+          - pattern: |
+              int32_t $FUNC(int32_t index) {
+                return $INTERNAL_GET(index) & 0xff;
+              }
+    message: "Missing bounds check in ByteArray::Get() may lead to heap-based buffer overflow (CWE-703)."
+    severity: ERROR
+    languages: [c]

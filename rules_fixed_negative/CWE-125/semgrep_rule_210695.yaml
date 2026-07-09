@@ -1,0 +1,30 @@
+rules:
+  - id: cve-2020-11043-oob-read-rfx-tileset
+    message: "Out-of-bounds read vulnerability in rfx_process_message_tileset due to insufficient bounds checking before reading tile data. Upgrade to FreeRDP >= 2.1.0."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (Stream_GetRemainingLength(s) < blockLen - 6)
+              {
+                ...
+                rc = FALSE;
+                break;
+              }
+              ...
+              Stream_Read_UINT8(s, ...);
+          - pattern: |
+              if (Stream_GetRemainingLength(s) < blockLen - 6)
+              {
+                ...
+                rc = FALSE;
+                break;
+              }
+              ...
+              Stream_Read_UINT16(s, ...);
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2020-11043"
+      references:
+        - https://github.com/FreeRDP/FreeRDP/commit/3a06ce058f690b7fc1edad2f352c453376c2ebfe

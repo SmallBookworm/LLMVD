@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2018-1000200-null-ptr-deref-oom-munlock
+    message: "Potential null pointer dereference due to unsafe concurrent munlock and oom reaper unmap. The check for VM_LOCKED in munlock_vma_pages_all() is racy if MMF_OOM_SKIP is not set before munlocking."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (mm->locked_vm) {
+                  ...
+                  if (vma->vm_flags & VM_LOCKED)
+                      munlock_vma_pages_all(vma);
+                  ...
+              }
+              ...
+              if (unlikely(mm_is_oom_victim(mm))) {
+                  set_bit(MMF_OOM_SKIP, &mm->flags);
+                  ...
+              }
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2018-1000200"

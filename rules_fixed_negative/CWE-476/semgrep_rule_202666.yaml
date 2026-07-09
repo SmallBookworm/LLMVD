@@ -1,0 +1,37 @@
+rules:
+  - id: cve-2015-7519-header-underscore-vulnerability
+    message: "HTTP headers containing underscores are not filtered, allowing header spoofing (CVE-2015-7519)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while (*$IT != NULL) {
+                  if (($COND) && ($CMP1 || $CMP2 || $CMP3)) {
+                      $IT.next();
+                      continue;
+                  }
+                  ...
+                  pos = appendData(pos, end, P_STATIC_STRING("HTTP_"));
+                  ...
+              }
+          - pattern: |
+              while (*$IT != NULL) {
+                  if (($COND1 || $COND2 || $COND3) && ($CMP1 || $CMP2 || $CMP3)) {
+                      $IT.next();
+                      continue;
+                  }
+                  ...
+                  pos = appendData(pos, end, P_STATIC_STRING("HTTP_"));
+                  ...
+              }
+    pattern-not: |
+        while (*$IT != NULL) {
+            if ((... ) || containsNonAlphaNumDash(...)) {
+                $IT.next();
+                continue;
+            }
+            ...
+            pos = appendData(pos, end, P_STATIC_STRING("HTTP_"));
+            ...
+        }

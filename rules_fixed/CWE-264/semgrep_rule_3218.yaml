@@ -1,0 +1,8 @@
+rules:
+  - id: aio_noexec_missing
+    message: "AIO pseudo-filesystem mount does not set SB_I_NOEXEC, potentially allowing bypass of W^X policy via READ_IMPLIES_EXEC."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      mount_pseudo($FS_TYPE, "aio:", $..., $MAGIC)
+    pattern-not-regex: \$ROOT\\s*=\\s*mount_pseudo\\([^\\)]*\\);[\\s\\S]*\$ROOT->d_sb->s_iflags\\s*\\|=\\s*SB_I_NOEXEC

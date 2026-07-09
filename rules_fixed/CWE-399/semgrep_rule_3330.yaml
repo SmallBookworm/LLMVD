@@ -1,0 +1,35 @@
+rules:
+  - id: libass-check-allocations-missing-size-update
+    message: "Missing update of allocated size variable 'n_glyphs' after reallocation, which may lead to memory allocation failures or undefined behavior."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($SIZE > $SHAPER->$FIELD) {
+                  if (!ASS_REALLOC_ARRAY(...) ||
+                      !ASS_REALLOC_ARRAY(...) ||
+                      !ASS_REALLOC_ARRAY(...) ||
+                      !ASS_REALLOC_ARRAY(...))
+                      return false;
+              }
+          - pattern: |
+              if ($SIZE > $SHAPER->$FIELD) {
+                  if (!ASS_REALLOC_ARRAY(...) ||
+                      !ASS_REALLOC_ARRAY(...) ||
+                      !ASS_REALLOC_ARRAY(...))
+                      return false;
+              }
+          - pattern: |
+              if ($SIZE > $SHAPER->$FIELD) {
+                  if (!ASS_REALLOC_ARRAY(...) ||
+                      !ASS_REALLOC_ARRAY(...))
+                      return false;
+              }
+          - pattern: |
+              if ($SIZE > $SHAPER->$FIELD) {
+                  if (!ASS_REALLOC_ARRAY(...))
+                      return false;
+              }
+    metavariable-pattern:
+      $FIELD: "n_glyphs"

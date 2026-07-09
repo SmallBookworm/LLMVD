@@ -1,0 +1,19 @@
+rules:
+  - id: ngiflib-pixel-overrun
+    message: "Potential heap-based buffer overflow in WritePixels due to missing bounds check on npix"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              WritePixels(..., $stackp, $stack_top - $stackp);
+              ...
+              $npix -= ($stack_top - $stackp);
+          - pattern: |
+              if ($npix == 0) { ... }
+              ...
+              WritePixels(..., $stackp, $stack_top - $stackp);
+    metavariable-pattern:
+      metavariable: $npix
+      pattern: npix
+    mode: regex

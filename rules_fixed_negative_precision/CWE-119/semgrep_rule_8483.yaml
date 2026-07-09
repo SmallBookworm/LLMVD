@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2016-2429-uninitialized-free
+    message: "Potential heap memory corruption due to missing reset of num_comments before returning on allocation failure. This may lead to free() on uninitialized pointers (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (0 == ($OBJ->comments = safe_malloc_mul_2op_p(...))) {
+              $DECODER->protected_->state = FLAC__STREAM_DECODER_MEMORY_ALLOCATION_ERROR;
+              return false;
+          }
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2016-2429"

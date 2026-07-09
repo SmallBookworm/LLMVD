@@ -1,0 +1,13 @@
+rules:
+  - id: cwe-125-heap-buffer-overread-webp
+    message: "Missing bounds check before accessing stream[VP8_CHUNK_INDEX] may lead to heap-based buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (stream[VP8_CHUNK_INDEX] != EXTENDED_HEADER)
+        return(stream[VP8_CHUNK_INDEX] == LOSSLESS_FLAG ? MagickTrue : MagickFalse);
+    pattern-not: |
+      if (length <= VP8_CHUNK_INDEX)
+        return(MagickFalse);
+      if (stream[VP8_CHUNK_INDEX] != EXTENDED_HEADER)
+        return(stream[VP8_CHUNK_INDEX] == LOSSLESS_FLAG ? MagickTrue : MagickFalse);

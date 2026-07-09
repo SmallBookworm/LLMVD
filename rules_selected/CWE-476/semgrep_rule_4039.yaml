@@ -1,0 +1,10 @@
+rules:
+  - id: null_pointer_dereference_copyIPv6IfDifferent
+    patterns:
+      - pattern: |
+          if (dest != src) {
+              memcpy(dest, src, sizeof(struct in6_addr));
+          }
+    message: "Potential NULL pointer dereference in copyIPv6IfDifferent. Missing NULL check for 'src' before memcpy."
+    severity: ERROR
+    languages: [c]

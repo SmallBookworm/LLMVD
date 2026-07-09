@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2018-8043-null-dereference
+    message: "platform_get_resource() may return NULL. Missing null check before dereferencing 'r' can lead to NULL pointer dereference (CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $R = platform_get_resource(...);
+          ...
+          devm_ioremap(..., $R->start, ...);
+    metavariable-pattern:
+      $R: variable

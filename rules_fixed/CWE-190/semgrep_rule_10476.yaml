@@ -1,0 +1,15 @@
+rules:
+  - id: qemu-integer-overflow-cve-2014-0143
+    message: "Potential integer overflow due to missing bounds check before multiplication with BDRV_SECTOR_SIZE. This may lead to buffer overflows or memory corruption (CVE-2014-0143)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $nb_sectors * BDRV_SECTOR_SIZE
+      - pattern: |
+          $sector_num * BDRV_SECTOR_SIZE
+    metavariable-regex:
+      metavariable: $nb_sectors
+      regex: "nb_sectors"
+    focus-metavariable: $nb_sectors
+    fix: ""

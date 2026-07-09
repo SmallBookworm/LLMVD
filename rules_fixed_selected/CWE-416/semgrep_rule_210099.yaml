@@ -1,0 +1,19 @@
+rules:
+  - id: imagemagick-mat-use-after-free-cve-2019-15140
+    message: "Potential use-after-free vulnerability in MATLAB image reader due to improper handling of image2 pointer before rotation. This may lead to denial of service or arbitrary code execution (CVE-2019-15140, CWE-416)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if(image2==image)
+              image2 = NULL;
+          ...
+          rotated_image = RotateImage(image, ...);
+      - pattern: |
+          if(image2==image)
+            image2 = NULL;
+          ...
+          rotated_image = RotateImage(image, ...);
+    fix-regex:
+      regex: ''
+      replacement: ''

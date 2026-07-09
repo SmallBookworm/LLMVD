@@ -1,0 +1,13 @@
+rules:
+  - id: cwe-190-integer-overflow-check-offset
+    message: "Potential integer overflow in offset calculation leading to memory corruption (CWE-190)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          ptrdiff_t $NEED_SIZE = (char *) $OFFSET - $MEMORY + $SIZE;
+          ...
+          if ($NEED_SIZE < 0 || $NEED_SIZE > $TOTAL_SIZE) { ... }
+    metadata:
+      cwe: ["CWE-190"]
+      cve: "CVE-2017-5208"

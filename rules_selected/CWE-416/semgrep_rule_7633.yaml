@@ -1,0 +1,16 @@
+rules:
+  - id: use-after-free-service-worker-delegate
+    message: "Potential use-after-free due to redundant null check after DCHECK. The delegate_ pointer may be used after being set to nullptr in certain execution paths."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              DCHECK($OBJ);
+              if ($OBJ != nullptr) {
+                ...
+                $OBJ = nullptr;
+              }
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2019-5828"

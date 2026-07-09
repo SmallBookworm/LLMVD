@@ -1,0 +1,21 @@
+rules:
+  - id: cwe-125-out-of-bounds-read-smp_process_keypress_notification
+    message: "Missing bounds check before reading from p_data may lead to out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              void smp_process_keypress_notification(..., tSMP_INT_DATA* p_data) {
+                ...
+                p_cb->status = *(uint8_t*)p_data;
+                ...
+                if (smp_command_has_invalid_parameters(p_cb)) {
+                  ...
+                  return;
+                }
+                ...
+              }
+    metadata:
+      cwe: ["CWE-125"]
+      cve: "CVE-2018-9508"

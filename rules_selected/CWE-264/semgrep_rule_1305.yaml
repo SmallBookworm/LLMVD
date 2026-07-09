@@ -1,0 +1,29 @@
+rules:
+  - id: cve-2014-3122-try_to_unmap_cluster-mlock-without-lock
+    message: "mlock_vma_page() is called without ensuring the page is locked, which may lead to a denial of service (system crash)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (locked_vma) {
+              mlock_vma_page($PAGE);
+              ...
+          }
+      - pattern: |
+          if (locked_vma) {
+              ...
+              mlock_vma_page($PAGE);
+              ...
+          }
+    metavariable-pattern:
+      $PAGE:
+        pattern-not: |
+          if ($PAGE == check_page) {
+              ...
+              mlock_vma_page($PAGE);
+              ...
+          } else if (trylock_page($PAGE)) {
+              ...
+              mlock_vma_page($PAGE);
+              ...
+          }

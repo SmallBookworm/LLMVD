@@ -1,0 +1,6 @@
+rules:
+  - id: systemd-touch-file-mode-check
+    message: "Unsafe mode check in touch_file may lead to world-writable SUID files (CVE-2016-10156)"
+    severity: ERROR
+    languages: [c]
+    pattern: 'open(..., mode > 0 ? ... : ...)'

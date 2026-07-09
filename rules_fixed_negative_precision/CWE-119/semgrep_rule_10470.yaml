@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2014-0145-qcow2-l1-buffer-overflow
+    message: "Buffer overflow vulnerability in qcow2_snapshot_load_tmp: using s->l1_size instead of sn->l1_size when allocating L1 table memory may lead to undersized allocation and subsequent overflow (CVE-2014-0145, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      $NEW_L1_BYTES = s->l1_size * sizeof(uint64_t);
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2014-0145"

@@ -1,0 +1,39 @@
+rules:
+  - id: cwe-200-uninitialized-data-audiosource
+    message: "Uninitialized member variables in AudioSource constructor may leak sensitive information (CWE-200)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              AudioSource::AudioSource(...) :
+                ...,
+                mPrevSampleTimeUs(...),
+                mFirstSampleTimeUs(...),
+                mNumFramesReceived(...),
+                mNumClientOwnedBuffers(...)
+                {
+                  ...
+                }
+          - pattern: |
+              : ..., mPrevSampleTimeUs(...), mFirstSampleTimeUs(...), mNumFramesReceived(...), mNumClientOwnedBuffers(...) {
+                  ...
+                }
+      - metavariable-pattern:
+          metavariable: $CTOR
+          pattern: |
+            AudioSource::AudioSource(...)
+      - pattern-not-inside: |
+          AudioSource::AudioSource(...) :
+            ...,
+            mTrackMaxAmplitude(...),
+            mStartTimeUs(...),
+            mMaxAmplitude(...),
+            mPrevSampleTimeUs(...),
+            mFirstSampleTimeUs(...),
+            mInitialReadTimeUs(...),
+            mNumFramesReceived(...),
+            mNumClientOwnedBuffers(...)
+            {
+              ...
+            }

@@ -1,0 +1,22 @@
+rules:
+  - id: cwe-476-null-pointer-dereference-max-channels-check-missing
+    message: Missing check for MAX_CHANNELS may lead to NULL pointer dereference when accessing state.outfile[ch] for ch >= MAX_CHANNELS.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (sfinfo.channels < 2)
+          { ... }
+          ...
+          state.channels = sfinfo.channels;
+      - pattern: |
+          state.channels = sfinfo.channels;
+          ...
+          if (sfinfo.channels < 2)
+          { ... }
+    metavariable-pattern:
+      metavariable: sfinfo
+      pattern: sfinfo
+    pattern-not: |
+      if (sfinfo.channels > MAX_CHANNELS)
+      { ... }

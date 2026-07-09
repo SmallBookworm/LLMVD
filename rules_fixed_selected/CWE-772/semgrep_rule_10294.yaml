@@ -1,0 +1,29 @@
+rules:
+  - id: qemu-ehci-missing-finalize
+    message: "Missing 'instance_finalize' in TypeInfo may cause memory leak on hot-unplug (CVE-2017-9374, CWE-772)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          static const TypeInfo $TYPE_INFO = {
+              .name = ...,
+              .parent = TYPE_PCI_DEVICE,
+              .instance_size = sizeof(...),
+              .instance_init = ...,
+              .abstract = true,
+              .class_init = ...,
+          };
+      - pattern: |
+          static const TypeInfo $TYPE_INFO = {
+              .name = ...,
+              .parent = TYPE_PCI_DEVICE,
+              .instance_size = sizeof(...),
+              .instance_init = ...,
+              .class_init = ...,
+          };
+    pattern-not: |
+        static const TypeInfo $TYPE_INFO = {
+            ...,
+            .instance_finalize = ...,
+            ...
+        };

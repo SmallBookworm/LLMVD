@@ -1,0 +1,27 @@
+rules:
+  - id: heap_buffer_overflow_oberthur_read_file
+    message: "Potential heap-based buffer overflow in sc_oberthur_read_file due to missing record count check before reading records."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for ($REC = 1; ; $REC++) {
+                  ...
+                  $RV = sc_read_record(..., $REC, ...);
+                  ...
+              }
+          - pattern: |
+              for ($REC = 1; ; $REC++) {
+                  $RV = sc_read_record(..., $REC, ...);
+                  ...
+              }
+    pattern-not: |
+      if ($REC > $FILE->record_count) {
+          ...
+          break;
+      }
+    metavariable-pattern:
+      metavariable: $FILE
+      pattern: file
+    focus-metavariable: $REC

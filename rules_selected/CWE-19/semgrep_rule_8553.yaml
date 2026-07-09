@@ -1,0 +1,19 @@
+rules:
+  - id: integer-overflow-getcoverageformat12
+    message: Potential integer overflow in getCoverageFormat12 due to missing upper bound check on nGroups before multiplication.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (kFirstGroupOffset + $NGROUPS * kGroupSize > $SIZE) {
+              return false;
+          }
+      - pattern: |
+          if ($NGROUPS * kGroupSize > $SIZE) {
+              return false;
+          }
+    metavariable-pattern:
+      $NGROUPS: 
+        pattern-type: expression
+        pattern: readU32(...)
+    focus-metavariable: $NGROUPS

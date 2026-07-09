@@ -1,0 +1,15 @@
+rules:
+  - id: nvmet_fc_queue_id_oob
+    message: "Missing bounds check on queue ID may lead to out-of-bounds access (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $qid = nvmet_fc_getqueueid($connection_id);
+          ...
+          $assoc->queues[$qid]
+    metadata:
+      cwe: ["CWE-119"]
+      references:
+        - https://github.com/torvalds/linux/commit/0c319d3a144d4b8f1ea2047fd614d2149b68f889
+        - CVE-2017-18379

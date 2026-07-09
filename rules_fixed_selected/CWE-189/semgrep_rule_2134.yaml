@@ -1,0 +1,21 @@
+rules:
+  - id: cwe-189-gd2-signedness-check
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (gdGetInt(&cidx[i].offset, in) != 1) {
+                ...
+              };
+              if (gdGetInt(&cidx[i].size, in) != 1) {
+                ...
+              };
+          - pattern: |
+              if (gdGetInt (&cidx[i].offset, in) != 1) {
+                ...
+              };
+              if (gdGetInt (&cidx[i].size, in) != 1) {
+                ...
+              };
+    message: "Missing validation for signed integer values 'offset' and 'size' may lead to integer signedness error (CWE-189). Add explicit checks for negative values."
+    severity: ERROR
+    languages: [c]

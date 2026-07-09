@@ -1,0 +1,7 @@
+rules:
+  - id: cwe-703-gpac-bs-readbyte-assert-dos
+    message: "Potential denial of service due to unsafe assertion in BS_ReadByte. An assertion failure can be triggered when bs->position exceeds bs->size + 1, leading to program termination."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      assert(bs->position <= 1+bs->size);

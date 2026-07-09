@@ -1,0 +1,17 @@
+rules:
+  - id: imagemagick-sun-out-of-bounds-read-cve-2015-8958
+    message: "Potential out-of-bounds read in SUN image reader due to missing length validation before memory copy."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (sun_info.length > (height * bytes_per_line))
+                ThrowReaderException(...);
+              (void) CopyMagickMemory(sun_pixels, sun_data, sun_info.length);
+          - pattern: |
+              length = image->rows * (image->columns + image->columns % 2);
+              if (((sun_info.type == RT_ENCODED) &&
+                   (length > (bytes_per_line * image->rows))) ||
+                  ((sun_info.type != RT_ENCODED) && (length > sun_info.length)))
+                ThrowReaderException(...);

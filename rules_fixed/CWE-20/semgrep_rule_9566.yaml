@@ -1,0 +1,9 @@
+rules:
+  - id: nntp_fetch_headers_missing_alloc_check
+    message: "Missing null check after memory allocation with mutt_mem_calloc. If allocation fails, the program may dereference a null pointer."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      $FC.messages = mutt_mem_calloc(...);
+      ... 
+      if ($FC.messages[$...])

@@ -1,0 +1,10 @@
+rules:
+  - id: cwe-416-wddx-use-after-free
+    patterns:
+      - pattern: |
+          if (((st_entry *)$E)->data) {
+              zval_ptr_dtor(&((st_entry *)$E)->data);
+          }
+    message: "Use-after-free vulnerability detected. Missing check for ST_FIELD type before calling zval_ptr_dtor."
+    severity: ERROR
+    languages: [c]

@@ -1,0 +1,13 @@
+rules:
+  - id: btrfs-get_old_root-race-condition
+    message: "Race condition in get_old_root due to missing read lock before cloning extent buffer. This may lead to a denial of service via BUG_ON()."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (old_root && tm && tm->op != MOD_LOG_KEY_REMOVE_WHILE_FREEING) {
+          ...
+          old = read_tree_block(...);
+          ...
+          eb = btrfs_clone_extent_buffer(old);
+          free_extent_buffer(old);
+      }

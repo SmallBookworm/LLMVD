@@ -1,0 +1,17 @@
+rules:
+  - id: vim-buffer-overread-cve-2022-2124
+    message: "Buffer over-read vulnerability when searching for quotes without checking for NUL terminator."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          while ($I <= $COL_END)
+              if ($LINE[$I++] == $QUOTECHAR)
+              {
+                  ...
+                  break;
+              }
+      - pattern: |
+          while ($I <= $COL_END)
+              if ($LINE[$I++] == $QUOTECHAR)
+                  ...

@@ -1,0 +1,33 @@
+rules:
+  - id: cwe-200-uninitialized-padding-netlink
+    message: Uninitialized padding fields in netlink structure may leak kernel memory
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              struct ndmsg *... = ...;
+              ...
+              $ndm->ndm_family = ...;
+              $ndm->ndm_flags = ...;
+              $ndm->ndm_type = ...;
+              $ndm->ndm_ifindex = ...;
+              ...
+              $ndm->ndm_state = ...;
+          - pattern: |
+              struct ndmsg *... = ...;
+              ...
+              $ndm->ndm_family = ...;
+              $ndm->ndm_flags = ...;
+              $ndm->ndm_type = ...;
+              $ndm->ndm_ifindex = ...;
+          - pattern: |
+              struct nlmsgerr *... = ...;
+              ...
+              $err->error = ...;
+              // missing initialization of $err->msg
+    metavariable-pattern:
+      $ndm:
+        pattern: "struct ndmsg *..."
+      $err:
+        pattern: "struct nlmsgerr *..."

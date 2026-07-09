@@ -1,0 +1,19 @@
+rules:
+  - id: imagemagick-svgstripstring-buffer-overread
+    message: "Heap-based buffer over-read in SVGStripString due to missing bounds check after comment removal loop. This may lead to denial of service via crafted SVG file (CVE-2018-18023, CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          for ( ; *p != '\0'; p++)
+            if ((*p == '*') && (*(p+1) == '/'))
+              break;
+          if (*p == '\0')
+            break;
+          p+=2;
+      - pattern: |
+          for ( ; *p != '\0'; p++)
+            if ((*p == '*') && (*(p+1) == '/'))
+              break;
+          ... 
+          p+=2;

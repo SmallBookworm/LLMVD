@@ -1,0 +1,18 @@
+rules:
+  - id: null_pointer_dereference_mirror_wait_on_conflicts
+    message: "NULL pointer dereference in mirror_wait_on_conflicts when 'self' is used without NULL check."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          self->waiting_for_op = $OP;
+      - pattern: |
+          self->waiting_for_op = NULL;
+    metavariable-pattern:
+      self:
+        patterns:
+          - pattern: $SELF
+          - pattern-not: |
+              if ($SELF) { ... }
+          - pattern-not-inside: |
+              if ($SELF) { ... }

@@ -1,0 +1,29 @@
+rules:
+  - id: cve-2019-19044-memory-leak-v3d-submit-cl
+    message: Memory leak in v3d_submit_cl_ioctl when kcalloc or v3d_job_init fails. Missing cleanup of previously allocated resources.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      # Case 1: kcalloc for bin fails but render->base is not put
+      - pattern: |
+          if (!bin)
+              return -ENOMEM;
+      # Case 2: v3d_job_init for bin fails but bin is not freed and render->base is not put
+      - patterns:
+        - pattern: |
+            if (ret) {
+                v3d_job_put(&render->base);
+                return ret;
+            }
+        - metavariable-pattern:
+            metavariable: ret
+            pattern: v3d_job_init(...)
+        - pattern-not: |
+            if (ret) {
+                v3d_job_put(&render->base);
+                kfree(bin);
+                return ret;
+            }
+    paths:
+      include:
+        - "drivers/gpu/drm/v3d/v3d_gem.c"

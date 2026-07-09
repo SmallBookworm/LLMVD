@@ -1,0 +1,18 @@
+rules:
+  - id: cwe-787-buffer-overflow-bufsize
+    message: "Potential stack-based buffer overflow due to use of BUFSIZE instead of MAXSTRING in buffer declarations and loop bounds."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              char charbuf[BUFSIZE];
+          - pattern: |
+              widechar inbuf[BUFSIZE];
+          - pattern: |
+              widechar transbuf[BUFSIZE];
+          - pattern: |
+              while (... && k < BUFSIZE - 1)
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2018-11683"

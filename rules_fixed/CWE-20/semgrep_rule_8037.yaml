@@ -1,0 +1,35 @@
+rules:
+  - id: cve-2016-6712-libvpx-dos
+    message: "Missing vp9_set_mb_mi(cm, 0, 0) call in error path may lead to use-after-free or denial of service (CVE-2016-6712)."
+    severity: HIGH
+    languages: [c]
+    pattern: |
+      int $FUNC(VP9_COMMON *cm, ...) {
+        ...
+        if (...) {
+          ...
+          goto fail;
+        }
+        ...
+        fail:
+        ...;
+        vp9_free_context_buffers(...);
+        return 1;
+        ...
+      }
+    metavariable-pattern:
+      metavariable: $FUNC
+      patterns:
+        - pattern-inside: |
+            int $FUNC(VP9_COMMON *cm, ...) {
+              ...
+              fail:
+              ...
+            }
+        - pattern-not: |
+            fail:
+            ...;
+            vp9_set_mb_mi(cm, 0, 0);
+            ...;
+            vp9_free_context_buffers(...);
+            return 1;

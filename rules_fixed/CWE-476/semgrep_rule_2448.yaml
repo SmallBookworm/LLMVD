@@ -1,0 +1,13 @@
+rules:
+  - id: cwe-476-null-pointer-deref-rngapi-reset
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $err = crypto_old_rng_alg($$tfm)->rng_reset($$tfm, $$src, $$slen);
+          - pattern: |
+              memcpy($$buf, $$seed, $$slen);
+              ... 
+              $err = crypto_old_rng_alg($$tfm)->rng_reset($$tfm, $$src, $$slen);
+    message: "Use of deprecated crypto_old_rng_alg interface may lead to NULL pointer dereference (CWE-476)."
+    severity: ERROR
+    languages: [c]

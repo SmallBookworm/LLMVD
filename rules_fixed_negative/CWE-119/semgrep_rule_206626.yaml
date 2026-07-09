@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2015-1572-buffer-overflow
+    message: "Potential heap-based buffer overflow due to incorrect bounds check in ext2fs_flush2. This could allow local users to execute arbitrary code via a crafted filesystem (CVE-2015-1572)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (fs->super->s_feature_incompat & EXT2_FEATURE_INCOMPAT_META_BG) {
+                  ... 
+                  if (old_desc_blocks > fs->super->s_first_meta_bg)
+                      old_desc_blocks = fs->desc_blocks;
+                  ...
+              }
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2015-1572"

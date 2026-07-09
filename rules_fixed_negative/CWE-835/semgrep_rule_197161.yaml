@@ -1,0 +1,19 @@
+rules:
+  - id: cwe-835-infinite-loop-avi-parsing
+    message: "Potential infinite loop due to missing size validation before memory allocation in AVI parsing (CWE-835)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          hdrl_len = (u32) n;
+          hdrl_data = (unsigned char *) gf_malloc((u32)n);
+      - pattern: |
+          if (n>40) {
+            AVI->extradata_size = (u32) (n - 40);
+            AVI->extradata = gf_malloc(sizeof(u8)* AVI->extradata_size);
+            memcpy(AVI->extradata, hdrl_data + i + 40, AVI->extradata_size);
+          }
+    metavariable-pattern:
+      metavariable: n
+      pattern-not: |
+        if (n>0xFFFFFFFF) ERR_EXIT(...)

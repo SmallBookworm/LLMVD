@@ -1,0 +1,8 @@
+rules:
+  - id: cve-2015-1233-display-rotation-check-missing
+    message: Missing check for rotation source before showing rotation change notification. This may lead to unexpected behavior or vulnerabilities related to display handling.
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      if (iter.second.GetActiveRotation() !=
+          old_iter->second.GetActiveRotation()) {

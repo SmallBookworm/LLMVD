@@ -1,0 +1,20 @@
+rules:
+  - id: pam_yubico_null_password_auth_bypass
+    message: "Authentication bypass vulnerability when password is NULL and 'use_first_pass' is not set. This can allow unauthorized access if the module is configured as 'sufficient'."
+    severity: ERROR
+    languages: [c]
+    cwe: ["CWE-20"]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (resp->resp == NULL)
+                {
+                  ...
+                  goto done;
+                }
+          - pattern: |
+              if (resp->resp == NULL)
+                {
+                  ...
+                  return ...;
+                }

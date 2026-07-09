@@ -1,0 +1,25 @@
+rules:
+  - id: cve-2014-3508-obj_obj2txt-missing-null-termination
+    message: "OBJ_obj2txt may not null-terminate output buffer, leading to information disclosure (CVE-2014-3508)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (buf && (buf_len > 0))
+              {
+                  *buf++ = ...;
+                  buf_len--;
+              }
+          - pattern: |
+              if (buf && (buf_len > 0))
+              {
+                  *buf++ = '.';
+                  buf_len--;
+              }
+    metavariable-pattern:
+      metavariable: buf
+      pattern: buf
+    fix-regex:
+      regex: ""
+      replacement: ""

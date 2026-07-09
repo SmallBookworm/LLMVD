@@ -1,0 +1,20 @@
+rules:
+  - id: bluetooth_hidp_unterminated_name
+    message: "Untrusted user input 'ca.name' is not null-terminated, potentially leading to information disclosure from kernel stack memory (CVE-2019-11884)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (copy_from_user(&ca, ..., sizeof(ca)))
+                  return ...;
+              ...
+              hidp_connection_add(&ca, ...);
+          - pattern: |
+              copy_from_user(&ca, ..., sizeof(ca));
+              ...
+              hidp_connection_add(&ca, ...);
+    metavariable-pattern:
+      metavariable: ca
+      pattern: $CA
+    focus-metavariable: ca

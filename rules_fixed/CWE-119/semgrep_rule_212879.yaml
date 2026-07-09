@@ -1,0 +1,9 @@
+rules:
+  - id: cve-2014-2309-dst-nocount-misuse
+    message: "DST_NOCOUNT flag is unconditionally used in ip6_route_add, allowing unlimited route creation via remote ICMPv6 Router Advertisements (CVE-2014-2309)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      ip6_dst_alloc($net, NULL, DST_NOCOUNT, $table)
+    fix: |
+      ip6_dst_alloc($net, NULL, ($cfg->fc_flags & RTF_ADDRCONF) ? 0 : DST_NOCOUNT, $table)

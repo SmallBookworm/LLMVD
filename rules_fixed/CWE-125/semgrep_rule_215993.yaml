@@ -1,0 +1,24 @@
+rules:
+  - id: cwe-125-tga-bpp-alpha-check
+    message: "Heap-based buffer over-read due to insufficient validation of bits-per-pixel and alpha bits in TGA image parsing (CVE-2017-17786)"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ((info.bpp != 15 && info.bpp != 16 &&
+               info.bpp != 24 && info.bpp != 32)      ||
+              ((info.bpp == 15 || info.bpp == 24) &&
+               info.alphaBits != 0)                   ||
+              (info.bpp == 16 && info.alphaBits != 1) ||
+              (info.bpp == 32 && info.alphaBits != 8))
+      - pattern: |
+          if ((info.bpp != 15 && info.bpp != 16 &&
+               info.bpp != 24 && info.bpp != 32)      ||
+              ((info.bpp == 15 || info.bpp == 24) &&
+               info.alphaBits != 0)                   ||
+              (info.bpp == 16 && info.alphaBits != 1 &&
+               info.alphaBits != 0)                   ||
+              (info.bpp == 32 && info.alphaBits != 8))
+    metavariable-regex:
+      - metavariable: $...
+        regex: .*TGA_TYPE_COLOR.*

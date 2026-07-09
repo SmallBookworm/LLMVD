@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2021-3527-unbounded-vla-allocation
+    message: Unbounded stack allocation via combined USB packet size without size limit (CVE-2021-3527)
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          totalsize = (p->combined) ? p->combined->iov.size : p->iov.size;
+          if ((p->iov.size % ep->max_packet_size) != 0 || !p->short_not_ok ||
+                  next == NULL ||
+                  (totalsize == (16 * KiB - 36) && p->int_req)) {
+            ...
+          }
+      - pattern: |
+          totalsize = (p->combined) ? p->combined->iov.size : p->iov.size;
+          if ((p->iov.size % ep->max_packet_size) != 0 || !p->short_not_ok ||
+                  next == NULL ||
+                  /* Work around for Linux usbfs bulk splitting + migration */
+                  (totalsize == (16 * KiB - 36) && p->int_req)) {
+            ...
+          }
+    metadata:
+      cwe: "CWE-770"
+      cve: "CVE-2021-3527"

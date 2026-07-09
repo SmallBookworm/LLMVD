@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2022-38784-jbig2-integer-overflow
+    message: |
+      Integer overflow in JBIG2Stream::readTextRegionSeg due to unchecked addition of symbol counts.
+      This can lead to heap corruption or arbitrary code execution when processing malicious JBIG2 streams.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              numSyms += ((JBIG2SymbolDict *)...)->getSize();
+          - pattern: |
+              numSyms = numSyms + ((JBIG2SymbolDict *)...)->getSize();
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2022-38784"
+      references:
+        - https://github.com/freedesktop/poppler/commit/27354e9d9696ee2bc063910a6c9a6b27c5184a52

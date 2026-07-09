@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2015-3196-psk-identity-hint-race
+    message: "PSK identity hint is stored in SSL_CTX instead of SSL_SESSION, leading to a race condition and potential double free in multi-threaded clients (CVE-2015-3196)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($SESSION->psk_identity_hint != NULL)
+                  OPENSSL_free($SESSION->psk_identity_hint);
+              $SESSION->psk_identity_hint = BUF_strdup($CTX->psk_identity_hint);
+          - pattern: |
+              $SESSION->psk_identity_hint = BUF_strdup($CTX->psk_identity_hint);
+    metavariable-pattern:
+      $SESSION: "s->session"
+      $CTX: "s->ctx"

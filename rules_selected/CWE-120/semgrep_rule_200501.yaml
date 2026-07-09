@@ -1,0 +1,26 @@
+rules:
+  - id: libpng-png_set_PLTE-buffer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (num_palette < 0 || num_palette > max_palette_length)
+              {
+                ...
+                return;
+              }
+              ...
+              memcpy(..., ..., num_palette * sizeof(...));
+          - pattern: |
+              if (num_palette < 0 || num_palette > max_palette_length)
+              {
+                ...
+                png_error(...);
+              }
+              ...
+              memcpy(..., ..., num_palette * sizeof(...));
+    message: "Potential buffer overflow in png_set_PLTE due to unchecked palette length before memcpy. Affected versions of libpng do not properly constrain num_palette against max_palette_length derived from bit_depth."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-120"
+      cve: "CVE-2015-8126"

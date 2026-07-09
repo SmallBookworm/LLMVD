@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2018-20467-infinite-loop-bmp
+    message: "Potential infinite loop in BMP image parsing due to missing validation of ba_offset, leading to denial of service (CWE-835)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (bmp_info.ba_offset != 0)
+            {
+              offset=SeekBlob(image,(MagickOffsetType) bmp_info.ba_offset,SEEK_SET);
+              ...
+            }
+      - pattern: |
+          if (bmp_info.ba_offset != 0)
+            offset=SeekBlob(image,(MagickOffsetType) bmp_info.ba_offset,SEEK_SET);

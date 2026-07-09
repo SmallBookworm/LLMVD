@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2019-19815-null-deref-f2fs
+    patterns:
+      - pattern: F2FS_M_SB($PAGE->mapping)
+    message: "Potential NULL pointer dereference due to direct access of 'page->mapping'. Use 'page_file_mapping(page)' instead to safely handle swap pages."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2019-19815"

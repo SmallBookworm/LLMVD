@@ -1,0 +1,26 @@
+rules:
+  - id: cve-2021-20193-tar-read-header-memory-leak
+    message: "Potential memory leak in read_header due to early return without freeing next_long_name or next_long_link. This may lead to uncontrolled memory consumption (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!header)
+            return HEADER_END_OF_FILE;
+      - pattern: |
+          if ((status = tar_checksum ($header, $flag)) != HEADER_SUCCESS)
+            return $status;
+      - pattern: |
+          if ($size < 0)
+            return HEADER_FAILURE;
+      - pattern: |
+          if (mode == read_header_x_raw)
+            return HEADER_SUCCESS_EXTENDED;
+      - pattern: |
+          if (mode == read_header_x_global)
+            return HEADER_SUCCESS_EXTENDED;
+      - pattern: |
+          return HEADER_SUCCESS;
+    metavariable-regex:
+      - metavariable: $header
+        regex: "header"

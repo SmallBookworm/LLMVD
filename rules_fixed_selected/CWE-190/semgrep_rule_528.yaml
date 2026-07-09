@@ -1,0 +1,21 @@
+rules:
+  - id: cwe-190-xorg-barrier-release-pointer-integer-overflow
+    message: |
+      Integer overflow vulnerability in XIBarrierReleasePointer request handling.
+      Missing check for multiplication overflow before calling REQUEST_FIXED_SIZE.
+      This could lead to buffer overflows, crashes, or arbitrary code execution.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          swapl(&stuff->num_barriers);
+          REQUEST_FIXED_SIZE($REQ_TYPE, stuff->num_barriers * sizeof($TYPE));
+      - pattern: |
+          swapl(&stuff->num_barriers);
+          ... 
+          REQUEST_FIXED_SIZE($REQ_TYPE, stuff->num_barriers * sizeof($TYPE));
+    metavariable-regex:
+      - metavariable: $REQ_TYPE
+        regex: xXIBarrierReleasePointerReq
+      - metavariable: $TYPE
+        regex: xXIBarrierReleasePointerInfo

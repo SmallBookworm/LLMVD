@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2019-19072-predicate-parse-memory-leak
+    message: Memory leak in predicate_parse due to missing cleanup on error path. Allocated memory is not freed before returning ERR_PTR directly.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (top - op_stack > nr_parens)
+                  return ERR_PTR(-EINVAL);
+          - pattern: |
+              if (top - op_stack > nr_parens)
+                  return ERR_PTR(...);
+    metadata:
+      cwe: ["CWE-284"]
+      cve: "CVE-2019-19072"

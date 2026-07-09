@@ -1,0 +1,10 @@
+rules:
+  - id: imagemagick-null-pointer-deref-xcf
+    message: "Potential NULL pointer dereference due to improper image list handling in XCF reader."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          DestroyImage(RemoveFirstImageFromList(&image));
+          ...
+          return(GetFirstImageInList(image));

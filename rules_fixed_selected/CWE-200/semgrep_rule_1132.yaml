@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2012-6541-uninitialized-struct
+    message: "Uninitialized struct 'tfrc_tx_info' may leak kernel stack memory via getsockopt. Missing memset(0) before use."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              struct tfrc_tx_info $TFRC;
+              ...
+              $TFRC.$FIELD = ...;
+          - pattern: |
+              struct tfrc_tx_info $TFRC = { ... };
+              ...
+              $TFRC.$FIELD = ...;
+    metavariable-pattern:
+      metavariable: $TFRC
+      pattern-not: |
+        memset(&$TFRC, 0, sizeof($TFRC));
+    fix: ""

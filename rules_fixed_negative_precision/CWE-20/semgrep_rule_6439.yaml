@@ -1,0 +1,17 @@
+rules:
+  - id: missing_html_entity_encoding_in_javascript_attribute
+    message: "Missing HTML entity encoding for attribute values that may contain unsafe characters (e.g., quotes), leading to potential XSS."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (attrValue.startsWith("javascript:", TextCaseInsensitive)) {
+              result.append(attrValue);
+          }
+      - pattern: |
+          result.append(m_localLinks.get(completeURL));
+      - pattern: |
+          result.append(completeURL);
+    metavariable-pattern:
+      metavariable: $RESULT
+      pattern: result

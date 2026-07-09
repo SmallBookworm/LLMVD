@@ -1,0 +1,9 @@
+rules:
+  - id: imagemagick-dib-out-of-bounds-write
+    patterns:
+      - pattern: |
+          pixels=(unsigned char *) AcquireQuantumMemory(dib_info.image_size,
+            sizeof(*pixels));
+    message: "Potential out-of-bounds write due to insufficient memory allocation in DIB image handling. CVE-2018-12600 (CWE-787)."
+    severity: ERROR
+    languages: [c]

@@ -1,0 +1,13 @@
+rules:
+  - id: qpdf-recursive-parsing-stack-overflow
+    message: "Recursive parsing in QPDFObjectHandle::parseInternal may lead to stack overflow (CVE-2017-12595)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          QPDFObjectHandle::parseInternal($..., bool in_array, bool in_dictionary, $...)
+      - pattern: |
+          parseInternal($..., $in_array, $in_dictionary, $...)
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2017-12595"

@@ -1,0 +1,17 @@
+rules:
+  - id: buffer_underflow_xvmcgetdrinfo
+    message: Buffer underflow vulnerability when handling empty strings in XvMCGetDRInfo. Accessing index -1 when rep.nameLen or rep.busIDLen is zero.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              (*name)[rep.nameLen - 1] = '\0';
+          - pattern: |
+              (*busID)[rep.busIDLen - 1] = '\0';
+    metavariable-regex:
+      metavariable: $NAME
+      regex: name
+    metavariable-regex:
+      metavariable: $BUSID
+      regex: busID

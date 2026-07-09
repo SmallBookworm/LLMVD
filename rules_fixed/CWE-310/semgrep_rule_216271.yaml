@@ -1,0 +1,40 @@
+rules:
+  - id: lucky_thirteen_vulnerable_hash_initialization
+    message: "Detected vulnerable hash initialization pattern susceptible to Lucky Thirteen timing attack (CVE-2013-0169). SHA-224/256/384/512 cases lack compile-time guards, potentially leading to non-constant-time MAC processing."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              switch ($CTX->digest->type)
+              {
+              ...
+              case NID_sha224:
+                  ...
+              case NID_sha256:
+                  ...
+              case NID_sha384:
+                  ...
+              case NID_sha512:
+                  ...
+              }
+          - pattern: |
+              switch ($CTX->digest->type)
+              {
+              ...
+              case NID_sha224:
+                  ...
+              case NID_sha256:
+                  ...
+              }
+          - pattern: |
+              switch ($CTX->digest->type)
+              {
+              ...
+              case NID_sha384:
+                  ...
+              case NID_sha512:
+                  ...
+              }
+    metavariable-pattern:
+      $CTX: EVP_MD_CTX

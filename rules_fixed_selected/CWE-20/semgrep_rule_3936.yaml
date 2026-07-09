@@ -1,0 +1,32 @@
+rules:
+  - id: cwe-20-pcapng-header-length-validation
+    message: "Insufficient validation of Section Header Block length before memory allocation in pcapng parsing (CVE-2019-15165)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (total_length < sizeof(*bhdrp) + sizeof(*shbp) + sizeof(struct block_trailer) ||
+                  (total_length > BT_SHB_INSANE_MAX)) {
+                ...
+                return (NULL);
+              }
+              ...
+              p->bufsize = 2048;
+              if (p->bufsize < total_length)
+                p->bufsize = total_length;
+              p->buffer = malloc(p->bufsize);
+          - pattern: |
+              if (total_length < sizeof(*bhdrp) + sizeof(*shbp) + sizeof(struct block_trailer) ||
+                  total_length > BT_SHB_INSANE_MAX) {
+                ...
+                return (NULL);
+              }
+              ...
+              p->bufsize = 2048;
+              if (p->bufsize < total_length)
+                p->bufsize = total_length;
+              p->buffer = malloc(p->bufsize);
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2019-15165"

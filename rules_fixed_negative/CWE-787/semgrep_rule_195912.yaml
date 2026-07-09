@@ -1,0 +1,14 @@
+rules:
+  - id: wangle_line_based_frame_decoder_underflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (... && b == '\r' && !c.isAtEnd() && c.read<char>() == '\n') {
+                ...
+              }
+    message: "Potential buffer underflow in LineBasedFrameDecoder due to unsafe read after checking isAtEnd. Use peekBytes() instead of read<char>()."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2019-3563"

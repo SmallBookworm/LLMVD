@@ -1,0 +1,10 @@
+rules:
+  - id: unsafe_strcpy_usage
+    patterns:
+      - pattern: strcpy($DST, $SRC)
+    message: "Use of strcpy is unsafe and may lead to buffer overflow. Prefer memcpy when the length is known."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2016-2315"

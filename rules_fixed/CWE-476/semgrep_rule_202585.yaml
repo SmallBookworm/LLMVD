@@ -1,0 +1,18 @@
+rules:
+  - id: null_pointer_dereference_chained_starts_page_start
+    message: "Potential null pointer dereference when accessing 'page_start' array without checking if it is NULL."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          if (page_idx >= $OBJ->page_count) {
+            break;
+          }
+          ...
+          $OBJ->page_start[$IDX]
+    metavariable-pattern:
+      metavariable: $OBJ
+      pattern: bin->chained_starts[$I]
+    fix-regex:
+      regex: ""
+      replacement: ""

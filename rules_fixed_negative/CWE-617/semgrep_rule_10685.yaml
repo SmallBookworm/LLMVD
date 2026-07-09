@@ -1,0 +1,12 @@
+rules:
+  - id: cwe-617-ffmpeg-profile-check
+    message: "Use of 'profile == FF_PROFILE_MPEG4_SIMPLE_STUDIO' as a condition may lead to assertion failure and denial of service (CWE-617)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      $AVCTX->profile == FF_PROFILE_MPEG4_SIMPLE_STUDIO
+    metadata:
+      cwe: "CWE-617"
+      cve: "CVE-2018-13304"
+      references:
+        - "https://github.com/FFmpeg/FFmpeg/commit/bd27a9364ca274ca97f1df6d984e88a0700fb235"

@@ -1,0 +1,6 @@
+rules:
+  - id: cve-2016-5095-filter-sanitize-full-special-chars-constant-mismatch
+    message: "Incorrect constant used for FILTER_SANITIZE_FULL_SPECIAL_CHARS, leading to potential integer overflow (CVE-2016-5095)."
+    severity: ERROR
+    languages: [c]
+    pattern: 'REGISTER_LONG_CONSTANT("FILTER_SANITIZE_FULL_SPECIAL_CHARS", FILTER_SANITIZE_SPECIAL_CHARS, ...)'

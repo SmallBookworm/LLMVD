@@ -1,0 +1,10 @@
+rules:
+  - id: vim_heap_buffer_overflow_cve_2022_0158
+    message: "Potential heap-based buffer overflow due to reading before the start of the line with '$'."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      semsg(_(...), start - 1);
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2022-0158"

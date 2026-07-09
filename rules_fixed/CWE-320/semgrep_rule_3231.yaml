@@ -1,0 +1,19 @@
+rules:
+  - id: cwe-320-sshbuf-realloc-key-leak
+    message: "Potential sensitive key material leak due to implicit realloc in sshbuf_put without pre-allocation. Use sshbuf_allocate to pre-allocate buffer."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((r = sshbuf_put($BLOB, $BUF, $LEN)) != 0)
+                  ...
+          - pattern: |
+              sshbuf_put($BLOB, $BUF, $LEN)
+    metavariable-pattern:
+      metavariable: $BLOB
+      patterns:
+        - pattern-not: |
+            sshbuf_allocate($BLOB, ...)
+    regex: 'sshbuf_put\([^)]*\)'
+    regex-language: c

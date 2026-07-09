@@ -1,0 +1,36 @@
+rules:
+  - id: w3m-infinite-recursion-CVE-2016-9625
+    message: "Infinite recursion vulnerability in HTMLtagproc1 may lead to denial of service (CWE-119, CVE-2016-9625)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          HTMLlineproc1("<i>", $H_ENV);
+      - pattern: |
+          HTMLlineproc1("</i>", $H_ENV);
+      - pattern: |
+          HTMLlineproc1("<b>", $H_ENV);
+      - pattern: |
+          HTMLlineproc1("</b>", $H_ENV);
+      - pattern: |
+          HTMLlineproc1("`", $H_ENV);
+      - pattern: |
+          HTMLlineproc1("'", $H_ENV);
+      - pattern: |
+          HTMLlineproc1("<U>[DEL:</U>", $H_ENV);
+      - pattern: |
+          HTMLlineproc1("<U>:DEL]</U>", $H_ENV);
+      - pattern: |
+          HTMLlineproc1("<U>[S:</U>", $H_ENV);
+      - pattern: |
+          HTMLlineproc1("<U>:S]</U>", $H_ENV);
+      - pattern: |
+          HTMLlineproc1("<U>[INS:</U>", $H_ENV);
+      - pattern: |
+          HTMLlineproc1("<U>:INS]</U>", $H_ENV);
+      - pattern: |
+          HTMLlineproc1("^", $H_ENV);
+      - pattern: |
+          HTMLlineproc1("[", $H_ENV);
+      - pattern: |
+          HTMLlineproc1("]", $H_ENV);

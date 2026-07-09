@@ -1,0 +1,7 @@
+rules:
+  - id: lepton_integer_overflow_cve_2018_20820
+    message: "Potential integer overflow leading to denial-of-service in BrotliCodec::Decompress due to missing size_t cast on max_file_size"
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      Sirikata::BrotliCodec::Decompress(..., max_file_size * 2 + ...)

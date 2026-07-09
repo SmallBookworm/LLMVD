@@ -1,0 +1,20 @@
+rules:
+  - id: collectd-cve-2017-7401
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (se->data.server.userdb == NULL) {
+                ...
+                return (0);
+              }
+          - pattern: |
+              if (se->data.server.userdb == NULL) {
+                ...
+                return (-1);
+              }
+    message: "Missing buffer pointer advancement when userdb is NULL may cause infinite loop (CVE-2017-7401)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-835"
+      cve: "CVE-2017-7401"

@@ -1,0 +1,23 @@
+rules:
+  - id: varnish-http1-header-parsing-assert
+    message: "HTTP/1 header parsing may trigger an assert due to improper handling of CRLF sequences, leading to DoS (CVE-2019-15892)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!vct_iscrlf($R, $BUF_END)) {
+            ...
+            return (400);
+          }
+          ...
+          assert($R < $BUF_END);
+      - pattern: |
+          if (!vct_iscrlf($R, $BUF_END)) {
+            ...
+            return (400);
+          }
+          $Q = $R;
+          assert($R < $BUF_END);
+    metadata:
+      cwe: "CWE-617"
+      cve: "CVE-2019-15892"

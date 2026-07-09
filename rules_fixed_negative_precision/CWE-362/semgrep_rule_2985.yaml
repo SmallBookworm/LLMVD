@@ -1,0 +1,22 @@
+rules:
+  - id: perf_event_open_move_group_race_condition
+    message: "Race condition in sys_perf_event_open() when moving a software group into a hardware context. Missing validation after acquiring locks may lead to use-after-free or privilege escalation (CVE-2017-6001)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (move_group) {
+            gctx = group_leader->ctx;
+            mutex_lock_double(&gctx->mutex, &ctx->mutex);
+            ...
+          }
+      - pattern: |
+          if (move_group) {
+            mutex_lock_double(...);
+            ...
+          }
+    metadata:
+      cwe: ["CWE-362"]
+      references:
+        - https://github.com/torvalds/linux/commit/321027c1fe77f892f4ea07846aeae08cefbbb290
+        - CVE-2017-6001

@@ -1,0 +1,30 @@
+rules:
+  - id: missing_endtry_in_ctrycatchfinally
+    message: Missing OP_ENDTRY opcode after OP_CATCH block may cause unbalanced exception stack leading to denial of service.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              emit(..., OP_CATCH, ...);
+              ...
+              emit(..., OP_ENDCATCH);
+              ...
+              emitjump(..., OP_JUMP);
+          - pattern: |
+              emitstring(..., OP_CATCH, ...);
+              ...
+              emit(..., OP_ENDCATCH);
+              ...
+              emitjump(..., OP_JUMP);
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern: ctrycatchfinally(...) { ... }
+    pattern-not-inside: |
+      emit(..., OP_CATCH, ...);
+      ...
+      emit(..., OP_ENDCATCH);
+      ...
+      emit(..., OP_ENDTRY);
+      ...
+      emitjump(..., OP_JUMP);

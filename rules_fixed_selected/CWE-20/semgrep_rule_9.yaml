@@ -1,0 +1,22 @@
+rules:
+  - id: mupdf_assertion_dos_cve_2018_1000037
+    message: "Missing exception handling around fz_clip_image_mask may lead to assertion crash (CVE-2018-1000037)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          fz_clip_image_mask($CTX, $DEV, $IMAGE->mask, $CTM, $BBOX);
+          ...
+          pdf_show_image_imp($CTX, $PR, $IMAGE, $CTM, $BBOX);
+      - pattern: |
+          fz_clip_image_mask($CTX, $DEV, $IMAGE, $CTM, $BBOX);
+          ...
+          fz_fill_shade($CTX, $DEV, $SHADE, $CTM2, $ALPHA, $PARAMS);
+    metavariable-pattern:
+      $IMAGE:
+        patterns:
+          - pattern-not: $IMAGE->mask == NULL
+          - pattern-inside: |
+              if ($IMAGE && $IMAGE->mask) {
+                ...
+              }

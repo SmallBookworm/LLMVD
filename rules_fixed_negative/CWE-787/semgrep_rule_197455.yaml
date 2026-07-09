@@ -1,0 +1,18 @@
+rules:
+  - id: bentoo4_avcc_hvcc_buffer_overread
+    message: "Potential heap-based buffer over-read due to missing bounds checks before accessing payload data."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              AP4_UI16 param_length = AP4_BytesToInt16BE(&payload[$CURSOR]);
+              ... 
+              $BUFFER.SetData(&payload[$CURSOR]+2, param_length);
+          - pattern: |
+              AP4_UI16 param_length = AP4_BytesToInt16BE(&payload[$CURSOR]);
+              ... 
+              $BUFFER.SetData(&payload[$CURSOR] + 2, param_length);
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2017-14646"

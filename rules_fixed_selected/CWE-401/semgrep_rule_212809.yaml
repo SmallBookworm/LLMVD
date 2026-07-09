@@ -1,0 +1,17 @@
+rules:
+  - id: imagemagick-svg-keyvalue-pairs-memory-leak
+    message: "Memory leak in SVGKeyValuePairs usage: allocated tokens are not properly freed."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          tokens = SVGKeyValuePairs(..., &number_tokens);
+          ...
+          break;
+      - pattern: |
+          tokens=SVGKeyValuePairs(..., &number_tokens);
+          ...
+          break;
+    metavariable-regex:
+      metavariable: $...
+      regex: '^(?:(?!for\s*\(.*tokens\[j\].*DestroyString|RelinquishMagickMemory\(tokens\)).)*$'

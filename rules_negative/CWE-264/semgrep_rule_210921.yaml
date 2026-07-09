@@ -1,0 +1,14 @@
+rules:
+  - id: sssd-nonposix-group-bypass
+    patterns:
+      - pattern: |
+          is_posix = ldb_msg_find_attr_as_string(..., SYSDB_POSIX, ...);
+          if (is_posix != NULL && strcmp(is_posix, "FALSE") == 0) {
+              continue;
+          }
+    message: "Skipping non-POSIX groups may allow local users to bypass access restrictions (CVE-2014-0249)."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-264"
+      cve: "CVE-2014-0249"

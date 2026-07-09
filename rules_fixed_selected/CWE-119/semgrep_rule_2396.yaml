@@ -1,0 +1,39 @@
+rules:
+  - id: smacker_decode_tree_recursion_check_missing
+    message: Missing recursion depth check in smacker_decode_tree may lead to stack overflow or out-of-bounds read (CVE-2017-16803).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          static int smacker_decode_tree(..., int length)
+          {
+              ...
+              if (!bitstream_read_bit(...)) {
+                  ...
+              } else {
+                  ...
+                  length++;
+                  ...
+              }
+          }
+      - pattern: |
+          static int smacker_decode_tree(..., int length)
+          {
+              if (!bitstream_read_bit(...)) {
+                  ...
+              } else {
+                  ...
+                  length++;
+                  ...
+              }
+          }
+    pattern-not: |
+        if (length > SMKTREE_DECODE_MAX_RECURSION) {
+            ...
+            return AVERROR_INVALIDDATA;
+        }
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern: |
+        static int smacker_decode_tree(...)
+    focus-metavariable: $FUNC

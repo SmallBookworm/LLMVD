@@ -1,0 +1,14 @@
+rules:
+  - id: cwe-22-path-traversal-in-copydirectory
+    message: "Potential path traversal vulnerability in CopyDirectory due to unsafe path concatenation. Use AppendRelativePath instead of manual suffix manipulation."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              std::string suffix(&current.value().c_str()[from_path_base.value().size()]);
+              ...
+              const FilePath target_path = to_path.Append(suffix);
+    metadata:
+      cwe: "CWE-22"
+      cve: "CVE-2013-0895"

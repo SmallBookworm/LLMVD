@@ -1,0 +1,23 @@
+rules:
+  - id: unchecked-setuid-return-value
+    message: "The return value of setuid() is not checked. This could lead to privilege escalation if the call fails (e.g., due to resource limits)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: setuid(...)
+          - pattern: setgid(...)
+      - pattern-not-inside: |
+          if ($RET = setuid(...), $RET == -1) { ... }
+      - pattern-not-inside: |
+          if (setuid(...) == -1) { ... }
+      - pattern-not-inside: |
+          if (setuid(...) < 0) { ... }
+      - pattern-not-inside: |
+          if (setgid(...) == -1) { ... }
+      - pattern-not-inside: |
+          if (setgid(...) < 0) { ... }
+      - pattern-not-inside: |
+          if (($RET = setuid(...)) == -1) { ... }
+      - pattern-not-inside: |
+          if (($RET = setgid(...)) == -1) { ... }

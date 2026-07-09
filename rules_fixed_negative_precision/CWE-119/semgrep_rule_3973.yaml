@@ -1,0 +1,16 @@
+rules:
+  - id: ssdp-buffer-overflow-off-by-one
+    message: "Potential stack-based buffer overflow due to off-by-one error in recvfrom() usage. Buffer may not be null-terminated if exactly MAX_PKT_SIZE bytes are received."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              char buf[$SIZE];
+              ...
+              recvfrom(..., buf, sizeof(buf), ...);
+              ...
+              buf[len] = 0;
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2019-14323"

@@ -1,0 +1,7 @@
+rules:
+  - id: cve-2016-0826-camera-service-dump
+    message: "CameraService::dump calls client->dump directly, which may allow privilege escalation. Use client->dumpClient instead."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      $CLIENT->dump($FD, $ARGS)

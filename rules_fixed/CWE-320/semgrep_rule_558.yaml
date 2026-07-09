@@ -1,0 +1,23 @@
+rules:
+  - id: cwe-320-openssl-ecdsa-timing-attack
+    message: "Missing constant-time modular exponentiation in ECDSA may lead to timing attacks (CWE-320, CVE-2016-7056)."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (group->generator != NULL)
+                      EC_POINT_clear_free(group->generator);
+              BN_clear_free(&group->order);
+          - pattern: |
+              BN_clear_free(&group->order);
+      - metavariable-pattern:
+          metavariable: $GROUP
+          pattern: $GROUP->mont_data
+      - pattern-not-inside: |
+          if ($GROUP->mont_data)
+                  BN_MONT_CTX_free($GROUP->mont_data);
+          ...
+          if ($GROUP->generator != NULL)
+                  EC_POINT_clear_free($GROUP->generator);
+          BN_clear_free(&$GROUP->order);

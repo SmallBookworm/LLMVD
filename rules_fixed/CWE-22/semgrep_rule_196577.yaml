@@ -1,0 +1,38 @@
+rules:
+  - id: mutt-imap-directory-traversal
+    message: "Potential directory traversal vulnerability due to missing validation of '..' in mailbox path"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (strstr($MBOX, "/../") || (strcmp($MBOX, "..") == 0) || (strncmp($MBOX, "../", 3) == 0))
+                return NULL;
+              ...
+              size_t $LEN = strlen($MBOX);
+              if (($LEN > 3) && (strcmp($MBOX + $LEN - 3, "/..") == 0))
+                return NULL;
+          - pattern-not: |
+              if (strstr($MBOX, "/../") || (strcmp($MBOX, "..") == 0) || (strncmp($MBOX, "../", 3) == 0))
+                return NULL;
+              ...
+              size_t $LEN = strlen($MBOX);
+              if (($LEN > 3) && (strcmp($MBOX + $LEN - 3, "/..") == 0))
+                return NULL;
+              ...
+              mutt_hcache_open(...);
+    pattern-not-inside: |
+      if (strstr($MBOX, "/../") || (strcmp($MBOX, "..") == 0) || (strncmp($MBOX, "../", 3) == 0))
+        return NULL;
+      ...
+      size_t $LEN = strlen($MBOX);
+      if (($LEN > 3) && (strcmp($MBOX + $LEN - 3, "/..") == 0))
+        return NULL;
+      ...
+      mutt_hcache_open(...);
+    fix-regex:
+      regex: ''
+      replacement: ''
+    metadata:
+      cwe: "CWE-22"
+      cve: "CVE-2018-14355"

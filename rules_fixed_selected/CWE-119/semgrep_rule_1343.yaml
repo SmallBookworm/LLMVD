@@ -1,0 +1,44 @@
+rules:
+  - id: cifs_iovec_write_unchecked_copy
+    message: "Uncached write in cifs_iovec_write does not validate copied bytes, leading to potential memory corruption (CVE-2014-0069)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          for (...; ...; ...) {
+            ...
+            copied = iov_iter_copy_from_user(...);
+            ...
+            cur_len -= copied;
+            iov_iter_advance(..., copied);
+          }
+          cur_len = save_len - cur_len;
+      - pattern: |
+          for (...; ...; ...) {
+            ...
+            copied = iov_iter_copy_from_user(...);
+            ...
+            cur_len -= copied;
+            iov_iter_advance(..., copied);
+            if (copied < bytes) { ... }
+          }
+          cur_len = save_len - cur_len;
+    metavariable-pattern:
+      metavariable: bytes
+      pattern: min_t(...)
+    pattern-not-inside: |
+      for (...; ...; ...) {
+        ...
+        copied = iov_iter_copy_from_user(...);
+        ...
+        cur_len -= copied;
+        iov_iter_advance(..., copied);
+        if (copied < bytes)
+          break;
+      }
+      cur_len = save_len - cur_len;
+      if (!cur_len) {
+        ...
+        rc = -EFAULT;
+        break;
+      }

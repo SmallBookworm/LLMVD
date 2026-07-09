@@ -1,0 +1,17 @@
+rules:
+  - id: cdxl_chunky_format_check_missing
+    message: "Missing check for CHUNKY format in BGR24 pixel format assignment may lead to heap-based buffer overflow (CVE-2017-9996)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!encoding && c->palette_size && c->bpp <= 8 && c->format != CHUNKY) {
+              ...
+          } else if (encoding == 1 && (c->bpp == 6 || c->bpp == 8)) {
+              ...
+              avctx->pix_fmt = AV_PIX_FMT_BGR24;
+          }
+    metadata:
+      cwe: ["CWE-119"]
+      vulnerability: "Heap-based buffer overflow due to missing format validation"
+      fix_commit: "https://github.com/FFmpeg/FFmpeg/commit/1e42736b95065c69a7481d0cf55247024f54b660"

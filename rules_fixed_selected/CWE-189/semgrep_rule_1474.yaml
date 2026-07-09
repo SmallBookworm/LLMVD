@@ -1,0 +1,17 @@
+rules:
+  - id: cwe-189-signedness-error-ozwpan
+    message: "Signed integer used in subtraction for memcpy length may result in negative value, leading to heap overflow (CWE-189). Use unsigned integers to prevent this."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          int copy_len;
+          ...
+          copy_len = $REQUIRED_SIZE - $OFFSET;
+      - pattern: |
+          int required_size = ...;
+          ...
+          copy_len = required_size - $OFFSET;
+    metavariable-pattern:
+      metavariable: $REQUIRED_SIZE
+      pattern: (int ...)

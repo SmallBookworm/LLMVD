@@ -1,0 +1,22 @@
+rules:
+  - id: nfdump-ipfix-integer-underflow
+    message: Potential unsigned integer underflow in Process_ipfix_template_withdraw leading to denial of service (CVE-2019-14459).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          while ($SIZE_LEFT) {
+            ...
+            $SIZE_LEFT -= 4;
+            ...
+          }
+      - pattern: |
+          while ($SIZE_LEFT) {
+            ...
+            $PTR = $PTR + 4;
+            ...
+          }
+    metavariable-pattern:
+      metavariable: $SIZE_LEFT
+      pattern: size_left
+    focus-metavariable: $SIZE_LEFT

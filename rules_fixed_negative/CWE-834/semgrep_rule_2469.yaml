@@ -1,0 +1,45 @@
+rules:
+  - id: ffmpeg-mov-read_tfra-missing-eof-check
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for ($INIT; $COND < $ITEM_COUNT; $INCR) {
+                ... 
+                if ($VERSION == 1) {
+                  $X = avio_rb64($F);
+                  $Y = avio_rb64($F);
+                } else {
+                  $X = avio_rb32($F);
+                  $Y = avio_rb32($F);
+                }
+                ...
+              }
+          - pattern: |
+              for ($INIT; $COND < $ITEM_COUNT; $INCR) {
+                ...
+                $TIME = avio_rb64($F);
+                $OFFSET = avio_rb64($F);
+                ...
+              }
+          - pattern: |
+              for ($INIT; $COND < $ITEM_COUNT; $INCR) {
+                ...
+                $TIME = avio_rb32($F);
+                $OFFSET = avio_rb32($F);
+                ...
+              }
+      - pattern-not: |
+          for ($INIT; $COND < $ITEM_COUNT; $INCR) {
+            ...
+            if (avio_feof($F)) {
+              ...
+              return $RET;
+            }
+            ...
+          }
+    message: "Missing EOF check inside loop reading 'item_count' entries may lead to DoS via excessive resource consumption (CWE-834, CVE-2017-14222)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-834"
+      cve: "CVE-2017-14222"

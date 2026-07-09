@@ -1,0 +1,21 @@
+rules:
+  - id: icu_integer_overflow_to_scientific_string
+    message: "Integer overflow vulnerability in toScientificString() due to missing check for INT32_MIN before negation."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          int32_t _scale = ...;
+          if (_scale < 0) {
+              _scale *= -1;
+              ...
+          }
+      - pattern: |
+          int32_t _scale = ...;
+          if (_scale < 0) {
+              _scale = -_scale;
+              ...
+          }
+    metavariable-pattern:
+      metavariable: _scale
+      pattern: upperPos + scale

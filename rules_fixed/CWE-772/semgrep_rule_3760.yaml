@@ -1,0 +1,41 @@
+rules:
+  - id: hwsim_new_radio_nl_memory_leak
+    message: "Memory leak detected: 'hwname' is allocated but not freed before returning from error path."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (idx >= ARRAY_SIZE(...)) {
+              return -EINVAL;
+          }
+      - pattern: |
+          if (... >= ARRAY_SIZE(...))
+              return -EINVAL;
+    metavariable-pattern:
+      metavariable: idx
+      pattern: nla_get_u32(...)
+    focus-metavariable: idx
+    fix-regex:
+      regex: ""
+      replacement: ""
+    additional-patterns:
+      - pattern-inside: |
+          static int hwsim_new_radio_nl(...) {
+            ...
+            const char *hwname = NULL;
+            ...
+            if (info->attrs[HWSIM_ATTR_RADIO_NAME]) {
+                hwname = kasprintf(...);
+                if (!hwname)
+                    return -ENOMEM;
+                ...
+            }
+            ...
+            if (info->attrs[HWSIM_ATTR_REG_CUSTOM_REG]) {
+                ... idx = nla_get_u32(...);
+                ...
+            }
+            ...
+            kfree(hwname);
+            return ...;
+          }

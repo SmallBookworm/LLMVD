@@ -1,0 +1,18 @@
+rules:
+  - id: nfsd-rootsquash-groups-sort-misplaced
+    message: "groups_sort() is called inside the loop when NFSEXP_ROOTSQUASH is enabled, leading to incorrect group sorting and potential privilege escalation (CVE-2018-1000028)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (flags & NFSEXP_ROOTSQUASH) {
+            ...
+            for (...; ...; ...) {
+              ...
+              groups_sort($GI);
+            }
+            ...
+          }
+    metadata:
+      cwe: ["CWE-269"]
+      cve: "CVE-2018-1000028"

@@ -1,0 +1,11 @@
+rules:
+  - id: cwe-20-negative-length-buffer-overflow
+    message: "Potential stack-based buffer overflow due to missing validation of negative length values. A negative 'plen' could bypass the 'plen <= *len' check and cause a buffer overflow when used in net_read_exact."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          assert($PLEN <= *$LEN);
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2014-8321"

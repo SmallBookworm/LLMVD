@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2018-14618-ntlm-integer-overflow
+    message: Potential integer overflow in NTLM password handling due to missing length check before multiplication. This can lead to a heap buffer overflow (CVE-2018-14618).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          size_t len = strlen($PASSWORD);
+          ...
+          malloc(len * 2)
+      - pattern: |
+          size_t len = strlen($PASSWORD);
+          ...
+          malloc(2 * len)
+    metavariable-regex:
+      metavariable: $PASSWORD
+      regex: password

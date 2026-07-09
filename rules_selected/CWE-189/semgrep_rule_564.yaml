@@ -1,0 +1,30 @@
+rules:
+  - id: pango_glyph_string_integer_overflow
+    message: "Potential integer overflow in pango_glyph_string_set_size leading to heap-based buffer overflow (CVE-2009-1194)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while ($NEW_LEN > $STRING->space)
+              {
+                ...
+                $STRING->space *= 2;
+                if ($STRING->space < 0)
+                {
+                  ...
+                }
+                ...
+              }
+          - pattern: |
+              while ($NEW_LEN > $STRING->space)
+              {
+                ...
+                $STRING->space *= 2;
+                ...
+              }
+              ...
+              g_realloc(..., $STRING->space * sizeof(...));
+    metadata:
+      cwe: "CWE-189"
+      cve: "CVE-2009-1194"

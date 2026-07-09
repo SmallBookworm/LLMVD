@@ -1,0 +1,25 @@
+rules:
+  - id: fetch_no_cors_redirect_check_missing
+    message: "Missing redirect mode check in 'no-cors' fetch request may lead to SOP bypass (CVE-2018-4117)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (fetch_request_data_->Mode() == FetchRequestMode::kNoCORS) {
+            ...
+            PerformSchemeFetch();
+            return;
+          }
+      - pattern: |
+          if (fetch_request_data_->Mode() == FetchRequestMode::kNoCORS) {
+            fetch_request_data_->SetResponseTainting(...);
+            PerformSchemeFetch();
+            return;
+          }
+    metavariable-pattern:
+      metavariable: $...
+      pattern-not: |
+        if (fetch_request_data_->Redirect() != FetchRedirectMode::kFollow) {
+          ...
+          return;
+        }

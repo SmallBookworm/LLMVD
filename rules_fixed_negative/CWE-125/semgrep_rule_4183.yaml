@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2018-14498-bmp-out-of-range-index
+    message: "Potential heap-based buffer over-read due to missing bounds check on BMP color index. Ensure 't' is checked against 'cmaplen' before using as colormap index."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              t = GETJSAMPLE(*inptr++);
+              *outptr++ = colormap[0][t];
+          - pattern: |
+              t = GETJSAMPLE(*inptr++);
+              rgb_to_cmyk(colormap[0][t], colormap[1][t], colormap[2][t], ...);
+          - pattern: |
+              t = GETJSAMPLE(*inptr++);
+              outptr[rindex] = colormap[0][t];
+              outptr[gindex] = colormap[1][t];
+              outptr[bindex] = colormap[2][t];
+    metavariable-pattern:
+      metavariable: $t
+      pattern-not: |
+        if ($t >= cmaplen)
+          ERREXIT(...);

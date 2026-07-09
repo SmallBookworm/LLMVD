@@ -1,0 +1,48 @@
+rules:
+  - id: android-libstagefright-amr-buffer-validation-missing
+    message: Missing input buffer size validation before processing AMR frame, which may lead to buffer over-read or privilege escalation (CVE-2016-2452).
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (mMode == MODE_NARROW) {
+                ...
+                int16 mode = ((inputPtr[0] >> 3) & 0x0f);
+                ...
+                numBytesRead = AMRDecode(...);
+                ...
+              }
+          - pattern: |
+              } else {
+                ...
+                int16 mode = ((inputPtr[0] >> 3) & 0x0f);
+                ...
+                size_t frameSize = getFrameSize(mode);
+                CHECK_GE(inHeader->nFilledLen, frameSize);
+                ...
+              }
+      - pattern-not-inside: |
+          if (mMode == MODE_NARROW) {
+            ...
+            int16 mode = ((inputPtr[0] >> 3) & 0x0f);
+            ...
+            size_t frameSize = ...;
+            if (inHeader->nFilledLen < frameSize) {
+              ...
+              return;
+            }
+            ...
+          }
+      - pattern-not-inside: |
+          } else {
+            ...
+            int16 mode = ((inputPtr[0] >> 3) & 0x0f);
+            ...
+            size_t frameSize = getFrameSize(mode);
+            if (inHeader->nFilledLen < frameSize) {
+              ...
+              return;
+            }
+            ...
+          }

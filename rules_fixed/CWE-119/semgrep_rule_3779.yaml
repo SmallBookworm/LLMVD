@@ -1,0 +1,12 @@
+rules:
+  - id: fscanf_sscanf_unbounded_string
+    message: Unbounded %s format specifier in fscanf or sscanf can lead to buffer overflow (CWE-119).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: fscanf(..., "%s", ...)
+      - pattern: sscanf(..., "%s", ...)
+    fix-regex:
+      regex: "%s"
+      replacement: "%[^\\n]"
+      enabled: false

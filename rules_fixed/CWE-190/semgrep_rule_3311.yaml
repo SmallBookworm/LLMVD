@@ -1,0 +1,7 @@
+rules:
+  - id: jasper_mem_resize_integer_overflow
+    message: "Potential integer overflow in mem_resize due to use of 'int' for buffer size; should use 'size_t' to prevent overflow leading to double free (CVE-2015-5203)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      static int mem_resize(..., int $SIZE)

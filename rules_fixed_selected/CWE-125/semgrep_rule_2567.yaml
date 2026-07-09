@@ -1,0 +1,25 @@
+rules:
+  - id: cwe-125-buffer-overread-eap-print
+    message: "Missing bounds check before dereferencing pointer may lead to buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              type = *(tptr);
+              ...
+              len = EXTRACT_16BITS(tptr+2);
+          - pattern: |
+              subtype = *(tptr+4);
+          - pattern: |
+              *(tptr+count)
+          - pattern: |
+              *(tptr + 5)
+          - pattern: |
+              EXTRACT_32BITS(tptr + 6)
+    metavariable-pattern:
+      metavariable: tptr
+      pattern-not-inside: |
+        ND_TCHECK_...(...);
+        ...
+        $X = *(tptr + ...);

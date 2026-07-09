@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2016-9793-negative-socket-buffer
+    message: "Negative values for sk_sndbuf or sk_rcvbuf can lead to memory corruption. Ensure max_t uses 'int' instead of 'u32' to prevent signed integer overflow."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          sk->sk_sndbuf = max_t(u32, $VAL * 2, SOCK_MIN_SNDBUF);
+      - pattern: |
+          sk->sk_rcvbuf = max_t(u32, $VAL * 2, SOCK_MIN_RCVBUF);

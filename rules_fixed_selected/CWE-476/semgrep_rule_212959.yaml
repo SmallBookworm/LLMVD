@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2016-9600-null-pointer-dereference
+    message: "Null pointer dereference vulnerability in JP2 encoder when ICC profile data is unavailable. Ensure jas_image_cmprof(image) is checked before use."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      jas_iccprof_createfromcmprof(jas_image_cmprof(...))
+    pattern-not: |
+      if (!jas_image_cmprof(...)) {
+        ...
+      }
+      jas_iccprof_createfromcmprof(jas_image_cmprof(...))

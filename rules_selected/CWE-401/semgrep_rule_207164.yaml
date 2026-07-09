@@ -1,0 +1,18 @@
+rules:
+  - id: imagemagick-pcd-memory-leak-cwe-401
+    message: "Memory leak in DecodeImage function in coders/pcd.c. Allocated pcd_table entries are not properly freed on error paths, leading to CWE-401 (Missing Release of Memory after Effective Lifetime)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (pcd_table[$I] == (PCDTable *) NULL)
+            {
+              buffer=(unsigned char *) RelinquishMagickMemory(buffer);
+              ThrowBinaryImageException(...);
+            }
+      - pattern: |
+          if (r->length > 16)
+            {
+              buffer=(unsigned char *) RelinquishMagickMemory(buffer);
+              return(MagickFalse);
+            }

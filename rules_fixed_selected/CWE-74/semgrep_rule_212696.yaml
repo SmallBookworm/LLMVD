@@ -1,0 +1,20 @@
+rules:
+  - id: flatpak_portal_spawn_env_injection
+    message: |
+      Flatpak portal passes untrusted environment variables to flatpak run,
+      which can lead to sandbox escape (CVE-2021-21261). Ensure environment
+      variables from the caller are not directly passed without proper
+      sanitization or unsetting of dangerous variables.
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      g_ptr_array_add (flatpak_argv,
+                       g_strdup_printf ("--env-fd=%d",
+                                        child_setup_data.env_fd));
+    pattern-not: |
+      for (i = 0; unset_env != NULL && unset_env[i] != NULL; i++)
+        {
+          ...
+          g_ptr_array_add (flatpak_argv,
+                           g_strdup_printf ("--unset-env=%s", var));
+        }

@@ -1,0 +1,10 @@
+rules:
+  - id: qemu-intel-hda-dma-memory-attrs
+    message: "DMA operation uses unspecified memory attributes, which may allow access to MMIO regions and lead to stack overflow (CVE-2021-3611, CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      const MemTxAttrs attrs = MEMTXATTRS_UNSPECIFIED;
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2021-3611"

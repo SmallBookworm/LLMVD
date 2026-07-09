@@ -1,0 +1,24 @@
+rules:
+  - id: xss_auditor_report_url_same_origin_check_missing
+    message: "XSS Auditor does not validate that the reporting URL is same-origin, which may leak referrer details to remote attackers."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ((xss_protection_header == kFilterReflectedXSS ||
+                xss_protection_header == kBlockReflectedXSS) &&
+               !report_url.IsEmpty()) {
+             xss_protection_report_url = document->CompleteURL(report_url);
+             if (MixedContentChecker::IsMixedContent(...)) { ... }
+          }
+      - pattern: |
+          if ((xss_protection_header == kFilterReflectedXSS ||
+                xss_protection_header == kBlockReflectedXSS) &&
+               !report_url.IsEmpty()) {
+             xss_protection_report_url = document->CompleteURL(report_url);
+             ...
+             if (MixedContentChecker::IsMixedContent(...)) { ... }
+          }
+    metavariable-regex:
+      metavariable: $...
+      regex: "(?!.*SecurityOrigin::Create\\(xss_protection_report_url\\)->IsSameSchemeHostPort\\(document->GetSecurityOrigin\\(\\)\\))"

@@ -1,0 +1,28 @@
+rules:
+  - id: opencv-dis-flow-out-of-bounds-read
+    message: "Potential out-of-bounds read in DISOpticalFlow due to unchecked coarsest_scale < finest_scale. This may lead to heap buffer over-read (CWE-369)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - patterns:
+        - pattern: coarsest_scale = min(..., ...);
+        - pattern-inside: |
+            ...
+            for (int i = coarsest_scale; i >= finest_scale; i--) {
+              ...
+            }
+        - focus-metavariable: coarsest_scale
+      - patterns:
+        - pattern: coarsest_scale = min(..., ...);
+        - pattern: Ux[coarsest_scale]
+        - pattern-inside: |
+            ...
+            for (int i = coarsest_scale; i >= finest_scale; i--) {
+              ...
+            }
+        - focus-metavariable: coarsest_scale
+    metadata:
+      cwe: "CWE-369"
+      cve: "CVE-2019-19624"
+      references:
+        - https://github.com/opencv/opencv/commit/d1615ba11a93062b1429fce9f0f638d1572d3418

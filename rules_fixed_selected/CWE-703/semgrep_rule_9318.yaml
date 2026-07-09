@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2014-5355-krb5-recvauth-strcmp
+    message: "Use of strcmp on krb5_data from krb5_read_message may cause NULL dereference or out-of-bounds read. Use data_eq() instead."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: strcmp($DATA_FIELD, $STR)
+      - pattern: strcmp($STR, $DATA_FIELD)
+    metavariable-pattern:
+      $DATA_FIELD:
+        patterns:
+          - pattern: $BUF.data
+          - metavariable: $BUF
+          - pattern-not:
+              pattern: $BUF = make_data(...)

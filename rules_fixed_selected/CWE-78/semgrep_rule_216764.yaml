@@ -1,0 +1,16 @@
+rules:
+  - id: libssh-scp-command-injection
+    message: |
+      Unquoted user-controlled input passed to scp command may lead to command injection (CWE-78).
+      Ensure that `scp->location` is properly quoted (e.g., using `ssh_quote_file_name`) before being used in a shell command.
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              snprintf($BUF, $SIZE, "scp -t %s %s", ..., $LOC);
+          - pattern: |
+              snprintf($BUF, $SIZE, "scp -f %s %s", ..., $LOC);
+    metavariable-pattern:
+      metavariable: $LOC
+      pattern-not: ssh_quote_file_name(...)

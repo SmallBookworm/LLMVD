@@ -1,0 +1,28 @@
+rules:
+  - id: use-after-free-webui-extension
+    message: "Potential use-after-free vulnerability due to missing frame validity check after V8 conversion that may trigger arbitrary JavaScript execution."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: content = base::ListValue::From(...);
+              - pattern-inside: |
+                  ...
+                  render_frame->Send(...frame->...);
+              - metavariable-regex:
+                  metavariable: frame
+                  regex: 'blink::WebLocalFrame\*'
+          - patterns:
+              - pattern: content = base::ListValue::From(...);
+              - pattern-inside: |
+                  ...
+                  frame->...;
+              - metavariable-regex:
+                  metavariable: frame
+                  regex: 'blink::WebLocalFrame\*'
+      - pattern-not-inside: |
+          if (frame != blink::WebLocalFrame::FrameForCurrentContext()) {
+            ...
+            return;
+          }

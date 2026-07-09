@@ -1,0 +1,28 @@
+rules:
+  - id: gnutls_cipher_block_missing_hash_size_check
+    message: "Missing check for ciphertext size against hash_size after IV removal in block cipher decryption, leading to potential heap corruption (CVE-2012-1573)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (_gnutls_version_has_explicit_iv(...))
+            {
+              ciphertext.size -= blocksize;
+              ciphertext.data += blocksize;
+
+              if (ciphertext.size == 0)
+                {
+                  ...
+                  return ...;
+                }
+            }
+
+          pad = ciphertext.data[ciphertext.size - 1] + 1;
+      - pattern: |
+          if (_gnutls_version_has_explicit_iv(...))
+            {
+              ciphertext.size -= blocksize;
+              ciphertext.data += blocksize;
+            }
+
+          pad = ciphertext.data[ciphertext.size - 1] + 1;

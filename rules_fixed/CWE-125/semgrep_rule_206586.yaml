@@ -1,0 +1,26 @@
+rules:
+  - id: cve-2018-19985-hso-oob-read
+    message: "Out-of-bounds read due to missing bounds check on if_num before using it as an index into config_data array."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              switch (config_data[if_num]) { ... }
+          - pattern: |
+              $X = config_data[if_num];
+      - metavariable-pattern:
+          metavariable: if_num
+          pattern: $IF_NUM
+      - pattern-not-inside: |
+          if ($IF_NUM > 16) { ... }
+      - pattern-not-inside: |
+          if ($IF_NUM >= 17) { ... }
+      - pattern-inside: |
+          int hso_get_config_data(...) {
+            ...
+            u32 if_num = ...;
+            ...
+            u8 *config_data = ...;
+            ...
+          }

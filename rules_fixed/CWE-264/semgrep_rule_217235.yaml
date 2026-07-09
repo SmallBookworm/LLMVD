@@ -1,0 +1,30 @@
+rules:
+  - id: abuild-sudo-keys-dir-allowed
+    message: "Detected missing check for '--keys-dir' option in abuild-sudo, which can be used to bypass signature trust checks."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          for (;;) {
+            if (strcmp(argv[$INDEX], "--allow-untrusted") == 0) {
+              $STMTS
+            }
+          }
+      - pattern: |
+          for (;;) {
+            if (strcmp($ARG, "--allow-untrusted") == 0) {
+              $STMTS
+            }
+          }
+    metavariable-pattern:
+      metavariable: LOOP
+      pattern: |
+        for (;;) {
+          $STMTS
+        }
+    pattern-not-inside: |
+      for (;;) {
+        ...
+        check_option(...);
+        ...
+      }

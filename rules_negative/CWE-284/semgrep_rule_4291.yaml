@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2016-3698-ndp-validation-missing
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (len < ndp_msg_type_info($MSG_TYPE)->raw_struct_size)
+                  return false;
+              return true;
+    message: "Missing validation of NDP message origin; vulnerable to CVE-2016-3698 (CWE-284). Router Advertisements and Redirects must be validated to originate from link-local addresses."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-284"
+      cve: "CVE-2016-3698"

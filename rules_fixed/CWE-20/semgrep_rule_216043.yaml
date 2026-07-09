@@ -1,0 +1,28 @@
+rules:
+  - id: ocfs2_uninitialized_hole_read
+    message: "Potential read of uninitialized disk data due to missing 'new' flag when holes span page boundaries in OCFS2."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2011-0463"
+    pattern-either:
+      - pattern: |
+          if (page == $WC->w_target_page) {
+            ...
+            if ($NEW) {
+              ...ocfs2_map_page_blocks($PAGE, ..., $CLUSTER_START, $CLUSTER_END, $NEW);
+            } else {
+              ...ocfs2_map_page_blocks($PAGE, ..., $MAP_FROM, $MAP_TO, $NEW);
+            }
+            ...
+          }
+      - pattern: |
+          } else {
+            BUG_ON(!$NEW);
+            ...
+            ...ocfs2_map_page_blocks($PAGE, ..., $CLUSTER_START, $CLUSTER_END, $NEW);
+          }
+    pattern-not: |
+      $NEW = $NEW | ((i_size_read($INODE) <= page_offset($PAGE)) &&
+                     (page_offset($PAGE) <= $USER_POS));

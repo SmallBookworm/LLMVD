@@ -1,0 +1,7 @@
+rules:
+  - id: f2fs_integer_overflow_in_b_size_assignment
+    message: "Potential integer overflow in bh->b_size assignment due to missing cast before left shift. This can lead to a denial of service via infinite loop (CVE-2017-18257)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      bh->b_size = map.m_len << inode->i_blkbits;

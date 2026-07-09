@@ -1,0 +1,22 @@
+rules:
+  - id: rsync-xattr-missing-null-check
+    message: "Missing check for trailing null byte in xattr name may lead to heap-based buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          read_buf(..., name, name_len);
+          ...
+          if (name_is_excluded(...)) { ... }
+      - pattern: |
+          read_buf(..., name, name_len);
+          ...
+          if (am_root <= 0 && !HAS_PREFIX(...)) { ... }
+      - pattern: |
+          read_buf(..., name, name_len);
+          ...
+          if (HAS_PREFIX(...)) { ... }
+    pattern-not: |
+      read_buf(..., name, name_len);
+      ...
+      if (name_len < 1 || name[name_len-1] != '\0') { ... }

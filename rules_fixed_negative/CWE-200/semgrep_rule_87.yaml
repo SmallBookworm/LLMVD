@@ -1,0 +1,15 @@
+rules:
+  - id: cwe-200-sensitive-data-in-log
+    message: "Sensitive data (e.g., password) is logged via g_message, which may expose it in log files."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern: |
+          g_message(..., $SECRET);
+    metavariable-pattern:
+      metavariable: $SECRET
+      pattern-either:
+        - pattern: secret
+        - pattern: password
+        - pattern: passwd
+        - pattern: key

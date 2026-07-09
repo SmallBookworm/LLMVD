@@ -1,0 +1,21 @@
+rules:
+  - id: use-after-free-pepper-flash-navigate
+    message: Potential use-after-free vulnerability due to missing validation before plugin reentrancy in PepperFlashRendererHost::OnNavigate.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          ppapi::proxy::HostDispatcher* host_dispatcher =
+              ppapi::proxy::HostDispatcher::GetForInstance(...);
+          host_dispatcher->set_allow_plugin_reentrancy();
+          ...
+          plugin_instance->Navigate(...);
+      - pattern: |
+          plugin_instance->Navigate(...);
+          ...
+          if (weak_ptr.get()) {
+            ...
+          }
+    metavariable-pattern:
+      metavariable: plugin_instance
+      pattern: content::PepperPluginInstance*

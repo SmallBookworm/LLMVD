@@ -1,0 +1,20 @@
+rules:
+  - id: cwe-125-out-of-bounds-read-avrc_msg_cback
+    message: Missing bounds check before accessing p_data[0], p_data[1], or p_data[2] may lead to out-of-bounds read (CWE-125).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          p_data = (uint8_t*)(p_pkt + 1) + p_pkt->offset;
+          ...
+          msg.hdr.ctype = p_data[0] & ...;
+      - pattern: |
+          p_data = (uint8_t*)(p_pkt + 1) + p_pkt->offset;
+          ...
+          msg.hdr.subunit_type = (p_data[1] & ...) >> ...;
+      - pattern: |
+          p_data = (uint8_t*)(p_pkt + 1) + p_pkt->offset;
+          ...
+          opcode = p_data[2];
+    metavariable-pattern:
+      p_pkt: { type: "BT_HDR*" }

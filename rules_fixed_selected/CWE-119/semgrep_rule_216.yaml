@@ -1,0 +1,24 @@
+rules:
+  - id: gnulib-tz-buffer-overflow-cve-2017-7476
+    message: "Potential heap-based buffer overflow in TZ environment variable handling due to missing bounds check on time zone abbreviation length (CVE-2017-7476)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          {
+            ...
+            char buf[...];
+            ...
+            memcpy(buf, ..., ...);
+            memset(..., ..., tzname_len);
+            strcpy(..., ...);
+            ...
+          }
+      - pattern-either:
+          - pattern: 'setenv("TZ", "...", ...);'
+          - pattern: 'setenv ("TZ", "...", ...);'
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2017-7476"
+      references:
+        - https://git.savannah.gnu.org/gitweb/?p=gnulib.git;a=commit;h=94e01571507835ff59dd8ce2a0b56a4b566965a4

@@ -1,0 +1,22 @@
+rules:
+  - id: cipso_v4_optptr_infinite_loop
+    message: "Infinite loop possible in cipso_v4_optptr due to unchecked zero-length IP option tag"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (...; $OPTLEN > 0; ) {
+                  ...
+                  $TAGLEN = $OPTPTR[1];
+                  $OPTLEN -= $TAGLEN;
+                  $OPTPTR += $TAGLEN;
+                  ...
+              }
+    metavariable-regex:
+      - metavariable: $TAGLEN
+        regex: "taglen"
+      - metavariable: $OPTLEN
+        regex: "optlen"
+      - metavariable: $OPTPTR
+        regex: "optptr"

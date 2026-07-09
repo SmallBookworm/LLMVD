@@ -1,0 +1,30 @@
+rules:
+  - id: tflite-compute-outsize-divide-by-zero
+    message: "Division by zero possible in ComputeOutSize when stride is 0."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              ($...,$stride,$...) {
+                $...
+                return ($... + $stride - $...) / $stride;
+                $...
+              }
+          - pattern: |
+              ($...,$stride,$...) {
+                $...
+                switch ($...) {
+                  $...
+                  case $...:
+                    return ($... + $stride - $...) / $stride;
+                  $...
+                }
+                $...
+              }
+    pattern-not-inside: |
+      if ($stride == 0) return ...;
+      ...
+    metavariable-pattern:
+      metavariable: $stride
+      pattern: stride

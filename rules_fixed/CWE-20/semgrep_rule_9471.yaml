@@ -1,0 +1,14 @@
+rules:
+  - id: imagemagick-tga-write-comment-use-after-free
+    message: "Use of potentially stale pointer 'value' after reassignment in TGA writer may lead to DoS (CVE-2017-6498)"
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      $value = GetImageProperty(...);
+      ...
+      if ($value != (const char *) NULL)
+        ... $value ...;
+      ...
+      $value = GetImageArtifact(...);
+      ...
+      WriteBlob(..., (unsigned char *) $value);

@@ -1,0 +1,17 @@
+rules:
+  - id: openjpeg-pi-include-oob-access
+    message: "Potential out-of-bounds access to pi->include array. Missing bounds check before array access."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              index = ...;
+              if (!pi->include[index]) { ... }
+          - pattern: |
+              index = ...;
+              pi->include[index] = ...;
+    metavariable-pattern:
+      metavariable: index
+      pattern-not: |
+        if (index >= pi->include_size) { ... }

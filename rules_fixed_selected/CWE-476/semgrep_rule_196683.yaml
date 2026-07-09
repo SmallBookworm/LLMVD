@@ -1,0 +1,27 @@
+rules:
+  - id: cve-2022-32202-null-pointer-dereference
+    message: "Potential NULL pointer dereference in FetchRegion due to missing null check on *m_pppImage[i]"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (*m_pppImage[$I]) {
+                FetchRegion(..., *m_pppImage[$I], ...);
+              } else {
+                ...
+              }
+          - pattern: |
+              if (*m_pppImage[$I]) {
+                FetchRegion(..., *m_pppImage[$I], ...);
+              } else {
+                ...
+              }
+    pattern-not-inside: |
+      if (*m_pppImage[$I]) {
+        FetchRegion(..., *m_pppImage[$I], ...);
+      } else {
+        memset(...);
+      }
+    metadata:
+      cwe: "CWE-476"

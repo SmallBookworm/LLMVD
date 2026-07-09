@@ -1,0 +1,27 @@
+rules:
+  - id: cve-2019-15807-sas-port-leak
+    message: "Memory leak in SAS expander discovery: sas_port not deleted on failure. This may lead to resource exhaustion and kernel BUG (CWE-401)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (res) {
+            ...
+            sas_put_device(...);
+            return NULL;
+          }
+      - pattern: |
+          if (res) {
+            ...
+            sas_put_device(...);
+          }
+    metavariable-pattern:
+      metavariable: res
+      pattern: "sas_discover_expander(...)"
+    pattern-not: |
+      if (res) {
+        ...
+        sas_port_delete(phy->port);
+        ...
+        return NULL;
+      }

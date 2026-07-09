@@ -1,0 +1,14 @@
+rules:
+  - id: cwe-125-yara-out-of-bounds-read
+    message: "Potential out-of-bounds read in yr_re_exec due to unsafe use of IS_WORD_CHAR macro on unvalidated input pointer."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              IS_WORD_CHAR(*$INPUT)
+          - pattern: |
+              IS_WORD_CHAR(*($INPUT - $INCR))
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2017-8294"

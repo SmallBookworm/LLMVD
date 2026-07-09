@@ -1,0 +1,33 @@
+rules:
+  - id: tensorflow_matrix_set_diag_null_pointer
+    message: "Missing validation for empty diag_index tensor may lead to null pointer dereference (CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (context->num_inputs() > kNumV1Inputs) {
+            ...
+            auto& diag_index = context->input(2);
+            OP_REQUIRES(context,
+                        TensorShapeUtils::IsScalar(diag_index.shape()) ||
+                            TensorShapeUtils::IsVector(diag_index.shape()),
+                        ...);
+            ...
+            lower_diag_index = diag_index.flat<int32>()(0);
+            ...
+          }
+      - pattern: |
+          if (context->num_inputs() > kNumV1Inputs) {
+            ...
+            const Tensor& diag_index = context->input(2);
+            OP_REQUIRES(context,
+                        TensorShapeUtils::IsScalar(diag_index.shape()) ||
+                            TensorShapeUtils::IsVector(diag_index.shape()),
+                        ...);
+            ...
+            lower_diag_index = diag_index.flat<int32>()(0);
+            ...
+          }
+    metavariable-regex:
+      metavariable: $...
+      regex: "((?!OP_REQUIRES\\s*\\(\\s*context\\s*,\\s*diag_index\\.NumElements\\(\\)\\s*>\\s*0).)*"

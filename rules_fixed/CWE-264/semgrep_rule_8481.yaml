@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2016-2440-binder-weak-ref-mishandling
+    message: "Unsafe use of weak reference without attempting to acquire a strong reference first in BR_TRANSACTION case. This may lead to use-after-free or privilege escalation (CVE-2016-2440)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (tr.target.ptr) {
+                  sp<BBinder> b((BBinder*)tr.cookie);
+                  ...
+              }
+          - pattern-regex: if\s*$$tr\.target\.ptr$$\s*\{[^}]*reinterpret_cast<BBinder*>$$tr\.cookie$$->[^}]*;\s*\}
+    metadata:
+      cwe: "CWE-264"
+      cve: "CVE-2016-2440"

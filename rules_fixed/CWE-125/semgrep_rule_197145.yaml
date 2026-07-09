@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2021-29521-negative-dense-shape
+    message: "Missing validation for negative values in dense_shape tensor may lead to out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              bool is_1d = shape.NumElements() == 1;
+              int num_batches = is_1d ? 1 : shape.flat<int64>()(0);
+          - pattern: |
+              int num_batches = ... ? 1 : shape.flat<int64>()(0);
+      - pattern-not-inside: |
+          for ($B = 0; $B < shape_vector.size(); $B++) {
+            OP_REQUIRES($..., shape_vector($B) >= 0, $...);
+          }
+    metavariable-pattern:
+      metavariable: shape
+      pattern: shape

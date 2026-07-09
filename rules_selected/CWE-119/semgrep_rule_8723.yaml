@@ -1,0 +1,18 @@
+rules:
+  - id: android_utf16_to_utf8_buffer_overflow
+    message: "Potential heap-based buffer overflow due to incorrect UTF-16 to UTF-8 conversion length handling."
+    severity: ERROR
+    languages: [c]
+    cwe: ["CWE-119"]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              ssize_t $SIZE = utf16_to_utf8_length($SRC, $UTF16_SIZE);
+              ...
+              $STR->resize($SIZE + 1);
+              utf16_to_utf8($SRC, $UTF16_SIZE, &((*$STR)[0]));
+          - pattern: |
+              ssize_t $SIZE = utf16_to_utf8_length($SRC, $UTF16_SIZE);
+              if ($SIZE < 0) { ... }
+              $STR->resize($SIZE + 1);
+              utf16_to_utf8($SRC, $UTF16_SIZE, &((*$STR)[0]));

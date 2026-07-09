@@ -1,0 +1,8 @@
+rules:
+  - id: imagemagick-psd-buffer-overread
+    message: "Heap-based buffer over-read in ParseImageResourceBlocks due to insufficient bounds check (CVE-2018-16412, CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if ((p+count) > (blocks+length))
+        break;

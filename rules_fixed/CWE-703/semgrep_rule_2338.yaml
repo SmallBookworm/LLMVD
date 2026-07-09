@@ -1,0 +1,21 @@
+rules:
+  - id: integer-overflow-snd-compr-allocate-buffer
+    message: Integer overflow possible in buffer size calculation. Missing overflow check before multiplication.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $fragment_size * $fragments
+    metavariable-pattern:
+      metavariable: $fragment_size
+      pattern: params->buffer.fragment_size
+    metavariable-pattern:
+      metavariable: $fragments
+      pattern: params->buffer.fragments
+    pattern-not-inside: |
+      if ($fragment_size == 0 ||
+          $fragments > SIZE_MAX / $fragment_size)
+        ...
+      ...
+      $fragment_size * $fragments
+    fix: ""

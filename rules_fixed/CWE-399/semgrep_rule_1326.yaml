@@ -1,0 +1,25 @@
+rules:
+  - id: yam_ioctl_uninitialized_struct_member
+    message: "Uninitialized struct member in yam_ioctl may leak kernel memory via SIOCYAMGCFG ioctl"
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: |
+                  case SIOCYAMGCFG:
+                    ...
+                    $YI.cfg.mask = ...;
+                    ...
+                    copy_to_user(..., &$YI, ...);
+              - metavariable-comparison:
+                  metavariable: $YI
+                  comparison: contains($YI, ".")
+          - pattern: |
+              case SIOCYAMGCFG:
+                ...
+                copy_to_user(..., &$YI, sizeof(struct yamdrv_ioctl_cfg));
+    metavariable-pattern:
+      $YI:
+        pattern-not: |
+          memset(&$YI, 0, ...);

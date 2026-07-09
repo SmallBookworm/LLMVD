@@ -1,0 +1,9 @@
+rules:
+  - id: nedmalloc-integer-overflow-calloc
+    message: Integer overflow in calloc-like function may lead to undersized allocation (CWE-189).
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      size_t no, size;
+      ...
+      no * size

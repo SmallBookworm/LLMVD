@@ -1,0 +1,25 @@
+rules:
+  - id: btrfs_clone_inline_extent_vulnerability
+    message: "Cloning inline extents without proper validation may lead to information disclosure or data loss (CVE-2015-8374)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (type == BTRFS_FILE_EXTENT_INLINE) {
+              ...
+              if (last_dest_end > 0) {
+                  ret = -EOPNOTSUPP;
+                  ...
+                  goto out;
+              }
+              ...
+          }
+      - pattern: |
+          if (type == BTRFS_FILE_EXTENT_INLINE) {
+              ...
+              ret = clone_copy_inline_extent(...);
+              ...
+          }
+    metavariable-regex:
+      metavariable: $func
+      regex: btrfs_clone

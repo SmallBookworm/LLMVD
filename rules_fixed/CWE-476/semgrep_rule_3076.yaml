@@ -1,0 +1,13 @@
+rules:
+  - id: cwe-476-null-deref-jpc_tsfb_synthesize
+    message: "Potential NULL pointer dereference due to missing check for empty sequence in jpc_tsfb_synthesize. Add a check for jas_seq2d_size(a) before dereferencing."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      (tsfb->numlvls > 0) ? jpc_tsfb_synthesize2(...)
+    fix-regex:
+      regex: ''
+      replacement: ''
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2016-10248"

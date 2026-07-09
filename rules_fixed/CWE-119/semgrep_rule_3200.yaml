@@ -1,0 +1,24 @@
+rules:
+  - id: imagemagick-tiff-buffer-overflow-cve-2016-10064
+    message: "Potential buffer overflow due to missing heap overflow check before memory allocation in TIFF image processing."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              number_pixels=(MagickSizeType) columns*rows;
+              if ((number_pixels*sizeof($TYPE)) != (MagickSizeType) ((size_t)
+                  (number_pixels*sizeof($TYPE))))
+                 {
+                   ...
+                 }
+          - pattern: |
+              number_pixels=(MagickSizeType) image->columns*image->rows;
+              if ((number_pixels*sizeof($TYPE)) != (MagickSizeType) ((size_t)
+                  (number_pixels*sizeof($TYPE))))
+                 {
+                   ...
+                 }
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2016-10064"

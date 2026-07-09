@@ -1,0 +1,15 @@
+rules:
+  - id: use-after-free-xacct-add-tsk
+    message: "Potential use-after-free vulnerability due to direct access of p->mm without proper reference counting. Use get_task_mm() and mmput() instead."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (p->mm) {
+            ...
+            $X = p->mm->$Y;
+            ...
+          }
+    metadata:
+      cwe: "CWE-399"
+      cve: "CVE-2012-3510"

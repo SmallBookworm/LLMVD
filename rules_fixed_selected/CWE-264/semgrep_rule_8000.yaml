@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2015-3845-parcel-appendfrom-bounds-check
+    message: "Parcel::appendFrom does not properly validate binder object boundaries, potentially allowing privilege escalation (CVE-2015-3845)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((off >= offset) && (off < offset + len)) {
+                ...
+              }
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: "appendFrom"
+    focus-metavariable: $FUNC

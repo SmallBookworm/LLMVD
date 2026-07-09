@@ -1,0 +1,14 @@
+rules:
+  - id: cwe-476-null-pointer-deref-libdwarf
+    message: "Potential NULL pointer dereference when accessing data->d_buf without checking for NULL. This can lead to a denial of service (CVE-2015-8750)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (data == NULL) {
+        ...
+        return ...;
+      }
+      *section_data = data->d_buf;
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2015-8750"

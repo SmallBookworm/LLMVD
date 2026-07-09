@@ -1,0 +1,27 @@
+rules:
+  - id: cve-2017-12989-resp-infinite-loop
+    message: "Missing assignment to *endp before returning in resp_get_length may cause infinite loop (CVE-2017-12989, CWE-835)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!saw_digit)
+              goto invalid;
+          ...
+          invalid:
+              return (-5);
+      - pattern: |
+          if (*bp != '\r')
+              goto invalid;
+          ...
+          invalid:
+              return (-5);
+      - pattern: |
+          if (*bp != '\n')
+              goto invalid;
+          ...
+          invalid:
+              return (-5);
+      - pattern: |
+          trunc:
+              return (-2);

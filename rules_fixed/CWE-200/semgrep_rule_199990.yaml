@@ -1,0 +1,32 @@
+rules:
+  - id: cve-2020-14093-imap-preauth-mitm
+    message: "Unencrypted PREAUTH response may lead to MITM attack (CVE-2020-14093)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (ascii_strncasecmp($BUF, "* PREAUTH", 9) == 0)
+          {
+            $...;
+            idata->state = IMAP_AUTHENTICATED;
+            $...;
+          }
+      - pattern: |
+          else if (ascii_strncasecmp($BUF, "* PREAUTH", 9) == 0)
+          {
+            $...;
+            idata->state = IMAP_AUTHENTICATED;
+            $...;
+          }
+    pattern-not-inside: |
+      #if defined(USE_SSL)
+      $...;
+      if (!idata->conn->ssf)
+      {
+        $...;
+        goto err_close_conn;
+      }
+      $...;
+      idata->state = IMAP_AUTHENTICATED;
+      $...;
+      #endif

@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2019-11810-missing-error-return
+    message: "Missing error return after megasas_create_frame_pool() failure may lead to NULL pointer dereference (CVE-2019-11810)"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (megasas_create_frame_pool($INSTANCE)) {
+              ...
+              megasas_free_cmds($INSTANCE);
+          }
+          return 0;
+    metadata:
+      cwe: ["CWE-476"]
+      references:
+        - https://github.com/torvalds/linux/commit/bcf3b67d16a4c8ffae0aa79de5853435e683945c
+        - https://nvd.nist.gov/vuln/detail/CVE-2019-11810

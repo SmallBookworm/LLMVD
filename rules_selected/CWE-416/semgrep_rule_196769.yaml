@@ -1,0 +1,10 @@
+rules:
+  - id: use-after-free-inspircd-silence
+    message: "Use-after-free vulnerability due to passing a reference to a temporary string via PushParamRef. Use PushParam instead to ensure proper copying."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: PushParamRef($FLAGS)
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2019-20918"

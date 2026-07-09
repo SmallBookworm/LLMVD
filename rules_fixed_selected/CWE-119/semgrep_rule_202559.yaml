@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2014-2270-oob-access
+    message: "Out-of-bounds memory access vulnerability due to incorrect OFFSET_OOB macro usage. This can lead to denial of service via crafted PE executables."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (nbytes < (offset + $SIZE))
+                  return 0;
+          - pattern: |
+              if (nbytes < offset)
+                  return 0;
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2014-2270"

@@ -1,0 +1,20 @@
+rules:
+  - id: tensorflow-quantize-axis-oob
+    message: "Potential out-of-bounds read in QuantizeAndDequantizeV* due to missing validation of 'axis' attribute."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              (*$OP.node_def.mutable_attr())["axis"].set_i($AXIS);
+              INFER_ERROR(..., $OP, ...);
+          - pattern: |
+              $OP.node_def.mutable_attr()->at("axis").set_i($AXIS);
+              INFER_ERROR(..., $OP, ...);
+    metavariable-patterns:
+      - metavariable: $AXIS
+        patterns:
+          - pattern-not: |
+              ($AXIS >= -1)
+    fix-regex:
+      enabled: false

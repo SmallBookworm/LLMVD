@@ -1,0 +1,16 @@
+rules:
+  - id: grub_memmove_buffer_overflow
+    message: "Potential heap-based buffer overflow in grub_disk_read due to missing bounds check before memcpy"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (buf)
+                grub_memcpy (buf, data + pos + real_offset, len);
+          - pattern: |
+              if (buf)
+                grub_memcpy (buf, tmp_buf + pos + real_offset, len);
+    metavariable-regex:
+      metavariable: $...
+    focus-metavariable: $...

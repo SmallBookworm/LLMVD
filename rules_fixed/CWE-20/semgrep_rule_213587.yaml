@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2018-14656-missing-usermode-check
+    message: Missing user mode and address validation before reading kernel memory in show_opcodes(), which may allow dumping arbitrary kernel memory via user-controlled RIP.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (probe_kernel_read(..., $RIP - ..., ...)) {
+            ...
+          }
+      - pattern: |
+          probe_kernel_read(..., $RIP - ..., ...)
+    metavariable-pattern:
+      metavariable: $RIP
+      pattern: $RIP
+      pattern-not: $REGS->ip
+    fix: null

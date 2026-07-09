@@ -1,0 +1,18 @@
+rules:
+  - id: cwe-125-hclge-vnet-base-sch-mode-oob
+    message: Missing bounds check on vport_id before using it as an index into tc_info array. This may lead to out-of-bounds read (CWE-125).
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      hclge_tm_pri_schd_mode_cfg($hdev, $vport->vport_id)
+    pattern-not: |
+      if ($vport->vport_id >= HNAE3_MAX_TC) { ... }
+    fix-regex:
+      regex: ''
+      replacement: ''
+    metadata:
+      cwe: ["CWE-125"]
+      cve: "CVE-2019-15925"
+    paths:
+      include:
+        - "drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.c"

@@ -1,0 +1,30 @@
+rules:
+  - id: cve-2015-0204-freak-attack
+    message: "Ephemeral RSA keys are allowed in non-export ciphersuites, which may lead to FREAK attack (CVE-2015-0204)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (alg & SSL_kRSA)
+              {
+              ...
+              }
+          - pattern: |
+              if (alg & SSL_kRSA)
+              {
+              ...
+              if ((rsa=RSA_new()) == NULL) { ... }
+              ...
+              }
+    pattern-not: |
+      if (alg & SSL_kRSA)
+      {
+      ...
+      if (!SSL_C_IS_EXPORT(s->s3->tmp.new_cipher))
+      {
+      ...
+      goto f_err;
+      }
+      ...
+      }

@@ -1,0 +1,24 @@
+rules:
+  - id: cwe-125-gxps-fonts-error-overwrite
+    message: "Potential heap-based buffer over-read due to overwriting GError after gxps_archive_read_entry failure. This may lead to undefined behavior or denial of service."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!$res) {
+                g_set_error($error, ...);
+                return NULL;
+              }
+          - pattern: |
+              if (!gxps_archive_read_entry(..., $error)) {
+                g_set_error($error, ...);
+                return NULL;
+              }
+    metavariable-pattern:
+      metavariable: $res
+      pattern: gxps_archive_read_entry(...)
+    fix-regex:
+      regex: .*
+      replacement: ''
+      count: 0

@@ -1,0 +1,14 @@
+rules:
+  - id: android-servicemanager-privilege-escalation
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($UID >= AID_APP) {
+                  return 0;
+              }
+    message: "Service registration is not properly restricted for application UIDs. Use multiuser_get_app_id(uid) to correctly identify app UIDs in multi-user environments."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-264"
+      cve: "CVE-2016-3900"

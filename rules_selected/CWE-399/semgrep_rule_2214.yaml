@@ -1,0 +1,14 @@
+rules:
+  - id: overlayfs-dentry-leak
+    patterns:
+      - pattern-either:
+          - pattern: |
+              out_cleanup:
+                  ovl_cleanup(..., newdentry);
+                  goto out;
+    message: "Dentry reference leak in overlayfs copy-up error path. 'out_cleanup' should goto 'out2' to properly release references."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-399"
+      cve: "CVE-2015-8953"

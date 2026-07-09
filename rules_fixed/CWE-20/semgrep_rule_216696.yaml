@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2017-7601-shift-exponent-too-large
+    message: "BitsPerSample is used in a bit-shift operation without validation, which may lead to undefined behavior (shift exponent too large)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              long top = 1L << $BITS;
+          - pattern: |
+              (1L << $BITS)
+    metavariable-pattern:
+      $BITS:
+        regex-not: '($X > 0 && $X <= 16) ? $X : 0'
+    fix-regex:
+      enabled: false

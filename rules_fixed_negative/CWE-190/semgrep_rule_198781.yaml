@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2017-1000158-integer-overflow
+    message: Potential integer overflow in PyBytes_DecodeEscape due to missing overflow check before multiplication.
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      Py_ssize_t newlen = recode_encoding ? 4*len : len;
+    metadata:
+      cwe: "CWE-190"
+      cve: "CVE-2017-1000158"

@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2010-5331-off-by-one-buffer-overflow
+    message: "Off-by-one buffer overflow due to incorrect range check (using '>' instead of '>=') before array access."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ($INDEX > MAX_SUPPORTED_TV_TIMING)
+            return false;
+      - pattern: |
+          if ($INDEX > MAX_SUPPORTED_TV_TIMING_V1_2)
+            return false;
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2010-5331"

@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2018-6556-lxc-user-nic-unchecked-open
+    message: "Unconditional open() of user-provided path in lxc-user-nic may allow path traversal or unintended side effects (CVE-2018-6556)."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              netns_fd = open(args.pid, O_RDONLY);
+          - pattern: |
+              netns_fd = open(..., O_RDONLY);
+    metadata:
+      cwe: "CWE-417"
+      cve: "CVE-2018-6556"
+      references:
+        - https://github.com/lxc/lxc/commit/5eb45428b312e978fb9e294dde16efb14dd9fa4d

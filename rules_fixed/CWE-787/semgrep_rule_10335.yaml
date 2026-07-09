@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2016-6351-esp-dma-oob-write
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($COND) {
+                  ...
+                  $DMA_READ($OPAQUE, &$CMDBUF[$CMDLEN], $LEN);
+                  ...
+              }
+          - pattern: |
+              if ($COND) {
+                  $DMA_READ($OPAQUE, &$CMDBUF[$CMDLEN], $LEN);
+                  ...
+              }
+    message: "Potential out-of-bounds write in ESP DMA command buffer. Missing bounds check on 'len' and 'cmdlen' before writing to 'cmdbuf'."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2016-6351"

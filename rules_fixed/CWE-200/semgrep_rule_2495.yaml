@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2017-13693-acpi-ds-create-operands-no-cache-flush
+    message: "Missing operand cache flush in AcpiDsCreateOperands may leak kernel memory (CVE-2017-13693, CWE-200)."
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          Cleanup:
+              ...
+              AcpiDsObjStackPopAndDelete($ArgCount, $WalkState);
+      - pattern: |
+          Cleanup:
+              ...
+              AcpiDsObjStackPopAndDelete(..., $WalkState);
+    metavariable-pattern:
+      metavariable: $ArgCount
+      pattern-not: NewNumOperands
+    fix: ""

@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2019-9578-uninitialized-memory-leak
+    message: "Potential uninitialized memory leak due to unsafe memcpy from response buffer without proper validation."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              memcpy (&$initresp, $resp, $resplen);
+          - pattern: |
+              memcpy($initresp, $resp, $resplen);
+    metavariable-pattern:
+      $initresp:
+        regex: "U2FHID_INIT_RESP"

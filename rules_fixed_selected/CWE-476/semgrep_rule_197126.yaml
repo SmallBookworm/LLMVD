@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2021-31257-null-pointer-dereference
+    message: "Potential NULL pointer dereference due to missing NULL check on esd->decoderConfig (CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (esd) {
+        ...
+        streamType = esd->decoderConfig->streamType;
+        ...
+      }

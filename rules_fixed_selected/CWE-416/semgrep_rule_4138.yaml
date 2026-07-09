@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2018-20836-use-after-free
+    message: "Use-after-free vulnerability due to race condition in smp_task_timedout(). The completion is called outside the lock without checking SAS_TASK_STATE_DONE, potentially leading to a use-after-free (CWE-416)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          spin_unlock_irqrestore(&task->task_state_lock, flags);
+          complete(&task->slow_task->completion);
+      - pattern: |
+          spin_unlock_irqrestore(...);
+          complete(...);
+    metavariable-pattern:
+      metavariable: task
+      pattern: $task

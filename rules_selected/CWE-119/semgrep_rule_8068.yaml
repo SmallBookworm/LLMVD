@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2016-3872-buffer-overflow-check
+    message: Potential buffer overflow due to insufficient bounds check before buffer usage.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($LEN > UINT32_MAX / 3) {
+                ...
+                return false;
+              } else if ($BUF->nAllocLen < $BUF->nFilledLen) {
+                ...
+                return false;
+              }
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2016-3872"

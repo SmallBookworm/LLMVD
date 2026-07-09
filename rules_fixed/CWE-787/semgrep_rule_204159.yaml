@@ -1,0 +1,13 @@
+rules:
+  - id: oniguruma_octal_overflow
+    message: "Octal value in regular expression may exceed 0xff, leading to heap out-of-bounds write (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      scan_unsigned_octal_number(...);
+      ...;
+      if (num < 0) return ...;
+    pattern-not: |
+      scan_unsigned_octal_number(...);
+      ...;
+      if (num < 0 || num >= 256) return ...;

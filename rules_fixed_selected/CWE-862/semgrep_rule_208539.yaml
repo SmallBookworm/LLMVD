@@ -1,0 +1,11 @@
+rules:
+  - id: af_isdn_raw_socket_missing_cap_net_raw
+    message: "AF_ISDN raw socket creation without CAP_NET_RAW check allows unprivileged users to create raw sockets (CVE-2019-17055)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (sock->type != SOCK_RAW)
+        return -ESOCKTNOSUPPORT;
+    metadata:
+      cwe: ["CWE-862"]
+      cve: "CVE-2019-17055"

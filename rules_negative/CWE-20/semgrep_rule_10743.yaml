@@ -1,0 +1,20 @@
+rules:
+  - id: stellaris_enet_buffer_overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              s->rx[n].len = size + 6;
+              p = s->rx[n].data;
+              *(p++) = (size + 6);
+              *(p++) = (size + 6) >> 8;
+              memcpy(p, buf, size);
+          - pattern: |
+              memcpy(p, buf, size);
+              ...
+              s->rx[n].len = size + 6;
+    message: "Missing check on 'size' before copying into fixed-size buffer 's->rx[n].data' may lead to buffer overflow (CWE-20)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2016-4001"

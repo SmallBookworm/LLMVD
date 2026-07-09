@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2019-6133-start-time-early-assignment
+    message: "Process start_time is recorded too early in copy_process(), making it predictable and bypassable. Move assignment after task visibility checks."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern: |
+          p->start_time = ktime_get_ns();
+          p->real_start_time = ktime_get_boot_ns();
+          ...
+          write_lock_irq(&tasklist_lock);
+    metadata:
+      cwe: "CWE-362"
+      cve: "CVE-2019-6133"

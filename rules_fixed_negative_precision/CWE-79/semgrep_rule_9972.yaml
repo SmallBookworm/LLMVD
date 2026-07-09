@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2016-5147-uxss-blink-scrolling
+    message: "Missing check for BlinkGenPropertyTreesEnabled() may lead to Universal XSS (UXSS) via mishandled deferred page loads."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              bool $HANDLED_SCROLL =
+                $LAYER->IsRootLayer() && $SCROLLING_COORDINATOR &&
+                $SCROLLING_COORDINATOR->UpdateCompositedScrollOffset(...);
+          - pattern: |
+              bool $HANDLED_SCROLL =
+                $LAYER->IsRootLayer() && $SCROLLING_COORDINATOR &&
+                $SCROLLING_COORDINATOR->UpdateCompositedScrollOffset($THIS);
+    metadata:
+      cwe: "CWE-79"
+      cve: "CVE-2016-5147"

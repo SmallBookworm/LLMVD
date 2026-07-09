@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2013-4563-udp6-ufo-fragment-headroom-check
+    message: "Incorrect headroom check in udp6_ufo_fragment may lead to integer underflow and kernel panic (CVE-2013-4563, CWE-189)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (skb_headroom($SKB) < ($TNL_HLEN + $FRAG_HDR_SZ)) {
+            ...
+          }
+    metadata:
+      cwe: ["CWE-189"]
+      cve: "CVE-2013-4563"
+      references:
+        - https://github.com/torvalds/linux/commit/0e033e04c2678dbbe74a46b23fffb7bb918c288e

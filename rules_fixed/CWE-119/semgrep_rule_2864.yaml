@@ -1,0 +1,28 @@
+rules:
+  - id: cve-2017-8070-stack-dma-buffer
+    message: "Stack-allocated buffer used for DMA memory test. This can cause memory corruption when CONFIG_VMAP_STACK is enabled. Use kmalloc instead."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $T $VAR = ...;
+          ...
+          catc_write_mem(..., & $VAR, ...);
+          ...
+          catc_read_mem(..., & $VAR, ...);
+      - pattern: |
+          $T $VAR = ...;
+          ...
+          catc_write_mem(..., &$VAR, ...);
+          ...
+          catc_read_mem(..., &$VAR, ...);
+    metavariable-pattern:
+      metavariable: $T
+      patterns:
+        - pattern: int
+        - pattern: u32
+        - pattern: unsigned int
+        - pattern: long
+        - pattern: u8
+        - pattern: char
+    focus-metavariable: $VAR

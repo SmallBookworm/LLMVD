@@ -1,0 +1,45 @@
+rules:
+  - id: freetype_integer_overflow_cve_2009_0946
+    message: "Potential integer overflow due to missing size check before bitmap allocation. This could lead to buffer overflows or arbitrary code execution."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (hmul)
+              {
+                width = width * 3;
+                ...
+              }
+              if (vmul)
+                height *= 3;
+              ...
+              $B->width = width;
+          - pattern: |
+              if (slot->library->lcd_filter_func)
+              {
+                ...
+                if (hmul)
+                {
+                  ...
+                  width += 3 * extra;
+                  ...
+                }
+                if (vmul)
+                {
+                  ...
+                  height += 3 * extra;
+                  ...
+                }
+              }
+              ...
+              $B->width = width;
+    metavariable-pattern:
+      metavariable: $B
+      pattern: FT_Bitmap
+    pattern-not: |
+      if (pitch > 0xFFFF || height > 0xFFFF)
+      {
+        ...
+        return ...;
+      }

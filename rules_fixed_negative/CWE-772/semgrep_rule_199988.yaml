@@ -1,0 +1,13 @@
+rules:
+  - id: memory-leak-msl-image
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $MSL_IMAGE = CloneImage(..., $EXCEPTION);
+              return ProcessMSLScript(..., &$MSL_IMAGE, $EXCEPTION);
+    message: "Memory leak detected: 'msl_image' is not destroyed before returning from the function."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-772"
+      cve: "CVE-2018-18544"

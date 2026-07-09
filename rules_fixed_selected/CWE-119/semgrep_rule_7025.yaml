@@ -1,0 +1,18 @@
+rules:
+  - id: brotli-integer-underflow-cve-2016-1624
+    message: "Potential integer underflow leading to buffer overflow in Brotli decompression (CVE-2016-1624). Missing underflow check before pointer arithmetic."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              const uint8_t *ringbuffer_end_minus_copy_length =
+                  s->ringbuffer_end - $I;
+          - pattern: |
+              const uint8_t *ringbuffer_end_minus_copy_length = s->ringbuffer_end - $I;
+    metavariable-pattern:
+      $I:
+        pattern-regex: \w+
+    fix-regex:
+      regex: .*
+      replacement: ""

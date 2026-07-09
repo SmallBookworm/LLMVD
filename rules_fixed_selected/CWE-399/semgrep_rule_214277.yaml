@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2012-2385-mosh-escape-sequence-loop
+    message: "Missing upper bound check on escape sequence parameter may lead to denial of service via large repeat count (CVE-2012-2385)."
+    severity: HIGH
+    languages: [c]
+    pattern: |
+      if ( ret < 1 ) ret = defaultval;
+    pattern-not: |
+      if ( ret > PARAM_MAX ) {
+        ret = defaultval;
+      }

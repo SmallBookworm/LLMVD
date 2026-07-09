@@ -1,0 +1,20 @@
+rules:
+  - id: openjpeg-out-of-bounds-include-access
+    message: "Missing bounds check before accessing pi->include array may lead to out-of-bounds read/write (CWE-20)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              index = ...;
+              if (!pi->include[index]) { ... }
+          - pattern: |
+              index = ...;
+              if (pi->include[index]) { ... }
+          - pattern: |
+              index = ...;
+              ... pi->include[index] ...
+    metavariable-pattern:
+      metavariable: index
+      pattern-not: |
+        if (index >= pi->include_size) { ... }

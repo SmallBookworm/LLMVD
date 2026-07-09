@@ -1,0 +1,25 @@
+rules:
+  - id: cve-2013-0166-null-pkey-check
+    message: "Missing NULL check for 'pkey' before use in ASN1_item_verify may lead to NULL pointer dereference (CVE-2013-0166)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      ASN1_item_verify(..., EVP_PKEY *pkey)
+      {
+        ...
+        if (!EVP_VerifyInit_ex($VERIFY_CTX$, pkey))
+        ...
+      }
+    pattern-not: |
+      ASN1_item_verify(..., EVP_PKEY *pkey)
+      {
+        ...
+        if (!pkey)
+        {
+          ...
+          return $RETVAL$;
+        }
+        ...
+        if (!EVP_VerifyInit_ex($VERIFY_CTX$, pkey))
+        ...
+      }

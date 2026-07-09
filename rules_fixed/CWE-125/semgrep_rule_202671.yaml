@@ -1,0 +1,26 @@
+rules:
+  - id: heap_buffer_overread_findnextborderpixel
+    message: "Heap-based buffer over-read in findNextBorderPixel due to missing bounds check before accessing pixel data."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              npx = ...;
+              npy = ...;
+              line = data + npy * wpl;
+              val = GET_DATA_BIT(line, npx);
+          - pattern: |
+              npx = ...;
+              npy = ...;
+              ... = data + npy * ...;
+              ... = GET_DATA_BIT(..., npx);
+    metavariable-pattern:
+      metavariable: $npx
+      pattern: "px + xpostab[...]"
+    metavariable-pattern:
+      metavariable: $npy
+      pattern: "py + ypostab[...]"
+    pattern-not: |
+      if (npx < 0 || npx >= ... || npy < 0 || npy >= ...)
+          continue;

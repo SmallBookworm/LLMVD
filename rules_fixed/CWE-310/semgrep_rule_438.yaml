@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2015-3197-ssl2-cipher-check
+    message: "SSLv2 allows use of disabled ciphers due to missing cipher suite validation. This may lead to cryptographic protection bypass (CVE-2015-3197)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $cp = ssl2_get_cipher_by_char($p);
+              if ($cp == NULL) {
+                ...
+              }
+          - pattern: |
+              if (ssl2_get_cipher_by_char($p) == NULL) {
+                ...
+              }
+    metavariable-patterns:
+      - metavariable: $cp
+        pattern-not: |
+          if ($cp == NULL || sk_SSL_CIPHER_find($s->session->ciphers, $cp) < 0) {
+            ...
+          }

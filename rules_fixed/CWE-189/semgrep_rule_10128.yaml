@@ -1,0 +1,23 @@
+rules:
+  - id: android_graphicbuffer_integer_overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              const size_t numFds = ...;
+              const size_t numInts = ...;
+              const size_t sizeNeeded = (10 + numInts) * sizeof(int);
+          - pattern: |
+              const size_t numFds = ...;
+              const size_t numInts = ...;
+              ... = numFds * sizeof(int);
+          - pattern: |
+              const size_t numFds = ...;
+              const size_t numInts = ...;
+              ... = numInts * sizeof(int);
+    pattern-not-regex: "const size_t maxNumber = UINT_MAX / sizeof\\(int\\);\\s*if \\(numFds >= maxNumber \\|\\| numInts >= \\(maxNumber - 10\\)\\) \\{"
+    message: "Potential integer overflow in GraphicBuffer::unflatten due to missing bounds check on numFds or numInts before multiplication (CWE-189)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: ["CWE-189"]
+      cve: ["CVE-2015-1474"]

@@ -1,0 +1,19 @@
+rules:
+  - id: haproxy_htx_add_header_integer_overflow
+    message: Missing length checks on header name and value in htx_add_header may lead to integer overflow and HTTP request smuggling (CVE-2021-40346).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          blk = htx_add_blk($HTX, HTX_BLK_HDR, $NAME.len + $VALUE.len);
+          ...
+          blk->info += ($VALUE.len << 8) + $NAME.len;
+      - pattern: |
+          $BLK = htx_add_blk($HTX, HTX_BLK_HDR, $NAME.len + $VALUE.len);
+          ...
+          $BLK->info += ($VALUE.len << 8) + $NAME.len;
+    metavariable-regex:
+      - metavariable: $NAME
+        regex: \w+
+      - metavariable: $VALUE
+        regex: \w+

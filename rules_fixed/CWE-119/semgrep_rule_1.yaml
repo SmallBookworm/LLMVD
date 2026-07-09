@@ -1,0 +1,18 @@
+rules:
+  - id: gnutls_session_get_data_buffer_overflow
+    message: "Buffer overflow vulnerability in gnutls_session_get_data due to incorrect size check ordering (CVE-2011-4128, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          *$SIZE = $PSIZE;
+          if ($PSIZE > *$SIZE) { ... }
+      - pattern: |
+          *$SIZE = $PSIZE;
+          if ($PSIZE > *$SIZE)
+            { ... }
+    metavariable-patterns:
+      - metavariable: $PSIZE
+        pattern: psession.size
+      - metavariable: $SIZE
+        pattern: session_data_size

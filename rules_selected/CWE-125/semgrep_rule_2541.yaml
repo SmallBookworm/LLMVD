@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2017-13036-ospfv3-buffer-overread
+    message: "Missing bounds check before accessing OSPFv3 hello_options field may lead to buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          EXTRACT_32BITS(&hellop->hello_options)
+      - pattern: |
+          bittok2str(ospf6_option_values, "none", EXTRACT_32BITS(&hellop->hello_options))
+    metavariable-pattern:
+      metavariable: hellop
+      pattern: |
+        (const struct hello6 *)((const uint8_t *)op + OSPF6HDR_LEN)
+    pattern-not-inside: |
+      ND_TCHECK_32BITS(&hellop->hello_options);
+      ...
+      EXTRACT_32BITS(&hellop->hello_options)

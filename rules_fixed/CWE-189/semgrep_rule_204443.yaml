@@ -1,0 +1,15 @@
+rules:
+  - id: libvncserver-divide-by-zero-scaling-factor
+    message: "Division by zero vulnerability in scaling factor handling. A zero scaling factor can cause a crash. Ensure the scaling factor is checked for zero before use."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              case rfbPalmVNCSetScaleFactor:
+                ...
+                rfbScalingSetup(..., ... / msg.ssc.scale, ...);
+          - pattern: |
+              case rfbSetScale:
+                ...
+                rfbScalingSetup(..., ... / msg.ssc.scale, ...);

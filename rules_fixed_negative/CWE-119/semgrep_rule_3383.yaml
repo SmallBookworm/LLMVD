@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2016-4796-buffer-overflow-color_cmyk_to_rgb
+    message: "Heap-based buffer overflow in color_cmyk_to_rgb due to missing component dimension validation. This may lead to out-of-bounds memory access when processing crafted .j2k files."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (image->numcomps < 4) return;
+      - pattern: |
+          if (image->numcomps < 4) { ... }
+    metavariable-pattern:
+      metavariable: image
+      pattern: opj_image_t *

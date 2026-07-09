@@ -1,0 +1,10 @@
+rules:
+  - id: lua_stack_shrink_vulnerability
+    message: "Potential heap-based buffer overflow due to unsafe stack shrinking logic (CWE-125, CVE-2020-15888)."
+    severity: HIGH
+    languages: [c]
+    pattern: |
+      int goodsize = inuse + (inuse / 8) + 2*EXTRA_STACK;
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2020-15888"

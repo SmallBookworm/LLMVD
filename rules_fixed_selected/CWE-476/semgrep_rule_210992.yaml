@@ -1,0 +1,14 @@
+rules:
+  - id: null_pointer_dereference_readvidimage
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $LABEL = InterpretImageProperties(...);
+              (void) SetImageProperty(..., $LABEL);
+              $LABEL = DestroyString($LABEL);
+    message: "Potential NULL pointer dereference. 'label' returned by InterpretImageProperties may be NULL and should be checked before use."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2019-12974"

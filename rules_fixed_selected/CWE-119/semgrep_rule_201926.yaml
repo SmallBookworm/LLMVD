@@ -1,0 +1,17 @@
+rules:
+  - id: ntp_nextvar_missing_length_check
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (len > 0)
+                  memcpy(name, cp, len);
+              name[len] = '\0';
+          - pattern: |
+              memcpy(name, cp, len);
+              name[len] = '\0';
+    message: "Missing length check before writing to 'name' buffer may lead to buffer overflow (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2015-7975"

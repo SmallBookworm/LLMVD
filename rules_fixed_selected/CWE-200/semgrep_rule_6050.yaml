@@ -1,0 +1,28 @@
+rules:
+  - id: cve-2013-0909-xss-auditor-sensitive-referer-leak
+    message: "Potential sensitive HTTP Referer information leak via XSS Auditor due to missing current directory restoration in layout tests."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          while (GetNextTest(..., &test_string)) {
+            ...
+            GURL test_url = GetURLForLayoutTest(...);
+            ...
+            main_runner_->Run();
+            if (!content::WebKitTestController::Get()->ResetAfterLayoutTest())
+              break;
+          }
+      - pattern: |
+          if (layout_test_mode) {
+            ...
+            while (GetNextTest(...)) {
+              ...
+              main_runner_->Run();
+              ...
+            }
+            ...
+          }
+    metavariable-pattern:
+      metavariable: test_string
+      pattern: $TEST_STRING

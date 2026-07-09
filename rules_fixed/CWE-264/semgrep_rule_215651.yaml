@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2011-4110-null-deref-user-key-update
+    message: "NULL pointer dereference in user_update due to missing null check before kfree_rcu. This can lead to a kernel oops when updating a negative key."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: $key->payload.data
+              - pattern: kfree_rcu($key->payload.data, ...)
+          - pattern: kfree_rcu($key->payload.data, ...)
+    metadata:
+      cwe: "CWE-264"
+      cve: "CVE-2011-4110"

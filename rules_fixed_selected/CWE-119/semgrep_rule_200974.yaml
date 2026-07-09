@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2018-10881-ext4-inline-data-clear
+    message: "Missing memset of ei->i_data when destroying inline data may lead to out-of-bounds access (CVE-2018-10881)"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              memset((void *)ext4_raw_inode(...)->i_block, 0, EXT4_MIN_INLINE_DATA_SIZE);
+              ...
+              if (ext4_has_feature_extents(...)) { ... }
+          - pattern: |
+              memset((void *)ext4_raw_inode(...)->i_block, 0, EXT4_MIN_INLINE_DATA_SIZE);
+              ...
+              ext4_clear_inode_flag(..., EXT4_INODE_INLINE_DATA);
+    pattern-not: |
+      memset((void *)ext4_raw_inode(...)->i_block, 0, EXT4_MIN_INLINE_DATA_SIZE);
+      memset(...->i_data, 0, EXT4_MIN_INLINE_DATA_SIZE)

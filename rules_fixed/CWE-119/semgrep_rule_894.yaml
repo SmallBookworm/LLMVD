@@ -1,0 +1,14 @@
+rules:
+  - id: g2m_buffer_allocation_cwe119
+    message: "Insufficient buffer allocation may lead to out-of-bounds access (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      c->framebuf_stride = FFALIGN($WIDTH * 3, 16);
+      aligned_height = FFALIGN($HEIGHT, 16);
+    fix-regex:
+      regex: ''
+      replacement: ''
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2013-7022"

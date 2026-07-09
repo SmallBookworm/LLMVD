@@ -1,0 +1,8 @@
+rules:
+  - id: cve-2013-6634-session-fixation
+    message: "Use of original_url() instead of url() for realm validation may lead to session fixation (CVE-2013-6634, CWE-287)."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      if (!gaia::IsGaiaSignonRealm(request->original_url().GetOrigin()))
+        return;

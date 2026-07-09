@@ -1,0 +1,25 @@
+rules:
+  - id: cve-2012-5670-bdf-negative-encoding
+    message: "Negative ENCODING value may lead to out-of-bounds write (CVE-2012-5670, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (p->glyph_enc < -1)
+        p->glyph_enc = -1;
+      ...
+      if (p->glyph_enc == -1 && ...)
+        p->glyph_enc = _bdf_atol(...);
+      ...
+      if (p->glyph_enc < -1)
+        p->glyph_enc = -1;
+    pattern-not: |
+      if (p->glyph_enc < -1)
+        p->glyph_enc = -1;
+      ...
+      if (p->glyph_enc == -1 && ...)
+        p->glyph_enc = _bdf_atol(...);
+      if (p->glyph_enc < -1)
+        p->glyph_enc = -1;
+    metadata:
+      fix-regex:
+        enabled: false

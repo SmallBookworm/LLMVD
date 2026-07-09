@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2015-8629-xdr-nullstring-missing-null-check
+    message: "xdr_nullstring does not validate that decoded strings are properly null-terminated or lack internal null bytes, leading to potential out-of-bounds reads (CVE-2015-8629)."
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!xdr_opaque(xdrs, *objp, size))
+              return FALSE;
+          return TRUE;
+      - pattern: |
+          return (xdr_opaque(xdrs, *objp, size));
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern: xdr_nullstring(...)
+    fix-regex:
+      regex: ""
+      replacement: ""

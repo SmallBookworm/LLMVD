@@ -1,0 +1,7 @@
+rules:
+  - id: mruby_clone_null_dereference_cwe476
+    message: "Unsafe flag copying in mrb_obj_clone may lead to NULL pointer dereference (CWE-476). Only MRB_FLAG_IS_FROZEN should be copied."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      p->flags = mrb_obj_ptr(...)->flags;

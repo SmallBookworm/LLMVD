@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2016-3951-double-free
+    message: "Missing cleanup of work and timer in error path may lead to double free (CVE-2016-3951)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              goto out1;
+              ...
+              out1:
+              free_netdev(...);
+          - pattern: |
+              goto out1;
+              ...
+              out1:
+              if (...) info->unbind(...);
+              free_netdev(...);
+    metavariable-patterns:
+      - metavariable: $FUNC
+        patterns:
+          - pattern: usbnet_probe
+    fix-regex:
+      enabled: false

@@ -1,0 +1,15 @@
+rules:
+  - id: cwe-125-out-of-bounds-read-v8
+    message: "Potential out-of-bounds read due to missing validation before dereferencing preferred_match()"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!...->IsNewLogin()) {
+                ...->Update(*...->preferred_match());
+                ...
+              }
+    metadata:
+      cwe: ["CWE-125"]
+      cve: "CVE-2018-6143"

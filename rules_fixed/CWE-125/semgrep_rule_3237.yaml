@@ -1,0 +1,27 @@
+rules:
+  - id: cve-2016-9935-wddx-empty-boolean
+    message: "Out-of-bounds read vulnerability in WDDX boolean element handling when attributes are missing or empty (CVE-2016-9935, CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!strcmp(name, EL_BOOLEAN)) {
+            ...
+            if (atts) for (...; ...; ...) {
+              if (!strcmp(atts[...], EL_VALUE) && atts[...] && atts[...][0]) {
+                ...
+              }
+            }
+          }
+      - pattern: |
+          if (name && !strcmp(name, EL_BOOLEAN)) {
+            ...
+            if (atts) for (...; ...; ...) {
+              if (!strcmp(atts[...], EL_VALUE) && atts[...] && atts[...][0]) {
+                ...
+              }
+            }
+          }
+    metavariable-pattern:
+      metavariable: name
+      pattern: "..."

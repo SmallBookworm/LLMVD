@@ -1,0 +1,35 @@
+rules:
+  - id: cwe-704-type-confusion-skia-output-surface
+    message: Potential type confusion due to unsafe handling of SkSurfaceCharacterization pointer in Reshape function.
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              SkSurfaceCharacterization* characterization = nullptr;
+              ...
+              if (characterization_.isValid()) {
+                ...
+                characterization_ = characterization_.createResized(...);
+                ...
+              } else {
+                characterization = &characterization_;
+                ...
+              }
+              ...
+              base::BindOnce(..., characterization, ...);
+          - pattern: |
+              SkSurfaceCharacterization* characterization = nullptr;
+              ...
+              if (characterization_.isValid()) {
+                characterization_ = characterization_.createResized(...);
+                ...
+              } else {
+                characterization = &characterization_;
+                ...
+              }
+              ...
+              base::BindOnce(..., characterization, ...);
+    metadata:
+      cwe: "CWE-704"
+      cve: "CVE-2017-5094"

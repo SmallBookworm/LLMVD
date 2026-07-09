@@ -1,0 +1,21 @@
+rules:
+  - id: mbedtls-buffer-overread-cve-2018-9989
+    message: "Potential buffer over-read due to unsafe bounds check in ssl_parse_server_psk_hint. Use 'ptr > end - len' instead of 'ptr + len > end' to prevent integer overflow."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($PTR + $LEN > $END) {
+                ...
+              }
+          - pattern: |
+              if (($PTR + $LEN) > $END) {
+                ...
+              }
+    metavariable-patterns:
+      - metavariable: $PTR
+        pattern: "*p"
+      - metavariable: $END
+        pattern: "end"
+    focus-metavariable: $PTR

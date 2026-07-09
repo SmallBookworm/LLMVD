@@ -1,0 +1,21 @@
+rules:
+  - id: cwe-190-integer-overflow-sei-user-data
+    message: "Potential integer overflow leading to out-of-bounds write in SEI user data parsing. Missing bounds check on u4_payload_size before use in loop."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              case SEI_USER_DATA_REGISTERED_ITU_T_T35:
+                  ... 
+                  ihevcd_parse_user_data_registered_itu_t_t35(..., $SIZE);
+                  ...
+          - pattern: |
+              case SEI_USER_DATA_REGISTERED_ITU_T_T35:
+                  ... 
+                  for($I = 0; $I < $SIZE; $I++)
+                      ihevcd_bits_flush(..., 8);
+                  ...
+    metavariable-pattern:
+      $SIZE:
+        pattern-inside: "UWORD32 ..."

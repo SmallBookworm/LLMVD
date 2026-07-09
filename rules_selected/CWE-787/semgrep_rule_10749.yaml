@@ -1,0 +1,11 @@
+rules:
+  - id: cwe-787-strncpy-buffer-overflow
+    message: "Use of strncpy without ensuring null termination may lead to buffer overflow (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: "strncpy($STR, $SRC, $LEN);"
+      - pattern: "strncpy($STR, \"$CONST_STR\", $LEN);"
+    metadata:
+      cwe: ["CWE-787"]
+      cve: ["CVE-2018-11593"]

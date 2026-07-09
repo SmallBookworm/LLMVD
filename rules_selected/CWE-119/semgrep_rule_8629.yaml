@@ -1,0 +1,10 @@
+rules:
+  - id: sonivox-stack-overflow-cve-2017-0541
+    message: "Stack overflow vulnerability due to incorrect boundary check before writing to stack array. This can lead to memory corruption and remote code execution (CVE-2017-0541, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (*$PTR >= $SIZE)
+        ...
+      *$PTR = *$PTR + 1;
+      $STACK[*$PTR] = $VALUE;

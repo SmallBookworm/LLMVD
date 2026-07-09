@@ -1,0 +1,26 @@
+rules:
+  - id: cve-2018-16513-type-confusion-setcolor
+    message: "Potential type confusion in setcolor due to incorrect handling of dict_find_string return value, which may lead to use of uninitialized or invalid pattern data (CVE-2018-16513)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (r_has_type(..., t_dictionary)) {
+                  ...
+                  code = dict_find_string(..., ..., ...);
+                  if (code != 0) {
+                      ...
+                  }
+              }
+          - pattern: |
+              if (r_has_type(..., t_dictionary)) {
+                  ...
+                  code = dict_find_string(..., ..., ...);
+                  if (code) {
+                      ...
+                  }
+              }
+    metavariable-pattern:
+      metavariable: code
+      pattern: 'code'

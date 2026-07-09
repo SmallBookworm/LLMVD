@@ -1,0 +1,25 @@
+rules:
+  - id: uninitialized_struct_memory_leak
+    patterns:
+      - pattern-either:
+          - pattern: |
+              struct sockaddr_ec *sec = (struct sockaddr_ec *)...;
+              ...
+              sec->sec_family = ...;
+              sec->port = ...;
+              sec->addr.station = ...;
+              sec->addr.net = ...;
+          - pattern: |
+              struct sockaddr_ec *sec = (struct sockaddr_ec *)...;
+              ...
+              sec->sec_family = ...;
+              sec->port = ...;
+              sec->addr = ...;
+    pattern-not: |
+      memset(sec, 0, sizeof(*sec));
+    message: "Uninitialized struct may leak kernel memory to user space. Missing memset initialization before assignment."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2009-3001"

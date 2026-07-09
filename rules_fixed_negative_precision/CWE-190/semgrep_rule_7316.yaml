@@ -1,0 +1,12 @@
+rules:
+  - id: integer-overflow-buffer-allocation
+    patterns:
+      - pattern-either:
+          - pattern: "StringBuffer<LChar> buffer(partial_sequence_size_ + length);"
+          - pattern: "StringBuffer<UChar> buffer16(partial_sequence_size_ + length);"
+    message: "Integer overflow possible in buffer allocation due to unchecked addition. Use base::CheckAdd to prevent overflow."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-190"
+      cve: "CVE-2018-18341"

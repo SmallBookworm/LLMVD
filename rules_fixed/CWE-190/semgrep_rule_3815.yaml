@@ -1,0 +1,9 @@
+rules:
+  - id: cve-2017-18255-perf-cpu-time-max-percent-handler
+    message: Use of 'proc_dointvec' without bounds checking may lead to integer overflow. Use 'proc_dointvec_minmax' instead.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          proc_dointvec($TABLE, $WRITE, $BUFFER, $LENP, $PPOS)
+    fix: ""

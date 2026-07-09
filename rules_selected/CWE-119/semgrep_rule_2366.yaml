@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2017-17857-missing-error-return-check-stack-boundary
+    message: Missing error return after detecting invalid variable stack read, which may lead to memory corruption (CVE-2017-17857).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!tnum_is_const($REG.var_off)) {
+              ...
+              verbose(...);
+          }
+          $OFF = $REG.off + $REG.var_off.value;
+      - pattern: |
+          if (!tnum_is_const($REG->var_off)) {
+              ...
+              verbose(...);
+          }
+          $OFF = $REG->off + $REG->var_off.value;
+    metavariable-pattern:
+      metavariable: $REG
+      pattern: regs[$REGNO]

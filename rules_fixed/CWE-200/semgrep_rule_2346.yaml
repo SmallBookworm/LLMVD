@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2017-1000380-uninitialized-queue-indices
+    message: Missing reset of queue indices (qhead, qtail, qused) before reallocating queue buffers in snd_timer_user_tselect may lead to disclosure of uninitialized kernel memory.
+    severity: HIGH
+    languages: [c]
+    pattern: |
+      $TU->qhead = $TU->qtail = $TU->qused = 0;
+    pattern-not-inside: |
+      kfree($TU->queue);
+      $TU->queue = NULL;
+      kfree($TU->tqueue);
+      $TU->tqueue = NULL;
+      if ($TU->tread) { ... }
+    pattern-not-inside: |
+      kfree($TU->tqueue);
+      $TU->tqueue = NULL;
+      kfree($TU->queue);
+      $TU->queue = NULL;
+      if ($TU->tread) { ... }
+    metavariable-regex:
+      metavariable: $TU
+      regex: tu

@@ -1,0 +1,44 @@
+rules:
+  - id: imagemagick-psd-out-of-bounds-read
+    message: "Potential out-of-bounds read in ReadPSDChannelPixels due to unsafe pixel processing loop (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          for (x=0; x < (ssize_t) image->columns; x++)
+          {
+            ...
+            if (image->depth == 1)
+            {
+              ...
+              for (bit=0; bit < number_bits; bit++)
+              {
+                ...
+                q+=GetPixelChannels(image);
+                x++;
+              }
+              x--;
+              continue;
+            }
+            ...
+            q+=GetPixelChannels(image);
+          }
+      - pattern: |
+          for (x=0; x < (ssize_t) image->columns; x++)
+          {
+            ...
+            if (image->depth == 1)
+            {
+              ...
+              for (bit = 0; bit < number_bits; bit++)
+              {
+                ...
+                q+=GetPixelChannels(image);
+                x++;
+              }
+              x--;
+              continue;
+            }
+            ...
+            q+=GetPixelChannels(image);
+          }

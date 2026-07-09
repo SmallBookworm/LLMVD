@@ -1,0 +1,21 @@
+rules:
+  - id: tor-v2-onion-logging-missing
+    message: "Missing warning log for v2 onion address connection. This may lead to privacy issues as described in CVE-2021-39246 (CWE-532)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (addresstype == ONION_V2_HOSTNAME ||
+              addresstype == ONION_V3_HOSTNAME) {
+            ...
+            return connection_ap_handle_onion(..., addresstype);
+          }
+      - pattern: |
+          tor_assert(addresstype == ONION_V2_HOSTNAME ||
+                     addresstype == ONION_V3_HOSTNAME);
+          ...
+          return connection_ap_handle_onion(..., addresstype);
+    pattern-not: |
+      if (addresstype == ONION_V2_HOSTNAME) {
+        log_warn(...);
+      }

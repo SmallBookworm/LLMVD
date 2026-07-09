@@ -1,0 +1,16 @@
+rules:
+  - id: libevent-name-parse-out-of-bounds-read
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (cp + $LABEL_LEN >= $END) return -1;
+              memcpy($CP, $PACKET + $J, $LABEL_LEN);
+          - pattern: |
+              if (cp + $LABEL_LEN >= end) return -1;
+              memcpy(cp, packet + j, $LABEL_LEN);
+    message: "Missing bounds check on 'j + label_len' before memcpy may lead to out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2016-10195"

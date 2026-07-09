@@ -1,0 +1,14 @@
+rules:
+  - id: use-after-free-chrome-media-stream
+    message: Potential use-after-free vulnerability due to missing thread stop after posting task with base::Unretained(this).
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($THREAD.IsRunning()) {
+                $THREAD.message_loop()->PostTask(..., base::Bind(..., base::Unretained(this)));
+              } else { ... }
+    metadata:
+      cwe: "CWE-399"
+      cve: "CVE-2012-2817"

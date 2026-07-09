@@ -1,0 +1,26 @@
+rules:
+  - id: cve-2018-18955-userns-idmap-missing-reverse-mapping
+    message: "Missing mapping of reverse extents in user namespace ID mapping may lead to privilege escalation (CVE-2018-18955)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          sort_idmaps(&new_map);
+          ...
+          for ($X; $Y; $Z) {
+            ...
+            e = &new_map.forward[$A];
+            ...
+            e->lower_first = map_id_range_down(...);
+          }
+      - pattern: |
+          ret = sort_idmaps(&new_map);
+          if (ret < 0)
+            goto ...;
+          ...
+          for ($X; $Y; $Z) {
+            ...
+            e = &new_map.forward[$A];
+            ...
+            e->lower_first = map_id_range_down(...);
+          }

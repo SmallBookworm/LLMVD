@@ -1,0 +1,25 @@
+rules:
+  - id: cve-2017-13025-buffer-overread
+    message: Buffer over-read vulnerability in IPv6 mobility parser due to missing bounds check before accessing bp[i+2] for IP6MOPT_ALTCOA option.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              case IP6MOPT_ALTCOA:
+                if (len - i < IP6MOPT_ALTCOA_MINLEN) {
+                  ...
+                  goto trunc;
+                }
+                ND_PRINT((..., ip6addr_string(..., &bp[i+2])));
+          - pattern-inside: |
+              case IP6MOPT_ALTCOA:
+                if (len - i < IP6MOPT_ALTCOA_MINLEN) {
+                  ...
+                  goto trunc;
+                }
+                ...
+          - pattern: ip6addr_string(..., &bp[i+2])
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2017-13025"

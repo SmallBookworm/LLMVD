@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2013-4149-virtio-net-buffer-overflow
+    message: Buffer overflow in virtio_net_load due to insufficient allocation before calling qemu_get_buffer. The allocated buffer size is 'n->mac_table.in_use', but 'n->mac_table.in_use * ETH_ALEN' bytes are read, which can lead to out-of-bounds write (CWE-119).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          uint8_t *buf = g_malloc0($SIZE);
+          ...
+          qemu_get_buffer($F, buf, $SIZE * $ETH_ALEN);
+    metavariable-pattern:
+      $ETH_ALEN: "ETH_ALEN"

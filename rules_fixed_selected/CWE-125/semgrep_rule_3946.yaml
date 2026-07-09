@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2019-15141-tiff-writedirectory-check
+    message: "Missing check for TIFFWriteDirectory return value may lead to heap-based buffer over-read (CVE-2019-15141, CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      (void) TIFFWriteDirectory($TIFF);
+    fix-regex:
+      regex: "(void) TIFFWriteDirectory\\(([^)]+)\\);"
+      replacement: "if (TIFFWriteDirectory($1) == 0)\n      {\n        status=MagickFalse;\n        break;\n      }"

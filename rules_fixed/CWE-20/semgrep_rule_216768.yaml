@@ -1,0 +1,15 @@
+rules:
+  - id: dovecot-snippet-null-deref
+    message: "Missing size check may lead to out-of-bounds read when data is empty. This can cause a denial of service (CVE-2020-7957)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (size >= 3 && ...)
+                ...
+              if (data[0] == '\0') ...
+          - pattern: |
+              if (size >= 3 && ...)
+                ...
+              if (i_isspace(*data)) ...

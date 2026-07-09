@@ -1,0 +1,13 @@
+rules:
+  - id: exim-string-vformat-buffer-overflow
+    message: "Potential heap-based buffer overflow in string_vformat due to insufficient buffer growth. This could lead to remote code execution (CVE-2019-16928, CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          gstring_grow($G, $PTR, $WIDTH - ($LIM - $PTR));
+      - pattern: |
+          gstring_grow($G, $PTR, $PRECISION + 8 - ($LIM - $PTR));
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2019-16928"

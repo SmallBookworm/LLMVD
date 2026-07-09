@@ -1,0 +1,8 @@
+rules:
+  - id: cve-2014-1700-use-after-free-indicator
+    message: "Potential use-after-free vulnerability due to improper handling of utterance data structure (CVE-2014-1700, CWE-399)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      !base::CommandLine::ForCurrentProcess()->HasSwitch(
+          keyboard::switches::kDisableSmartVirtualKeyboard)

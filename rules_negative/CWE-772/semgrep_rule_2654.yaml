@@ -1,0 +1,17 @@
+rules:
+  - id: imagemagick-write-map-memory-leak
+    message: "Memory leak in WriteMAPImage: allocated memory for 'colormap' or 'pixels' is not properly freed on allocation failure."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ((pixels == (unsigned char *) NULL) ||
+              (colormap == (unsigned char *) NULL))
+            ThrowWriterException(...);
+      - pattern: |
+          if ((colormap == (unsigned char *) NULL) ||
+              (pixels == (unsigned char *) NULL))
+            ThrowWriterException(...);
+    metadata:
+      cwe: "CWE-772"
+      cve: "CVE-2017-12663"

@@ -1,0 +1,10 @@
+rules:
+  - id: tensorflow_unsafe_tensor_slice_construction
+    message: "Unsafe direct construction of TensorSlice from unvalidated TensorSliceProto may lead to undefined behavior or crashes (CVE-2021-41203)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      TensorSlice($TSP)
+    metadata:
+      cwe: "CWE-345"
+      cve: "CVE-2021-41203"

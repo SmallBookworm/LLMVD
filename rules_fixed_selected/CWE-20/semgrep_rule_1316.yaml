@@ -1,0 +1,17 @@
+rules:
+  - id: nfs_can_extend_write_missing_page_uptodate_check
+    message: "Missing check for up-to-date page before extending write with delegation, which may lead to reading stale kernel memory (CVE-2014-2038)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (NFS_PROTO(inode)->have_delegation(inode, FMODE_WRITE))
+                  return 1;
+              if (nfs_write_pageuptodate(page, inode) && ...)
+                  return 1;
+    metadata:
+      cwe: ["CWE-20"]
+      references:
+        - https://github.com/torvalds/linux/commit/263b4509ec4d47e0da3e753f85a39ea12d1eff24
+        - CVE-2014-2038

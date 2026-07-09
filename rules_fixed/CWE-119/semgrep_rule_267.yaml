@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2010-2499-buffer-overflow
+    message: "Missing error check after FT_Stream_Read may lead to buffer overflow (CVE-2010-2499, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              FT_Stream_Read($$, $$, $rlen);
+              $pfb_pos += $rlen;
+          - pattern: |
+              error = FT_Stream_Read($$, $$, $rlen);
+              $pfb_pos += $rlen;
+    metavariable-pattern:
+      metavariable: $rlen
+      pattern:
+        patterns:
+          - pattern-either:
+              - pattern: "FT_Long"
+              - pattern: "$T"

@@ -1,0 +1,25 @@
+rules:
+  - id: nethack_escapes_vulnerability
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (*cp == '\\' && cp[1] && index("0123456789xXoO", cp[1]) && cp[2]) {
+                ...
+                for (; *cp && (index("0123456789",*cp)) && (dcount++ < 3); cp++)
+                  ...
+              }
+          - pattern: |
+              if (*cp == '\\' && cp[1] && index("0123456789xXoO", cp[1]) && cp[2]) {
+                ...
+                for (++cp; *cp && (index("01234567",*cp)) && (dcount++ < 3); cp++)
+                  ...
+              }
+          - pattern: |
+              if (*cp == '\\' && cp[1] && index("0123456789xXoO", cp[1]) && cp[2]) {
+                ...
+                for (++cp; *cp && (dp = index(hex, *cp)) && (dcount++ < 2); cp++)
+                  ...
+              }
+    message: "Vulnerable escapes() function may mishandle trailing backslash with a single digit, leading to potential security issues (CVE-2020-5253, CWE-269)."
+    severity: WARNING
+    languages: [c]

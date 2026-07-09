@@ -1,0 +1,26 @@
+rules:
+  - id: rpza_decode_stream-out-of-bounds-write
+    message: "Potential out-of-bounds write in rpza_decode_stream due to missing ADVANCE_BLOCK() before pixel buffer access. This may lead to denial of service or arbitrary code execution."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while (n_blocks--) {
+                  block_ptr = row_ptr + pixel_ptr;
+                  ...
+              }
+          - pattern: |
+              while (n_blocks--) {
+                  for (...; ...; ...) {
+                      for (...; ...; ...) {
+                          pixels[block_ptr] = ...;
+                          ...
+                      }
+                      ...
+                  }
+              }
+    metavariable-pattern:
+      metavariable: block_ptr
+      pattern: row_ptr + pixel_ptr
+    focus-metavariable: block_ptr

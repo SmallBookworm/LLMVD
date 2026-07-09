@@ -1,0 +1,18 @@
+rules:
+  - id: cwe-190-integer-overflow-bplist
+    message: Integer overflow when calculating offset table size may lead to heap-based buffer over-read.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (num_objects * offset_size < num_objects) {
+                  ...
+              }
+          - pattern: |
+              if ((uint64_t)offset_table + num_objects * offset_size > (uint64_t)end_data) {
+                  ...
+              }
+    metadata:
+      cwe: ["CWE-190"]
+      cve: "CVE-2017-7982"

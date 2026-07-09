@@ -1,0 +1,14 @@
+rules:
+  - id: psensor-directory-traversal
+    patterns:
+      - pattern-either:
+          - pattern: |
+              create_response_file(..., $FPATH);
+          - pattern: |
+              resp = create_response_file(..., $FPATH);
+    message: "Potential directory traversal vulnerability due to missing validation that the resolved file path is within the webserver directory."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-22"
+      cve: "CVE-2014-10073"

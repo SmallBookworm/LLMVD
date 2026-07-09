@@ -1,0 +1,13 @@
+rules:
+  - id: unchecked-fputc-call
+    message: "fputc return value is not checked, which may lead to silent write failures and denial of service (CWE-20)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          fputc(..., ...);
+      - pattern: |
+          (void) fputc(..., ...);
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2018-16643"

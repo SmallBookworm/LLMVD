@@ -1,0 +1,12 @@
+rules:
+  - id: comedi_infoleak
+    patterns:
+      - pattern-either:
+          - pattern: memcpy(devinfo.driver_name, ..., COMEDI_NAMELEN);
+          - pattern: memcpy(devinfo.board_name, ..., COMEDI_NAMELEN);
+    message: "Use of memcpy with COMEDI_NAMELEN may leak kernel memory; use strlcpy instead."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2011-2909"

@@ -1,0 +1,18 @@
+rules:
+  - id: wget-cve-2017-13090-negative-chunk-size
+    patterns:
+      - pattern-either:
+          - pattern: |
+              remaining_chunk_size = strtol(...);
+              ...
+              if (remaining_chunk_size == 0) { ... }
+          - pattern: |
+              remaining_chunk_size = strtol(...);
+              ...
+              rdsize = MIN(remaining_chunk_size, ...);
+    message: "Missing check for negative chunk size in HTTP chunked transfer encoding may lead to heap overflow (CVE-2017-13090)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2017-13090"

@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2020-1730-null-deref-aes-ctr-cleanup
+    patterns:
+      - pattern-either:
+          - pattern: |
+              explicit_bzero(cipher->aes_key, sizeof(*cipher->aes_key));
+              SAFE_FREE(cipher->aes_key);
+    message: "Potential NULL pointer dereference in aes_ctr_cleanup. Missing NULL check for 'cipher' or 'cipher->aes_key' before calling explicit_bzero."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2020-1730"

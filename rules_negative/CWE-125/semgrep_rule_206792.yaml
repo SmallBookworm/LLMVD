@@ -1,0 +1,22 @@
+rules:
+  - id: freerdp-oob-read-irp-write
+    patterns:
+      - pattern-either:
+          - pattern: |
+              Stream_Read_UINT32($IRP->input, $LENGTH);
+              Stream_Read_UINT64($IRP->input, $OFFSET);
+              Stream_Seek($IRP->input, 20);
+              ...
+              $JOB->Write($JOB, Stream_Pointer($IRP->input), $LENGTH);
+          - pattern: |
+              Stream_Read_UINT32($IRP->input, $LENGTH);
+              Stream_Read_UINT64($IRP->input, $OFFSET);
+              Stream_Seek($IRP->input, 20);
+              ...
+              printjob->Write(printjob, Stream_Pointer($IRP->input), $LENGTH);
+    message: "Potential out-of-bounds read due to missing input length validation before using Stream_Pointer with Length. See CVE-2020-11089."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-125"
+      confidence: MEDIUM

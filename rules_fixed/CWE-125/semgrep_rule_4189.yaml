@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2018-14468-buffer-overread
+    message: "Missing length check before reading 4-byte Magic Number IE may cause buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          case MFR_CTRL_IE_MAGIC_NUM:
+            ND_PRINT((_, "0x%08x", EXTRACT_32BITS(_)));
+      - pattern: |
+          case MFR_CTRL_IE_MAGIC_NUM:
+            ND_PRINT((_, _, EXTRACT_32BITS(_)));
+    metavariable-pattern:
+      metavariable: $FUNC
+      patterns:
+        - pattern: mfr_print(...)
+        - pattern-inside: |
+            $FUNC {
+              ...
+            }

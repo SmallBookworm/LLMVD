@@ -1,0 +1,18 @@
+rules:
+  - id: array-index-out-of-bounds-detach-capi-ctr
+    message: "Array index out of bounds vulnerability in detach_capi_ctr. Missing bounds check on ctr->cnr before array access."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (capi_controller[ctr->cnr - 1] != ctr) {
+                ...
+              }
+          - pattern: |
+              capi_controller[ctr->cnr - 1] = NULL;
+    metavariable-pattern:
+      metavariable: ctr
+      patterns:
+        - pattern: $CTR
+        - focus-metavariable: $CTR

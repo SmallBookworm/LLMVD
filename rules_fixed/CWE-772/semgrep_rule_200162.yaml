@@ -1,0 +1,22 @@
+rules:
+  - id: imagemagick-mat-memory-leak-cve-2017-17881
+    message: Memory leak in ReadMATImage due to missing cleanup of image2 and clone_info before throwing exception.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (MATLAB_HDR.StructureClass != mxCHAR_CLASS &&
+                  ...
+                  MATLAB_HDR.StructureClass != mxUINT64_CLASS)
+                ThrowReaderException(...);
+          - pattern: |
+              if (MATLAB_HDR.StructureClass != mxCHAR_CLASS &&
+                  ...
+                  MATLAB_HDR.StructureClass != mxUINT64_CLASS)
+                {
+                  ...
+                  ThrowReaderException(...);
+                }
+    metadata:
+      cwe: "CWE-772"

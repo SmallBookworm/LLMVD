@@ -1,0 +1,16 @@
+rules:
+  - id: cwe-415-double-free-psutil
+    message: "Potential double free due to improper reference counting. Use Py_CLEAR instead of Py_DECREF to safely decrement and nullify PyObject pointers."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+        - pattern: |
+            Py_DECREF($OBJ);
+            ...
+            Py_DECREF($OBJ);
+        - pattern-regex: |
+            for\s*$$[^}]*$$\s*{\s*[^}]*Py_DECREF$$\$OBJ$$[^}]*goto\s+error\s*;\s*}\s*[^}]*error:\s*[^}]*Py_XDECREF$$\$OBJ$$
+    metadata:
+      cwe: "CWE-415"
+      cve: "CVE-2019-18874"

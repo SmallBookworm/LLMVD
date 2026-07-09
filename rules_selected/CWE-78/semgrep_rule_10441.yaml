@@ -1,0 +1,36 @@
+rules:
+  - id: php_escape_shell_arg_windows_backslash_vulnerability
+    message: "Missing backslash escaping logic in php_escape_shell_arg on Windows may lead to command injection (CVE-2015-4642, CWE-78)."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              #ifdef PHP_WIN32
+              ...
+              cmd[y++] = '"';
+              #endif
+          - pattern: |
+              #ifdef PHP_WIN32
+              cmd[y++] = '"';
+              #endif
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern: |
+        PHPAPI char *php_escape_shell_arg(char *str)
+        {
+          ...
+          #ifdef PHP_WIN32
+          ...
+          cmd[y++] = '"';
+          #endif
+          ...
+        }
+    pattern-not: |
+      #ifdef PHP_WIN32
+      ...
+      if (y > 0 && '\\' == cmd[y - 1]) {
+        ...
+      }
+      cmd[y++] = '"';
+      #endif

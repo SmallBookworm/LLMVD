@@ -1,0 +1,14 @@
+rules:
+  - id: cwe-787-armass-buffer-index-mismatch
+    message: "Loop condition uses incorrect index variable, potentially leading to out-of-bounds read (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      for ($I = 0; $I < sizeof($BUF) - 1 && $STR[$I]; $I++) {
+        ...
+        if ($STR[$J] == '#') {
+          $I--;
+          continue;
+        }
+        $BUF[$I] = $_...$STR[$J]$_...;
+      }

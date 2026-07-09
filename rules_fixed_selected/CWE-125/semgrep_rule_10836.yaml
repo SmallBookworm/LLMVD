@@ -1,0 +1,18 @@
+rules:
+  - id: lcms2-mlu-out-of-bounds-read
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (Offset < (SizeOfHeader + 8)) goto Error;
+              ...
+              BeginOfThisString = Offset - SizeOfHeader - 8;
+          - pattern: |
+              BeginOfThisString = Offset - SizeOfHeader - 8;
+              ...
+              if (Offset < (SizeOfHeader + 8)) goto Error;
+    message: "Missing bounds check for Offset + Len against SizeOfTag may lead to out-of-bounds heap read (CWE-125)."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2016-10165"

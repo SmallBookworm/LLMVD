@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2017-12176-missing-length-validation
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((...->majorVersion != ...) ||
+                  (...->minorVersion != ...))
+                  ...;
+          - pattern: |
+              if ((...->majorVersion != ...) ||
+                  (...->minorVersion != ...)) {
+                  ...
+              }
+    message: "Missing extra length validation in ProcEstablishConnection may lead to buffer over-read or code execution (CVE-2017-12176)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-20"
+      references:
+        - https://cgit.freedesktop.org/xorg/xserver/commit/?id=b747da5e25be944337a9cd1415506fc06b70aa81

@@ -1,0 +1,23 @@
+rules:
+  - id: qemu-rndis-integer-overflow
+    message: |
+      Integer overflow vulnerability in RNDIS buffer handling. Missing checks for
+      InformationBufferOffset and InformationBufferLength may lead to buffer over-read.
+      Ensure buflen <= length, bufoffs < length, and bufoffs + buflen <= length.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (bufoffs + buflen > length)
+              return ...;
+      - pattern: |
+          if (bufoffs + buflen > length) {
+              ...
+          }
+    metavariable-regex:
+      - metavariable: bufoffs
+        regex: 'bufoffs'
+      - metavariable: buflen
+        regex: 'buflen'
+      - metavariable: length
+        regex: 'length'

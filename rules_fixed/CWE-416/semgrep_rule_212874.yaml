@@ -1,0 +1,19 @@
+rules:
+  - id: use-after-free-cipso-mac802154
+    message: "Potential use-after-free due to improper cleanup of crypto tfm array. Missing IS_ERR_OR_NULL check before freeing."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (...; ...; ...) {
+                if (key->tfm[...])
+                  crypto_free_aead(key->tfm[...]);
+              }
+          - pattern: |
+              for (...; ...; ...) {
+                crypto_free_...(...);
+              }
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2021-33033"

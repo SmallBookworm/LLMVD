@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2014-9422-kadmind-auth-bypass
+    patterns:
+      - pattern-either:
+          - pattern: |
+              strncmp("kadmin", $C1->data, $C1->length) == 0
+          - pattern: |
+              strncmp("history", $C2->data, $C2->length) == 0
+          - pattern: |
+              strncmp($REALM, $REALM_DATA->data, $REALM_DATA->length) == 0
+    message: "Use of strncmp() for principal component comparison may allow authentication bypass via prefix match. Use data_eq_string() instead."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-284"
+      cve: "CVE-2014-9422"

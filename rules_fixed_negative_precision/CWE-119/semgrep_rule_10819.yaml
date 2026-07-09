@@ -1,0 +1,12 @@
+rules:
+  - id: jbig2stream_format_string_vulnerability
+    patterns:
+      - pattern-either:
+          - pattern: 'error(..., "{0:d} extraneous byte...", segExtraBytes, ...);'
+          - pattern: 'error(..., "{0:d} extraneous byte{1:s} after segment", segExtraBytes, ...);'
+    message: "Format string uses %d specifier for Goffset (signed 64-bit) value 'segExtraBytes', which may cause memory corruption. Use %lld instead."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2013-7296"

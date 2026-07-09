@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2017-9992-buffer-overflow
+    message: "Heap-based buffer overflow due to insufficient bounds check (width + 3 instead of width + 4)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          if (frame_end - frame < width + 3)
+              return AVERROR_INVALIDDATA;
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2017-9992"

@@ -1,0 +1,26 @@
+rules:
+  - id: cwe-125-ghostscript-xpsfont-buffer-overread
+    message: "Heap-based buffer over-read due to missing bounds checks on font data access in xps_load_sfnt_name."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              memcpy($DST, $SRC + $OFFSET + $BASE, $LEN);
+          - pattern: |
+              $TYPE *$PTR = $SRC + $OFFSET + $BASE;
+              ... 
+              $PTR[$IDX]
+    pattern-not-inside: |
+      if ($OFFSET + $CONST > $FONT->length || ...)
+      {
+        ...
+        return;
+      }
+    metavariable-pattern:
+      metavariable: $SRC
+      pattern: namedata
+    metavariable-pattern:
+      metavariable: $BASE
+      pattern: offset
+    focus-metavariable: $SRC

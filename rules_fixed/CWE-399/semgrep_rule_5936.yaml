@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2013-0880-use-after-free
+    message: "Missing permission check before handling shared memory may lead to use-after-free (CVE-2013-0880)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              HostDispatcher* dispatcher = HostDispatcher::GetForInstance(...);
+              if (!dispatcher)
+                return;
+              ...
+              dispatcher->ShareHandleWithRemote(...);
+          - pattern: |
+              HostDispatcher* dispatcher = HostDispatcher::GetForInstance(...);
+              if (!dispatcher)
+                return;
+              ...
+              $DISPATCHER->ShareHandleWithRemote(...);
+    metavariable-pattern:
+      - metavariable: "$DISPATCHER"
+        pattern: "dispatcher"

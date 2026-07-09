@@ -1,0 +1,8 @@
+rules:
+  - id: cwe-476-null-pointer-deref-ilst-item-box-read
+    message: "Potential null pointer dereference due to missing null check on 'a' before accessing 'a->size'. This may lead to denial of service (CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (!e && ptr->size < a->size) {
+    fix: ""

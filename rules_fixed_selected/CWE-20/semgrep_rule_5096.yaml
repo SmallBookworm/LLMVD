@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2011-1799-webkit-cast-issue
+    message: "Unsafe cast or incorrect height calculation for percentage-based layout in WebKit engine may lead to denial of service or unspecified impact."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (h.isPercent())
+                 return computeContentBoxLogicalHeight(h.calcValue(containingBlock()->availableLogicalHeight()));

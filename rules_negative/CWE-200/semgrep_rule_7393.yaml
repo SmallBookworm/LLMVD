@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2018-6053-missing-clear-thumbnails
+    message: Missing call to ClearUnreferencedThumbnails() may allow local attackers to view website thumbnails after clearing browser data.
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          cache_->SetTopSites(...);
+          cache_->ClearUnreferencedThumbnails();
+      - pattern-either:
+          - pattern: |
+              cache_->SetTopSites($TOP_SITES);
+              if (!temp_images_.empty()) { ... }
+          - pattern: |
+              cache_->SetTopSites($TOP_SITES);
+              if ($TOP_SITES.size() - $NUM_FORCED_URLS >= $K_NON_FORCED_TOP_SITES_NUMBER) ...
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2018-6053"

@@ -1,0 +1,30 @@
+rules:
+  - id: cwe-125-libwebm-vp9-superframe
+    message: "Missing validation of child_frame_length may lead to heap-based buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          for (...; ...; ...) {
+            ...
+            $CHILD_FRAME_LENGTH = ...;
+            ...
+            $FRAME_RANGES->push_back(Range(..., $CHILD_FRAME_LENGTH));
+            ...
+          }
+      - pattern: |
+          for (...; ...; ...) {
+            ...
+            $CHILD_FRAME_LENGTH |= ...;
+            ...
+            $FRAME_RANGES->push_back(Range(..., $CHILD_FRAME_LENGTH));
+            ...
+          }
+    pattern-not-inside: |
+      if (... - ... < $CHILD_FRAME_LENGTH) {
+        ...
+        return false;
+      }
+    metavariable-pattern:
+      metavariable: $CHILD_FRAME_LENGTH
+      pattern: std::uint32_t

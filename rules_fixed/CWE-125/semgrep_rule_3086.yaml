@@ -1,0 +1,30 @@
+rules:
+  - id: cve-2016-10208-ext4-s_first_meta_bg-validation
+    message: "Missing validation of s_first_meta_bg may lead to out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (ext4_has_feature_meta_bg($SB)) {
+              ...
+          }
+      - pattern: |
+          if (ext4_has_feature_meta_bg($SB)) {
+              if (le32_to_cpu($ES->s_first_meta_bg) >= $DB_COUNT) {
+                  ...
+                  goto $LABEL;
+              }
+          }
+    metavariable-pattern:
+      metavariable: $ES
+      pattern: "struct ext4_super_block *"
+    pattern-not-inside: |
+        if (ext4_has_feature_meta_bg($SB)) {
+            if (le32_to_cpu($ES->s_first_meta_bg) >= $DB_COUNT) {
+                ...
+                goto ...;
+            }
+        }
+    fix-regex:
+      regex: ""
+      replacement: ""

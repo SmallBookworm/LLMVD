@@ -1,0 +1,15 @@
+rules:
+  - id: hhvm-fastcgi-default-bind-all-interfaces
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (useFileSocket) {
+                ...
+              } else if (address.empty()) {
+                sock_addr.setFromLocalPort(...);
+              } else {
+                ...
+              }
+    message: "FastCGI server binds to all interfaces by default when address is empty, leading to potential information disclosure (CWE-200, CVE-2019-3569)."
+    severity: WARNING
+    languages: [c]

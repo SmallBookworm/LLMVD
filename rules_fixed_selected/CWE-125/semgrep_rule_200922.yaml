@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2019-15139-xwd-xoffset-check
+    message: "Missing validation of header.xoffset against blob size may lead to out-of-bounds read (CVE-2019-15139, CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (header.header_size < sz_XWDheader)
+        ThrowReaderException(...);
+    pattern-not: |
+      if ((MagickSizeType) header.xoffset >= GetBlobSize(image))
+        ThrowReaderException(...);

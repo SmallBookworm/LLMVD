@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2012-2833-buffer-overflow-dom-objects
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (isMainThread()) {
+                  DOMData::removeObjectsFromWrapperMap<Node>(&store, store.domNodeMap());
+                  DOMData::removeObjectsFromWrapperMap<Node>(&store, store.activeDomNodeMap());
+              }
+              DOMData::removeObjectsFromWrapperMap<void>(&store, store.domObjectMap());
+    message: "Potential buffer overflow due to unsafe handling of DOM wrapper maps on non-main threads. See CVE-2012-2833."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      vulnerability: buffer-overflow

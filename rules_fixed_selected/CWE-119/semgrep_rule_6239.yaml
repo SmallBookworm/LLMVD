@@ -1,0 +1,21 @@
+rules:
+  - id: ffmpeg_video_decoder_buffer_overflow
+    message: "Potential heap-based buffer overflow due to incorrect frame size handling in FFmpegVideoDecoder::GetVideoBuffer. Use 'coded_size' instead of raw dimensions to prevent overread/overwrite."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!VideoFrame::IsValidConfig($FORMAT, $SIZE, $RECT, $NATURAL_SIZE))
+                return AVERROR(EINVAL);
+              ...
+              frame_pool_.CreateFrame($FORMAT, $SIZE, ..., $NATURAL_SIZE, ...);
+          - pattern: |
+              scoped_refptr<VideoFrame> video_frame =
+                  frame_pool_.CreateFrame($FORMAT, $SIZE, ..., $NATURAL_SIZE, ...);
+              ...
+              frame->width = $CODEC_CONTEXT->width;
+              frame->height = $CODEC_CONTEXT->height;
+    metavariable-pattern:
+      $SIZE:
+        regex-not: "^coded_size$"

@@ -1,0 +1,22 @@
+rules:
+  - id: imagemagick-dot-memory-leak
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($STATUS == MagickFalse)
+              {
+                $IMAGE = DestroyImageList($IMAGE);
+                return ((Image *) NULL);
+              }
+          - pattern: |
+              if ($GRAPH == (graph_t *) NULL)
+              {
+                (void) RelinquishUniqueFileResource($FILENAME);
+                return ((Image *) NULL);
+              }
+    message: "Memory leak detected: image resource not properly destroyed before returning NULL."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-401"
+      cve: "CVE-2019-16713"

@@ -1,0 +1,26 @@
+rules:
+  - id: openafs-foreign-realm-group-creation-bypass
+    message: "Foreign Kerberos realm users may bypass access restrictions due to improper handling of creator ID in newEntry."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (code != 2) {
+                  ...
+                  admin = IsAMemberOf(...);
+              } else {
+                  admin = ((!restricted && !strcmp(...)) || IsAMemberOf(...));
+                  oid = *cid = SYSADMINID;
+              }
+          - pattern: |
+              if (code != 2) {
+                  ...
+                  admin = IsAMemberOf(...);
+              } else {
+                  admin = ((!restricted && strcmp(...) == 0) || IsAMemberOf(...));
+                  oid = *cid = SYSADMINID;
+              }
+    metadata:
+      cwe: ["CWE-284"]
+      cve: "CVE-2016-2860"

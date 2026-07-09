@@ -1,0 +1,18 @@
+rules:
+  - id: f2fs_init_extent_tree_null_check_missing
+    message: "Missing NULL check for extent tree 'et' before use, which may lead to a denial of service (BUG) under concurrent remount and inode operations."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              et = __grab_extent_tree(...);
+              ...
+              write_lock(&et->lock);
+          - pattern: |
+              et = __grab_extent_tree(...);
+              ...
+              write_unlock(&et->lock);
+    metavariable-regex:
+      metavariable: $et
+      regex: "^et$"

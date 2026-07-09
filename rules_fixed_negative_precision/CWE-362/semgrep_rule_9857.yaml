@@ -1,0 +1,16 @@
+rules:
+  - id: race_condition_in_shutdown_without_modal_loop_deferral
+    message: "Potential race condition due to missing modal loop deferral during shutdown. This may allow timer or event processing during shutdown, leading to use-after-free or other concurrency issues."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern: |
+          if ($WEBKIT_PLATFORM_SUPPORT) {
+            $WEBKIT_PLATFORM_SUPPORT->web_database_observer_impl()->WaitForAllDatabasesToClose();
+          }
+    metavariable-patterns:
+      - metavariable: $WEBKIT_PLATFORM_SUPPORT
+        pattern-not: |
+          WebView::willEnterModalLoop();
+          ...
+          WebView::didExitModalLoop();

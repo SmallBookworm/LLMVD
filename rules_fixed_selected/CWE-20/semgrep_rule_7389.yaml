@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2018-6047-webgl-url-leak
+    patterns:
+      - pattern: |
+          if (WouldTaintOrigin(..., ...)) {
+            exception_state.ThrowSecurityError("The cross-origin image at " + url.ElidedString() + " may not be loaded.");
+            ...
+          }
+    message: "Potential user redirect URL leak via ElidedString() in security error message. Use generic message instead."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2018-6047"

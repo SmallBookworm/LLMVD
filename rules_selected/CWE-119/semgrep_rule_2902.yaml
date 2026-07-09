@@ -1,0 +1,19 @@
+rules:
+  - id: cwe-119-id3-skip-buffer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (buf [0] == 'I' && buf [1] == 'D' && buf [2] == '3')
+              { ...
+                psf->fileoffset += offset + 10 ;
+                psf_binheader_readf (psf, "p", psf->fileoffset) ;
+                ... }
+          - pattern: |
+              if (buf[0] == 'I' && buf[1] == 'D' && buf[2] == '3')
+              { ...
+                psf->fileoffset += offset + 10;
+                psf_binheader_readf(psf, "p", psf->fileoffset);
+                ... }
+    message: "Missing bounds check on file offset before calling psf_binheader_readf may lead to buffer overflow (CWE-119)."
+    severity: ERROR
+    languages: [c]

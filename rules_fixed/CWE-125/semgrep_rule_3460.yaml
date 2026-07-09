@@ -1,0 +1,22 @@
+rules:
+  - id: freerdp-drdynvc-missing-length-check
+    message: Missing length check before reading from stream may lead to out-of-bounds read (CWE-125).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ((drdynvc->version == 2) || (drdynvc->version == 3))
+          {
+            Stream_Read_UINT16(...);
+            ...
+          }
+      - pattern: |
+          Stream_Read_UINT16($STREAM, ...);
+          ...
+          if (($OBJ->version == 2) || ($OBJ->version == 3))
+          {
+            Stream_Read_UINT16(...);
+            ...
+          }
+    metavariable-pattern:
+      $STREAM: wStream*

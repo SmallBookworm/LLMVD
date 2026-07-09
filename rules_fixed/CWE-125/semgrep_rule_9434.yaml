@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2017-12985-buffer-overread
+    message: "Missing check for negative return value from print routines (e.g., rt6_print, ah_print, esp_print, mobility_print) may lead to buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - patterns:
+            - pattern: $advance = rt6_print($...);
+            - pattern: $nh = *$cp;
+          - patterns:
+            - pattern: $advance = ah_print($...);
+            - pattern: $nh = *$cp;
+          - patterns:
+            - pattern: $advance = esp_print($...);
+            - pattern: $nh = $...;
+          - patterns:
+            - pattern: $advance = mobility_print($...);
+            - pattern: $nh = *$cp;
+      - pattern-not-inside: |
+          $advance = $FUNC($...);
+          if ($advance < 0)
+            return;
+          ...

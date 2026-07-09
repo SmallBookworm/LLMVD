@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2016-3872-buffer-overflow
+    message: "Potential buffer overflow due to insufficient buffer size check before copying frame data. Use outputBufferSafe() to validate buffer capacity."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (outHeader->nAllocLen >= outHeader->nFilledLen) {
+        ...
+        copyYV12FrameToOutputBuffer(...);
+      }

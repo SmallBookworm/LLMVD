@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2019-9162-snmp-asn1-length-check
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (*(unsigned char *)data > 1)
+                return ...;
+          - pattern: |
+              if (*(unsigned char *)data > ...)
+                return ...;
+    message: "Missing ASN.1 length check before dereferencing 'data'. This can lead to out-of-bounds read (CWE-129)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-129"
+      cve: "CVE-2019-9162"
+      references:
+        - "https://github.com/torvalds/linux/commit/c4c07b4d6fa1f11880eab8e076d3d060ef3f55fc"

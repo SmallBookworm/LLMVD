@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2012-4565-divide-by-zero-tcp-illinois
+    message: "Potential divide-by-zero in tcp_illinois_info when ca->cnt_rtt is zero. Add a check 'if (info.tcpv_rttcnt > 0)' before division."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              do_div($T, $CA->cnt_rtt);
+          - pattern: |
+              do_div($T, ca->cnt_rtt);
+    metadata:
+      cwe: ["CWE-189"]
+      cve: "CVE-2012-4565"

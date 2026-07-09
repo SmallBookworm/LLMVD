@@ -1,0 +1,12 @@
+rules:
+  - id: incomplete_tiocsti_seccomp_filter
+    message: "Incomplete seccomp filter for TIOCSTI ioctl allows sandbox bypass on 64-bit platforms. Only the lowest 32 bits of the ioctl argument should be compared."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              SCMP_A1 (SCMP_CMP_EQ, (int) TIOCSTI)
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2019-10063"

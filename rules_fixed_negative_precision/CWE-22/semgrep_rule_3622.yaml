@@ -1,0 +1,8 @@
+rules:
+  - id: unsafe_cache_path_concatenation
+    patterns:
+      - pattern: |
+          snprintf($DEST, $DESTLEN, "%s.hcache", $PATH)
+    message: "Unsafe cache path construction may lead to directory traversal (CWE-22)."
+    severity: WARNING
+    languages: [c]

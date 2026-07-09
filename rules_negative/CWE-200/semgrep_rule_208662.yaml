@@ -1,0 +1,28 @@
+rules:
+  - id: libgcrypt-cve-2016-6313
+    message: "Vulnerable mixing function in Libgcrypt random number generator (CVE-2016-6313). The loop incorrectly hashes non-contiguous pool segments, allowing prediction of future output."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              memcpy (hashbuf, p, DIGESTLEN);
+              p += DIGESTLEN;
+              if (p+DIGESTLEN+BLOCKLEN < pend)
+                memcpy (hashbuf+DIGESTLEN, p+DIGESTLEN, BLOCKLEN-DIGESTLEN);
+              else
+                {
+                  ...
+                }
+          - pattern: |
+              memcpy (hashbuf, p, DIGESTLEN);
+              p += DIGESTLEN;
+              if (p + DIGESTLEN + BLOCKLEN < pend)
+                memcpy (hashbuf + DIGESTLEN, p + DIGESTLEN, BLOCKLEN - DIGESTLEN);
+              else
+                {
+                  ...
+                }
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2016-6313"

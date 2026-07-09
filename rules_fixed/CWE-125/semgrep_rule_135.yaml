@@ -1,0 +1,24 @@
+rules:
+  - id: cwe-125-ghostscript-mdrp-bounds-check
+    message: "Missing bounds check on CUR.GS.rp0 before array access in Ins_MDRP may lead to heap-based buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if ( BOUNDS($ARG, $N_POINTS) )
+      {
+        ...
+        return;
+      }
+    pattern-not: |
+      if ( BOUNDS($ARG1, $N_POINTS1) ||
+           BOUNDS($ARG2, $N_POINTS2) )
+      {
+        ...
+        return;
+      }
+    fix-regex:
+      regex: ''
+      replacement: ''
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2017-9726"

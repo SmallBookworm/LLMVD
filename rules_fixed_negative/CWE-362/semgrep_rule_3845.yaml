@@ -1,0 +1,13 @@
+rules:
+  - id: dm_get_from_kobject_race_condition
+    patterns:
+      - pattern: |
+          if (test_bit(DMF_FREEING, &($MD->flags)) || dm_deleting_md($MD))
+            return NULL;
+          dm_get($MD);
+    message: "Race condition between checking DMF_FREEING/dm_deleting_md and calling dm_get(). Use _minor_lock to protect this section."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-362"
+      cve: "CVE-2017-18203"

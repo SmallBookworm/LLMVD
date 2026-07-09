@@ -1,0 +1,26 @@
+rules:
+  - id: wavpack-zero-sample-rate
+    message: "Zero sample rate can cause infinite loop leading to denial-of-service (CVE-2018-19840)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (!config->sample_rate) {
+          ...
+          return FALSE;
+      }
+    pattern-not-inside: |
+      if (!config->sample_rate) {
+          ...
+          return FALSE;
+      }
+    pattern-either:
+      - pattern: |
+          $WPC->config.sample_rate = $CONFIG->sample_rate;
+          ...
+          for ($I = 0; $I < 15; ++$I)
+            if ($WPC->config.sample_rate == sample_rates [$I])
+              break;
+      - pattern: |
+          $FLAGS |= $I << SRATE_LSB;
+          ...
+          $WPC->config.sample_rate = $CONFIG->sample_rate;

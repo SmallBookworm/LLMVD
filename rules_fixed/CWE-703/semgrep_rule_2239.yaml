@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2015-8787-null-pointer-deref
+    message: "Missing NULL check for indev->ifa_list before dereference may lead to NULL pointer dereference (CVE-2015-8787)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if ($INDEV != NULL) {
+        ...
+        $IFA = $INDEV->ifa_list;
+        ... = $IFA->ifa_local;
+      }
+    fix-regex:
+      regex: if \(([^)]+?) != NULL\)
+      replacement: if (\1 && \1->ifa_list)

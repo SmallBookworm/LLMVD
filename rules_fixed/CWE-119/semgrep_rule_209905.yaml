@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2013-2236-buffer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              memcpy(&$$nmsg->data, $$data, ntohs($$data->length));
+          - pattern: |
+              memcpy(&$$nmsg->data, $$data, $$data->length);
+    message: "Potential stack-based buffer overflow due to unchecked memcpy of LSA data. CVE-2013-2236 (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2013-2236"

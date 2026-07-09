@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2014-5355-krb5-read-message-null-termination
+    message: "krb5_data from krb5_read_message() is used as a C string without verifying null termination. This can lead to NULL pointer dereference or out-of-bounds read (CVE-2014-5355)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              krb5_read_message(..., &$X);
+              ...
+              printf(..., $X.data, ...);
+          - pattern: |
+              krb5_read_message(..., &$X);
+              ...
+              krb5_parse_name(..., $X.data, ...);
+      - metavariable-pattern:
+          metavariable: $X
+          pattern: $X
+      - pattern-not: |
+          krb5_read_message(..., &$X);
+          ...
+          if (... || $X.length == 0 || $X.data[$X.length - 1] != '\0') { ... }

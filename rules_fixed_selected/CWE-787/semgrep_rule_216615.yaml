@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2016-2182-bn_bn2dec-overflow
+    message: "Missing error check for BN_div_word() return value may lead to out-of-bounds write (CVE-2016-2182, CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          while (!BN_is_zero($T)) {
+              *$LP = BN_div_word($T, $BN_DEC_CONV);
+              $LP++;
+          }
+      - pattern: |
+          while (!BN_is_zero($T)) {
+              *$LP = BN_div_word($T, $BN_DEC_CONV);
+              ...
+              $LP++;
+          }
+    metavariable-regex:
+      metavariable: $BN_DEC_CONV
+      regex: "BN_DEC_CONV"

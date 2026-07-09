@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2020-14303-empty-udp-packet-busy-loop
+    message: "Empty UDP packet may cause a busy loop due to improper handling of zero-length data blobs. This can lead to 100% CPU consumption (CVE-2020-14303)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          blob = data_blob_talloc($CTX, NULL, $DSIZE);
+          if (blob.data == NULL) {
+            ...
+            return;
+          }
+    metadata:
+      cwe: ["CWE-834"]
+      cve: "CVE-2020-14303"

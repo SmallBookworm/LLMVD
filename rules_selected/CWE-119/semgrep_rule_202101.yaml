@@ -1,0 +1,21 @@
+rules:
+  - id: w3m-addMultirowsForm-buffer-overflow
+    message: "Heap-based buffer overflow in addMultirowsForm due to missing bounds check before writing to lineBuf"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              l->lineBuf[pos - 1] = '[';
+              l->lineBuf[a->end.pos] = ']';
+          - pattern: |
+              l->lineBuf[...];
+              l->lineBuf[...];
+    pattern-not: |
+      if (pos < 1 || a->end.pos >= l->size)
+          continue;
+      l->lineBuf[pos - 1] = '[';
+      l->lineBuf[a->end.pos] = ']';
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: addMultirowsForm

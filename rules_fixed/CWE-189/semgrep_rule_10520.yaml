@@ -1,0 +1,23 @@
+rules:
+  - id: postgresql-integer-overflow-cve-2014-0064
+    message: |
+      Integer overflow possible in allocation size calculation. 
+      An attacker could trigger a buffer overflow by providing a large input array.
+      Ensure allocation size is checked against MaxAllocSize before calling palloc.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $COUNT = $IN_COUNT / 2;
+              ...
+              palloc($COUNT * sizeof($TYPE));
+          - pattern: |
+              $COUNT = $IN_COUNT >> 1;
+              ...
+              palloc($COUNT * sizeof($TYPE));
+    metavariable-patterns:
+      - metavariable: $TYPE
+        patterns:
+          - pattern-either:
+              - pattern: Pairs

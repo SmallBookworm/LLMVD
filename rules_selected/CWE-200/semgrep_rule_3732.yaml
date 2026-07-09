@@ -1,0 +1,22 @@
+rules:
+  - id: pam_yubico_fd_leak
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (s_token && otp_id && strcmp (otp_id, s_token) == 0)
+                {
+                  ...
+                  return AUTH_FOUND;
+                }
+          - pattern: |
+              if (s_token && otp_id && !strcmp (otp_id, s_token))
+                {
+                  ...
+                  return AUTH_FOUND;
+                }
+    message: "File descriptor leak in check_user_token: opwfile is not closed before returning AUTH_FOUND, leading to potential information disclosure or DoS (CVE-2018-9275)."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-200"
+      confidence: MEDIUM

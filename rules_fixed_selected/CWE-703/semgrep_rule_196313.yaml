@@ -1,0 +1,17 @@
+rules:
+  - id: imagemagick-palm-memory-leak
+    message: "Memory leak in WritePALMImage: 'lastrow' allocation lacks null check before use, leading to potential resource exhaustion (CVE-2017-12664)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $LASTROW = (unsigned char *) AcquireQuantumMemory($BYTES_PER_ROW, sizeof(*$LASTROW));
+          /* TODO check whether memory really was acquired? */
+      - pattern: |
+          $LASTROW = (unsigned char *) AcquireQuantumMemory($BYTES_PER_ROW, sizeof(*$LASTROW));
+          ...
+          if ($ONE_ROW == (unsigned char *) NULL)
+            ThrowWriterException(...);
+    metadata:
+      cwe: "CWE-703"
+      cve: "CVE-2017-12664"

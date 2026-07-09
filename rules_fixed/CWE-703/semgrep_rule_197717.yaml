@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2015-4692-kvm-apic-null-deref
+    message: "Potential NULL pointer dereference in kvm_apic_has_events. Missing NULL check before accessing vcpu->arch.apic->pending_events."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          $vcpu->arch.apic->pending_events
+      - pattern-not-inside: |
+          kvm_vcpu_has_lapic($vcpu) && $vcpu->arch.apic->pending_events
+    metadata:
+      cwe: "CWE-703"
+      cve: "CVE-2015-4692"

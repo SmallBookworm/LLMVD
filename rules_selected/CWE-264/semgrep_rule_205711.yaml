@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2014-3215-selinux-nnp-nosuid-check-missing
+    message: |
+      Missing bounded transition check under NO_NEW_PRIVS or NOSUID may allow privilege escalation.
+      The code directly returns -EPERM/-EACCES instead of allowing bounded transitions.
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (bprm->unsafe & LSM_UNSAFE_NO_NEW_PRIVS)
+                  return -EPERM;
+          - pattern: |
+              if (bprm->file->f_path.mnt->mnt_flags & MNT_NOSUID)
+                  return -EACCES;
+    metadata:
+      cwe: ["CWE-264"]
+      cve: "CVE-2014-3215"

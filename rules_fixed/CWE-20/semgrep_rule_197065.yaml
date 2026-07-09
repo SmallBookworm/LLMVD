@@ -1,0 +1,20 @@
+rules:
+  - id: uws_inflate_unbounded_decompression
+    message: Unbounded inflation in WebSocket permessage-deflate can lead to denial of service via memory exhaustion (CVE-2016-10544).
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          do {
+            ...
+            dynamicInflationBuffer.append(...);
+          } while (err == Z_BUF_ERROR);
+      - pattern: |
+          if (err != Z_BUF_ERROR && err != Z_OK) {
+            ...
+          }
+    metavariable-regex:
+      metavariable: $BUFFER
+      regex: .*
+    fix-regex:
+      enabled: false

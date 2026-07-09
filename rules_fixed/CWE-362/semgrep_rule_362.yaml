@@ -1,0 +1,41 @@
+rules:
+  - id: cve-2014-3509-race-condition-ec-point-formats
+    message: "Race condition in EC point formats extension handling may lead to memory overwrite. Missing 'if (!s->hit)' guard before updating session data."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (type == TLSEXT_TYPE_ec_point_formats)
+              {
+                ...
+                s->session->tlsext_ecpointformatlist_length = 0;
+                if (s->session->tlsext_ecpointformatlist != NULL) OPENSSL_free(s->session->tlsext_ecpointformatlist);
+                if ((s->session->tlsext_ecpointformatlist = OPENSSL_malloc(...)) == NULL)
+                {
+                  ...
+                  return 0;
+                }
+                s->session->tlsext_ecpointformatlist_length = ...;
+                memcpy(s->session->tlsext_ecpointformatlist, ..., ...);
+                ...
+              }
+          - pattern: |
+              else if (type == TLSEXT_TYPE_ec_point_formats)
+              {
+                ...
+                s->session->tlsext_ecpointformatlist_length = 0;
+                if (s->session->tlsext_ecpointformatlist != NULL) OPENSSL_free(s->session->tlsext_ecpointformatlist);
+                if ((s->session->tlsext_ecpointformatlist = OPENSSL_malloc(...)) == NULL)
+                {
+                  ...
+                  return 0;
+                }
+                s->session->tlsext_ecpointformatlist_length = ...;
+                memcpy(s->session->tlsext_ecpointformatlist, ..., ...);
+                ...
+              }
+    metavariable-regex:
+      metavariable: $TYPE
+      regex: "TLSEXT_TYPE_ec_point_formats"
+    fix-regex: {}

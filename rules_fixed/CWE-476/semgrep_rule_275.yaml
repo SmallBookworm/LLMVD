@@ -1,0 +1,13 @@
+rules:
+  - id: null_pointer_dereference_getvariation
+    message: "Potential NULL pointer dereference in Ins_GETVARIATION. The 'coords' pointer is used without a NULL check, which may lead to denial of service (CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      $coords = $exc->face->blend->normalizedcoords;
+      ...
+      $args[$i] = $coords[$i] >> 2;
+    metavariable-pattern:
+      metavariable: $coords
+      patterns:
+        - pattern-not: if ($coords) { ... }

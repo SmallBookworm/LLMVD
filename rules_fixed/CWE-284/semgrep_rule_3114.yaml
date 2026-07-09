@@ -1,0 +1,15 @@
+rules:
+  - id: imagemagick-missing-malloc-check-cve-2016-10144
+    message: "Missing null check after AcquireQuantumInfo may lead to improper access control (CWE-284)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $quantum_info = AcquireQuantumInfo(...);
+          if ($quantum_info == NULL) { ... }
+      - pattern: |
+          $quantum_info = AcquireQuantumInfo(...);
+          if (!$quantum_info) { ... }
+    metadata:
+      cwe: ["CWE-284"]
+      cve: "CVE-2016-10144"

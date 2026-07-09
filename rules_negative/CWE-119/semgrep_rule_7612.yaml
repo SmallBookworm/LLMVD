@@ -1,0 +1,16 @@
+rules:
+  - id: quic_client_promise_missing_method_check
+    message: Missing check for missing HTTP method header may lead to undefined behavior or buffer overflow.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              SpdyHeaderBlock::const_iterator it = headers.find(kHttp2MethodHeader);
+              DCHECK(it != headers.end());
+          - pattern: |
+              auto it = headers.find(kHttp2MethodHeader);
+              DCHECK(it != headers.end());
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2017-15398"

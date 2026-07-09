@@ -1,0 +1,31 @@
+rules:
+  - id: amd_erratum_793_missing_workaround
+    message: "Missing workaround for AMD Family 16h erratum 793 (CVE-2013-6885). Systems with affected processors may hang due to interaction between locked instructions and write-combined memory."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (c->x86 == 0x16 && c->x86_model <= 0xf) {
+              ...
+              rdmsrl(MSR_AMD64_LS_CFG, ...);
+              ...
+              wrmsrl(MSR_AMD64_LS_CFG, ... | BIT(15));
+          }
+      - pattern: |
+          if (c->x86 == 0x16 && c->x86_model <= 0xf) {
+              ...
+              rdmsrl(0xC0011020, ...);
+              ...
+              wrmsrl(0xC0011020, ... | (1 << 15));
+          }
+    metavariable-pattern:
+      metavariable: $...
+      pattern: ...
+    pattern-not-inside: |
+        if (c->x86 == 0x16 && c->x86_model <= 0xf) {
+            ...
+            rdmsrl(..., ...);
+            ...
+            wrmsrl(..., ... | ...);
+            ...
+        }

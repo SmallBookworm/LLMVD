@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2016-6720-information-disclosure
+    message: "Potential information disclosure due to unnecessary buffer zeroing which may expose sensitive data. This matches the vulnerable pattern in libstagefright prior to the fix for CVE-2016-6720."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern: |
+          memset($HEADER->pBuffer, 0, $HEADER->nAllocLen);
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2016-6720"

@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2008-2372-get-user-pages-zero-page
+    message: "Missing ZERO_PAGE optimization in get_user_pages may lead to excessive memory allocation (CVE-2008-2372, CWE-20)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!write && !(vma->vm_flags & VM_LOCKED) &&
+              (!vma->vm_ops || !vma->vm_ops->fault)) {
+            ...;
+            $$ |= FOLL_ANON;
+            ...;
+          }
+      - pattern: |
+          if (!write && !(vma->vm_flags & VM_LOCKED) &&
+              (!vma->vm_ops || !vma->vm_ops->fault)) {
+            ...;
+            foll_flags |= FOLL_ANON;
+            ...;
+          }
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2008-2372"

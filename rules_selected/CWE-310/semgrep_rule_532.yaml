@@ -1,0 +1,18 @@
+rules:
+  - id: libgcrypt_rsa_crt_side_channel
+    message: "Detected vulnerable RSA CRT implementation susceptible to cache side-channel attack (CVE-2017-7526). Exponentiation uses unblinded exponents."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              mpi_sub_ui($H, $P, 1);
+              mpi_fdiv_r($H, $D, $H);
+              mpi_powm($M1, $C, $H, $P);
+          - pattern: |
+              mpi_sub_ui($H, $Q, 1);
+              mpi_fdiv_r($H, $D, $H);
+              mpi_powm($M2, $C, $H, $Q);
+    metadata:
+      cwe: "CWE-310"
+      cve: "CVE-2017-7526"

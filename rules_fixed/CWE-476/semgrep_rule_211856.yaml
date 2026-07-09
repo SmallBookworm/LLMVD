@@ -1,0 +1,17 @@
+rules:
+  - id: kvm_mmu_invpcid_gva-null-deref
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (... == ...) {
+                  $$mmu->invlpg(...);
+                  ...
+              }
+          - pattern: |
+              if (VALID_PAGE(...) && ... == ...) {
+                  $$mmu->invlpg(...);
+                  ...
+              }
+    message: "Missing NULL check for mmu->invlpg before use may cause NULL pointer dereference (CVE-2022-1789)."
+    severity: ERROR
+    languages: [c]

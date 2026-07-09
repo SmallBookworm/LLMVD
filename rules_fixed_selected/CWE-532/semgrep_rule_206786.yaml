@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2021-22929-v2-onion-logging
+    message: "V2 onion address connection attempts are logged without rate-limiting, leading to information disclosure via tor.log (CVE-2021-22929)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (addresstype == ONION_V2_HOSTNAME) {
+            log_warn(LD_PROTOCOL, ...);
+            ...
+          }
+      - pattern: |
+          if (addresstype == ONION_V2_HOSTNAME) {
+            log_warn(...);
+            ...
+          }

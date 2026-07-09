@@ -1,0 +1,8 @@
+rules:
+  - id: cve-2017-2633-vnc-out-of-bounds
+    message: "Potential out-of-bounds memory access in VNC display driver due to use of guest surface dimensions instead of server surface bounds."
+    severity: ERROR
+    languages: [c]
+    cwe: ["CWE-125"]
+    pattern: |
+      vnc_framebuffer_update(..., surface_width($VD->ds), surface_height($VD->ds), ...)

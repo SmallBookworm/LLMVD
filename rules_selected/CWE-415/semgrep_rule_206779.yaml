@@ -1,0 +1,27 @@
+rules:
+  - id: cve-2017-8890-double-free-fastopen-req
+    message: "Missing initialization of fastopen_req to NULL in tcp_create_openreq_child may lead to double free (CVE-2017-8890, CWE-415)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (newsk) {
+              ...
+              newtp->fastopen_rsk = NULL;
+              ...
+          }
+      - pattern: |
+          if (newsk) {
+              ...
+              newtp->$X = ...;
+              ...
+          }
+    pattern-not-inside: |
+      if (newsk) {
+          ...
+          newtp->fastopen_req = NULL;
+          ...
+      }
+    metavariable-pattern:
+      metavariable: $X
+      pattern: "fastopen_rsk"

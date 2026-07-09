@@ -1,0 +1,15 @@
+rules:
+  - id: cwe-125-bson-utf8-validate-length-miscalculation
+    message: "Potential heap-based buffer over-read due to miscalculated length argument in bson_utf8_validate (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          bson_new_from_data ($DATA, sizeof ($DATA))
+      - pattern: |
+          bson_reader_new_from_file (...);
+          ...
+          bson_reader_read (...);
+    metadata:
+      cwe: ["CWE-125"]
+      cve: "CVE-2017-14227"

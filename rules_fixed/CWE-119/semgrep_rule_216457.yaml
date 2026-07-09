@@ -1,0 +1,30 @@
+rules:
+  - id: cve-2014-7904-buffer-overflow
+    message: "Potential buffer overflow due to unchecked array access in coordinate pair processing. Missing bounds check before accessing pointlist[i + 1]."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for ($I; $COND; $INC) {
+                ...
+                $pointlist[$I + 1]
+                ...
+              }
+          - pattern: |
+              for (...; $i < $len; ...) {
+                ...
+                $arr[$i + 1]
+                ...
+              }
+      - metavariable-regex:
+          metavariable: $arr
+          regex: "pointlist"
+      - pattern-not-inside: |
+          if ($i + 1 < $len) {
+            ...
+            $arr[$i + 1]
+            ...
+          } else {
+            ...
+          }

@@ -1,0 +1,33 @@
+rules:
+  - id: libmicrohttpd-buffer-overflow-CVE-2021-3466
+    message: |
+      Missing bounds check in post_process_urlencoded may lead to buffer overflow (CVE-2021-3466, CWE-120).
+      The vulnerable code lacks a check before memcpy that ensures the destination buffer has enough space.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (NULL != start_key)
+          {
+            if (NULL == end_key)
+              end_key = &post_data[poff];
+            memcpy (&kbuf[pp->buffer_pos],
+                    start_key,
+                    end_key - start_key);
+          }
+      - pattern: |
+          memcpy (&kbuf[pp->buffer_pos],
+                  start_key,
+                  end_key - start_key);
+    metavariable-pattern:
+      metavariable: kbuf
+      pattern: (char *) &pp[1]
+    pattern-not-inside: |
+      if (pp->buffer_pos + (end_key - start_key) >= pp->buffer_size)
+      {
+        pp->state = PP_Error;
+        return MHD_NO;
+      }
+      memcpy (&kbuf[pp->buffer_pos],
+              start_key,
+              end_key - start_key);

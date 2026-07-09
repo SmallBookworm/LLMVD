@@ -1,0 +1,24 @@
+rules:
+  - id: qemu-ide-atapi-oob-read
+    message: |
+      Out-of-bounds read vulnerability in ide_atapi_cmd_reply_end due to missing validation of io_buffer_index.
+      This may lead to information disclosure or crash. See CVE-2020-29443.
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              s->io_buffer_index += $SIZE;
+              ...
+              ide_transfer_start_norecurse(s,
+                s->io_buffer + s->io_buffer_index - $SIZE,
+                $SIZE, ...);
+          - pattern: |
+              $S->io_buffer_index += $SIZE;
+              ...
+              ide_transfer_start_norecurse($S,
+                $S->io_buffer + $S->io_buffer_index - $SIZE,
+                $SIZE, ...);
+    metavariable-pattern:
+      $S: { type: "IDEState *" }
+    fix: ""

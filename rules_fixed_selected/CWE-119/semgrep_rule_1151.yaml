@@ -1,0 +1,18 @@
+rules:
+  - id: batman_adv_buffer_overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              copy_to_user($BUF, $SRC, $LEN);
+          - pattern: |
+              $X = $LEN;
+              copy_to_user($BUF, $SRC, $X);
+    pattern-not: |
+      $PACKET_LEN = min($COUNT, $ICMP_LEN);
+      copy_to_user($BUF, $SRC, $PACKET_LEN);
+    message: "Potential buffer overflow in bat_socket_read: copy_to_user uses unbounded length without checking against user-provided buffer size."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2011-4604"

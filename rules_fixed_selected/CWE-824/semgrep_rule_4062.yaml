@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2019-11498-uninitialized-sample-rate
+    message: "Use of uninitialized sample_rate in DFF file parsing may lead to denial of service (CWE-824)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!config->num_channels) {
+            ...
+          }
+      - pattern: |
+          if (!config->num_channels || !config->sample_rate) {
+            ...
+          }
+    pattern-not: |
+      if (!config->num_channels || !config->sample_rate) {
+        ...
+      }
+    fix-regex:
+      regex: 'if \(!config->num_channels\)'
+      replacement: 'if (!config->num_channels || !config->sample_rate)'

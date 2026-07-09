@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2017-13017-dhcp6-reconf-msg-missing-length-check
+    message: "Missing length check in DHCPv6 RECONF_MSG option may lead to buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              case DH6OPT_RECONF_MSG:
+                tp = (const u_char *)(dh6o + 1);
+                switch (*tp) { ... }
+          - pattern: |
+              case DH6OPT_RECONF_MSG:
+                __...
+                tp = (const u_char *)(dh6o + 1);
+                switch (*tp) { ... }
+    metadata:
+      cwe: ["CWE-125"]
+      cve: "CVE-2017-13017"

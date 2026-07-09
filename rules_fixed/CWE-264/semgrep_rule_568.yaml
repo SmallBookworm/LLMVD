@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2010-0011-uzbl-js-object-exposure
+    message: "Exposure of Uzbl JavaScript object allows remote attackers to execute arbitrary commands."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern: |
+          JSObjectSetProperty(context, globalObject, var_name,
+                              JSObjectMake(context, classRef, NULL),
+                              kJSClassAttributeNone, NULL);
+    metadata:
+      cwe: "CWE-264"
+      cve: "CVE-2010-0011"

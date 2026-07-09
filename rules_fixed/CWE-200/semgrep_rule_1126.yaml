@@ -1,0 +1,31 @@
+rules:
+  - id: tun_ioctl_info_leak
+    message: "Uninitialized struct 'ifr' may leak kernel stack memory via ioctl (CVE-2012-6547)"
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          struct ifreq ifr;
+          ...
+          if (cmd == TUNGETIFF || cmd == SIOCGIFHWADDR) {
+            ...
+            copy_to_user(..., &ifr, ...);
+          }
+      - pattern: |
+          struct ifreq ifr;
+          ...
+          switch (cmd) {
+          case TUNGETIFF:
+            ...
+            copy_to_user(..., &ifr, ...);
+            break;
+          case SIOCGIFHWADDR:
+            ...
+            copy_to_user(..., &ifr, ...);
+            break;
+          }
+    metavariable-pattern:
+      metavariable: ifr
+      pattern: struct ifreq $X;
+    pattern-not: |
+      memset(&ifr, 0, sizeof(ifr));

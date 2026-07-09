@@ -1,0 +1,14 @@
+rules:
+  - id: fribidi-buffer-overflow-CVE-2019-18397
+    message: "Buffer overflow in fribidi_get_par_embedding_levels_ex due to missing bounds check on isolate_level before array access. This can lead to out-of-bounds write (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          base_level_per_iso_level[isolate_level] = ...;
+          ...
+          isolate_level++;
+      - pattern: |
+          isolate_level++;
+          ...
+          base_level_per_iso_level[isolate_level] = ...;

@@ -1,0 +1,13 @@
+rules:
+  - id: cwe-252-resource-exhaustion-le-binary
+    message: "Missing return value check for r_buf_read_at may lead to resource exhaustion (CWE-252)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          r_buf_read_at(..., (ut8 *)&$PAGE, sizeof($PAGE));
+      - pattern: |
+          r_buf_read_at($buf, $off, (ut8 *)&$PAGE, sizeof($PAGE));
+    metavariable-pattern:
+      metavariable: $PAGE
+      pattern: LE_object_page_entry

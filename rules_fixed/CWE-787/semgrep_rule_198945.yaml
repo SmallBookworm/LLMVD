@@ -1,0 +1,8 @@
+rules:
+  - id: heap_buffer_overflow_vrend_renderer_transfer_write_iov
+    message: "Potential heap-based buffer overflow in vrend_renderer_transfer_write_iov due to missing size validation (CVE-2019-18391, CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      test_heap_overflow_vrend_renderer_transfer_write_iov();
+      virgl_renderer_context_destroy(...)

@@ -1,0 +1,15 @@
+rules:
+  - id: mod_wsgi_content_type_use_after_free
+    message: "Content-Type header may use memory that has been freed in embedded mode, leading to information disclosure (CVE-2014-0242)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (*self->config->process_group)
+                  r->content_type = apr_pstrdup(r->pool, value);
+              else
+                  ap_set_content_type(r, value);
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2014-0242"

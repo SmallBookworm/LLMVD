@@ -1,0 +1,22 @@
+rules:
+  - id: openexr-hufdecode-undefined-right-shift
+    message: "Missing check for negative code length after subtraction may lead to undefined right shift (CWE-190)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              lc -= pl.len;
+              getCode (..., lc, ...);
+          - pattern: |
+              lc -= l;
+              getCode (..., lc, ...);
+      - metavariable-pattern:
+          metavariable: pl.len
+          language: c
+          pattern: $X
+      - pattern-not: |
+          lc -= ...;
+          if (lc < 0)
+            invalidCode();
+          getCode (..., lc, ...);

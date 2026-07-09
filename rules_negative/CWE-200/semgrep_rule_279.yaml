@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2018-6790-notification-body-not-sanitized
+    message: "Notification body is used without sanitization, potentially leaking client IP addresses via embedded URLs (e.g., in IMG src)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          $BODY = NotificationSanitizer::parse(...);
+      - pattern-either:
+          - pattern: |
+              _body = ...;
+              ...
+              _body.append("\n").append(body);
+          - pattern: |
+              _body = body;
+    metadata:
+      cwe: ["CWE-200"]
+      cve: "CVE-2018-6790"

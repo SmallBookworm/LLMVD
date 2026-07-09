@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2013-0914-sa_restorer-not-cleared
+    message: "sa_restorer is not cleared during exec, potentially leaking address space layout and bypassing ASLR."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              flush_signal_handlers(...) {
+                ...
+                ka->sa.sa_flags = 0;
+                sigemptyset(&ka->sa.sa_mask);
+                ...
+              }
+          - pattern: |
+              flush_signal_handlers(...) {
+                ...
+                ka->sa.sa_flags = 0;
+                $KA++;
+                ...
+              }
+    metavariable-pattern:
+      metavariable: $KA
+      pattern: ka

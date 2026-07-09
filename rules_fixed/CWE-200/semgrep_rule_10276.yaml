@@ -1,0 +1,13 @@
+rules:
+  - id: cwe-200-xxe-soap-parser
+    message: "XML External Entity (XXE) vulnerability due to unsafe DTD loading in SOAP parser. Use bitwise AND with negation (~XML_PARSE_DTDLOAD) to disable DTD loading."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $ctxt->options -= XML_PARSE_DTDLOAD;
+    metadata:
+      cwe: ["CWE-200"]
+      references:
+        - "https://git.php.net/?p=php-src.git;a=commit;h=188c196d4da60bdde9190d2fc532650d17f7af2d"
+        - "CVE-2013-1824"

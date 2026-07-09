@@ -1,0 +1,41 @@
+rules:
+  - id: tensorflow_ragged_tensor_shape_check_missing
+    message: Missing shape compatibility check for RaggedTensor values may lead to uninitialized memory exposure (CVE-2021-37679).
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          TensorShape expected_value_shape = ...;
+          expected_value_shape.RemoveDim(0);
+          ...
+          for (...; ...; ...) {
+            ...
+            TensorShape value_shape = ...;
+            value_shape.RemoveDim(0);
+            if (value_shape != expected_value_shape) {
+              return errors::InvalidArgument(...);
+            }
+            ...
+          }
+      - pattern-either:
+          - pattern: |
+              for (int i = 0; i < ragged_components.size(); i++) {
+                ...
+                auto component_values_flat = ragged_components[i].values().flat_outer_dims<...>();
+                ...
+                for (int j = 0; j < ragged_components[i].values().dim_size(0); j++, values_index++) {
+                  ...
+                }
+              }
+          - pattern: |
+              for (int i = 0; i < ragged_components.size(); i++) {
+                ...
+                int num_inner_elements = ragged_components[i].values().NumElements();
+                ...
+                for (int j = 0; j < ragged_components[i].values().dim_size(0); j++, values_index++) {
+                  ...
+                }
+              }
+    metavariable-regex:
+      metavariable: expected_value_shape
+      regex: expected_value_shape

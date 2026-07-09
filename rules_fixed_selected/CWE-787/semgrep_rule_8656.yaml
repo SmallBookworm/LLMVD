@@ -1,0 +1,8 @@
+rules:
+  - id: skia-ico-codec-integer-overflow
+    message: "Potential integer overflow leading to out-of-bounds write in SkIcoCodec::NewFromStream (CVE-2018-9498, CWE-787). Use sk_malloc_canfail instead of sk_malloc_flags with SK_MALLOC_TEMP to avoid unsafe allocation."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: sk_malloc_flags(sizeof(Entry) * $NUM_IMAGES, SK_MALLOC_TEMP)
+      - pattern: sk_malloc_flags($SIZE, 0)

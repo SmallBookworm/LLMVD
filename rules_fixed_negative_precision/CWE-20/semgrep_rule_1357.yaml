@@ -1,0 +1,24 @@
+rules:
+  - id: cwe-20-uninitialized-memory-leak-recvmsg
+    message: Potential uninitialized memory leak in recvmsg handler. msg_namelen is set before validating or initializing msg_name.
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (msg->msg_namelen >= ...)
+              {
+                ...
+                msg->msg_namelen = ...;
+                ...
+              }
+          - pattern: |
+              if (msg->msg_namelen)
+              {
+                ...
+                msg->msg_namelen = 0;
+                ...
+              }
+    metavariable-pattern:
+      metavariable: msg
+      pattern: struct msghdr *

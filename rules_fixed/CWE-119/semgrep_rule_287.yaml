@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2010-1642-samba-uninitialized-read
+    message: "Potential out-of-bounds read due to use of unbounded data_blob_len instead of actual blob length. This can lead to denial of service (CVE-2010-1642, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $BLOB = data_blob(..., MIN($bufrem, $DATA_BLOB_LEN));
+              ...
+              $p2 = (char *)$req->buf + $DATA_BLOB_LEN;
+          - pattern: |
+              data_blob(..., MIN(..., $DATA_BLOB_LEN));
+              ...
+              ... = (char *)...->buf + $DATA_BLOB_LEN;
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2010-1642"
+      references:
+        - https://git.samba.org/?p=samba.git;a=commit;h=9280051bfba337458722fb157f3082f93cbd9f2b

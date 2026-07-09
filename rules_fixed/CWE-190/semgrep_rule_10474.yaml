@@ -1,0 +1,15 @@
+rules:
+  - id: cwe-190-qcow2-snapshot-l1-size-overflow
+    message: "Integer overflow possible due to missing upper bound check on l1_size before allocation. This may lead to buffer overflow or excessive memory allocation (CVE-2014-0143)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      $SN->l1_size * sizeof(uint64_t)
+    pattern-not: |
+      if ($SN->l1_size > QCOW_MAX_L1_SIZE) { ... }
+    metavariable-regex:
+      metavariable: $SN
+      regex: sn
+    paths:
+      include:
+        - "block/qcow2-snapshot.c"

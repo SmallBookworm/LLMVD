@@ -1,0 +1,20 @@
+rules:
+  - id: mptsas_fetch_request_invalid_state_check_missing
+    message: "Missing check for MPI_IOC_STATE_OPERATIONAL before fetching requests may lead to infinite loop (CVE-2016-4964)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if ($STATE != MPI_IOC_STATE_OPERATIONAL) {
+        ...
+        return;
+      }
+    pattern-not-inside: |
+      void mptsas_fetch_request(MPTSASState *$S) {
+        ...
+        if ($S->state != MPI_IOC_STATE_OPERATIONAL) {
+          ...
+          return;
+        }
+        ...
+      }
+    mode: search

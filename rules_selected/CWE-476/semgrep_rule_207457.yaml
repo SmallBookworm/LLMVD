@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2016-10218-unmatched-transparency-group-pop
+    message: "Unmatched transparency group pop may lead to NULL pointer dereference (CWE-476). Ensure 'nos' is checked before use."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      pdf14_buf *tos = ctx->stack;
+      pdf14_buf *nos = tos->saved;
+      ...
+      if (nos == NULL)
+        return_error(gs_error_rangecheck);

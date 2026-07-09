@@ -1,0 +1,16 @@
+rules:
+  - id: curl-writeout-buffer-overread
+    message: "Buffer over-read in --write-out handling when format string ends with '%'. This may leak sensitive process memory."
+    severity: HIGH
+    languages: [c]
+    cwe: ["CWE-200"]
+    pattern: |
+      if('%' == *ptr) {
+        if('%' == ptr[1]) {
+    fix-regex:
+      regex: if\('%' == \*ptr\) \{
+      replacement: if('%' == *ptr && ptr[1]) {
+    metadata:
+      cve: "CVE-2017-7407"
+      references:
+        - https://github.com/curl/curl/commit/1890d59905414ab84a35892b2e45833654aa5c13

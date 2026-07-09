@@ -1,0 +1,16 @@
+rules:
+  - id: gnutls-signedness-error-cve-2008-1950
+    message: "Integer signedness error in padding length calculation may lead to buffer over-read (CVE-2008-1950, CWE-189)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (pad > ciphertext.size - hash_size)
+      - patterns:
+        - pattern: |
+            length = ciphertext.size - hash_size - pad;
+        - pattern: |
+            if (length < 0)
+    metadata:
+      cwe: ["CWE-189"]
+      cve: "CVE-2008-1950"

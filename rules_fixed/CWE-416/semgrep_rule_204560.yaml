@@ -1,0 +1,22 @@
+rules:
+  - id: jbd2-use-after-free-transaction
+    message: "Use-after-free vulnerability in jbd2_journal_wait_updates due to stale transaction_t pointer after lock release. Transaction must be re-fetched after re-acquiring j_state_lock."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: transaction_t *$T = $J->j_running_transaction;
+              - pattern: write_unlock(&$J->j_state_lock);
+              - pattern: write_lock(&$J->j_state_lock);
+              - pattern: $T->$FIELD
+            metavariable-regex:
+              metavariable: $FIELD
+              regex: "t_.*"
+          - patterns:
+              - pattern: transaction_t *$T = $J->j_running_transaction;
+              - pattern: spin_unlock(&$T->t_handle_lock);
+              - pattern: write_unlock(&$J->j_state_lock);
+              - pattern: schedule();
+              - pattern: write_lock(&$J->j_state_lock);
+              - pattern: spin_lock(&$T->t_handle_lock)

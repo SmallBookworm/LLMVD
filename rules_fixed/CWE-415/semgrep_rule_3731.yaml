@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2018-9336-double-free
+    message: Potential double-free vulnerability in GetStartupData due to missing NULL assignment before error exit.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          sud->directory = data;
+          ...
+          goto out;
+      - pattern: |
+          sud->directory = data;
+          ...
+          return ...;
+    metavariable-pattern:
+      metavariable: data
+      pattern: $DATA
+    focus-metavariable: data
+    fix-regex:
+      regex: ""
+      replacement: ""

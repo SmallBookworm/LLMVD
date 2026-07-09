@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2010-0421-pango-gdef-buffer-overflow
+    message: "Potential buffer overflow due to incorrect allocation size in synthetic GDEF table construction. Allocation uses 'num_total_glyphs' instead of 'count', which may lead to out-of-bounds writes."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          if (layout->new_gdef.len == 0) {
+            layout->new_gdef.klasses = (unsigned char *) calloc ($NUM_TOTAL_GLYPHS, sizeof (unsigned char));
+            layout->new_gdef.len = $COUNT;
+          }
+      - metavariable-regex:
+          metavariable: $NUM_TOTAL_GLYPHS
+          regex: num_total_glyphs
+      - metavariable-regex:
+          metavariable: $COUNT
+          regex: count

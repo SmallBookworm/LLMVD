@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2018-8779-unix-socket-null-check-missing
+    message: Missing null character check in UNIX socket path may lead to connection to unintended socket (CVE-2018-8779).
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          $PATH = unixsock_path_value($PATH);
+      - pattern-either:
+          - pattern: |
+              FilePathValue($PATH);
+          - pattern: |
+              rb_str_new_frozen($PATH);
+    metavariable-regex:
+      metavariable: $PATH
+      regex: path

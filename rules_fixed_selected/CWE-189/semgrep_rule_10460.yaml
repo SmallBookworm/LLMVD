@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2014-9766-integer-overflow
+    message: "Potential integer overflow in buffer size calculation due to missing cast to size_t before multiplication."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      $HEIGHT * $STRIDE
+    pattern-not: |
+      (size_t)$HEIGHT * $STRIDE
+    fix-regex:
+      regex: ""
+      replacement: ""

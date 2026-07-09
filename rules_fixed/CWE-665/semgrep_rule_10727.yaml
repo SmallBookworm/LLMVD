@@ -1,0 +1,20 @@
+rules:
+  - id: wavpack-uninitialized-waveheader
+    message: "Uninitialized variable 'WaveHeader' may lead to unexpected behavior. Ensure it is cleared before use."
+    severity: WARNING
+    languages: [c]
+    pattern-not: |
+      $FUNC(..., WaveHeader $WH, ...) { ... CLEAR($WH); ... }
+    pattern-either:
+      - pattern: |
+          WaveHeader $WH;
+          ...
+          DoReadFile(..., &$WH, ...)
+      - pattern: |
+          WaveHeader $WH;
+          ...
+          WavpackLittleEndianToNative(&$WH, ...)
+    metavariable-pattern:
+      metavariable: $WH
+      pattern: |
+        WaveHeader

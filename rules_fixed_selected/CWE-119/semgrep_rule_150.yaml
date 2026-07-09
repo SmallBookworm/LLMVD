@@ -1,0 +1,30 @@
+rules:
+  - id: openssl-evp-decode-update-integer-underflow
+    message: "Integer underflow in EVP_DecodeUpdate may lead to buffer overflow (CVE-2015-0292, CWE-119). Missing check 'if (eof > v)' before subtraction."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (n > 0)
+            {
+            v = EVP_DecodeBlock(..., ..., n);
+            ...
+            ret += (v - eof);
+            }
+      - pattern: |
+          if (n > 0) {
+            v = EVP_DecodeBlock(..., ..., n);
+            ...
+            ret += (v - eof);
+          }
+    metavariable-pattern:
+      metavariable: $V
+      pattern: v
+    pattern-not: |
+      if (n > 0)
+        {
+        v = EVP_DecodeBlock(..., ..., n);
+        ...
+        if (eof > v) { ... }
+        ret += (v - eof);
+        }

@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2013-0889-missing-address-bar-check
+    message: "Missing check for PAGE_TRANSITION_FROM_ADDRESS_BAR before allowing dangerous download, which may bypass user gesture requirement."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (danger_level == download_util::AllowOnUserGesture)
+                return !download.HasUserGesture() || !visited_referrer_before;
+    metadata:
+      cwe: ["CWE-264"]
+      cve: "CVE-2013-0889"

@@ -1,0 +1,25 @@
+rules:
+  - id: mongoose-directory-traversal-upload
+    message: "Directory traversal vulnerability in mg_http_upload may allow writing files outside the target directory."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              snprintf($PATH, $SIZE, "%s%c%s", $DIR, $SEP, $NAME);
+              ... fopen($PATH, ...);
+          - pattern: |
+              snprintf($PATH, $SIZE, "%s%c%s", $DIR, $SEP, $NAME);
+              ... 
+              fopen($PATH, ...);
+    pattern-not: |
+      snprintf($PATH, $SIZE, "%s%c%s", $DIR, $SEP, $NAME);
+      ...
+      remove_double_dots($PATH);
+      ...
+      fopen($PATH, ...);
+    metavariable-regex:
+      - metavariable: $NAME
+        regex: 'name'
+      - metavariable: $PATH
+        regex: 'path'

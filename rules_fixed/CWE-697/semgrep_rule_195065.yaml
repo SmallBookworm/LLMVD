@@ -1,0 +1,12 @@
+rules:
+  - id: unicorn_split_region_gva_gpa_comparison_flaw
+    message: "Faulty comparison in split_region may lead to sandbox escape (CVE-2021-44078)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      QLIST_FOREACH($block, &$uc->ram_list.blocks, $next) {
+        if ($block->offset <= $mr->addr &&
+            $block->used_length >= ($mr->end - $mr->addr)) {
+          break;
+        }
+      }

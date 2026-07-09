@@ -1,0 +1,28 @@
+rules:
+  - id: vim-out-of-bounds-read-cursor
+    message: "Potential out-of-bounds read due to missing cursor validation after text formatting. This may lead to undefined behavior or crashes (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (keep_cursor)
+          {
+              curwin->w_cursor = saved_cursor;
+              saved_cursor.lnum = 0;
+          }
+      - pattern: |
+          if (keep_cursor)
+          {
+              curwin->w_cursor = saved_cursor;
+              saved_cursor.lnum = 0;
+
+              check_cursor();
+          }
+    pattern-not: |
+        if (keep_cursor)
+        {
+            curwin->w_cursor = saved_cursor;
+            saved_cursor.lnum = 0;
+
+            check_cursor();
+        }

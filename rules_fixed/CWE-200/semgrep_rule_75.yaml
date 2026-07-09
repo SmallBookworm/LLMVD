@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2015-5330-ldb-dn-escape
+    message: "Potential information disclosure due to unsafe string handling in ldb_dn_escape_internal (CVE-2015-5330, CWE-200). The vulnerable code uses strcspn and memcpy on possibly unterminated strings, which may leak heap memory."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          while ($P - $SRC < $LEN) {
+              $P += strcspn($P, ...);
+              ...
+              memcpy($DST, $S, $P - $S);
+              ...
+          }
+      - pattern: |
+          while ($P - $SRC < $LEN) {
+              $P += strcspn($P, ",=\\n\\r+<>#;\\\\\\" ");

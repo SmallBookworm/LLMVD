@@ -1,0 +1,29 @@
+rules:
+  - id: minissdpd-uninitialized-service-pointers
+    message: "Uninitialized struct service pointers may lead to invalid free and denial of service (CVE-2016-3179)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      struct service * newserv = NULL;
+      ...
+      $newserv = malloc(sizeof(struct service));
+      ...
+      if (!$newserv) { ... }
+      ...
+      // Access to any of the pointer fields without prior initialization
+      $newserv->st = malloc(...);
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $newserv->st = malloc(...);
+          - pattern: |
+              $newserv->usn = malloc(...);
+          - pattern: |
+              $newserv->server = malloc(...);
+          - pattern: |
+              $newserv->location = malloc(...);
+      - metavariable-comparison:
+          metavariable: newserv
+          comparison: '$NEWSERV != null'
+      - pattern-not: |
+          memset($newserv, 0, sizeof(struct service));

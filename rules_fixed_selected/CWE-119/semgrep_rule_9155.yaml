@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2016-1907-ssh-packet-read-poll2
+    message: "Missing return statement after sshpkt_disconnect in ssh_packet_read_poll2 may lead to out-of-bounds read (CVE-2016-1907, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ((r = sshpkt_disconnect(...)) != 0)
+            return r;
+      - pattern: |
+          if ((r = sshpkt_disconnect(...)) != 0 ||
+              (r = ssh_packet_write_wait(...)) != 0)
+            return r;
+          return SSH_ERR_CONN_CORRUPT;
+    pattern-not-inside: |
+      if ((r = sshpkt_disconnect($SSH, $FMT, ...)) != 0 ||
+          (r = ssh_packet_write_wait($SSH)) != 0)
+        return r;
+      return SSH_ERR_CONN_CORRUPT;
+    metadata:
+      cwe: "CWE-119"

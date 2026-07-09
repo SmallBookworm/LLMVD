@@ -1,0 +1,23 @@
+rules:
+  - id: l2tp_sock_zapped_race_condition
+    message: "Race condition: SOCK_ZAPPED flag checked without holding socket lock, leading to potential use-after-free (CWE-416)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!sock_flag($SK, SOCK_ZAPPED)) {
+              return ...;
+          }
+          ...
+          lock_sock($SK);
+      - pattern: |
+          if (!sock_flag($SK, SOCK_ZAPPED)) {
+              goto ...;
+          }
+          ...
+          lock_sock($SK);
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2016-10200"
+      references:
+        - https://github.com/torvalds/linux/commit/32c231164b762dddefa13af5a0101032c70b50ef

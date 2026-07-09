@@ -1,0 +1,16 @@
+rules:
+  - id: sddm-reuse-session-auth-bypass
+    message: "Authentication bypass when ReuseSession is enabled. The success status of authentication is not checked before unlocking the session."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              connect($AUTH, &Auth::authentication, $THIS, [=](){
+                  ...
+                  $MANAGER.UnlockSession($SESSION_ID);
+                  $MANAGER.ActivateSession($SESSION_ID);
+              });
+    metadata:
+      cwe: ["CWE-284"]
+      cve: "CVE-2018-14345"

@@ -1,0 +1,28 @@
+rules:
+  - id: cve-2019-15219-null-deref-sisusb
+    message: "NULL pointer dereference in sisusb_probe due to use of uninitialized sisusb->sisusb_dev in error logging before assignment."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (retval) {
+                dev_err(&sisusb->sisusb_dev->dev, ...);
+                ...
+              }
+          - pattern: |
+              if (retval) {
+                ...
+                dev_err(&sisusb->sisusb_dev->dev, ...);
+                ...
+              }
+      - pattern-not: |
+          sisusb->sisusb_dev = ...;
+          ...
+          if (retval) {
+            dev_err(&sisusb->sisusb_dev->dev, ...);
+            ...
+          }
+    metavariable-pattern:
+      metavariable: sisusb
+      pattern: struct sisusb_usb_data *...

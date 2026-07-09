@@ -1,0 +1,17 @@
+rules:
+  - id: imagemagick-sfw-buffer-overflow
+    message: "Heap-based buffer overflow in ReadSFWImage due to insufficient buffer allocation. Missing MagickPathExtent padding may lead to out-of-bounds write."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              buffer=(unsigned char *) AcquireQuantumMemory((size_t) GetBlobSize($IMAGE), sizeof(*buffer));
+          - pattern: |
+              buffer=(unsigned char *) AcquireQuantumMemory(GetBlobSize($IMAGE), sizeof(*buffer));
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2017-12983"
+      references:
+        - https://github.com/ImageMagick/ImageMagick/issues/682
+        - https://github.com/ImageMagick/ImageMagick/commit/d4145e664aea3752ca6d3bf1ee825352b595dab5

@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2019-19065-sdma-init-memory-leak
+    message: "Memory leak in sdma_init(): allocated tmp_sdma_rht is not freed if rhashtable_init() fails."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $TMP = kzalloc(...);
+          ...
+          if (rhashtable_init($TMP, ...) < 0)
+            goto $LABEL;
+      - pattern: |
+          $TMP = kzalloc(...);
+          ...
+          ret = rhashtable_init($TMP, ...);
+          if (ret < 0)
+            goto $LABEL;
+    metavariable-pattern:
+      $TMP:
+        type: "struct rhashtable *"

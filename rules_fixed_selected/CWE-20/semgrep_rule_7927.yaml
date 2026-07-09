@@ -1,0 +1,26 @@
+rules:
+  - id: cve-2018-6121-insufficient-input-validation
+    message: Insufficient validation of navigation requests to extension-scheme resources from non-extension processes may lead to privilege escalation.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (navigation_handle()->IsInMainFrame()) {
+            ...
+            bool current_frame_is_extension_process = ...;
+            if (!url_has_extension_scheme && !current_frame_is_extension_process) {
+              ...
+            }
+            ...
+          }
+      - pattern: |
+          if (!url_has_extension_scheme && !current_frame_is_extension_process) {
+            ...
+          }
+          ...
+          if (navigation_handle()->IsInMainFrame()) {
+            ...
+          }
+    metavariable-pattern:
+      metavariable: current_frame_is_extension_process
+      pattern: registry->enabled_extensions().GetExtensionOrAppByURL(navigation_handle()->GetStartingSiteInstance()->GetSiteURL())

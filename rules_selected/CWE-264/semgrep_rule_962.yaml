@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2013-4300-scm-check-creds-namespace-check
+    message: "Incorrect namespace used in ns_capable check in scm_check_creds; may allow privilege escalation via PID spoofing (CVE-2013-4300)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              ns_capable(current->nsproxy->pid_ns->user_ns, ...)
+    metadata:
+      cwe: ["CWE-264"]
+      references:
+        - https://github.com/torvalds/linux/commit/d661684cf6820331feae71146c35da83d794467e
+        - CVE-2013-4300

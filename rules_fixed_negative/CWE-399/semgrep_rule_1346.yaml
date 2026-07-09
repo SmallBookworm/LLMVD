@@ -1,0 +1,23 @@
+rules:
+  - id: double-free-in-ioctx-alloc
+    message: "Double free vulnerability in ioctx_alloc: aio_free_ring is called both in aio_setup_ring failure path and in error cleanup, leading to a double free (CVE-2013-7348)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (aio_setup_ring($CTX) < 0)
+              goto err;
+          ...
+          err_cleanup:
+              ...
+          err:
+              aio_free_ring($CTX);
+      - pattern: |
+          if (aio_setup_ring($CTX) < 0)
+              goto err;
+          ...
+          err:
+              aio_free_ring($CTX);
+    metadata:
+      cwe: "CWE-399"
+      cve: "CVE-2013-7348"

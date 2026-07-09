@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2019-19227-null-deref-register-snap-client
+    message: "Potential NULL pointer dereference due to missing error handling after register_snap_client() which may return NULL."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $DL = register_snap_client(...);
+              if (!$DL)
+                ...;
+              ...
+              unregister_snap_client($DL);
+          - pattern: |
+              $DL = register_snap_client(...);
+              if (!$DL)
+                ...;
+              ...
+              goto ...;
+              ...
+              unregister_snap_client($DL);
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2019-19227"

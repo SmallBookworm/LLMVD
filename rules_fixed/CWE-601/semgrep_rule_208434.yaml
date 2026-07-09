@@ -1,0 +1,29 @@
+rules:
+  - id: open_redirect_target_link_uri_missing_validation
+    message: "Missing validation of 'target_link_uri' against OIDCRedirectURLsAllowed setting, leading to open redirect vulnerability (CVE-2021-39191)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (oidc_target_link_uri_matches_configuration($CONFIG, $TARGET_LINK_URI) == FALSE) {
+            ...
+          }
+          ...
+          oidc_authenticate_user(..., $TARGET_LINK_URI, ...);
+      - pattern: |
+          if (oidc_target_link_uri_matches_configuration($CONFIG, $TARGET_LINK_URI) == FALSE) {
+            ...
+          }
+          ...
+          return oidc_authenticate_user(..., $TARGET_LINK_URI, ...);
+    metavariable-comparison:
+      - metavariable: $TARGET_LINK_URI
+        comparison: regex-match
+        value: ^[a-zA-Z_][a-zA-Z0-9_]*$
+    metavariable-pattern:
+      $TARGET_LINK_URI:
+        patterns:
+          - pattern-not: |
+              if (oidc_validate_redirect_url(..., $TARGET_LINK_URI, ...) == FALSE) {
+                ...
+              }

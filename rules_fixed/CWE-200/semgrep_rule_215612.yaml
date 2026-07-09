@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2011-0711-xfs-geometry-uninit
+    message: "Potential uninitialized memory exposure in xfs_ioc_fsgeometry_v1 due to incorrect structure casting and insufficient zeroing before copy_to_user."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          xfs_fs_geometry(..., (xfs_fsop_geom_t *)&$FSGEO, ...);
+          ...
+          copy_to_user(..., &$FSGEO, sizeof($FSGEO));
+      - pattern: |
+          xfs_fs_geometry(..., (xfs_fsop_geom_t *)&$FSGEO, ...);
+          ...
+          copy_to_user(..., &$FSGEO, ...);
+    metavariable-pattern:
+      $FSGEO:
+        patterns:
+          - pattern-inside: |
+              xfs_fsop_geom_v1_t $FSGEO;
+          - pattern: $FSGEO
+            constraint: { named: true }

@@ -1,0 +1,10 @@
+rules:
+  - id: cwe-59-insecure-temp-file
+    patterns:
+      - pattern-either:
+          - pattern: g_file_set_contents("/tmp/rs-filter-graph", ...)
+          - pattern: system("dot -Tpng >/tmp/rs-filter-graph.png </tmp/rs-filter-graph")
+          - pattern: system("gnome-open /tmp/rs-filter-graph.png")
+    message: "Insecure use of predictable temporary file paths may lead to symlink attacks (CWE-59, CVE-2014-4978)."
+    severity: WARNING
+    languages: [c]

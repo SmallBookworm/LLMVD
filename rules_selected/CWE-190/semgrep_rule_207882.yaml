@@ -1,0 +1,17 @@
+rules:
+  - id: bmp-integer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              rowbytes= ((Bitmap_Head.biWidth * Bitmap_Head.biBitCnt - 1) / 32) * 4 + 4;
+          - pattern: |
+              image_ID = ReadImage (fd,
+                                    Bitmap_Head.biWidth,
+                                    ABS (Bitmap_Head.biHeight),
+                                    ...);
+    message: "Potential integer overflow in BMP width/height leading to heap-based buffer overflow (CVE-2009-1570)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-190"
+      cve: "CVE-2009-1570"

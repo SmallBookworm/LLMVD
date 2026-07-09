@@ -1,0 +1,17 @@
+rules:
+  - id: imagemagick-readmatimage-use-after-free
+    message: Use-after-free vulnerability in ReadMATImage due to improper handling of image2 pointer before rotation.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          if(image2==image)
+              image2 = NULL;
+          ... 
+          rotated_image = RotateImage(image, ...);
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2018-11624"
+      references:
+        - https://github.com/ImageMagick/ImageMagick/issues/1149
+        - https://github.com/ImageMagick/ImageMagick6/commit/172d82afe89d3499ef0cab06dc58d380cc1ab946

@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2015-0275-ext4-zero-range-bug
+    message: "Potential denial of service in ext4_zero_range due to improper handling of unaligned block ranges (CVE-2015-0275)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!(mode & FALLOC_FL_KEEP_SIZE) &&
+               offset + len > i_size_read(inode)) {
+              ...
+              if (partial_end)
+                  max_blocks += 1;
+          }
+      - pattern: |
+          ret = ext4_alloc_file_blocks(file, lblk, max_blocks, new_size,
+                                       flags, mode);
+          ...
+          if (!partial_begin && !partial_end)
+              goto out_dio;
+          ...
+          ret = ext4_zero_partial_blocks(handle, inode, offset, len);
+    metadata:
+      cwe: "CWE-17"
+      cve: "CVE-2015-0275"

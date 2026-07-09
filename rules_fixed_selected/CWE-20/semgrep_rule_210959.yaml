@@ -1,0 +1,17 @@
+rules:
+  - id: vorbis_comment_unsafe_parsing
+    message: "Unsafe parsing of Vorbis comment fields may lead to denial of service via crafted input (CVE-2012-1108)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          int commentFields = $DATA.mid($POS, 4).toUInt(false);
+          ...
+          for(int $I = 0; $I < commentFields; $I++) {}
+      - pattern: |
+          int commentLength = $DATA.mid($POS, 4).toUInt(false);
+          ...
+          String comment = String($DATA.mid($POS2, commentLength), String::UTF8);
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2012-1108"

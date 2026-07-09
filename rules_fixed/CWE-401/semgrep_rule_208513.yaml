@@ -1,0 +1,13 @@
+rules:
+  - id: imagemagick-pcl-memory-leak-cve-2019-12976
+    message: "Memory leak in ReadPCLImage due to missing DestroyImage call when delegate_info is NULL"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (delegate_info == (const DelegateInfo *) NULL)
+                return((Image *) NULL);
+          - pattern: |
+              if (delegate_info == (DelegateInfo *) NULL)
+                return((Image *) NULL)

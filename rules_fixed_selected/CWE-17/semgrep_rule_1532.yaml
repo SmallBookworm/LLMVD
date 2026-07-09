@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2015-1805-pipe-write-vulnerable-copy
+    message: "Detected vulnerable pipe_write implementation using pipe_iov_copy_from_user which may lead to I/O vector array overrun (CVE-2015-1805)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          pipe_iov_copy_from_user(..., $IOV, ..., $ATOMIC)
+      - pattern: |
+          error = pipe_iov_copy_from_user(...)
+    metadata:
+      cwe: ["CWE-17"]
+      cve: "CVE-2015-1805"

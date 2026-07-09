@@ -1,0 +1,18 @@
+rules:
+  - id: flatpak-nofilesystem-host-home-traversal
+    message: "Potential path traversal due to insufficient handling of --nofilesystem=host/home in Flatpak context merging"
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          g_hash_table_iter_init (&iter, other->filesystems);
+          while (g_hash_table_iter_next (&iter, &key, &value))
+            g_hash_table_insert (context->filesystems, g_strdup (key), value);
+      - pattern: |
+          g_hash_table_iter_init (&iter, other->filesystems);
+          while (g_hash_table_iter_next (&iter, &key, &value))
+            g_hash_table_insert (context->filesystems, g_strdup (key), value);
+    metavariable-pattern:
+      metavariable: context
+      pattern: FlatpakContext *
+    focus-metavariable: context

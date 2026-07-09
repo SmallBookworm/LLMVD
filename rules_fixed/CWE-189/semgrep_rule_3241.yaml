@@ -1,0 +1,8 @@
+rules:
+  - id: zlib-crc32-big-endian-pointer-decrement
+    message: "Pre-decrement of pointer 'buf4' may result in undefined behavior by pointing before allocated memory (CWE-189)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      $BUF4 = (const z_crc_t FAR *)(const void FAR *)$BUF;
+      $BUF4--;

@@ -1,0 +1,25 @@
+rules:
+  - id: cve-2018-8799-lspci-process-unchecked-stream
+    message: "Unvalidated stream access in lspci_process may lead to out-of-bounds read (CVE-2018-8799, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      lspci_process(STREAM $s) {
+        ...
+        unsigned int pkglen;
+        ...
+        pkglen = $s->end - $s->p;
+        ...
+      }
+    pattern-not: |
+      lspci_process(STREAM $s) {
+        ...
+        if (!s_check($s)) {
+          rdp_protocol_error(...);
+        }
+        ...
+        unsigned int pkglen;
+        ...
+        pkglen = $s->end - $s->p;
+        ...
+      }

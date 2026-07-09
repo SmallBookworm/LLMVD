@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2016-0755-ntlm-proxy-credentials-check
+    message: "Missing proxy NTLM credentials comparison in ConnectionExists may allow authentication bypass (CVE-2016-0755, CWE-287)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if((!(needle->handler->flags & PROTOPT_CREDSPERREQUEST))
+          #ifdef USE_NTLM
+             || (wantNTLMhttp || check->ntlm.state != NTLMSTATE_NONE)
+          #endif
+            ) {
+            ...
+            # Proxy NTLM credentials are not compared here
+          }
+      - pattern: |
+          if(wantNTLMhttp) {
+            if(credentialsMatch && check->ntlm.state != NTLMSTATE_NONE) {
+              ...
+            }
+            ...
+          }

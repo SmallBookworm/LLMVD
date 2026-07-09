@@ -1,0 +1,15 @@
+rules:
+  - id: ffmpeg-xwddec-bpp-check-incomplete
+    message: "Incomplete validation of 'bpp' may lead to heap-based buffer overflow (CVE-2017-9991, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (bpp != 1 && bpp != 8)
+              return ...;
+      - pattern: |
+          if (bpp != 16 && bpp != 24 && bpp != 32)
+              return ...;
+    metavariable-regex:
+      metavariable: $...
+      regex: "AVERROR_INVALIDDATA"

@@ -1,0 +1,14 @@
+rules:
+  - id: imagemagick-writegifimage-memory-leak
+    message: "Memory leak in WriteGIFImage due to missing deallocation of global_colormap or colormap on allocation failure."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ((global_colormap == (unsigned char *) NULL) ||
+              (colormap == (unsigned char *) NULL))
+            ThrowWriterException(...);
+      - pattern: |
+          if ((global_colormap == (unsigned char *) NULL) ||
+              (colormap == (unsigned char *) NULL))
+            $EXCEPTION;

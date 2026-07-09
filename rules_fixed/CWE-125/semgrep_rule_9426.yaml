@@ -1,0 +1,13 @@
+rules:
+  - id: cwe-125-radius-buffer-overread
+    message: "Buffer over-read vulnerability in RADIUS parser due to unchecked pointer dereference before length validation."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (...; *$DATA && $I < $LENGTH; ...)
+          - pattern: |
+              for (...; *$DATA && ...; ...)
+              ...
+              $I < $LENGTH

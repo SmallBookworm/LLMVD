@@ -1,0 +1,30 @@
+rules:
+  - id: libvncclient-missing-vncrec-free
+    message: "Missing free of 'client->vncRec' in rfbClientCleanup() may cause memory leak (CVE-2020-29260)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          void rfbClientCleanup(rfbClient* client) {
+            ...
+            FreeTLS(client);
+            ...
+            if (client->sock != RFB_INVALID_SOCKET)
+              rfbCloseSocket(client->sock);
+            ...
+          }
+      - pattern: |
+          void rfbClientCleanup(rfbClient* client) {
+            ...
+            FreeTLS(client);
+            ...
+            if (client->listenSock != RFB_INVALID_SOCKET)
+              rfbCloseSocket(client->listenSock);
+            ...
+          }
+    pattern-not: |
+      void rfbClientCleanup(rfbClient* client) {
+        ...
+        free(client->vncRec);
+        ...
+      }

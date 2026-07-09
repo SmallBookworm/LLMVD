@@ -1,0 +1,27 @@
+rules:
+  - id: double-fetch-vop-ioctl
+    message: "Double fetch vulnerability detected: user-controlled data is read twice without validation in between, which may lead to race conditions and memory corruption."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (copy_from_user(&$dd, $argp, sizeof($dd)))
+                  return -EFAULT;
+              ...
+              if (copy_from_user($dd_config, $argp, mic_desc_size(&$dd))) {
+                  ...
+              }
+              ...
+              $mutex_lock(...);
+          - pattern: |
+              copy_from_user(&$dd, $argp, sizeof($dd));
+              ...
+              copy_from_user($dd_config, $argp, mic_desc_size(&$dd));
+              ...
+              mutex_lock(...);
+    metavariable-regex:
+      - metavariable: $dd
+        regex: "dd"
+    fix-regex:
+      enabled: false

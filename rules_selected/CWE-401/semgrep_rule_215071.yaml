@@ -1,0 +1,19 @@
+rules:
+  - id: missing_snd_card_free
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (ret < 0) {
+                  kfree($X);
+                  return ret;
+              }
+          - pattern: |
+              if (ret < 0) {
+                  return ret;
+              }
+    message: "Missing call to snd_card_free in error path may cause memory leak (CWE-401)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: ["CWE-401"]
+      cve: "CVE-2019-20810"

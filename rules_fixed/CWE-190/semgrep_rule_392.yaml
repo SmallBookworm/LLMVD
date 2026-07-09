@@ -1,0 +1,19 @@
+rules:
+  - id: cwe-190-integer-overflow-libnl
+    message: "Missing overflow check before buffer reservation may lead to integer overflow (CWE-190)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern: |
+          if ((tlen + nlmsg_len) > n->nm_size)
+            n->nm_nlh->nlmsg_len += tlen;
+      - metavariable-pattern:
+          metavariable: tlen
+          pattern: |
+            $X ? (($Y + ($X - 1)) & ~($X - 1)) : $Y
+      - pattern-not: |
+          if ($LEN > n->nm_size)
+            return NULL;
+          ...
+          if ((tlen + nlmsg_len) > n->nm_size)
+            n->nm_nlh->nlmsg_len += tlen;

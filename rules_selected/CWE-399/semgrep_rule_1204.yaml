@@ -1,0 +1,21 @@
+rules:
+  - id: udf_unbounded_icb_indirection
+    message: "Unbounded ICB indirection in __udf_read_inode may cause infinite loop or stack overflow (CVE-2014-6410)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (fe->icbTag.strategyType == cpu_to_le16(4096)) {
+            ...
+            __udf_read_inode(inode);
+            return;
+          }
+      - pattern: |
+          if (fe->icbTag.strategyType == cpu_to_le16(4096)) {
+            ...
+            $FUNC_NAME(inode);
+            return;
+          }
+    metadata:
+      cwe: ["CWE-399"]
+      cve: "CVE-2014-6410"

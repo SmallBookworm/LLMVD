@@ -1,0 +1,34 @@
+rules:
+  - id: cve-2015-8467-samba-uac-account-swap
+    message: "Missing admin privilege check when swapping between UF_NORMAL_ACCOUNT and UF_WORKSTATION_TRUST_ACCOUNT in userAccountControl"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (this_uac_new != this_uac_old) {
+                  if (this_uac_old != 0) {
+                      if (map[i].delete_is_privileged == false) {
+                          continue;
+                      }
+                  }
+                  ...
+              }
+          - pattern: |
+              for (...; ...; ...) {
+                  uint32_t this_uac_new = user_account_control & map[i].uac;
+                  uint32_t this_uac_old = user_account_control_old & map[i].uac;
+                  if (this_uac_new != this_uac_old) {
+                      ...
+                  }
+              }
+    pattern-not-inside: |
+      const struct uac_to_guid {
+          ...
+          .priv_to_change_from = ...,
+          .admin_required = true,
+          ...
+      } map[] = { ... };
+    fix-regex:
+      regex: ""
+      replacement: ""

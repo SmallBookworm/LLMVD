@@ -1,0 +1,20 @@
+rules:
+  - id: lucky_thirteen_vulnerable_padding_removal
+    message: "Detected vulnerable TLS CBC padding removal logic susceptible to Lucky Thirteen timing attack (CVE-2013-0169)."
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          const char has_explicit_iv = $S->version >= TLS1_1_VERSION || $S->version == DTLS1_VERSION;
+          const unsigned overhead = 1 + $MAC_SIZE + (has_explicit_iv ? $BLOCK_SIZE : 0);
+          if (overhead > $REC->length)
+            return 0;
+      - pattern: |
+          if (EVP_CIPHER_flags($CTX->cipher) & EVP_CIPH_FLAG_AEAD_CIPHER)
+            {
+            rec->length -= padding_length;
+            return 1;
+            }
+    metadata:
+      cwe: "CWE-310"
+      cve: "CVE-2013-0169"

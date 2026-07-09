@@ -1,0 +1,23 @@
+rules:
+  - id: ext4_missing_superblock_sanity_check
+    message: Missing sanity check for superblock configuration before mounting ext4 filesystem. This could lead to NULL pointer dereference and denial of service.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (EXT4_BLOCKS_PER_GROUP(sb) == 0)
+          	goto cantfind_ext4;
+          ...
+          blocks_count = (ext4_blocks_count(es) -
+          		le32_to_cpu(es->s_first_data_block) +
+          		EXT4_BLOCKS_PER_GROUP(sb) - 1);
+      - pattern: |
+          if (EXT4_BLOCKS_PER_GROUP(sb) == 0)
+          	goto cantfind_ext4;
+          ...
+          sbi->s_groups_count = blocks_count;
+    metavariable-regex:
+      - metavariable: blocks_count
+        regex: "blocks_count"
+    fix-regex:
+      enabled: false

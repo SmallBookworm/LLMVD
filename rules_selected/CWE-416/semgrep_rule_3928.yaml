@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2019-15917-use-after-free
+    message: "Use-after-free vulnerability due to premature setting of HCI_UART_PROTO_READY flag before successful registration."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          set_bit(HCI_UART_PROTO_READY, &hu->flags);
+          ...
+          err = hci_uart_register_dev(hu);
+          if (err) {
+              clear_bit(HCI_UART_PROTO_READY, &hu->flags);
+              return err;
+          }
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2019-15917"

@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2016-3758-buffer-overflow-strncat
+    message: "Potential buffer overflow in strncat usage. The third argument should account for remaining space using 'kBufLen - strlen(dest)' to prevent overflows (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: strncat($BUF, $SRC, $KBUFLEN)
+      - pattern: strncat($BUF, "/", $KBUFLEN)
+    metavariable-pattern:
+      metavariable: $KBUFLEN
+      pattern: kBufLen
+    focus-metavariable: $KBUFLEN

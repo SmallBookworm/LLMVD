@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2014-9669-integer-overflow-cwe-125
+    message: "Potential integer overflow leading to out-of-bounds read (CWE-125). Use division-based bounds check instead of multiplication to avoid overflow."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ( $PTR + $NUM * 12 > $LIMIT )
+                ...
+          - pattern: |
+              if ( $START_ID + $END - $START >= $GLYPH_COUNT )
+                ...
+    metadata:
+      cwe: ["CWE-125"]
+      cve: "CVE-2014-9669"

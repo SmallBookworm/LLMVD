@@ -1,0 +1,7 @@
+rules:
+  - id: cve-2013-2909-use-after-free-bidi-isolate
+    message: "Use-after-free vulnerability due to incorrect isolate containment in bidirectional text handling. Use 'highestContainingIsolateWithinRoot' instead of 'containingIsolate' to avoid dangling references."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      containingIsolate($START_OBJ, $CURRENT_ROOT)

@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2019-5775-idn-spoof-checker-missing-confusables
+    message: "Missing confusable character mappings in IDN spoof checker may allow URL bar spoofing (CVE-2019-5775)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern-inside: |
+              extra_confusable_mapper_.reset(icu::Transliterator::createFromRules(
+                  ...,
+                  icu::UnicodeString::fromUTF8($STR),
+                  ...));
+          - metavariable-regex:
+              metavariable: $STR
+              regex: '.*\\[.*[\\u0e1a\\u0e9aบບ].*> u;.*'
+      - pattern-not: |
+          extra_confusable_mapper_.reset(icu::Transliterator::createFromRules(
+              ...,
+              icu::UnicodeString::fromUTF8(..."[०০੦૦ଠ୦೦] > o;[৭੧૧] > q;[บບ] > u;[२২੨੨૨೩೭] > 2;..."),
+              ...));

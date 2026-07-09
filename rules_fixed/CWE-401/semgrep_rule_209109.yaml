@@ -1,0 +1,24 @@
+rules:
+  - id: memory-leak-af9005-identify-state
+    message: Memory leak detected. Returning -EIO without freeing 'buf' may cause denial of service.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ($COND) {
+            $STMTS
+          } else {
+            return -EIO;
+          }
+      - pattern: |
+          if ($COND1) {
+            $STMTS1
+          } else if ($COND2) {
+            $STMTS2
+          } else {
+            return -EIO;
+          }
+    metavariable-regex:
+      metavariable: $STMTS
+      regex: "reply"
+    focus-metavariable: $STMTS

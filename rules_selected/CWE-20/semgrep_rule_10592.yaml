@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2015-5194-logconfig-crash
+    patterns:
+      - pattern-either:
+          - pattern: |
+              char prefix = $STR[0];
+              char *type = $STR + 1;
+              if (prefix != '+' && prefix != '-' && prefix != '=') {
+                yyerror("Logconfig prefix is not '+', '-' or '='\n");
+              }
+          - pattern: |
+              char prefix = $STR[0];
+              char *type = $STR + 1;
+              if (prefix != '+' && prefix != '-' && prefix != '=') {
+                ...
+              }
+    message: "Unsafe logconfig prefix handling may lead to crash on malformed input (CVE-2015-5194)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2015-5194"

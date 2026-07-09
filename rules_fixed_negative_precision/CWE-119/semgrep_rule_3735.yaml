@@ -1,0 +1,21 @@
+rules:
+  - id: kamailio-tmx-buffer-overflow-cve-2018-8828
+    message: "Heap-based buffer overflow due to missing null-terminator space allocation for branch value in tmx_check_pretran"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          dsize = ... + sftag.len + 4;
+          if(likely(vbr!=NULL)) {
+            ...
+            dsize += svbranch.len;
+          }
+      - pattern: |
+          dsize = scallid.len + scseqnum.len + scseqmet.len + sftag.len + 4;
+          if(likely(vbr!=NULL)) {
+            ...
+            dsize += svbranch.len;
+          }
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2018-8828"

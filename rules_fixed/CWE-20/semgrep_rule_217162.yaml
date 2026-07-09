@@ -1,0 +1,42 @@
+rules:
+  - id: vim-modeline-filetype-validation
+    message: "Missing validation for 'filetype', 'syntax', or 'keymap' options may lead to arbitrary code execution via malicious modelines."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (varp == &(curbuf->b_p_keymap)) {
+          ...
+          }
+      - pattern: |
+          if (gvarp == &p_ft) {
+          ...
+          }
+      - pattern: |
+          if (gvarp == &p_syn) {
+          ...
+          }
+    patterns:
+      - pattern-not-inside: |
+          if (varp == &(curbuf->b_p_keymap)) {
+            if (!valid_filetype(*varp)) {
+              errmsg = e_invarg;
+            } else {
+              ...
+            }
+            ...
+          }
+      - pattern-not-inside: |
+          if (gvarp == &p_ft) {
+            if (!valid_filetype(*varp)) {
+              errmsg = e_invarg;
+            }
+            ...
+          }
+      - pattern-not-inside: |
+          if (gvarp == &p_syn) {
+            if (!valid_filetype(*varp)) {
+              errmsg = e_invarg;
+            }
+            ...
+          }

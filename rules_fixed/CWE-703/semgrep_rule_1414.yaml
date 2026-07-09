@@ -1,0 +1,18 @@
+rules:
+  - id: corosync-hmac-key-initialization
+    message: HMAC key is not properly initialized, leading to potential denial of service (CVE-2013-0250).
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $hash_param.data = 0;
+              ...
+              $hash_param.len = 0;
+          - pattern: |
+              $hash_param.data = NULL;
+              ...
+              $hash_param.len = 0;
+    metavariable-pattern:
+      metavariable: $hash_param
+      pattern: SECItem

@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2017-13715-uninitialized-thoff
+    message: "Missing bounds check on 'thoff' field may lead to out-of-bounds access. Ensure 'thoff' is capped by skb->len or hlen."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          key_control->thoff = (u16)nhoff;
+      - pattern: |
+          key_control->thoff = nhoff;
+    metavariable-regex:
+      - metavariable: nhoff
+        regex: "nhoff"
+    fix-regex:
+      enabled: false

@@ -1,0 +1,14 @@
+rules:
+  - id: imagemagick-writeprofile-exif-buffer-overflow
+    message: "Potential buffer overflow in WriteProfile function when handling EXIF profiles larger than 65533 bytes. Missing size validation before jpeg_write_marker call."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (LocaleCompare(name,"EXIF") == 0)
+           for ($I=0; $I < (ssize_t) GetStringInfoLength($PROFILE); $I+=65533L)
+            {
+             $LENGTH=MagickMin(GetStringInfoLength($PROFILE)-$I,65533L);
+             jpeg_write_marker($JPEG_INFO,XML_MARKER,GetStringInfoDatum($PROFILE)+$I,
+                (unsigned int) $LENGTH);
+            }

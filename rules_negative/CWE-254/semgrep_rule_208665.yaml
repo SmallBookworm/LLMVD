@@ -1,0 +1,15 @@
+rules:
+  - id: ntp-cve-2015-7973-broadcast-timestamp-check
+    message: "Use of L_ISGT instead of L_SUB for timestamp monotonicity check in broadcast mode may allow replay attacks (CVE-2015-7973)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern: |
+          if (L_ISGT(&peer->bxmt, &p_xmt)) {
+              ...
+          }
+    metadata:
+      cwe: "CWE-254"
+      cve: "CVE-2015-7973"
+      references:
+        - "https://github.com/ntp-project/ntp/commit/50ef2f62dc326bc9edac166b2b4ba5b5d8b4f7d4"

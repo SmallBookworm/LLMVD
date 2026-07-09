@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2021-3975-use-after-free
+    message: "Use-after-free vulnerability due to missing monitor lock before calling qemuMonitorUnregister. This may lead to a denial of service via crash."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              qemuMonitorUnregister($MON);
+          - pattern: |
+              ... 
+              qemuMonitorUnregister($MON);
+              ...
+    # Exclude cases where the call is protected by virObjectLock/Unlock
+    pattern-not-inside: |
+      virObjectLock($MON);
+      ...
+      qemuMonitorUnregister($MON);
+      ...
+      virObjectUnlock($MON);
+    metavariable-regex:
+      metavariable: $MON
+      regex: mon

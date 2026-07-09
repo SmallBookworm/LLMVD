@@ -1,0 +1,20 @@
+rules:
+  - id: cwe-476-null-pointer-dereference-libtasn1
+    message: "Potential NULL pointer dereference in asn1_read_value_type when ivalue is NULL and used without check."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              PUT_STR_VALUE($value, $value_size, ...);
+          - pattern: |
+              PUT_AS_STR_VALUE($value, $value_size, ...);
+          - pattern: |
+              ADD_STR_VALUE($value, $value_size, ...);
+          - pattern: |
+              PUT_VALUE($value, $value_size, ...);
+    metavariable-pattern:
+      $value:
+        regex: ivalue
+    fix-regex:
+      enabled: false

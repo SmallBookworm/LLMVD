@@ -1,0 +1,17 @@
+rules:
+  - id: hid-off-by-one-rsize-check
+    message: "Potential out-of-bounds write due to off-by-one error in report descriptor size check (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (*$rsize >= 74 &&
+              ... &&
+              rdesc[74] == ...)
+      - pattern: |
+          if (*$rsize > 74 &&
+              ... &&
+              rdesc[74] == ...)
+    metavariable-regex:
+      metavariable: $rsize
+      regex: rsize

@@ -1,0 +1,8 @@
+rules:
+  - id: xfs_attr_shortform_verify_boundary_check
+    message: "Off-by-one error in boundary check for xfs_attr_sf_entry may lead to denial of service (CVE-2020-14385, CWE-131)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (((char *)sfep + sizeof(*sfep)) >= endp)
+        return __this_address;

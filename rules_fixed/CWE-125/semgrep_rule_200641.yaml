@@ -1,0 +1,31 @@
+rules:
+  - id: cwe-125-exif-buffer-overflow
+    message: "Potential out-of-bounds read in exif_iif_add_value due to missing bounds check on 'length' against actual buffer size. This may lead to information disclosure or crash (CWE-125, CVE-2019-11035)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          case TAG_FMT_STRING:
+            if (value) {
+              length = php_strnlen(value, length);
+              ...
+            }
+      - pattern: |
+          case TAG_FMT_UNDEFINED:
+            if (value) {
+              ...
+              info_value->s = estrndup(value, length);
+              ...
+            }
+      - pattern: |
+          for ($*; idex < (size_t)length; idex++, vptr = (char *)vptr + php_tiff_bytes_per_format[$...]) {
+            ...
+            switch ($$) {
+              ...
+              case TAG_FMT_$$$: 
+                ...
+            }
+          }
+    metavariable-regex:
+      metavariable: '$$$$'
+      regex: "TAG_FMT_(STRING|UNDEFINED|USHORT|ULONG|URATIONAL|SSHORT|SLONG|SRATIONAL|SINGLE|DOUBLE)"

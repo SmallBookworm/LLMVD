@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2017-11522-null-ptr-deref
+    patterns:
+      - pattern: |
+          image = CloneImage(...);
+          image_info=(ImageInfo *) CloneImageInfo(...);
+          if (image_info == (ImageInfo *) NULL)
+            ThrowWriterException(...);
+      - pattern-not: |
+          image = CloneImage(...);
+          if (image == (Image *) NULL)
+            return(MagickFalse);
+          image_info=(ImageInfo *) CloneImageInfo(...);
+          if (image_info == (ImageInfo *) NULL)
+            ThrowWriterException(...);
+    message: "Missing NULL check after CloneImage() may lead to NULL pointer dereference (CVE-2017-11522, CWE-476)."
+    severity: ERROR
+    languages: [c]

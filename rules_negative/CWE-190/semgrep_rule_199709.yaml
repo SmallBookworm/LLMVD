@@ -1,0 +1,15 @@
+rules:
+  - id: imagemagick-cve-2020-27761-integer-overflow
+    message: "Potential integer overflow due to unsafe casting to size_t in arithmetic expression. Use ssize_t to avoid undefined behavior."
+    severity: LOW
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: '(($X * (size_t) $Y) / (size_t) $Z)'
+          - pattern: '(($X * (size_t) $Y) / (size_t) QuantumRange)'
+    metadata:
+      cwe: "CWE-190"
+      cve: "CVE-2020-27761"
+      references:
+        - https://github.com/ImageMagick/ImageMagick/issues/1726
+        - https://github.com/ImageMagick/ImageMagick/commit/db5e12e24f1378ce8c93a5c35991dcdd23a67bb0

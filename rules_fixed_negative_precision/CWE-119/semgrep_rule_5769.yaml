@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2013-6627-android-fifo-initialization-check
+    message: "Missing CHECK for kDumpRenderTree switch before Android FIFO initialization may lead to out-of-bounds read (CVE-2013-6627)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          CHECK(CommandLine::ForCurrentProcess()->HasSwitch(switches::kDumpRenderTree));
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2013-6627"

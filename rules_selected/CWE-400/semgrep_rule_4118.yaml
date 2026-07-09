@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2018-21017-dinf-memleak
+    message: "Missing call to gf_isom_box_add_for_dump_mode may cause memory leak in dinf_Read"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!((GF_DataInformationBox *)$S)->dref) {
+              ...
+              ((GF_DataInformationBox *)$S)->dref = (GF_DataReferenceBox *)gf_isom_box_new(...);
+          }
+      - pattern: |
+          if (!((GF_DataInformationBox *)$S)->dref) {
+              ...
+              $DREF = gf_isom_box_new(...);
+              ((GF_DataInformationBox *)$S)->dref = (GF_DataReferenceBox *)$DREF;
+          }
+    pattern-not: |
+        if (!((GF_DataInformationBox *)$S)->dref) {
+            ...
+            $DREF = gf_isom_box_new(...);
+            ((GF_DataInformationBox *)$S)->dref = (GF_DataReferenceBox *)$DREF;
+            gf_isom_box_add_for_dump_mode($S, $DREF);
+        }

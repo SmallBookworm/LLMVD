@@ -1,0 +1,17 @@
+rules:
+  - id: radare2-command-injection-cve-2019-16718
+    message: "Potential command injection vulnerability due to unsafe usage of symbol names in r_cons_printf without proper quoting. This may allow arbitrary shell command execution via crafted symbol names (CVE-2019-16718, CWE-78)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          r_cons_printf ("k bin/pe/%s/%d=%s\n",
+            ...,
+            ...,
+            ...);
+      - pattern: |
+          r_cons_printf ("k bin/pe/%s/%d=%s.%s\n",
+            ...,
+            ...,
+            ...,
+            ...);

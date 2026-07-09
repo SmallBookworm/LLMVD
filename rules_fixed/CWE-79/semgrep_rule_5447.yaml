@@ -1,0 +1,14 @@
+rules:
+  - id: chromium-xss-ssl-error
+    message: "Potential XSS vulnerability due to missing HTML escaping in SSL error messages. User-controlled input from certificate fields or URLs is directly interpolated into UI strings without sanitization."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          l10n_util::GetStringFUTF16(..., UTF8ToUTF16($X), ...)
+      - pattern: |
+          l10n_util::GetStringFUTF16(..., UTF8ToUTF16($X), UTF8ToUTF16($Y), ...)
+    metavariable-pattern:
+      - metavariable: $X
+        patterns:
+          - pattern-not: net::EscapeForHTML($X)

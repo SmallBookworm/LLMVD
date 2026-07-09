@@ -1,0 +1,27 @@
+rules:
+  - id: imagemagick-cache-memory-leak-cve-2017-17887
+    message: "Potential memory leak in GetImagePixelCache due to missing DestroyPixelCache call on failure path."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (status != MagickFalse)
+            {
+              ...
+              if (clone != MagickFalse)
+                status=ClonePixelCacheRepository(...);
+              if (status != MagickFalse)
+                {
+                  destroy=MagickTrue;
+                  image->cache=clone_image.cache;
+                }
+            }
+      - pattern: |
+          status=OpenPixelCache(&clone_image,...);
+          if (status != MagickFalse)
+            {
+              ...
+            }
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: GetImagePixelCache

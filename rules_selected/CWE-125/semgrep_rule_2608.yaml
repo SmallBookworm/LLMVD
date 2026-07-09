@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2017-12992-buffer-overread
+    message: Buffer over-read vulnerability in RIPng parser due to insufficient bounds checking (CVE-2017-12992, CWE-125).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          for ($NI = $RP->rip6_nets; $I >= sizeof(*$NI);
+              $I -= sizeof(*$NI), ++$NI) {
+            ...
+            rip6_entry_print(..., $NI, ...);
+          }
+      - pattern: |
+          for ($NI = $RP->rip6_nets; $LENGTH_LEFT >= sizeof(*$NI);
+              $LENGTH_LEFT -= sizeof(*$NI), ++$NI) {
+            ...
+            rip6_entry_print(..., $NI, ...);
+          }
+    metavariable-pattern:
+      metavariable: $RP
+      pattern: (const struct rip6 *)
+    focus-metavariable: $NI

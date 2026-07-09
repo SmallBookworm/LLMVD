@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2014-2270-out-of-bounds-access
+    message: "Potential out-of-bounds memory access due to missing bounds check before offset use. This could lead to denial of service (CVE-2014-2270)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (nbytes < offset || nbytes < (offset + $SIZE))
+            return 0;
+      - pattern: |
+          if (nbytes < (offset + $SIZE))
+            return 0;
+    fix-regex:
+      regex: '.*'
+      replacement: ''

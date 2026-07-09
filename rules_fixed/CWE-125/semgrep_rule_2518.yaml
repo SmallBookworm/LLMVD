@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2017-13052-cfm-sender-id-buffer-overread
+    message: "Buffer over-read vulnerability in CFM Sender ID TLV parsing due to missing length validation before calling etheraddr_string()."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              case CFM_CHASSIS_ID_MAC_ADDRESS:
+                  ND_PRINT((..., "\n\t  MAC %s", etheraddr_string(..., tptr + 1)));
+          - pattern: |
+              case CFM_CHASSIS_ID_MAC_ADDRESS:
+                  ND_PRINT((..., "\n\t  MAC %s", etheraddr_string(..., ...)))
+    metavariable-pattern:
+      metavariable: tptr
+      pattern: $PTR
+    fixes:
+      - regex: etheraddr_string$$[^,]+,\s*tptr\h*\+\h*1$$
+        replacement: etheraddr_string(..., tptr + 1) /* TODO: validate buffer bounds */
+    fix-regex:
+      enabled: false

@@ -1,0 +1,24 @@
+rules:
+  - id: cwe-787-out-of-bounds-access-pam-u2f
+    message: Potential out-of-bounds write due to unchecked array index. The loop variable 'i' may exceed the allocated 'devices' array bounds when '*n_devs' is incremented before bounds checking.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (((*$n_devs)++) > MAX_DEVS - 1) {
+                ...
+                $devices[$i]...;
+                ...
+                $i++;
+              }
+          - pattern: |
+              if (((*$n_devs)++) > $max_devs - 1) {
+                ...
+                $devices[$i]...;
+                ...
+                $i++;
+              }
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2019-1221"

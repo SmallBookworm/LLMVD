@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2013-4513-buffer-overflow
+    message: |
+      Buffer overflow vulnerability in oz_cdev_write. Missing check on 'count' 
+      against available buffer space in ei->data before copy_from_user.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (copy_from_user(..., ..., count))
+            ...
+      - pattern: |
+          elt->length = sizeof(struct oz_app_hdr) + count;
+    metavariable-pattern:
+      metavariable: count
+      pattern-not: |
+        if (count > sizeof(ei->data) - sizeof(*elt) - sizeof(*app_hdr))
+          return -EINVAL;

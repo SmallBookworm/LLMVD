@@ -1,0 +1,7 @@
+rules:
+  - id: cwe-787-mdc2-update-integer-overflow
+    message: "Potential integer overflow in MDC2_Update leading to out-of-bounds write (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (i + len < MDC2_BLOCK)

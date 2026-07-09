@@ -1,0 +1,12 @@
+rules:
+  - id: unsafe_sprintf_buffer_overflow
+    patterns:
+      - pattern: sprintf($BUF, "%.*s", $LEN, $SRC)
+    message: "Use of sprintf with '%.*s' format may lead to buffer overflow. Prefer snprintf with explicit buffer size."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      references:
+        - "https://github.com/ckolivas/cgminer/commit/e1c5050734123973b99d181c45e74b2cbb00272e"
+        - "CVE-2014-4502"

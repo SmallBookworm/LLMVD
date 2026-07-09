@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2013-7265-uninitialized-addr-len
+    message: "Potential disclosure of uninitialized kernel stack memory via recv* syscalls due to premature update of *addr_len."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      pattern-either:
+        - pattern: |
+            if ($ADDR_LEN)
+                *$ADDR_LEN = $SIZE;
+            ... 
+            if ($MSG->msg_name != NULL)
+                memcpy(...);
+        - pattern: |
+            *$ADDR_LEN = $SIZE;
+            ... 
+            if ($MSG->msg_name != NULL)
+                memcpy(...);
+    metavariable-pattern:
+      $SIZE: "sizeof(...)"

@@ -1,0 +1,7 @@
+rules:
+  - id: cve-2016-1249-out-of-bounds-read
+    message: "Potential out-of-bounds read due to unsafe access of imp_sth->stmt->fields[i] when fields may be uninitialized (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      imp_sth->stmt->fields[i].type

@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2019-8383-buffer-overflow
+    message: "Potential buffer overflow due to missing integer overflow checks before memory allocation. This could lead to heap corruption or denial of service."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2019-8383"
+    pattern-either:
+      - pattern: |
+          $DAT_SIZE = $HEIGHT * ($WIDTH_ALIGN * $PIXEL + 1);
+          $DAT_PTR = malloc($DAT_SIZE);
+      - pattern: |
+          $DAT_SIZE = $HEIGHT * ($WIDTH_ALIGN / $N + 1);
+          $DAT_PTR = malloc($DAT_SIZE)

@@ -1,0 +1,24 @@
+rules:
+  - id: sctp_rcv_socket_race_condition
+    message: "Detected potential race condition in sctp_rcv due to missing socket mismatch check after locking. This may lead to a denial of service (CVE-2011-4348, CWE-362)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          sctp_bh_lock_sock($SK);
+          if (sock_owned_by_user($SK)) {
+            ...
+          } else {
+            ...
+          }
+      - pattern: |
+          sctp_bh_lock_sock($SK);
+          ... sock_owned_by_user($SK) ...
+    metavariable-pattern:
+      $SK:
+        pattern-not: |
+          if ($SK != $RCVR->sk) {
+            sctp_bh_unlock_sock($SK);
+            $SK = $RCVR->sk;
+            sctp_bh_lock_sock($SK);
+          }

@@ -1,0 +1,10 @@
+rules:
+  - id: mujs-numtostr-buffer-overflow
+    patterns:
+      - pattern: |
+          char buf[32];
+          ...
+          sprintf(buf, ...);
+    message: "Stack-based buffer overflow vulnerability in numtostr due to insufficient buffer size (CWE-119)."
+    severity: ERROR
+    languages: [c]

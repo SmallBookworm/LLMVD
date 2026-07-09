@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2019-10125-use-after-free-aio-poll
+    message: "Use-after-free vulnerability in aio_poll due to premature fput() on req->file. The file descriptor may be released by aio_poll_wake() before vfs_poll() completes, leading to a use-after-free (CWE-416)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          req->file = fget(...);
+          ...
+          mask = vfs_poll(req->file, ...);
+          ...
+          if (unlikely(apt.error)) {
+              fput(req->file);
+              ...
+          }
+      - pattern: |
+          req->file = fget(...);
+          ...
+          vfs_poll(req->file, ...);
+          ...
+          fput(req->file);
+    metavariable-regex:
+      metavariable: $...
+      regex: ".*"

@@ -1,0 +1,33 @@
+rules:
+  - id: cve-2008-3275-lookup-dead-dir
+    message: "Lookup on a deleted (S_DEAD) directory may lead to denial of service. Missing check for IS_DEADDIR before creating child dentry."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!dentry) {
+                ...
+                $$new = d_alloc(...);
+                ...
+              }
+          - pattern: |
+              if (!dentry) {
+                struct dentry *$$new;
+                ...
+                $$new = d_alloc(...);
+                ...
+              }
+      - pattern-not: |
+          if (!dentry) {
+            ...
+            if (IS_DEADDIR(...)) {
+              goto ...;
+            }
+            ...
+            d_alloc(...);
+            ...
+          }
+    metavariable-regex:
+      metavariable: new
+      regex: "^new$"

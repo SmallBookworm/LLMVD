@@ -1,0 +1,42 @@
+rules:
+  - id: cve-2010-4819-render-add-glyphs-bounds-check
+    message: "Missing bounds check for nglyphs in ProcRenderAddGlyphs may lead to memory corruption or DoS (CVE-2010-4819)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          remain = (client->req_len << 2) - sizeof ($REQ_TYPE);
+          ...
+          $GIDS = (CARD32 *) ($STUFF + 1);
+          $GI = (xGlyphInfo *) ($GIDS + $NGRAPHS);
+          $BITS = (CARD8 *) ($GI + $NGRAPHS);
+          remain -= (sizeof (CARD32) + sizeof (xGlyphInfo)) * $NGRAPHS;
+          ...
+          for (...; ... < $NGRAPHS; ...)
+          {
+            ...
+          }
+      - pattern: |
+          $GIDS = (CARD32 *) ($STUFF + 1);
+          $GI = (xGlyphInfo *) ($GIDS + $NGRAPHS);
+          $BITS = (CARD8 *) ($GI + $NGRAPHS);
+          ...
+          for (...; ... < $NGRAPHS; ...)
+          {
+            ...
+          }
+    pattern-not: |
+      if ($GI < $STUFF || $GI > ((CARD32 *)$STUFF + $CLIENT->req_len) ||
+          $BITS < $STUFF || $BITS > ((CARD32 *)$STUFF + $CLIENT->req_len)) {
+          ...
+          goto bail;
+      }
+    metavariable-pattern:
+      - metavariable: $REQ_TYPE
+        pattern: xRenderAddGlyphsReq
+      - metavariable: $STUFF
+        pattern: stuff
+      - metavariable: $CLIENT
+        pattern: client
+    fix-regex:
+      enabled: false

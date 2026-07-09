@@ -1,0 +1,18 @@
+rules:
+  - id: ne2000_buffer_validation_missing
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($INDEX < $BOUNDARY)
+                  return 1;
+          - pattern: |
+              index = $CURPAG << 8;
+              boundary = $BOUNDARY << 8;
+              if (index < boundary)
+                  return 1;
+    message: Missing validation of NE2000 ring buffer control registers (PSTART/PSTOP) may lead to infinite loop or OOB access.
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2016-2841"

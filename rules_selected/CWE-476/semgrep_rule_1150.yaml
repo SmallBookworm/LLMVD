@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2012-1016-null-ptr-deref
+    message: "Potential NULL pointer dereference in PKINIT draft9 handling. The code accesses rep->u.dh_Info.kdfID without ensuring rep is non-NULL in draft9 context, which can lead to denial of service (CVE-2012-1016)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((rep9 != NULL &&
+                    rep9->choice == choice_pa_pk_as_rep_draft9_dhSignedData) ||
+                   (rep != NULL && rep->choice == choice_pa_pk_as_rep_dhInfo)) {
+                ...
+                if (rep->u.dh_Info.kdfID) {
+                  ...
+                }
+                ...
+              }
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2012-1016"

@@ -1,0 +1,28 @@
+rules:
+  - id: nfp_flower_spawn_vnic_reprs_memory_leak
+    message: Memory leak in nfp_flower_spawn_vnic_reprs due to missing kfree(repr_priv) on error paths.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!repr_priv) {
+                  ...
+                  goto err_reprs_clean;
+              }
+          - pattern: |
+              if (IS_ERR(port)) {
+                  ...
+                  nfp_repr_free(repr);
+                  goto err_reprs_clean;
+              }
+          - pattern: |
+              if (err) {
+                  ...
+                  nfp_port_free(port);
+                  nfp_repr_free(repr);
+                  goto err_reprs_clean;
+              }
+    metavariable-regex:
+      - metavariable: $...
+        regex: "(?!.*kfree\\(repr_priv\\).*)"

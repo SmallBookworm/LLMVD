@@ -1,0 +1,25 @@
+rules:
+  - id: openbsd_tcp_sackhole_limit_missing
+    message: Missing per-connection SACK hole limit may lead to denial of service (CVE-2019-8460)
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (SEQ_LT(cur->start, sack.start) &&
+                  SEQ_GT(cur->end, sack.end)) {
+                ...
+                temp = (struct sackhole *)
+                    pool_get(&sackhl_pool, PR_NOWAIT);
+                ...
+              }
+          - pattern: |
+              if (SEQ_LT(tp->rcv_lastsack, sack.start)) {
+                ...
+                temp = (struct sackhole *)
+                    pool_get(&sackhl_pool, PR_NOWAIT);
+                ...
+              }
+      - pattern-not: |
+          if (tp->snd_numholes >= TCP_SACKHOLE_LIMIT)
+              goto done;

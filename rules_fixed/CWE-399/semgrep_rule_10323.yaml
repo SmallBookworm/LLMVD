@@ -1,0 +1,24 @@
+rules:
+  - id: pvscsi_unbounded_io_loop
+    message: "Unbounded IO loop in pvscsi_ring_pop_req_descr may cause denial of service. Missing ring size check allows infinite loop."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($READY_PTR != $CONSUMED_PTR) {
+                ...
+              }
+          - pattern: |
+              if ($READY_PTR != $CONSUMED_PTR
+                  && ...) {
+                ...
+              }
+    pattern-not: |
+      if ($READY_PTR != $CONSUMED_PTR
+          && $READY_PTR - $CONSUMED_PTR < $RING_SIZE) {
+        ...
+      }
+    metavariable-pattern:
+      metavariable: $RING_SIZE
+      pattern: PVSCSI_MAX_NUM_PAGES_REQ_RING * PVSCSI_MAX_NUM_REQ_ENTRIES_PER_PAGE

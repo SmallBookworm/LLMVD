@@ -1,0 +1,39 @@
+rules:
+  - id: libraw-xtrans-interpolate-uninitialized-allhex
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: short allhex[3][3][2][8], ...;
+              - pattern-inside: |
+                  ...
+                  for (...; ...; ...)
+                    for (...; ...; ...)
+                      for (...; ...; ...)
+                        for (...; ...; ...)
+                          allhex[...][...][...][...] = ...;
+          - patterns:
+              - pattern: short allhex[3][3][2][8], ...;
+              - pattern-inside: |
+                  ...
+                  /* Map a green hexagon ... */
+                  for (...; ...; ...)
+                    for (...; ...; ...)
+                      for (...; ...; ...)
+                      {
+                        ...
+                        allhex[...][...][...][...] = ...;
+                      }
+      - pattern-not: |
+          short allhex[3][3][2][8], ...;
+          ...
+          for(int i = 0; i < 3; i++)
+            for(int j = 0; j < 3; j++)
+              for(int k = 0; k < 2; k++)
+                for(int l = 0; l < 8; l++)
+                  allhex[i][j][k][l]=32700;
+    message: "Uninitialized 'allhex' array may lead to out-of-bounds read (CWE-125). Ensure all elements are initialized before use."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2017-16910"

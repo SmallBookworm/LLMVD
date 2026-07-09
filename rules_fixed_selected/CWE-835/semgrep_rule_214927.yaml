@@ -1,0 +1,15 @@
+rules:
+  - id: imagemagick-caption-infinite-loop
+    message: Infinite loop in ReadCAPTIONImage due to unbounded pointsize scaling (CVE-2017-14741)
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for ( ; ; draw_info->pointsize*=2.0)
+              {
+                ...
+              }
+    metadata:
+      cwe: "CWE-835"
+      cve: "CVE-2017-14741"

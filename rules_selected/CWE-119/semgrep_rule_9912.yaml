@@ -1,0 +1,13 @@
+rules:
+  - id: chromium-clipboard-buffer-overflow-cve-2014-3156
+    message: "Potential buffer overflow due to unchecked bitmap pixel data. Use CHECK(bitmap.getPixels()) instead of if (!bitmap.getPixels()) return; to prevent unsafe clipboard operations."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!bitmap.getPixels())
+                return;
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2014-3156"

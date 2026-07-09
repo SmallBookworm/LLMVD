@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2017-16535-out-of-bounds-read
+    message: |
+      Missing bounds check before accessing usb_dev_cap_header may lead to out-of-bounds read (CWE-125).
+      The code must verify that at least sizeof(struct usb_dev_cap_header) bytes remain in the buffer
+      before dereferencing cap->bLength.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $cap = (struct usb_dev_cap_header *)$buffer;
+          ...
+          if ($total_len < $cap->bLength) { ... }
+      - pattern: |
+          $cap = (struct usb_dev_cap_header *)$buffer;
+          ...
+          if ($total_len < $length) { ... }
+    metavariable-pattern:
+      $length: $cap->bLength

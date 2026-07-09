@@ -1,0 +1,13 @@
+rules:
+  - id: gdImageScaleTwoPass-memory-leak
+    patterns:
+      - pattern: |
+          if (src != tmp_im) {
+            gdFree(tmp_im);
+          }
+    message: "Use of 'gdFree' instead of 'gdImageDestroy' may cause memory leak in gdImageScaleTwoPass."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-399"
+      cve: "CVE-2015-8877"

@@ -1,0 +1,22 @@
+rules:
+  - id: cephx_signature_calculation_vulnerability
+    message: "Detected vulnerable Cephx signature calculation that does not use CEPHX_V2 mode, potentially allowing signature bypass (CVE-2018-1129)."
+    severity: HIGH
+    languages: [c]
+    cwe: ["CWE-284"]
+    pattern-either:
+      - pattern: |
+          struct {
+            __u8 v;
+            __le64 magic;
+            __le32 len;
+            __le32 header_crc;
+            __le32 front_crc;
+            __le32 middle_crc;
+            __le32 data_crc;
+          } __attribute__ ((packed)) sigblock = { ... };
+      - pattern: |
+          *psig = *reinterpret_cast<__le64*>(exp_buf);
+    metavariable-regex:
+      metavariable: $psig
+      regex: psig

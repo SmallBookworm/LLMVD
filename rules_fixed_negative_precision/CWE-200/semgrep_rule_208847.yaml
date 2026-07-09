@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2013-0157-umount-path-sanitization
+    message: "Non-root users can infer existence of restricted directories due to missing path sanitization in umount."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          while (argc--)
+              rc += umount_one(cxt, *argv++);
+      - pattern: |
+          while (argc--)
+              rc += umount_one($CTX, *$ARGV++);

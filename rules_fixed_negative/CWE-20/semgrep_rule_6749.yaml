@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2015-1302-sop-bypass
+    message: "Missing origin validation for PDF plugin may lead to Same Origin Policy bypass (CVE-2015-1302)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              std::string document_url = ...;
+              ...
+              bool in_extension = !document_url.compare(0, ..., ...);
+              if (in_extension) { ... }
+          - pattern: |
+              std::string document_url = document_url_var.is_string() ?
+                  document_url_var.AsString() : std::string();
+              ...
+              if (!document_url.compare(...)) { ... }
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2015-1302"

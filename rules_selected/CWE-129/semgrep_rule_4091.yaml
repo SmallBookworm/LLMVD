@@ -1,0 +1,31 @@
+rules:
+  - id: cve-2019-9162-snmp-asn1-length-check
+    patterns:
+      - pattern-either:
+          - pattern: |
+              int snmp_helper(..., const void *data, size_t datalen)
+              {
+                ...
+                __be32 *pdata = (__be32 *)data;
+                ...
+                if (*pdata == ...)
+                {
+                  ...
+                }
+                ...
+              }
+          - pattern: |
+              int snmp_version(..., const void *data, size_t datalen)
+              {
+                ...
+                __be32 *pdata = (__be32 *)data;
+                ...
+                if (*pdata == ...)
+                {
+                  ...
+                }
+                ...
+              }
+    message: "Missing length check before dereferencing ASN.1 decoded data may lead to out-of-bounds access (CVE-2019-9162)."
+    severity: ERROR
+    languages: [c]

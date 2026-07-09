@@ -1,0 +1,16 @@
+rules:
+  - id: cjson-null-dereference-CVE-2019-1010239
+    message: "Potential null dereference in cJSON_GetObjectItemCaseSensitive when accessing current_element->string without checking for NULL. This can lead to denial of service via crafted JSON input."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          while (($X != NULL) && (strcmp($Y, $elem->$field) != 0))
+      - pattern: |
+          while (($X != NULL) && (case_insensitive_strcmp($Y, $elem->$field) != 0))
+    metavariable-pattern:
+      - metavariable: $field
+        patterns:
+          - pattern-either:
+              - pattern: string
+    focus-metavariable: $elem->$field

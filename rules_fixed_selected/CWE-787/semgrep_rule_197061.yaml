@@ -1,0 +1,17 @@
+rules:
+  - id: vlc-update-integer-truncation
+    message: "Integer truncation vulnerability in GetUpdateFile may lead to buffer overflow (CVE-2014-9625, CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          const int64_t $SIZE = stream_Size($STREAM);
+          ...
+          malloc($SIZE + 1);
+      - pattern: |
+          const int64_t $SIZE = stream_Size($STREAM);
+          ...
+          psz_update_data = malloc($SIZE + 1);
+    metavariable-regex:
+      metavariable: $SIZE
+      regex: i_read

@@ -1,0 +1,9 @@
+rules:
+  - id: cve-2017-8379-vnc-key-delay
+    message: "VNC keyboard delay set to 1ms may cause host memory exhaustion via rapid keyboard events. Default should be 10ms."
+    severity: WARNING
+    languages: [c]
+    pattern: 'key_delay_ms = qemu_opt_get_number(..., "key-delay-ms", 1);'
+    metadata:
+      cwe: "CWE-772"
+      cve: "CVE-2017-8379"

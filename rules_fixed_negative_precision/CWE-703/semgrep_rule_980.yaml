@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2013-4220-bad-mode-kernel-panic
+    message: "Vulnerable pattern detected: kernel panic in bad_mode may cause DoS. Fixed version uses arm64_notify_die with SIGILL instead."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              die("Oops - bad mode", ..., ...);
+              ...
+              panic("bad mode");
+    metadata:
+      cwe: "CWE-703"
+      cve: "CVE-2013-4220"

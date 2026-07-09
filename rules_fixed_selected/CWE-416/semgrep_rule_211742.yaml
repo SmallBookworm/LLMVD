@@ -1,0 +1,17 @@
+rules:
+  - id: imagemagick-wmf-use-after-free
+    message: Use-after-free vulnerability in ReadWMFImage due to improper cleanup order of API and image resources.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          wmf_api_destroy($API);
+          ...
+          ThrowReaderException(...);
+      - pattern: |
+          wmf_api_destroy($API);
+          ...
+          ThrowFileException(...);
+    metavariable-regex:
+      metavariable: $API
+      regex: API

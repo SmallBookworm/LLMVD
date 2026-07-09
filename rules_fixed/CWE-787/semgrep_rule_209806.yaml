@@ -1,0 +1,10 @@
+rules:
+  - id: vim-skip_string-buffer-overflow
+    message: "Heap-based buffer overflow due to missing NUL check before accessing p[i] in skip_string"
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (p[i] == '\'')
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2022-1733"

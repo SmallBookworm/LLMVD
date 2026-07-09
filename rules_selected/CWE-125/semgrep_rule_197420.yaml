@@ -1,0 +1,13 @@
+rules:
+  - id: pure-ftpd-oob-read-pure_strcmp
+    message: "Out-of-bounds read in pure_strcmp due to using strlen(s1) when s2 may be longer"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          pure_memcmp($S1, $S2, strlen($S1) + 1U)
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2020-9365"
+      references:
+        - https://github.com/jedisct1/pure-ftpd/commit/bf6fcd4935e95128cf22af5924cdc8fe5c0579da

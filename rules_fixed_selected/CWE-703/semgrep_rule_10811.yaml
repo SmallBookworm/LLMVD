@@ -1,0 +1,8 @@
+rules:
+  - id: cve-2013-7008-h264-droppable-field-check
+    message: "Use of 'last_pic_droppable' without checking 'tf.owner' can lead to deadlock (CVE-2013-7008)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (!last_pic_droppable && ...)
+        ff_thread_report_progress(...);

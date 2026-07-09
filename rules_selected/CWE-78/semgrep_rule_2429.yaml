@@ -1,0 +1,16 @@
+rules:
+  - id: cwe-78-command-injection-shadowsocks
+    message: "Potential command injection via unsanitized JSON configuration fields. User-controlled input from server fields (e.g., password, plugin, plugin_opts) is directly embedded into a config file that may be used to construct shell commands."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              fprintf(f, "\"password\":\"%s\"", $SERVER->password);
+          - pattern: |
+              fprintf(f, "\"plugin\":\"%s\"", $SERVER->plugin);
+          - pattern: |
+              fprintf(f, "\"plugin_opts\":\"%s\"", $SERVER->plugin_opts);
+    metadata:
+      cwe: "CWE-78"
+      cve: "CVE-2017-15924"

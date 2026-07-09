@@ -1,0 +1,13 @@
+rules:
+  - id: freetype_integer_overflow_cve_2010_2500
+    message: "Potential integer overflow in scanline offset calculation due to missing cast to unsigned. This may lead to buffer underflow or arbitrary code execution."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          p = (unsigned char*)$BUF - $Y * $PITCH;
+          if ($PITCH >= 0)
+            p += ($ROWS - 1) * $PITCH;
+    metadata:
+      cwe: "CWE-189"
+      cve: "CVE-2010-2500"

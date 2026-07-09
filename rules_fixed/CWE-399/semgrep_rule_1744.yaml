@@ -1,0 +1,29 @@
+rules:
+  - id: libarchive-unlimited-recursion-cve-2016-7166
+    message: "Unlimited recursive decompression may lead to denial of service (CVE-2016-7166)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (;;) {
+                ...
+                if (best_bidder == NULL) {
+                  ...
+                  return (ARCHIVE_OK);
+                }
+                ...
+              }
+          - pattern: |
+              while (1) {
+                ...
+                if (best_bidder == NULL) {
+                  ...
+                  return (ARCHIVE_OK);
+                }
+                ...
+              }
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern: |
+        choose_filters(...)

@@ -1,0 +1,24 @@
+rules:
+  - id: cwe-787-stack-buffer-overflow-extract-sockaddr
+    patterns:
+      - pattern-either:
+          - pattern: |
+              sprintf($BUF, "%.*s", $LEN, $SRC);
+          - pattern: |
+              snprintf($BUF, $SIZE, "%.*s", $LEN, $SRC);
+    pattern-not-inside: |
+      if ($LEN >= sizeof($BUF)) {
+        ...
+        $LEN = sizeof($BUF) - 1;
+        ...
+      }
+      ...
+      sprintf($BUF, "%.*s", $LEN, $SRC);
+    message: "Potential stack-based buffer overflow due to missing bounds check before sprintf/snprintf with '%.*s'."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-787"
+      references:
+        - "https://github.com/luke-jr/bfgminer/commit/c80ad8548251eb0e15329fc240c89070640c9d79"
+        - "CVE-2014-4501"

@@ -1,0 +1,26 @@
+rules:
+  - id: acpi_ns_terminate_operand_cache_leak
+    message: "ACPI operand cache leak in acpi_ns_terminate() due to conditional deletion under ACPI_EXEC_APP, leading to potential KASLR bypass (CVE-2017-11472)."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern: |
+          void acpi_ns_terminate(...) {
+            ...
+          }
+      - inside: |
+          void acpi_ns_terminate(...) {
+            ...
+            #ifdef ACPI_EXEC_APP
+              ...
+              while ((... = acpi_gbl_module_code_list) != NULL) {
+                ...
+                acpi_ut_remove_reference(...);
+              }
+              ...
+            #endif
+            ...
+          }
+    metadata:
+      cwe: ["CWE-755"]
+      cve: "CVE-2017-11472"

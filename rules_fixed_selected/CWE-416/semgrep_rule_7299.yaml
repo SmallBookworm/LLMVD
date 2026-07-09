@@ -1,0 +1,26 @@
+rules:
+  - id: cve-2018-18337-use-after-free
+    message: "Potential use-after-free due to incorrect ordering of stylesheet processing and shadow tree checks in HTMLLinkElement::InsertedInto."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!ShouldLoadLink() && IsInShadowTree()) {
+                ...
+                return kInsertionDone;
+              }
+              GetDocument().GetStyleEngine().AddStyleSheetCandidateNode(*this);
+          - pattern: |
+              GetDocument().GetStyleEngine().AddStyleSheetCandidateNode(*this);
+              ...
+              if (!ShouldLoadLink() && IsInShadowTree()) {
+                ...
+                return kInsertionDone;
+              }
+              Process();
+              if (link_)
+                link_->OwnerInserted();
+    metadata:
+      cwe: ["CWE-416"]
+      cve: "CVE-2018-18337"

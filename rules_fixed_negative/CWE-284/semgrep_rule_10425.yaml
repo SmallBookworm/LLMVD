@@ -1,0 +1,16 @@
+rules:
+  - id: php_mysqlnd_ssl_downgrade_vulnerability
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((greet_packet->server_capabilities & CLIENT_SSL) && (mysql_flags & CLIENT_SSL)) {
+                ...
+              }
+    message: "SSL is treated as optional, allowing cleartext-downgrade attacks (CVE-2015-8838)."
+    severity: HIGH
+    languages: [c]
+    metadata:
+      cwe: "CWE-284"
+      references:
+        - "https://git.php.net/?p=php-src.git;a=commit;h=97aa752fee61fccdec361279adbfb17a3c60f3f4"
+        - "https://nvd.nist.gov/vuln/detail/CVE-2015-8838"

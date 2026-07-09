@@ -1,0 +1,44 @@
+rules:
+  - id: cve-2014-0206-aio-read-events-ring
+    message: "Missing modulo operation on 'head' and 'tail' before use as array indices may lead to kernel memory disclosure (CVE-2014-0206)."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              head = ...;
+              tail = ...;
+              ...
+              if (head == tail) ...;
+              while (...){
+                ...
+                pos = head + ...;
+                page = ctx->ring_pages[pos / ...];
+                ...
+              }
+          - pattern: |
+              head = ...;
+              tail = ...;
+              ...
+              while (...){
+                ...
+                pos = head + ...;
+                page = ctx->ring_pages[pos / ...];
+                ...
+              }
+      - pattern-not: |
+          head = ...;
+          tail = ...;
+          ...
+          head %= ...;
+          tail %= ...;
+          ...
+          while (...){
+            ...
+            pos = head + ...;
+            page = ctx->ring_pages[pos / ...];
+            ...
+          }
+    metavariable-regex:
+      metavariable: $CTX
+      regex: ctx

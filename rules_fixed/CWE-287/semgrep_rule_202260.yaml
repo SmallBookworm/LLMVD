@@ -1,0 +1,20 @@
+rules:
+  - id: packagekit-auth-bypass-just-reinstall
+    message: "Authentication bypass vulnerability: setting JUST_REINSTALL on auth failure allows unauthorized package reinstallation."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern: |
+          if (!polkit_authorization_result_get_is_authorized($RESULT)) {
+              if (g_strcmp0($ACTION_ID, "org.freedesktop.packagekit.package-install") == 0 &&
+                  pk_bitfield_contain($FLAGS, PK_TRANSACTION_FLAG_ENUM_ALLOW_REINSTALL)) {
+                  pk_bitfield_add($FLAGS, PK_TRANSACTION_FLAG_ENUM_JUST_REINSTALL);
+              } else {
+                  ...
+              }
+          }
+    metadata:
+      cwe: ["CWE-287"]
+      cve: "CVE-2018-1106"
+      references:
+        - https://github.com/hughsie/PackageKit/commit/7e8a7905ea9abbd1f384f05f36a4458682cd4697

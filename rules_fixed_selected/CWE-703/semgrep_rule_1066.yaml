@@ -1,0 +1,16 @@
+rules:
+  - id: xfrm_state_netlink_null_return
+    message: "Returning NULL instead of an error pointer in xfrm_state_netlink may lead to NULL pointer dereference (CVE-2013-1826)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (dump_one_state(...)) {
+              kfree_skb(...);
+              return NULL;
+          }
+      - pattern: |
+          if (dump_one_state(...) != 0) {
+              kfree_skb(...);
+              return NULL;
+          }

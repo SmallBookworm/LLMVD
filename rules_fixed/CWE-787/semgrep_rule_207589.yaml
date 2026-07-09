@@ -1,0 +1,19 @@
+rules:
+  - id: hid-inputs-assumption
+    message: "Potential out-of-bounds write due to unchecked assumption that HID device has inputs. Add a check for empty hid->inputs list before accessing it."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-not-inside: |
+          if (list_empty(&$HID->inputs)) {
+            ...
+            return ...;
+          }
+      - pattern-either:
+          - pattern: |
+              struct hid_input *$VAR = list_entry($HID->inputs.next, struct hid_input, list);
+          - pattern: |
+              $VAR = list_entry($HID->inputs.next, struct hid_input, list);
+    metavariable-regex:
+      metavariable: $HID
+      regex: "hid"

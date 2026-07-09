@@ -1,0 +1,11 @@
+rules:
+  - id: ffmpeg-null-pointer-dereference-close
+    message: "NULL pointer dereference vulnerability in avcodec_open2. The 'close' function pointer must be checked before calling."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          if (avctx->codec &&
+              (codec_init_ok ||
+               (avctx->codec->caps_internal & FF_CODEC_CAP_INIT_CLEANUP)))
+              avctx->codec->close(avctx);

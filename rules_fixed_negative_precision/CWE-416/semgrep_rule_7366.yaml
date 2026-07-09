@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2018-6031-use-after-free-pdfium
+    message: "Potential use-after-free vulnerability due to unsafe iteration over 'deferred_page_unloads_' while modifying it indirectly during page unloading."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (int $PAGE_INDEX : deferred_page_unloads_)
+                pages_[$PAGE_INDEX]->Unload();
+              deferred_page_unloads_.clear();
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2018-6031"

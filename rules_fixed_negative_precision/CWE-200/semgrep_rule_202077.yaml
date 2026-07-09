@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2015-0844-wml-file-disclosure
+    message: "Potential arbitrary file read via crafted WML file due to missing current_dir validation in get_wml_location."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (filename.size() >= 2 && filename[0] == '.' && filename[1] == '/')
+              {
+                  result = current_dir + filename.substr(2);
+              }
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2015-0844"

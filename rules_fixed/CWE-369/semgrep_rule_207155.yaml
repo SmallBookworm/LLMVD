@@ -1,0 +1,12 @@
+rules:
+  - id: cwe-369-division-by-zero-dot24-print-page
+    message: Division by zero vulnerability in dot24_print_page. If xres is less than 10, then bytes_per_space becomes zero and later used as a divisor.
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      int xres = (int)pdev->x_pixels_per_inch;
+      ...
+      int dots_per_space = xres / 10;
+      int bytes_per_space = dots_per_space * 3;
+      ...
+      (outp - out) / bytes_per_space

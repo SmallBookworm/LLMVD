@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2013-6378-zero-length-kmalloc
+    message: "Zero-length kmalloc may lead to OOPS; missing check for cnt == 0 and missing null termination."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $pdata = kmalloc(cnt, GFP_KERNEL);
+          - pattern: |
+              kmalloc(cnt, GFP_KERNEL)
+    metavariable-pattern:
+      metavariable: cnt
+      pattern-not: |
+        if (cnt == 0) ...

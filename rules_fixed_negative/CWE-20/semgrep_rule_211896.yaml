@@ -1,0 +1,12 @@
+rules:
+  - id: teeworlds-cve-2014-9351
+    message: "Potential integer overflow leading to out-of-bounds memory access in map data handling. Use unsigned integers for ChunkSize and Offset to prevent negative values."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          int ChunkSize = ...;
+          int Offset = ...;
+      - pattern: |
+          int ChunkSize = ... - ...;
+          int Offset = Chunk * ChunkSize;

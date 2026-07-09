@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2018-5345-buffer-overflow
+    message: "Potential stack-based buffer overflow due to missing buffer size check before reading data (CVE-2018-5345)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          RN ($BUF, $CD->ncbytes);
+      - pattern: |
+          RN ($BUF, cd->ncbytes);
+    metavariable-regex:
+      - metavariable: $BUF
+        regex: "cd->(in|out)"
+    fix-regex:
+      enabled: false

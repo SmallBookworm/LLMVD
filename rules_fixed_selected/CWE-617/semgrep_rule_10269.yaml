@@ -1,0 +1,10 @@
+rules:
+  - id: vga_dirty_bitmap_region_miscalculation
+    message: "VGA display update uses incorrect region size (bwidth * height) for dirty bitmap snapshot, which may cause assertion failure in split screen mode. Should use (line_offset * height)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          snap = memory_region_snapshot_and_clear_dirty(..., $ADDR, 
+                                                       $BWIDTH * $HEIGHT,
+                                                       ...);

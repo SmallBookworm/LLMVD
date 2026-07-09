@@ -1,0 +1,15 @@
+rules:
+  - id: cwe-125-dnxhd-mb-height-check
+    message: "Out-of-bounds read due to missing mb_height validation before array access. This may lead to denial of service or arbitrary code execution."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (ctx->mb_height > 68 ||
+              (ctx->mb_height << frame->interlaced_frame) > (ctx->height + 15) >> 4) {
+            ...
+          }
+      - pattern: |
+          if (ctx->mb_height > 68 || (ctx->mb_height << $X) > $Y) {
+            ...
+          }

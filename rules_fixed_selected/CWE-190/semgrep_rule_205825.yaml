@@ -1,0 +1,24 @@
+rules:
+  - id: dpdk-vhost-user-get-inflight-fd-fd-leak
+    message: "Potential file descriptor leak in vhost_user_get_inflight_fd. Previous inflight_info->fd is not closed before assigning a new one, which may lead to resource exhaustion (CVE-2020-10726)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (dev->inflight_info->addr) {
+                  munmap(dev->inflight_info->addr, dev->inflight_info->size);
+                  dev->inflight_info->addr = NULL;
+              }
+              ...
+              dev->inflight_info->fd = ...;
+          - pattern: |
+              if (dev->inflight_info->addr) {
+                  munmap(dev->inflight_info->addr, dev->inflight_info->size);
+                  dev->inflight_info->addr = NULL;
+              }
+              ...
+              msg->fds[0] = ...;
+    metavariable-regex:
+      metavariable: $FD
+      regex: "fd"

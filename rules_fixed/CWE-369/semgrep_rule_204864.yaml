@@ -1,0 +1,26 @@
+rules:
+  - id: cve-2018-20544-division-by-zero
+    message: Potential division by zero due to integer overflow in dithering calculations. Use uint64_t to prevent overflow before division.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $x = ($a - $b) * $w / $deltax;
+      - pattern: |
+          $x = ($a - $b) * $h / $deltay;
+      - pattern: |
+          $x = ($a - $b + 1) * $w / $deltax;
+      - pattern: |
+          $x = ($a - $b + 1) * $h / $deltay;
+    metavariable-pattern:
+      metavariable: $x
+      patterns:
+        - pattern: (int)
+    pattern-not-inside: |
+      $x = (uint64_t)($a - $b) * $w / $deltax;
+    pattern-not-inside: |
+      $x = (uint64_t)($a - $b) * $h / $deltay;
+    pattern-not-inside: |
+      $x = (uint64_t)($a - $b + 1) * $w / $deltax;
+    pattern-not-inside: |
+      $x = (uint64_t)($a - $b + 1) * $h / $deltay;

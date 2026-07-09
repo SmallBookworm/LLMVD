@@ -1,0 +1,9 @@
+rules:
+  - id: phar-xss-cve-2018-5712
+    message: "Reflected XSS vulnerability in PHAR 404 error page. The file name '$pt' is directly embedded in HTML output without sanitization."
+    severity: HIGH
+    languages: [c]
+    pattern: 'echo \\"<html>\\\\n <head>\\\\n  <title>File Not Found<title>\\\\n </head>\\\\n <body>\\\\n  <h1>404 - File \\", $pt, \\" Not Found</h1>\\\\n </body>\\\\n</html>\\";'
+    metadata:
+      cwe: "CWE-79"
+      cve: "CVE-2018-5712"

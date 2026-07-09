@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2013-4265-null-deref-condition
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!*ptrptr && !(nmemb && size))
+                  return AVERROR(ENOMEM);
+    message: "Incorrect condition may lead to NULL pointer dereference (CVE-2013-4265, CWE-476)."
+    severity: ERROR
+    languages: [c]

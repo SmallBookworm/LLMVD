@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2017-6892-aiff-chanmap-oob-read
+    patterns:
+      - pattern-either:
+          - pattern: |
+              size_t chanmap_size = psf->sf.channels * sizeof (psf->channel_map [0]) ;
+          - pattern: |
+              size_t chanmap_size = psf->sf.channels * sizeof (psf->channel_map[0]) ;
+    message: "Potential out-of-bounds read due to missing channel count validation (CVE-2017-6892)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2017-6892"

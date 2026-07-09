@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2018-16880-vhost-net-oob-write
+    message: "Potential out-of-bounds write in vhost_net due to missing flush of batched heads before busy polling. This may lead to kernel memory corruption (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          nheads += $HEADCOUNT;
+          if (nheads > VHOST_RX_BATCH) {
+              vhost_add_used_and_signal_n(...);
+              nheads = 0;
+          }
+      - pattern: |
+          if (nheads)
+              vhost_add_used_and_signal_n(..., nheads);
+    metavariable-pattern:
+      $HEADCOUNT:
+        regex: headcount

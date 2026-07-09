@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2016-10905-use-after-free-gfs2
+    message: "Use-after-free vulnerability in GFS2 due to missing nullification of rd_bits before freeing. This may lead to kernel panic or memory corruption."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              kfree($X->rd_bits);
+              ...
+              kmem_cache_free(..., $X);
+          - pattern: |
+              kfree($X->rd_bits);
+              return_all_reservations($X);
+              kmem_cache_free(..., $X);
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2016-10905"

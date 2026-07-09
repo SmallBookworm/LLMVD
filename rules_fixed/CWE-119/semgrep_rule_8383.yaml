@@ -1,0 +1,17 @@
+rules:
+  - id: h264bsd_integer_overflow
+    message: "Potential integer overflow in picSizeInMbs calculation due to missing bounds check before multiplication."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $storage->picSizeInMbs =
+                  $storage->activeSps->picWidthInMbs *
+                  $storage->activeSps->picHeightInMbs;
+    metavariable-patterns:
+      - metavariable: $storage
+        patterns:
+          - pattern: pStorage
+    fix-regex:
+      enabled: false

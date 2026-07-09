@@ -1,0 +1,11 @@
+rules:
+  - id: polarssl-x509parse_crt-infinite-loop
+    message: "Use of x509parse_crt() may lead to infinite loop when parsing PEM-encoded certificates. Use x509parse_crt_der() instead."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          x509parse_crt($CERT, $BUF, $LEN)
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2013-4623"

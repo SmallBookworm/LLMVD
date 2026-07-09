@@ -1,0 +1,20 @@
+rules:
+  - id: null_pointer_dereference_mrb_class_real
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: |
+                  while (($X->tt == MRB_TT_SCLASS) || ($X->tt == MRB_TT_ICLASS)) {
+                    $X = $X->super;
+                  }
+              - pattern-not: |
+                  while (($X->tt == MRB_TT_SCLASS) || ($X->tt == MRB_TT_ICLASS)) {
+                    $X = $X->super;
+                    if ($X == 0) return NULL;
+                  }
+    message: "Potential NULL pointer dereference in mrb_class_real due to missing NULL check after accessing 'super' field."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2018-12249"

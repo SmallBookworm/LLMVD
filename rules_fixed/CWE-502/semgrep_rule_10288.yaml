@@ -1,0 +1,26 @@
+rules:
+  - id: cve-2017-11143-wddx-boolean-deserialization
+    message: "Potential invalid free in WDDX deserialization of boolean elements due to missing initialization before push (CVE-2017-11143, CWE-502)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          else if (!strcmp(name, EL_BOOLEAN)) {
+            if (atts) {
+              for (; ; ) {
+                if (!strcmp(atts[i], EL_VALUE) && atts[i+1] && atts[i+1][0]) {
+                  ent.type = ST_BOOLEAN;
+                  SET_STACK_VARNAME;
+                  ALLOC_ZVAL(ent.data);
+                  INIT_PZVAL(ent.data);
+                  Z_TYPE_P(ent.data) = IS_BOOL;
+                  wddx_stack_push($STACK$, &ent);
+                }
+              }
+            } else {
+              ent.type = ST_BOOLEAN;
+              SET_STACK_VARNAME;
+              ZVAL_FALSE(&ent.data);
+              wddx_stack_push($STACK$, &ent);
+            }
+          }

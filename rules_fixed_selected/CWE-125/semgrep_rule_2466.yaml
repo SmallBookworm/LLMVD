@@ -1,0 +1,17 @@
+rules:
+  - id: cwe-125-rar-utf16-off-by-one
+    message: "Off-by-one error in UTF-16 filename handling may lead to out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          filename[filename_size++] = '\0';
+          filename[filename_size++] = '\0';
+      - pattern: |
+          filename[filename_size++] = '\0';
+          filename[filename_size] = '\0';
+    metavariable-pattern:
+      metavariable: filename_size
+      pattern-not: |
+        filename[filename_size] = '\0';
+        filename[filename_size + 1] = '\0';

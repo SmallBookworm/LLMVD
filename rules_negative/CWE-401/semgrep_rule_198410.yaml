@@ -1,0 +1,20 @@
+rules:
+  - id: imagemagick-pict-memory-leak
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (($X == (unsigned char *) NULL) ||
+                  ($Y == (unsigned char *) NULL) ||
+                  ($Z == (unsigned char *) NULL))
+                ThrowWriterException(...);
+          - pattern: |
+              if (($X == (unsigned char *) NULL) ||
+                  ($Y == (unsigned char *) NULL) ||
+                  ($Z == (unsigned char *) NULL))
+                return ...;
+    message: "Memory leak vulnerability (CWE-401): allocated memory not freed before throwing exception or returning on allocation failure."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-401"
+      cve: "CVE-2017-12665"

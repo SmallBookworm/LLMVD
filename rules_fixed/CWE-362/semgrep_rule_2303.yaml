@@ -1,0 +1,15 @@
+rules:
+  - id: ldsem_cmpxchg_race_condition
+    patterns:
+      - pattern: |
+          static inline int ldsem_cmpxchg(long *old, long new, struct ld_semaphore *sem) {
+            long tmp = *old;
+            *old = atomic_long_cmpxchg(&sem->count, *old, new);
+            return *old == tmp;
+          }
+    message: "Race condition in ldsem_cmpxchg may cause deadlock (CWE-362, CVE-2015-4170). The function returns comparison with the old value instead of updating *old to the result of cmpxchg."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-362"
+      cve: "CVE-2015-4170"

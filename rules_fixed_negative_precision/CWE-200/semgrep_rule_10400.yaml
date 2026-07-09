@@ -1,0 +1,10 @@
+rules:
+  - id: uninitialized-imm32-variable
+    message: "Uninitialized variable 'imm32' may leak stack memory (CWE-200, CVE-2016-4020)"
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      uint32_t imm32;
+    fix-regex:
+      regex: "uint32_t imm32;"
+      replacement: "uint32_t imm32 = 0;"

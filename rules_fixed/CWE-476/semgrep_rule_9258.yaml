@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2014-5353-null-deref-ldap-policy
+    message: "LDAP query with no results may lead to NULL dereference due to missing KRB5_KDB_NOENTRY check"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          ent = ldap_first_entry($ld, $result);
+          if (ent != NULL) {
+              ...
+          }
+      - pattern: |
+          ent = ldap_first_entry($ld, $result);
+          if (ent) {
+              ...
+          }
+    metavariable-regex:
+      metavariable: $ld
+      regex: ld

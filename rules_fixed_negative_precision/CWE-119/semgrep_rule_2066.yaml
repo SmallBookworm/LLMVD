@@ -1,0 +1,19 @@
+rules:
+  - id: cjson_buffer_overflow_utf16
+    message: "Potential heap-based buffer overflow in cJSON parse_string due to missing bounds checks when handling UTF-16 escape sequences."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              sscanf(..., "%4x", ...);
+              ...
+              ptr += 4;
+          - pattern: |
+              sscanf(..., "%4x", ...);
+              ...
+              ptr += 6;
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern: parse_string(...)
+    focus-metavariable: $FUNC

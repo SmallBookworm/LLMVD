@@ -1,0 +1,17 @@
+rules:
+  - id: libgcrypt_rsa_exponent_blinding_missing
+    message: "RSA implementation is missing exponent blinding, making it vulnerable to cache side-channel attacks (CVE-2017-7526, CWE-310)."
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          mpi_sub_ui($H, $P, 1);
+          mpi_fdiv_r($H, $D, $H);
+          mpi_powm($M1, $C, $H, $P);
+      - pattern: |
+          mpi_sub_ui($H, $Q, 1);
+          mpi_fdiv_r($H, $D, $H);
+          mpi_powm($M2, $C, $H, $Q);
+    metavariable-regex:
+      metavariable: $H
+      regex: "h"

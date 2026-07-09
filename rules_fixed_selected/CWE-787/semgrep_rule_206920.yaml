@@ -1,0 +1,14 @@
+rules:
+  - id: pillow-resample-integer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              kk = malloc(xsize * kmax * sizeof(float));
+          - pattern: |
+              xbounds = malloc(xsize * 2 * sizeof(int));
+    message: "Potential integer overflow in malloc size calculation leading to heap-based buffer overflow (CWE-787). Missing overflow checks before allocation."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2016-4009"

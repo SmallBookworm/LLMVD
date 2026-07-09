@@ -1,0 +1,25 @@
+rules:
+  - id: coredump_race_condition_missing_mmget_still_valid
+    patterns:
+      - pattern-either:
+          - pattern: |
+              down_write(&${mm}->mmap_sem);
+              ...
+              if (!mmget_still_valid(${mm}))
+                goto $label;
+          - pattern: |
+              down_write(&${mm}->mmap_sem);
+              ...
+              if (!mmget_still_valid(${mm}))
+                continue;
+          - pattern: |
+              down_write(&${mm}->mmap_sem);
+              ...
+              if (!mmget_still_valid(${mm}))
+                break;
+    message: "Missing mmget_still_valid() check after acquiring mmap_sem for writing, which may lead to a race condition during core dumping (CWE-362)."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-362"
+      cve: "CVE-2019-11599"

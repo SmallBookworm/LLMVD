@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2015-8539-keys-negative-instantiation
+    message: "Missing check for negatively instantiated key before accessing payload. This may lead to privilege escalation or denial of service (CVE-2015-8539)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              struct $T *p = $key->payload.data[0];
+              ...
+              if (!p->$field) { ... }
+          - pattern: |
+              struct $T *p = $key->payload.data[0];
+              ...
+              $expr(p->$field);
+    metavariable-pattern:
+      $T:
+        pattern-regex: ".*_payload"
+    pattern-not-inside: |
+      if (test_bit(KEY_FLAG_NEGATIVE, &$key->flags))
+          return -ENOKEY;
+      ...

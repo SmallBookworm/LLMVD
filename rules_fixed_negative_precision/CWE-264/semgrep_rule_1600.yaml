@@ -1,0 +1,11 @@
+rules:
+  - id: crypto_module_prefix_missing
+    patterns:
+      - pattern: |
+          try_then_request_module(__crypto_lookup_template($NAME), "%s", $NAME)
+    message: "Missing 'crypto-' module prefix in template lookup may allow loading arbitrary kernel modules."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: ["CWE-264"]
+      cve: "CVE-2014-9644"

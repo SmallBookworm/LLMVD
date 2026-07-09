@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2014-0221-dtls-recursion
+    message: "Detected vulnerable recursive call in DTLS handshake handling that can lead to denial of service (CVE-2014-0221)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (!s->server && s->d1->r_msg_hdr.frag_off == 0 &&
+          wire[0] == SSL3_MT_HELLO_REQUEST)
+        {
+          if (wire[1] == 0 && wire[2] == 0 && wire[3] == 0)
+            {
+              ...
+              return dtls1_get_message_fragment(...);
+            }
+        }

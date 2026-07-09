@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2017-8065-stack-dma-buffer
+    message: "Stack-allocated buffer 'odata' or 'idata' used in DMA scatterlist may cause memory corruption when CONFIG_VMAP_STACK is enabled."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              u8 odata[16];
+          - pattern: |
+              u8 idata[16];

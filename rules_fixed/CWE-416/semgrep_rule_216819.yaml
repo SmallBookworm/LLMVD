@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2020-8265-use-after-free-tls
+    message: "Detected raw pointer usage in DoWrite method which may lead to use-after-free (CWE-416). Use std::unique_ptr<WriteWrap>& instead."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          int DoWrite(WriteWrap* $W, ...)
+      - pattern-not: |
+          int DoWrite(std::unique_ptr<WriteWrap>& $W, ...)

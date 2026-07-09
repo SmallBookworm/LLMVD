@@ -1,0 +1,25 @@
+rules:
+  - id: yam_memory_leak_cwe_401
+    message: Memory leak in yam_siocdevprivate when ym->cmd != SIOCYAMSMCS. Allocated memory via memdup_user is not freed before returning -EINVAL.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $YM = memdup_user(...);
+          if (IS_ERR($YM))
+            return PTR_ERR($YM);
+          if ($YM->cmd != SIOCYAMSMCS)
+            return -EINVAL;
+          ...
+          kfree($YM);
+      - pattern: |
+          $YM = memdup_user(...);
+          if (IS_ERR($YM))
+            return PTR_ERR($YM);
+          if ($YM->cmd != SIOCYAMSMCS || ...)
+            return -EINVAL;
+          ...
+          kfree($YM);
+    metavariable-pattern:
+      metavariable: $YM
+      pattern: struct yamdrv_ioctl_mcs *

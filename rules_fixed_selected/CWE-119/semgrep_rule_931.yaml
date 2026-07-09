@@ -1,0 +1,20 @@
+rules:
+  - id: ipvs_ioctl_cmd_bounds_check_missing
+    message: Missing bounds check on ioctl command may lead to buffer overflow via out-of-bounds array access.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (len != set_arglen[SET_CMDID($CMD)]) {
+                ...
+              }
+          - pattern: |
+              if (len != set_arglen[SET_CMDID(...)]) {
+                ...
+              }
+    metavariable-pattern:
+      $CMD: 
+        pattern-not: |
+          if ($CMD < IP_VS_BASE_CTL || $CMD > IP_VS_SO_SET_MAX)
+            return -EINVAL;

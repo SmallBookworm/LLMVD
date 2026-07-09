@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2015-1331-lxc-symlink-vulnerability
+    message: "Potential symlink attack vulnerability due to unsafe lockfile path '/lock/lxc/'. Use '/lxc/lock/' instead."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: 'snprintf(..., "%s/lock/lxc/...", ...)'
+          - pattern: 'strlen("/lock/lxc/")'
+    metadata:
+      cwe: "CWE-59"
+      cve: "CVE-2015-1331"

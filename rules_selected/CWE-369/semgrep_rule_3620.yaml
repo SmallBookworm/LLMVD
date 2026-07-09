@@ -1,0 +1,18 @@
+rules:
+  - id: ffmpeg_movenc_divide_by_zero_cwe369
+    message: "Potential divide-by-zero vulnerability when track->par->channels is zero and version == 1, leading to crash during MOV audio format conversion."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (version == 1) {
+              ...
+              avio_wb32(pb, track->sample_size / track->par->channels);
+              ...
+          }
+      - pattern: |
+          avio_wb32(pb, track->sample_size / track->par->channels);
+    metavariable-pattern:
+      metavariable: track
+      pattern: $TRACK
+    focus-metavariable: track->par->channels

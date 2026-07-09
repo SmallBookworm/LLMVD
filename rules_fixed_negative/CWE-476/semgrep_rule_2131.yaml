@@ -1,0 +1,8 @@
+rules:
+  - id: cve-2016-3120-null-deref
+    message: "Potential NULL pointer dereference in validate_as_request when restrict_anonymous_to_tgt is enabled. Use client.princ instead of request->client to avoid crash on S4U2Self requests."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          check_anon(..., request->client, ...)

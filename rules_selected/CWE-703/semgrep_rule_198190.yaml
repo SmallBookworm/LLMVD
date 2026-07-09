@@ -1,0 +1,28 @@
+rules:
+  - id: redis-stream-iterator-memory-leak
+    patterns:
+      - pattern-either:
+          - pattern: |
+              streamIterator $SI;
+              ...
+              streamIteratorStart(&$SI, ...);
+              ...
+              if (!...) {
+                ...
+              }
+          - pattern: |
+              streamIterator $SI;
+              ...
+              streamIteratorStart(&$SI, ...);
+              ...
+              if (...) {
+                ...
+              }
+    pattern-not: |
+      streamIteratorStop(&$SI);
+    message: "Missing call to streamIteratorStop() may cause a memory leak (CVE-2022-33105)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-703"
+      cve: "CVE-2022-33105"

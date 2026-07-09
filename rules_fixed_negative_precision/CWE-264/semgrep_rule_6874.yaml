@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2016-1631-sop-bypass
+    message: "Missing WebView modal loop guards may allow Same Origin Policy bypass in nested message loops."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          base::MessageLoop::ScopedNestableTaskAllower allow(...);
+          base::MessageLoop::current()->Run();
+      - pattern: |
+          {
+            base::MessageLoop::ScopedNestableTaskAllower allow(...);
+            base::MessageLoop::current()->Run();
+          }
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern-not: |
+        blink::WebView::willEnterModalLoop();
+        ...
+        base::MessageLoop::current()->Run();
+        ...
+        blink::WebView::didExitModalLoop();

@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2012-3400-udf-sparing-table-buffer-overflow
+    message: "Heap-based buffer overflow vulnerability in UDF sparing table handling. Missing bounds check before accessing sparing table entries may lead to memory corruption."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (...; ...; ...) {
+                ...
+                struct sparablePartitionMap *spm = (struct sparablePartitionMap *)...;
+                ...
+                for (j = 0; j < spm->numSparingTables; j++) {
+                  ...
+                  map->s_type_specific.s_sparing.s_spar_map[j] = ...;
+                  ...
+                }
+                ...
+              }
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2012-3400"

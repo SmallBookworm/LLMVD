@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2015-7855-decodenetnum-buffer-check
+    patterns:
+      - pattern: |
+          REQUIRE(strlen($NUM) < sizeof($BUF));
+    message: "Missing explicit length check before buffer use may lead to assertion failure (CVE-2015-7855). Use explicit return on overflow instead of relying on REQUIRE."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2015-7855"

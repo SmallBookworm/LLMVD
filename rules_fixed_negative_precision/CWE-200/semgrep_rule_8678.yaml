@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2017-13200-id3-unsync-info-disclosure
+    message: "Potential information disclosure due to unsafe handling of ID3 unsynchronization (CVE-2017-13200, CWE-200)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          for (...; ...; ...) {
+            ...
+            if (... && ...) {
+              ++readOffset;
+              --mSize;
+              --dataSize;
+            }
+            mData[writeOffset++] = mData[readOffset++];
+            ...
+          }
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2017-13200"

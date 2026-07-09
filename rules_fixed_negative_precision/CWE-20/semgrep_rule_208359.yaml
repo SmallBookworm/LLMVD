@@ -1,0 +1,37 @@
+rules:
+  - id: mutt-imap-status-literal-size-check
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!imap_get_literal_count(..., &litlen))
+              {
+                ...
+                if (imap_cmd_step(...) != IMAP_CMD_CONTINUE)
+                {
+                  ...
+                  return;
+                }
+                mailbox = idata->buf;
+                ...
+              }
+          - pattern: |
+              if (!imap_get_literal_count(..., &litlen))
+              {
+                ...
+                if (imap_cmd_step(...) != IMAP_CMD_CONTINUE)
+                  return;
+                mailbox = idata->buf;
+                ...
+              }
+    pattern-not: |
+      if (strlen(idata->buf) < litlen)
+      {
+        ...
+        return;
+      }
+    message: "Missing validation that literal length 'litlen' does not exceed buffer size. This may lead to buffer over-read or out-of-bounds access (CWE-20)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2018-14351"

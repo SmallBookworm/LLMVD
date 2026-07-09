@@ -1,0 +1,21 @@
+rules:
+  - id: libtasn1-infinite-recursion-cve-2016-4008
+    message: "Missing bounds check on counter_end may lead to infinite recursion in _asn1_extract_der_octet (CVE-2016-4008)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - patterns:
+        - pattern: |
+            if (len2 == -1)
+              counter_end = der_len - 2;
+            else
+              counter_end = der_len;
+        - pattern: while (counter < counter_end)
+      - patterns:
+        - pattern: |
+            if (len2 == -1)
+              counter_end = der_len - 2;
+            else
+              counter_end = der_len;
+        - pattern: ...
+        - pattern: while (counter < counter_end)

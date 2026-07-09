@@ -1,0 +1,32 @@
+rules:
+  - id: curl_ntlm_connection_reuse_vulnerability
+    message: "NTLM connection reuse without verifying credentials match may lead to authentication bypass (CVE-2015-3143)."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if((!(...->handler->flags & PROTOPT_CREDSPERREQUEST)) ||
+                 wantNTLMhttp) {
+                ...
+                if(!strequal(...->user, ...->user) ||
+                   !strequal(...->passwd, ...->passwd)) {
+                  continue;
+                }
+                ...
+              }
+          - pattern: |
+              if((!(...->handler->flags & PROTOPT_CREDSPERREQUEST)) ||
+                 (wantNTLMhttp || ...->ntlm.state != NTLMSTATE_NONE)) {
+                ...
+              }
+    pattern-not: |
+      if((!(...->handler->flags & PROTOPT_CREDSPERREQUEST)) ||
+         (wantNTLMhttp || ...->ntlm.state != NTLMSTATE_NONE)) {
+        ...
+        if(!strequal(...->user, ...->user) ||
+           !strequal(...->passwd, ...->passwd)) {
+          continue;
+        }
+        ...
+      }

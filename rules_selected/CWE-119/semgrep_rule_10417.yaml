@@ -1,0 +1,10 @@
+rules:
+  - id: use-of-deprecated-load_image
+    message: "Use of deprecated load_image() function which may cause buffer overflow. Use load_image_size() instead."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern: load_image(...)
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2018-20815"

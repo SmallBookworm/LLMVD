@@ -1,0 +1,22 @@
+rules:
+  - id: memory-leak-of_fdt_unflatten_tree
+    message: Memory allocated by kmemdup is not freed when of_fdt_unflatten_tree fails, leading to a memory leak.
+    severity: MEDIUM
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $data = kmemdup(...);
+              ...
+              of_fdt_unflatten_tree($data, ..., &$node);
+              if (!$node) {
+                ...
+                return ...;
+              }
+          - pattern: |
+              $data = kmemdup(...);
+              ...
+              of_fdt_unflatten_tree($data, ..., &$node);
+              if (!$node)
+                return ...;
+    fix: ""

@@ -1,0 +1,20 @@
+rules:
+  - id: libxcursor-integer-overflow-cve-2017-16612
+    message: |
+      Integer overflow vulnerability in libXcursor before 1.1.15 may lead to heap buffer overflow.
+      Missing lower-bound check on 'length' parameter before memory allocation.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($LENGTH > XCURSOR_COMMENT_MAX_LEN)
+                return NULL;
+              ...
+              malloc(sizeof($TYPE) + $LENGTH + 1);
+          - pattern: |
+              if ($WIDTH >= 0x10000 || $HEIGHT > 0x10000)
+                return NULL;
+    metadata:
+      cwe: "CWE-190"
+      cve: "CVE-2017-16612"

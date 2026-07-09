@@ -1,0 +1,25 @@
+rules:
+  - id: ghostscript-use-after-free-Ins_IP
+    message: "Missing bounds check on CUR.GS.rp1 and CUR.GS.rp2 before array access in Ins_IP may lead to use-after-free (CWE-416)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (CUR.top < CUR.GS.loop)
+          {
+            ...
+          }
+      - pattern: |
+          if (CUR.top < CUR.GS.loop || ...)
+          {
+            ...
+          }
+    metavariable-pattern:
+      metavariable: $COND
+      pattern-not: |
+        if (CUR.top < CUR.GS.loop ||
+            BOUNDS(CUR.GS.rp1, CUR.zp0.n_points) ||
+            BOUNDS(CUR.GS.rp2, CUR.zp1.n_points))
+        {
+          ...
+        }

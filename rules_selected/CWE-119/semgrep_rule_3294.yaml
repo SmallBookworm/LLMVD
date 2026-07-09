@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2016-9556-sgi-dimension-check-missing
+    message: Missing validation for iris_info.dimension may lead to out-of-bounds heap read (CVE-2016-9556).
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if ((iris_info.depth == 0) || (iris_info.depth > 4))
+        ThrowReaderException(...);
+    pattern-not: |
+      if ((iris_info.dimension == 0) || (iris_info.dimension > 3)) 
+        ThrowReaderException(...);
+    fix-regex:
+      regex: ''
+      replacement: ''

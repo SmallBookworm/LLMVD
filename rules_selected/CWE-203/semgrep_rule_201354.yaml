@@ -1,0 +1,26 @@
+rules:
+  - id: cve-2021-38209-nf-conntrack-sysctl-leak
+    message: "Global sysctls NF_SYSCTL_CT_MAX, NF_SYSCTL_CT_EXPECT_MAX, and NF_SYSCTL_CT_BUCKETS are not marked read-only in non-init net namespaces, leading to information leak across namespaces (CWE-203)."
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (net->user_ns != &init_user_ns) {
+              table[NF_SYSCTL_CT_MAX].mode = 0444;
+              table[NF_SYSCTL_CT_EXPECT_MAX].mode = 0444;
+              ...
+              table[NF_SYSCTL_CT_BUCKETS].mode = 0444;
+          } else if (!net_eq(&init_net, net)) {
+              table[NF_SYSCTL_CT_BUCKETS].mode = 0444;
+          }
+      - pattern: |
+          if (net->user_ns != &init_user_ns) {
+              ...
+          }
+          ...
+          if (!net_eq(&init_net, net)) {
+              table[NF_SYSCTL_CT_BUCKETS].mode = 0444;
+          }
+    metadata:
+      cwe: ["CWE-203"]
+      cve: "CVE-2021-38209"

@@ -1,0 +1,14 @@
+rules:
+  - id: qemu-xhci-msix-memory-leak
+    message: "Missing msix_uninit() call in usb_xhci_exit may cause memory leak when MSI-X is used."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (dev->msix_table && dev->msix_pba && dev->msix_entry_used) {
+              memory_region_del_subregion(..., &dev->msix_table_mmio);
+              memory_region_del_subregion(..., &dev->msix_pba_mmio);
+          }
+    metadata:
+      cwe: "CWE-399"
+      cve: "CVE-2016-7466"

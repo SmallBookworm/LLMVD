@@ -1,0 +1,34 @@
+rules:
+  - id: cve-2018-0737-openssl-rsa-keygen-missing-consttime
+    message: "RSA key generation is missing BN_FLG_CONSTTIME flag on p and q, making it vulnerable to cache timing side-channel attacks (CVE-2018-0737)."
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (BN_copy(rsa->e, e_value) == NULL)
+              goto err;
+          ...
+          BN_set_flags(r2, BN_FLG_CONSTTIME);
+          ...
+          for (;;) {
+              if (!BN_sub(r2, rsa->p, BN_value_one()))
+                  goto err;
+              ...
+          }
+      - pattern: |
+          if (BN_copy(rsa->e, e_value) == NULL)
+              goto err;
+          ...
+          BN_set_flags(r2, BN_FLG_CONSTTIME);
+          ...
+          for (;;) {
+              if (!BN_sub(r2, rsa->q, BN_value_one()))
+                  goto err;
+              ...
+          }
+    pattern-not: |
+        BN_set_flags(rsa->p, BN_FLG_CONSTTIME);
+        BN_set_flags(rsa->q, BN_FLG_CONSTTIME);
+    fix-regex:
+      regex: ""
+      replacement: ""

@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2015-4054-null-pointer-dereference
+    message: "NULL pointer dereference possible if 'auth_user' is not checked before use. This can lead to denial of service (CVE-2015-4054)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          PgUser *user = $CLIENT->auth_user;
+          ...
+          if (!(*$PASSWD) || !(user->$FIELD))
+      - pattern: |
+          PgUser *user = $CLIENT->auth_user;
+          ...
+          $FUNC(user->$FIELD, ...)
+    metavariable-pattern:
+      metavariable: $FIELD
+      pattern: passwd

@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2014-9903-sched-read-attr-info-leak
+    patterns:
+      - pattern-either:
+          - pattern: |
+              copy_to_user($UATTR, $ATTR, $USIZE)
+          - pattern: |
+              copy_to_user(..., ..., $USIZE)
+    message: "Use of incorrect size in copy_to_user may leak kernel stack memory. Use attr->size instead of usize to avoid information disclosure (CVE-2014-9903)."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-200"
+      confidence: MEDIUM

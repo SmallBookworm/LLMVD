@@ -1,0 +1,17 @@
+rules:
+  - id: spice-vdagent-missing-cleanup-active-xfers
+    patterns:
+      - pattern: |
+          if (client_connected) {
+              udscs_server_write_all(...);
+              client_connected = false;
+          }
+      - pattern-not: |
+          g_hash_table_remove_all(active_xfers);
+          if (client_connected) {
+              udscs_server_write_all(...);
+              client_connected = false;
+          }
+    message: "Missing cleanup of active_xfers on client disconnect may lead to information disclosure or denial of service (CVE-2020-25651)."
+    severity: WARNING
+    languages: [c]

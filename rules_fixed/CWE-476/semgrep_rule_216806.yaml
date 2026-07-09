@@ -1,0 +1,37 @@
+rules:
+  - id: openssl-edi-party-name-null-deref
+    message: "Detected vulnerable ASN.1 parsing logic that may lead to NULL pointer dereference in EDIPARTYNAME handling (CVE-2020-1971)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          case ASN1_ITYPE_MSTRING:
+              ...
+              if (tag != -1) {
+                  ...
+              }
+      - pattern: |
+          case ASN1_ITYPE_CHOICE:
+              ...
+              if (tag != -1) {
+                  ...
+              }
+    metavariable-pattern:
+      metavariable: tag
+      pattern: tag != -1
+    pattern-not-inside: |
+      case ASN1_ITYPE_MSTRING:
+          if (tag != -1) {
+              ERR_raise(..., ASN1_R_BAD_TEMPLATE);
+              goto err;
+          }
+          ...
+    pattern-not-inside: |
+      switch (itype) {
+        case ASN1_ITYPE_CHOICE:
+          if (tag != -1) {
+              ERR_raise(..., ASN1_R_BAD_TEMPLATE);
+              goto err;
+          }
+          ...
+      }

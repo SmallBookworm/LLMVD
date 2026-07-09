@@ -1,0 +1,25 @@
+rules:
+  - id: xfs_agf_verify_missing_freeblks_check
+    message: "Missing verification of agf_freeblks against agf_longest in xfs_agf_verify, which may lead to excessive sync duration (CVE-2020-12655)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!(XFS_AGF_GOOD_VERSION(...) &&
+                be32_to_cpu($AGF->agf_freeblks) <= be32_to_cpu($AGF->agf_length) &&
+                ...))
+            return __this_address;
+      - pattern: |
+          if (!(XFS_AGF_GOOD_VERSION(...) &&
+                be32_to_cpu($AGF->agf_freeblks) <= be32_to_cpu($AGF->agf_length) &&
+                be32_to_cpu($AGF->agf_flfirst) < xfs_agfl_size(...) &&
+                be32_to_cpu($AGF->agf_fllast) < xfs_agfl_size(...) &&
+                be32_to_cpu($AGF->agf_flcount) <= xfs_agfl_size(...)))
+            return __this_address;
+    pattern-not: |
+      if (be32_to_cpu($AGF->agf_freeblks) < be32_to_cpu($AGF->agf_longest) ||
+          be32_to_cpu($AGF->agf_freeblks) > be32_to_cpu($AGF->agf_length))
+        return __this_address;
+    metavariable-regex:
+      metavariable: $AGF
+      regex: agf

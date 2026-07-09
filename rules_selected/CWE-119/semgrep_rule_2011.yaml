@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2016-4564-buffer-overflow-drawimage
+    message: "Buffer overflow vulnerability in DrawImage due to unsafe GetNextToken usage with variable extent. Use MagickPathExtent instead."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      GetNextToken($PTR, &$PTR2, $EXTENT, $TOKEN)
+    pattern-not: |
+      GetNextToken($PTR, &$PTR2, MagickPathExtent, $TOKEN)
+    fix-regex:
+      regex: '(GetNextToken\([^,]+,\s*[^,]+,\s*)[^,]+(,\s*[^)]+\))'
+      replacement: '\1MagickPathExtent\2'

@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2015-4178-fs-pin-hlist-del
+    message: "Use of hlist_del instead of hlist_del_init on m_list or s_list in pin_remove may lead to use-after-free or system crash (CVE-2015-4178)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          hlist_del(&pin->m_list);
+      - pattern: |
+          hlist_del(&pin->s_list);
+    metavariable-regex:
+      metavariable: pin
+      regex: ".*"

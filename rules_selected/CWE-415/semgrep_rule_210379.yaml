@@ -1,0 +1,19 @@
+rules:
+  - id: cwe-415-double-free-gdimagebmpptr
+    message: |
+      Potential double free vulnerability in gdImageBmpPtr. If gdImageBmpCtx fails,
+      gdDPExtractData may return data that leads to double free when out->gd_free is called.
+      Ensure the return value of _gdImageBmpCtx is checked before calling gdDPExtractData.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          gdImageBmpCtx($IM, $OUT, $COMP);
+          $RV = gdDPExtractData($OUT, $SIZE);
+      - pattern: |
+          gdImageBmpCtx($IM, $OUT, $COMP);
+          ...;
+          $RV = gdDPExtractData($OUT, $SIZE);
+    metavariable-regex:
+      metavariable: $OUT
+      regex: 'out'

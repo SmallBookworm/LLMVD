@@ -1,0 +1,18 @@
+rules:
+  - id: cwe-78-os-command-injection-podcast-filename
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $CMD.append(" \"");
+              $CMD.append(utils::replace_all($FILE, "\"", "\\\""));
+              $CMD.append("\"");
+          - pattern: |
+              $CMD += " \"";
+              $CMD += utils::replace_all($FILE, "\"", "\\\"");
+              $CMD += "\"";
+    message: "OS command injection vulnerability due to improper escaping of shell metacharacters in podcast filename. Use single quotes and percent-encode instead."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-78"
+      cve: "CVE-2017-14500"

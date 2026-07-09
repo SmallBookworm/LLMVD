@@ -1,0 +1,17 @@
+rules:
+  - id: lucky_thirteen_vulnerable_mac_handling
+    message: "Detected vulnerable MAC handling susceptible to Lucky Thirteen timing side-channel attack (CVE-2013-0169)."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              union { unsigned int u[SHA_DIGEST_LENGTH/sizeof(unsigned int)];
+                      unsigned char c[SHA_DIGEST_LENGTH]; } mac;
+          - pattern: |
+              SHA1_Final(mac.c, ...);
+          - pattern: |
+              res |= out[i]^mac.c[i];
+    metadata:
+      cwe: "CWE-310"
+      cve: "CVE-2013-0169"

@@ -1,0 +1,20 @@
+rules:
+  - id: cwe-787-ipc-integer-overflow
+    message: "Potential integer overflow leading to heap buffer overflow or double-free in IPC message handling. Use 'size_t' instead of 'unsigned short' for length tracking."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              static unsigned short len = 0;
+              ...
+              len += $BL;
+              ... erealloc(..., len + 1);
+          - pattern: |
+              static unsigned short len = 0;
+              ...
+              len = $BL;
+              ... emalloc(len + 1);
+    metadata:
+      cwe: ["CWE-787"]
+      cve: "CVE-2017-7875"

@@ -1,0 +1,7 @@
+rules:
+  - id: lzma_unlimited_memory_usage
+    message: "LZMA decompression without memory limit may lead to denial of service via excessive memory consumption."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      lzma_auto_decoder(..., UINT64_MAX, ...)

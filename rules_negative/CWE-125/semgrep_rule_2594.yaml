@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2017-13001-buffer-overread
+    message: "Buffer over-read vulnerability in nfs_printfh due to unsafe strncpy usage without proper length validation (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          static char temp[$SIZE + 1];
+          ...
+          strncpy(temp, $SRC, $SIZE);
+      - pattern: |
+          char temp[$SIZE + 1];
+          ...
+          strncpy(temp, $SRC, $SIZE);
+          temp[sizeof(temp) - 1] = '\0';
+    metavariable-regex:
+      SIZE: "NFSX_V3FHMAX"

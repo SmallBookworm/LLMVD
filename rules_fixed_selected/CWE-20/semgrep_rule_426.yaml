@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2010-4818-glx-screen-validation
+    message: Missing check for negative screen value may lead to out-of-bounds access.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($SCREEN >= $NUM_SCREENS) {
+                ...
+              }
+          - pattern: |
+              if ($SCREEN >= screenInfo.numScreens) {
+                ...
+              }
+    metavariable-pattern:
+      metavariable: $SCREEN
+      pattern: screen

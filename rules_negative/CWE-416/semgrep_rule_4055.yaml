@@ -1,0 +1,27 @@
+rules:
+  - id: ipmi_si_use_after_free_cwe416
+    message: "Use-after-free vulnerability in ipmi_si module due to premature assignment of io_cleanup before successful resource allocation. This may lead to accessing freed memory when reading /proc/ioports after module removal."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          io->io_cleanup = port_cleanup;
+          ...
+          if (request_region(...) == NULL) {
+              ...
+              return ...;
+          }
+      - pattern: |
+          io->io_cleanup = ...;
+          ...
+          for (...; ...; ...) {
+              if (request_region(...) == NULL) {
+                  ...
+                  return ...;
+              }
+          }
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2019-11811"
+      references:
+        - https://github.com/torvalds/linux/commit/401e7e88d4ef80188ffa07095ac00456f901b8c4

@@ -1,0 +1,27 @@
+rules:
+  - id: cwe-362-vips-null-deref-race-condition
+    message: "Potential NULL pointer dereference due to missing error flag check in vips_foreign_load_start. This may lead to a race condition and denial of service (CWE-362, CVE-2018-7998)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!load->real) {
+            ...
+            if (class->load(load) ||
+                vips_image_pio_input(load->real)) {
+              return NULL;
+            }
+            ...
+          }
+      - pattern: |
+          if (!load->real) {
+            ...
+            if (!vips_foreign_load_iscompat(load->real, out)) {
+              return NULL;
+            }
+            ...
+          }
+    metavariable-pattern:
+      metavariable: $FUNC
+      patterns:
+        - pattern: vips_foreign_load_start

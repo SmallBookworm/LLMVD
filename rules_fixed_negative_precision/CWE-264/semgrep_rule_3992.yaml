@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2019-13272-ptrace-cred-mishandling
+    message: "Use of __task_cred(new_parent) in ptrace_link() may lead to privilege escalation. Should use current_cred() instead."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          __ptrace_link(..., __task_cred($NEW_PARENT));
+    metadata:
+      cwe: ["CWE-264"]
+      cve: "CVE-2019-13272"

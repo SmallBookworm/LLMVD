@@ -1,0 +1,18 @@
+rules:
+  - id: cwe-703-null-pointer-deref-adf
+    message: "Potential null pointer dereference due to unchecked return value of r_anal_get_fcn_in before use in anal_fcn_data."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              RAnalFunction *fcn = r_anal_get_fcn_in(..., -1);
+              ...;
+              ut32 fcn_size = r_anal_function_size_from_entry(fcn);
+          - pattern: |
+              RAnalFunction *fcn = r_anal_get_fcn_in(..., -1);
+              ...;
+              $MEMBER = fcn->$MEMBER_NAME;
+    metadata:
+      cwe: "CWE-703"
+      cve: "CVE-2020-27795"

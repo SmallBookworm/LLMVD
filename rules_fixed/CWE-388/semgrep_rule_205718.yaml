@@ -1,0 +1,28 @@
+rules:
+  - id: efi_call_phys_prolog_missing_allocation_check
+    message: "Missing check for kmalloc_array failure in efi_call_phys_prolog may lead to use of NULL pointer"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $SAVE_PGD = kmalloc_array(...);
+          ...
+          for (...; ...; ...) {
+              ...
+          }
+          ...
+          return $SAVE_PGD;
+      - pattern: |
+          $SAVE_PGD = kmalloc_array(...);
+          ...
+          out:
+          ...
+          return $SAVE_PGD;
+    metavariable-pattern:
+      $SAVE_PGD:
+        pattern: pgd_t * ...
+    pattern-not-inside: |
+      $SAVE_PGD = kmalloc_array(...);
+      if (!$SAVE_PGD)
+          return NULL;
+      ...

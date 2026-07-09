@@ -1,0 +1,9 @@
+rules:
+  - id: cve-2012-2870-libxslt-missing-error-check
+    message: Missing error check after xsltCompileIdKeyPattern may lead to memory management issues and denial of service.
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      xsltCompileIdKeyPattern(...);
+      if ((CUR == '/') && (NXT(1) == '/')) {
+      }

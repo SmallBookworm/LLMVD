@@ -1,0 +1,14 @@
+rules:
+  - id: imagemagick-pnm-buffer-overflow-cve-2019-13304
+    message: "Stack-based buffer overflow in WritePNMImage due to misplaced assignment in pixel writing loop (CVE-2019-13304)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          *q++ = (unsigned char) (GetPixelLuma($image, $p) >= (QuantumRange / 2.0) ? '0' : '1');
+          *q++ = ' ';
+          if (($q - $pixels + 1) >= (ssize_t) sizeof($pixels))
+      - pattern: |
+          *q++ = (unsigned char) (GetPixelLuma($image, $p) >= (QuantumRange / 2.0) ? '0' : '1');
+          *q++ = ' ';
+          if (($q - $pixels + 1) >= sizeof($pixels))

@@ -1,0 +1,16 @@
+rules:
+  - id: dhcpcd_buffer_overflow_cve_2016_1503
+    message: "Potential heap-based buffer overflow due to improper handling of DHCP option lengths. Missing bounds check for ARRAY type when sz is zero."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (opt->type & ARRAY)
+                  return dl % sz;
+          - pattern: |
+              if (opt->type & (IPV4 | ARRAY))
+                  return dl % sz;
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2016-1503"

@@ -1,0 +1,31 @@
+rules:
+  - id: cwe-125-libcroco-buffer-overread
+    message: "Heap-based buffer over-read due to missing bounds check before reading byte in cr_input_read_byte."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              *$X = PRIVATE($a_this)->in_buf[PRIVATE($a_this)->next_byte_index];
+              ...
+              if (PRIVATE($a_this)->nb_bytes - PRIVATE($a_this)->next_byte_index < 2) {
+                  ...
+              }
+          - pattern: |
+              $byte = PRIVATE($a_this)->in_buf[PRIVATE($a_this)->next_byte_index];
+              ...
+              if (PRIVATE($a_this)->nb_bytes - PRIVATE($a_this)->next_byte_index < 2) {
+                  ...
+              }
+    pattern-not-inside: |
+      cr_input_read_byte(...) {
+          ...
+          nb_bytes_left = cr_input_get_nb_bytes_left(...);
+          if (nb_bytes_left < 1) {
+              return ...;
+          }
+          ...
+      }
+    metavariable-pattern:
+      metavariable: $a_this
+      pattern: CRInput * ...

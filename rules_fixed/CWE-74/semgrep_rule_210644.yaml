@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2021-21261-flatpak-missing-bwrap-envp-to-args
+    message: "Missing call to flatpak_bwrap_envp_to_args() before executing bwrap may allow environment variable injection leading to sandbox escape (CVE-2021-21261)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - patterns:
+        - pattern: |
+            $BWARP = flatpak_bwrap_new(...);
+        - pattern: |
+            if (!flatpak_bwrap_bundle_args(...)) ...
+        - pattern: |
+            execvpe(flatpak_get_bwrap(), ..., $BWARP->envp)
+        - metavariable-regex:
+            metavariable: $BWARP
+            regex: '^[a-zA-Z_][a-zA-Z0-9_]*$'
+    pattern-not: |
+      $BWARP = flatpak_bwrap_new(...);
+      ...
+      flatpak_bwrap_envp_to_args($BWARP);
+      ...
+      if (!flatpak_bwrap_bundle_args($BWARP, ...)) ...
+      ...
+      execvpe(flatpak_get_bwrap(), ..., $BWARP->envp)

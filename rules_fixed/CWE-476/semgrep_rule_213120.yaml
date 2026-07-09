@@ -1,0 +1,16 @@
+rules:
+  - id: null_pointer_dereference-check-event-logging
+    message: "Potential NULL pointer dereference in CheckEventLogging. The pointer 'p' may be NULL when accessing 'p->event_mask'."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $P = (LogInfo *)GetNextValueInLinkedList(...);
+              ... $P->event_mask ...
+          - pattern: |
+              $P = (LogInfo *)GetNextValueInLinkedList(...);
+              ... $P -> event_mask ...
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2018-16328"

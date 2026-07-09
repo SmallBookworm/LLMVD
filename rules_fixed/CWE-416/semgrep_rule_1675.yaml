@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2016-9576-use-after-free
+    message: "Missing check for iov_iter type before use may lead to use-after-free (CWE-416). Ensure iter_is_iovec() is called to validate the iterator type."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      blk_rq_map_user_iov(..., const struct iov_iter *iter, ...)
+      {
+        ...
+        if (!iter_is_iovec(iter))
+          ...
+      }
+    pattern-not: |
+      blk_rq_map_user_iov(..., const struct iov_iter *iter, ...)
+      {
+        ...
+        if (!iter_is_iovec(iter))
+          goto ...;
+        ...
+      }
+    mode: search

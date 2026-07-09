@@ -1,0 +1,14 @@
+rules:
+  - id: cwe-125-out-of-bounds-read-typed-ast
+    message: "Potential out-of-bounds read due to unsafe increment of index 'i' after processing keyword-only arguments. This may lead to a crash when parsing malformed Python source code."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              i += 2; /* the name and the comma */
+          - pattern: |
+              i += 2;
+    metadata:
+      cwe: ["CWE-125"]
+      cve: "CVE-2019-19275"

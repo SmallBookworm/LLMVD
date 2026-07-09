@@ -1,0 +1,31 @@
+rules:
+  - id: ip_expire_route_revalidation_missing
+    message: "Missing route revalidation in ip_expire() may lead to use-after-free when sending ICMP_TIME_EXCEEDED"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ((qp->q.last_in & INET_FRAG_FIRST_IN) && qp->q.fragments != NULL) {
+              ...
+              if (qp->user == IP_DEFRAG_CONNTRACK_IN && !skb_dst(head)) {
+                  ...
+                  int err = ip_route_input(...);
+                  ...
+              }
+              ...
+              icmp_send(...);
+          }
+      - pattern: |
+          if ((qp->q.last_in & INET_FRAG_FIRST_IN) && qp->q.fragments != NULL) {
+              ...
+              if (qp->user == IP_DEFRAG_CONNTRACK_IN && !skb_dst(head)) {
+                  ...
+                  int err = ip_route_input_noref(...);
+                  ...
+              }
+              ...
+              icmp_send(...);
+          }
+    metavariable-regex:
+      metavariable: $func
+      regex: ip_expire

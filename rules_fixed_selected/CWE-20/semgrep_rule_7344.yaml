@@ -1,0 +1,16 @@
+rules:
+  - id: missing_modifier_letter_voicing_removal
+    message: "Missing removal of modifier letter voicing (U+02EC) may allow IDN spoofing via confusable characters."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          allowed_set.remove(0x2ecu);
+      - pattern-either:
+          - pattern: |
+              allowed_set.remove(...);
+              ...
+              uspoof_setAllowedUnicodeSet(...);
+    metavariable-pattern:
+      metavariable: $allowed_set
+      pattern: icu::UnicodeSet

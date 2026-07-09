@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2017-9098-uninitialized-memory-rle
+    message: "Uninitialized memory in RLE decoder may lead to information disclosure (CVE-2017-9098, CWE-200). Missing call to ResetMagickMemory after allocating pixel buffer."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          pixels=(unsigned char *) GetVirtualMemoryBlob(...);
+          ...
+          if ((flags & 0x01) && !(flags & 0x02))
+      - pattern: |
+          pixels=(unsigned char *) GetVirtualMemoryBlob(...);
+          ...
+          plane=0;
+    fix-regex:
+      regex: ""
+      replacement: ""

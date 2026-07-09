@@ -1,0 +1,23 @@
+rules:
+  - id: tensorflow-lsh-divide-by-zero
+    message: "Division by zero possible in LSH projection due to missing input dimension validation."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          TF_LITE_ENSURE(context, SizeOfDimension(input, 0) >= 1);
+      - pattern-either:
+          - pattern: |
+              const TfLiteTensor* input;
+              ...
+              TF_LITE_ENSURE_OK(context, GetInputSafe(context, node, 1, &input));
+              ...
+              switch (params->type) {
+                case kTfLiteLshProjectionSparse:
+                ...
+                case kTfLiteLshProjectionDense:
+                ...
+              }
+    metadata:
+      cwe: ["CWE-369"]
+      cve: "CVE-2021-37691"

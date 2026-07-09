@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2016-10067-buffer-overflow-viff
+    message: "Potential buffer overflow due to missing heap overflow check in VIFF image reader. Use HeapOverflowSanityCheck instead of CheckMemoryOverflow."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (CheckMemoryOverflow(..., ...) != MagickFalse)
+                ThrowReaderException(ResourceLimitError, "MemoryAllocationFailed");
+          - pattern: |
+              if (CheckMemoryOverflow(...) != MagickFalse)
+                ThrowReaderException(ResourceLimitError, "MemoryAllocationFailed");
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2016-10067"

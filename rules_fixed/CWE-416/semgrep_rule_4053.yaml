@@ -1,0 +1,40 @@
+rules:
+  - id: ipmi_si_use_after_free
+    message: "Use-after-free vulnerability in ipmi_si due to missing io_cleanup() on error path. This may lead to accessing freed memory when reading /proc/ioports after module removal."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (rv) {
+              ...
+              goto out_err;
+          }
+          ...
+          out_err:
+          kfree(init_name);
+      - pattern: |
+          goto out_err;
+          ...
+          out_err:
+          kfree(init_name);
+    metavariable-regex:
+      metavariable: $rv
+      regex: rv
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (rv) {
+                  ...
+                  goto out_err;
+              }
+              ...
+              out_err:
+              kfree(init_name);
+          - pattern: |
+              goto out_err;
+              ...
+              out_err:
+              kfree(init_name);
+      - metavariable-regex:
+          metavariable: $rv
+          regex: rv

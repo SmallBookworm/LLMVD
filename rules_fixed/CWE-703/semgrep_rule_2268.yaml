@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2015-8630-null-policy-check
+    message: "Missing null check for entry->policy when KADM5_POLICY is set in mask. This can lead to a NULL pointer dereference (CVE-2015-8630)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((mask & KADM5_POLICY)) {
+                ... get_policy(..., entry->policy, ...);
+                ...
+              }
+          - pattern: |
+              if (mask & KADM5_POLICY) {
+                ... get_policy(..., entry->policy, ...);
+                ...
+              }
+    metavariable-pattern:
+      metavariable: entry
+      pattern: entry
+    mode: regex

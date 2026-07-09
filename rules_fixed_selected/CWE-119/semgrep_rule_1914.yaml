@@ -1,0 +1,43 @@
+rules:
+  - id: cve-2016-5400-airspy-probe-memory-leak
+    message: "Memory leak in airspy_probe due to missing v4l2_device_unregister on error path after control handler initialization. This can lead to denial of service via crafted USB device."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (ret) {
+                ...
+                goto err_free_mem;
+              }
+              ...
+              v4l2_ctrl_handler_init(...);
+              ...
+              if (...->hdl.error) {
+                ...
+                goto err_free_controls;
+              }
+              ...
+              ret = video_register_device(...);
+              if (ret) {
+                ...
+                goto err_unregister_v4l2_dev;
+              }
+          - pattern: |
+              if (ret) {
+                ...
+                goto err_free_mem;
+              }
+              ...
+              v4l2_ctrl_handler_init(...);
+              ...
+              if (...->hdl.error) {
+                ...
+                goto err_free_controls;
+              }
+              ...
+              ret = video_register_device(...);
+              if (ret) {
+                ...
+                goto err_free_mem;
+              }

@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2013-4254-validate-event-missing-software-check
+    message: Missing check for software events in validate_event may lead to NULL pointer dereference (CVE-2013-4254).
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($EVENT->pmu != $LEADER_PMU || ...)
+                return 1;
+              ...
+              return $ARMPMU->get_event_idx(...) >= 0;
+          - pattern: |
+              if ($EVENT->state == PERF_EVENT_STATE_OFF && ...)
+                return 1;
+              ...
+              return $ARMPMU->get_event_idx(...) >= 0;
+    pattern-not: |
+      if (is_software_event($EVENT))
+        return 1;

@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2015-5221-use-after-free
+    message: Use-after-free vulnerability due to premature destruction of tvp before error checks.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          jas_tvparser_destroy($TVP);
+          if (... || ...) {
+            goto error;
+          }
+      - pattern: |
+          jas_tvparser_destroy($TVP);
+          if ($COND) {
+            goto error;
+          }
+    metavariable-pattern:
+      metavariable: $TVP
+      pattern: jas_tvparser_t *

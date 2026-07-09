@@ -1,0 +1,12 @@
+rules:
+  - id: cwe-200-hidp-strncpy-bounds
+    message: "strncpy() used with a fixed length (128) instead of sizeof(req->name) - 1, potentially leading to information disclosure from kernel memory."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern: strncpy($DST, $SRC, 128);
+    metadata:
+      cwe: ["CWE-200"]
+      references:
+        - https://github.com/torvalds/linux/commit/0a9ab9bdb3e891762553f667066190c1d22ad62b
+        - CVE-2013-0349

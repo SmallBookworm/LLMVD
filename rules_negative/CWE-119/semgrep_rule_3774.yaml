@@ -1,0 +1,14 @@
+rules:
+  - id: unsanitized_rootname_buffer_overflow
+    message: "Unsanitized input 'rootname' used in sprintf may cause buffer overflow (CWE-119). Use snprintf instead."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: sprintf(charbuf, "%s/%s.html", dirout, rootname);
+          - pattern: sprintf(charbuf, "%s/%s-links.html", dirout, rootname);
+          - pattern: sprintf(charbuf, "%s_thumb_%03d", rootname, index);
+          - pattern: sprintf(charbuf, "%s_view_%03d", rootname, index);
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2018-7247"

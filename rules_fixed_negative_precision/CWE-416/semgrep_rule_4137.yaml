@@ -1,0 +1,9 @@
+rules:
+  - id: cve-2018-20836-use-after-free
+    message: "Potential use-after-free due to race condition in smp_task_done. The del_timer() return value should not be checked before calling complete()."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (!del_timer(&$TASK->slow_task->timer))
+        return;
+      complete(&$TASK->slow_task->completion);

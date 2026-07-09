@@ -1,0 +1,41 @@
+rules:
+  - id: cwe-78-exim-cve-2019-10149
+    message: "Improper validation of recipient address in deliver_message() may lead to remote command execution (CVE-2019-10149)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-not-inside: |
+          if (!parse_extract_address(addr, &errmsg, &start, &end, &dom, TRUE)) {
+            log_write(0, LOG_MAIN|LOG_PANIC,
+                  "failed to parse address '%.100s': %s\n", addr, errmsg);
+          } else {
+            deliver_localpart =
+              string_copyn(addr+start, dom ? (dom-1) - start : end - start);
+            deliver_domain = dom ? CUS string_copyn(addr+dom, end - dom) : CUS"";
+            ...
+          }
+      - pattern-either:
+          - pattern: |
+              uschar * save_local =  deliver_localpart;
+              const uschar * save_domain = deliver_domain;
+              deliver_localpart = expand_string(
+                        string_sprintf("${local_part:%s}", new->address));
+              deliver_domain =    expand_string(
+                        string_sprintf("${domain:%s}", new->address));
+              (void) event_raise(event_action,
+                        US"msg:fail:internal", new->message);
+              deliver_localpart = save_local;
+              deliver_domain =    save_domain;
+          - pattern: |
+              uschar * save_local =  deliver_localpart;
+              const uschar * save_domain = deliver_domain;
+              deliver_localpart = expand_string(...);
+              deliver_domain = expand_string(...);
+              event_raise(...);
+              deliver_localpart = save_local;
+              deliver_domain = save_domain;
+    metadata:
+      cwe: "CWE-78"
+      cve: "CVE-2019-10149"
+      references:
+        - https://git.exim.org/exim.git/commitdiff/d740d2111f189760593a303124ff6b9b1f83453d

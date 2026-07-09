@@ -1,0 +1,29 @@
+rules:
+  - id: cros_ec_double_fetch_race_condition
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (copy_from_user(&u_cmd, ..., sizeof(u_cmd)))
+                  ...
+              ...
+              if (copy_from_user(s_cmd, ..., sizeof(*s_cmd) + u_cmd.outsize)) {
+                  ...
+              }
+              ...
+              if (copy_to_user(..., ..., sizeof(*s_cmd) + u_cmd.insize))
+                  ...
+          - pattern: |
+              if (copy_from_user(&u_cmd, ..., sizeof(u_cmd)))
+                  ...
+              ...
+              if (copy_from_user(s_cmd, ..., sizeof(*s_cmd) + u_cmd.outsize)) {
+                  ...
+              }
+              ...
+              copy_to_user(..., ..., sizeof(*s_cmd) + u_cmd.insize);
+    message: "Potential double-fetch race condition. The values of 'u_cmd.outsize' or 'u_cmd.insize' may have changed between user copies, leading to out-of-bounds access."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-362"
+      cve: "CVE-2016-6156"

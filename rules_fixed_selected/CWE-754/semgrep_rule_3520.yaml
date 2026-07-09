@@ -1,0 +1,33 @@
+rules:
+  - id: xfs_attr_shortform_addname_missing_error_check_and_flag_clear
+    message: "Missing error check after xfs_attr_shortform_remove and failure to clear ATTR_REPLACE flag, which can lead to unchecked error conditions during attribute replacement (CVE-2018-18690)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (retval == -EEXIST) {
+            ...
+            retval = xfs_attr_shortform_remove(args);
+            ASSERT(retval == 0);
+            ...
+          }
+      - pattern: |
+          if (retval == -EEXIST) {
+            ...
+            retval = xfs_attr_shortform_remove(args);
+            if (retval)
+              return retval;
+            ...
+            args->flags &= ~ATTR_REPLACE;
+            ...
+          }
+    pattern-not-inside: |
+      if (retval == -EEXIST) {
+        ...
+        retval = xfs_attr_shortform_remove(args);
+        if (retval)
+          return retval;
+        ...
+        args->flags &= ~ATTR_REPLACE;
+        ...
+      }

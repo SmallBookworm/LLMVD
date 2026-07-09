@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2016-5220-pdfium-local-file-read
+    message: "Potential local file disclosure due to missing feature flag check before showing placeholder text. This may allow a remote attacker to read local files via a crafted PDF."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              return Textfield::ShouldShowPlaceholderText() &&
+                    !model()->is_caret_visible() && !model()->is_keyword_selected();
+    metadata:
+      cwe: ["CWE-200"]
+      cve: "CVE-2016-5220"

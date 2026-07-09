@@ -1,0 +1,24 @@
+rules:
+  - id: nginx-integer-overflow-year-buffer-overflow
+    message: "Detected missing time truncation in ngx_gmtime which may lead to buffer overflow for years exceeding four digits (CWE-190)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (t < 0) {
+          t = 0;
+      }
+      days = t / 86400;
+      sec = t % 86400;
+      ...
+      wday = (4 + days) % 7;
+    pattern-not: |
+      if (t < 0) {
+          t = 0;
+      }
+      days = t / 86400;
+      sec = t % 86400;
+
+      if (days > 2932896) {
+          days = 2932896;
+          sec = 86399;
+      }

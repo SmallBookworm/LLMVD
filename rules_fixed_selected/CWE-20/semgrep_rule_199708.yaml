@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2021-21705-filter-validate-url-password-validation
+    message: "Missing validation of URL password component in FILTER_VALIDATE_URL may lead to SSRF bypass (CVE-2021-21705)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (url->user != NULL && !is_userinfo_valid(url->user)) {
+                ...
+              }
+          - pattern: |
+              if (url->user != NULL && !is_userinfo_valid(url->user))
+                ...
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern-not: |
+        if (url->user != NULL && !is_userinfo_valid(url->user)
+            || url->pass != NULL && !is_userinfo_valid(url->pass)
+        ) {
+          ...
+        }

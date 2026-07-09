@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2009-1888-uninitialized-sbuf
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (lp_dos_filemode(...) &&
+                  can_write_to_file(..., ..., &sbuf)) {
+                ...
+              }
+          - pattern: |
+              if (lp_acl_group_control(...) &&
+                  current_user_in_group(prim_gid)) {
+                ...
+              }
+    message: "Use of potentially uninitialized 'sbuf' variable in acl_group_override may lead to reading uninitialized memory (CVE-2009-1888)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-264"
+      cve: "CVE-2009-1888"

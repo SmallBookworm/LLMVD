@@ -1,0 +1,30 @@
+rules:
+  - id: lsi_infinite_loop_no_opcode_check
+    message: "Infinite loop possible in lsi_execute_script() when processing empty opcodes due to missing iteration limit before opcode fetch."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              int insn_processed = 0;
+              ...
+              again:
+              ...
+              insn = read_dword(..., s->dsp);
+              if (!insn) {
+                ...
+                s->dsp += 4;
+              }
+          - pattern: |
+              int insn_processed = 0;
+              ...
+              again:
+              ...
+              insn = read_dword(..., s->dsp);
+              if (!insn) {
+                ...
+                s->dsp = s->dsp + 4;
+              }
+    metavariable-regex:
+      metavariable: insn
+      regex: "insn"

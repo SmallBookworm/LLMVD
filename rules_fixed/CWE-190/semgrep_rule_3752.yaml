@@ -1,0 +1,20 @@
+rules:
+  - id: freerdp-cve-2018-8787-integer-overflow
+    message: |
+      Integer overflow in gdi_Bitmap_Decompress may lead to heap-based buffer overflow.
+      Multiplication DstWidth * DstHeight * GetBytesPerPixel(...) is performed without overflow checks.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $width * $height * GetBytesPerPixel(...)
+      - pattern: |
+          $width * $height
+          ...
+          $size * GetBytesPerPixel(...)
+    metavariable-pattern:
+      metavariable: $width
+      pattern: "DstWidth"
+    metavariable-pattern:
+      metavariable: $height
+      pattern: "DstHeight"

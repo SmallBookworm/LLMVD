@@ -1,0 +1,18 @@
+rules:
+  - id: heap_buffer_overflow_vrend_vertex_elements
+    message: "Heap-based buffer overflow possible due to missing validation of 'num_elements' against PIPE_MAX_ATTRIBS."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (!v)
+         return ENOMEM;
+      v->count = $NUM_ELEMENTS;
+    pattern-not: |
+      if ($NUM_ELEMENTS > PIPE_MAX_ATTRIBS)
+         return EINVAL;
+    metavariable-pattern:
+      metavariable: $NUM_ELEMENTS
+      pattern: num_elements
+    fix-regex:
+      regex: ""
+      replacement: ""

@@ -1,0 +1,44 @@
+rules:
+  - id: cve-2014-3153-futex-requeue-pi-same-address
+    message: "futex_requeue with requeue_pi=1 allows uaddr1 == uaddr2, which can lead to privilege escalation (CVE-2014-3153)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (requeue_pi) {
+                ...
+                if ($UADDR1 == $UADDR2) {
+                  ...
+                }
+                ...
+              }
+          - pattern: |
+              if (requeue_pi) {
+                ...
+                if (match_futex(&$KEY1, &$KEY2)) {
+                  ...
+                }
+                ...
+              }
+      - pattern-not: |
+          if (requeue_pi) {
+            ...
+            if ($UADDR1 == $UADDR2)
+              return -EINVAL;
+            ...
+            if (match_futex(&$KEY1, &$KEY2)) {
+              ret = -EINVAL;
+              ...
+            }
+            ...
+          }
+    metavariable-regex:
+      - metavariable: $UADDR1
+        regex: uaddr1
+      - metavariable: $UADDR2
+        regex: uaddr2
+      - metavariable: $KEY1
+        regex: key1
+      - metavariable: $KEY2
+        regex: key2

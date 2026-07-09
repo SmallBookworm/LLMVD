@@ -1,0 +1,19 @@
+rules:
+  - id: imagemagick-dpx-memory-leak-cve-2019-12975
+    message: "Memory leak in WriteDPXImage due to missing check on ExportQuantumPixels return value before WriteBlob"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              length = ExportQuantumPixels(..., $pixels, ...);
+              count = WriteBlob(..., $extent, $pixels);
+          - pattern: |
+              $length = ExportQuantumPixels(..., $pixels, ...);
+              $count = WriteBlob(..., $extent, $pixels);
+    metavariable-patterns:
+      - metavariable: $length
+        pattern: length
+      - metavariable: $count
+        pattern: count
+    focus-metavariable: $length

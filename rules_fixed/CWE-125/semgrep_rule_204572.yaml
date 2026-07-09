@@ -1,0 +1,20 @@
+rules:
+  - id: cwe-125-heap-buffer-overread-psp
+    message: "Heap-based buffer over-read due to missing null-termination check on externally read string. Strings read at fixed length must be explicitly null-terminated or verified to be null-terminated."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $string = g_malloc($length + 1);
+              if (fread($string, $length, 1, $f) < 1) { ... }
+              ...
+              strlen($string)
+          - pattern: |
+              $string = g_malloc($length + 1);
+              if (fread($string, $length, 1, $f) < 1) { ... }
+              ...
+              g_string_append(..., $string)
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2017-17787"

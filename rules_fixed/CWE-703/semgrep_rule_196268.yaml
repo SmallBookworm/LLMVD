@@ -1,0 +1,24 @@
+rules:
+  - id: mintty-title-dos-no-delay
+    message: "Missing usleep delay in window operation handler may lead to DoS via rapid title changes (CVE-2021-28848)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              when (9):
+                ...;
+                // no usleep after win_maximise or win_set_geom
+          - pattern: |
+              when (10):
+                ...;
+                // no usleep after win_maximise
+      - pattern-not: |
+          when ($N):
+            ...;
+            usleep(...);
+      - metavariable-pattern:
+          metavariable: $N
+          pattern-either:
+            - pattern: 9
+            - pattern: 10

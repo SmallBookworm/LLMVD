@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2015-8867-openssl-random-pseudo-bytes
+    message: Use of deprecated RAND_pseudo_bytes() which may weaken cryptographic security. Use RAND_bytes() instead.
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern: RAND_pseudo_bytes(...)
+    metadata:
+      cwe: "CWE-310"
+      cve: "CVE-2015-8867"

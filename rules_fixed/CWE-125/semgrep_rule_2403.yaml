@@ -1,0 +1,27 @@
+rules:
+  - id: cve-2017-16529-out-of-bounds-read
+    message: |
+      Missing bounds check on control_header buffer may lead to out-of-bounds read (CWE-125).
+      The code accesses fields of h1 (uac1_ac_header_descriptor) without verifying that
+      the buffer is large enough to contain them.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              struct uac1_ac_header_descriptor *h1 = ...;
+              ...
+              if (!h1->bInCollection) { ... }
+          - pattern: |
+              struct uac1_ac_header_descriptor *h1 = ...;
+              ...
+              if (h1->bLength < sizeof(*h1) + h1->bInCollection) { ... }
+    metavariable-regex:
+      metavariable: $...
+      regex: ".*"
+    fixes:
+      - message: "Add bounds check for bLength to prevent out-of-bounds read"
+        lines_before: 1
+        lines_after: 1
+        match_regex: "(.*)"
+        replace_with: "$1"

@@ -1,0 +1,18 @@
+rules:
+  - id: rds_recv_track_latency_out_of_bounds
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: if (copy_from_user(...)) ...
+              - pattern: $rs->$field = $trace.rx_traces;
+              - pattern: for (...; ... < $rs->$field; ...) { ... }
+          - patterns:
+              - pattern: if (copy_from_user(...)) ...
+              - pattern: $var = $trace.rx_traces;
+              - pattern: for (...; ... < $var; ...) { ... }
+      - pattern-not: |
+          if ($trace.rx_traces > RDS_MSG_RX_DGRAM_TRACE_MAX)
+              return -EFAULT;
+    message: "Missing validation of 'rx_traces' against RDS_MSG_RX_DGRAM_TRACE_MAX may lead to out-of-bounds read/write (CWE-787)."
+    severity: ERROR
+    languages: [c]

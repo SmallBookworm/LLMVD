@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2021-31535-xlookupcolor-length-check
+    message: "Missing length check before sending user-controlled string over X protocol; may lead to buffer overflow (CWE-120, CVE-2021-31535)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          n = (int) strlen($SPEC);
+          ...
+          req->nbytes = n;
+      - pattern: |
+          $N = (int) strlen($SPEC);
+          ...
+          req->nbytes = $N;
+    metavariable-pattern:
+      metavariable: $N
+      pattern-not: |
+        if ($N >= USHRT_MAX) ...

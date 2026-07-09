@@ -1,0 +1,25 @@
+rules:
+  - id: exiv2-infinite-loop-cve-2018-18915
+    message: "Missing validation of seek and read operations in printIFDStructure may cause infinite loop (CVE-2018-18915, CWE-835)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          io.seek($START, BasicIo::beg);
+          io.read($BUF, $SIZE);
+          ...
+          $VAR = byteSwap...($BUF, ...);
+      - pattern: |
+          io.seek($OFFSET, BasicIo::beg);
+          io.read($BUF, $SIZE);
+    metavariable-pattern:
+      metavariable: $SIZE
+      pattern-either:
+        - pattern: 2
+        - pattern: 4
+        - pattern: 12
+    fixes:
+      - regex: .*
+        replacement: ""
+    fix-regex:
+      enabled: false

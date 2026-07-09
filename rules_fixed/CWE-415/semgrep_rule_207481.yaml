@@ -1,0 +1,11 @@
+rules:
+  - id: cwe-415-null-pointer-dereference-upx-canunpack
+    message: "Missing checkEhdr() call before accessing ELF header fields may lead to null pointer dereference (CWE-415)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (super::canUnpack()) {
+          return true;
+      }
+      if (Elf64_Ehdr::ET_DYN == get_te16(&ehdri.e_type)) {
+      }

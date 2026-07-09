@@ -1,0 +1,9 @@
+rules:
+  - id: cve-2016-0839-use-after-free
+    message: "Potential use-after-free vulnerability due to missing null check on 'recv_contex' before dereferencing. This may lead to memory corruption (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      vol_listener_context_t *recv_contex = (vol_listener_context_t *)handle;
+      ...
+      recv_contex->desc->uuid

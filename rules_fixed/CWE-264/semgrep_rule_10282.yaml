@@ -1,0 +1,8 @@
+rules:
+  - id: cve-2015-2348-move-uploaded-file-null-byte
+    message: "Potential null byte injection in move_uploaded_file due to unsafe parameter parsing ('ss' instead of 'sp'). This may allow bypassing file extension restrictions."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern: |
+          zend_parse_parameters(..., "ss", ..., &new_path, &new_path_len)

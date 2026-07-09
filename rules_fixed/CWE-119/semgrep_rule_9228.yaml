@@ -1,0 +1,14 @@
+rules:
+  - id: ipvs_ioctl_buffer_overflow
+    message: "Missing bounds check on ioctl command may lead to buffer overflow (CVE-2013-4588, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (*len < get_arglen[GET_CMDID($CMD)]) { ... }
+          ...
+          copy_from_user($BUF, $USER, get_arglen[GET_CMDID($CMD)])
+      - pattern: |
+          copy_from_user($BUF, $USER, get_arglen[GET_CMDID($CMD)])
+    metavariable-pattern:
+      $BUF: "arg"

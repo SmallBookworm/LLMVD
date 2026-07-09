@@ -1,0 +1,8 @@
+rules:
+  - id: imagemagick-cve-2016-7536
+    message: "Missing check for negative 'count' value may lead to segmentation fault (CVE-2016-7536, CWE-20)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if ((p > (datum+length-count)) || (count > (ssize_t) length))
+        break;

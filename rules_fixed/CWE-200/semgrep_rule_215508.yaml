@@ -1,0 +1,24 @@
+rules:
+  - id: cwe-200-uninitialized-padding-netlink
+    message: Uninitialized padding fields in netlink message structure may leak kernel memory.
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $t = NLMSG_DATA($nlh);
+              $t->$field = ...;
+          - pattern: |
+              $t = NLMSG_DATA($nlh);
+              ...
+              $t->$field = ...;
+        metavariable-pattern:
+          metavariable: $field
+          pattern-not: /(tca__pad1|tca__pad2)/
+        where:
+          - pattern-not-inside: |
+              $t = NLMSG_DATA($nlh);
+              ...
+              $t->tca__pad1 = 0;
+              $t->tca__pad2 = 0;
+              ...

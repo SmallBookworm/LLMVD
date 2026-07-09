@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2017-16533-out-of-bounds-read
+    message: |
+      Out-of-bounds read vulnerability in usbhid_parse due to missing validation of HID descriptor size and bNumDescriptors.
+      This can lead to denial of service or other unspecified impact via a crafted USB device.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (int n = 0; n < hdesc->bNumDescriptors; n++) {
+                ... hdesc->desc[n] ...;
+              }
+          - pattern: |
+              for (n = 0; n < hdesc->bNumDescriptors; n++) {
+                ... hdesc->desc[n] ...;
+              }

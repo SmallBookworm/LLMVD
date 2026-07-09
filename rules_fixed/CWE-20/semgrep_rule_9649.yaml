@@ -1,0 +1,14 @@
+rules:
+  - id: sscanf_unsigned_packet_length
+    patterns:
+      - pattern-either:
+          - pattern: |
+              sscanf(..., "%...u", ..., $pkt_len, ...);
+          - pattern: |
+              sscanf(..., "%...u", ..., &pkt_len, ...);
+    message: "Use of sscanf with %u to parse packet length may allow negative values due to sscanf's handling of unsigned integers. Use signed integer with %d and validate for negativity instead."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2016-5357"

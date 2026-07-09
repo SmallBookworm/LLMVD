@@ -1,0 +1,12 @@
+rules:
+  - id: double-free-in-OGRExpatRealloc
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (CanAlloc(...))
+                  return realloc(...);
+              free(...);
+              return nullptr;
+    message: "Double free vulnerability detected in OGRExpatRealloc. The pointer may be freed here and later passed to realloc, leading to a double-free condition (CWE-415)."
+    severity: ERROR
+    languages: [c]

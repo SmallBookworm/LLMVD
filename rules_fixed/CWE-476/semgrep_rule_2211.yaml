@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2015-8956-null-deref-rfcomm-bind
+    message: "Potential NULL pointer dereference in rfcomm_sock_bind. 'addr' is dereferenced before NULL check."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: struct sockaddr_rc *sa = (struct sockaddr_rc *) addr;
+              - pattern-inside: |
+                  ...
+                  if (!addr || ...)
+          - pattern: |
+              struct sockaddr_rc *$SA = (struct sockaddr_rc *) $ADDR;
+              ...;
+              $SA->$FIELD
+              ...;
+              if (!addr || ...)
+    metavariable-pattern:
+      $ADDR: addr

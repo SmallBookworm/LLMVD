@@ -1,0 +1,10 @@
+rules:
+  - id: ext4_orphan_del_missing_orphan_fs_check
+    message: "Missing check for EXT4_ORPHAN_FS in ext4_orphan_del may cause denial of service on non-journal filesystems with orphan list."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          if (!EXT4_SB(...)->s_journal)
+            return 0;
+    fix-regex: {}

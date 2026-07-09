@@ -1,0 +1,16 @@
+rules:
+  - id: cwe-125-juniper-buffer-overread
+    message: "Missing bounds check before reading 16 bits from packet data may lead to buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-not: ND_TCHECK_16BITS(...)
+      - pattern-either:
+          - pattern: EXTRACT_16BITS($PTR)
+          - pattern: EXTRACT_16BITS($PTR + ...)
+    metavariable-pattern:
+      metavariable: $PTR
+      pattern-not: p + l2info->cookie_len
+    fix-regex:
+      regex: EXTRACT_16BITS\((.+?)\)
+      replacement: ND_TCHECK_16BITS(\1); EXTRACT_16BITS(\1)

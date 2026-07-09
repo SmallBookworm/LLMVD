@@ -1,0 +1,15 @@
+rules:
+  - id: clusterip_buffer_overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (copy_from_user($BUF, $INPUT, $LEN))
+                  return -EFAULT;
+          - pattern: |
+              copy_from_user($BUF, $INPUT, $LEN);
+    message: "Buffer overflow vulnerability: user input copied without ensuring null termination before use in simple_strtoul(). Ensure buffer is null-terminated after copy_from_user."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-120"
+      cve: "CVE-2011-2534"

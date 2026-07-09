@@ -1,0 +1,26 @@
+rules:
+  - id: cve-2014-0142-bochs-divide-by-zero
+    message: "Possible divide-by-zero vulnerability due to missing check for zero extent_size before division."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: $s->extent_size = le32_to_cpu($bochs.extent);
+              - pattern-inside: |
+                  if ($s->extent_size == 0) {
+                    ...
+                  }
+                negate: true
+              - pattern: $catalog_size < $total_sectors / $s->extent_size
+          - patterns:
+              - pattern: $s->extent_size = le32_to_cpu($bochs.extent);
+              - pattern-inside: |
+                  if ($s->extent_size == 0) {
+                    ...
+                  }
+                negate: true
+              - pattern: ... / $s->extent_size
+    metavariable-pattern:
+      metavariable: $s
+      pattern: BDRVBochsState

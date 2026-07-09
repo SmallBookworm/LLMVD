@@ -1,0 +1,17 @@
+rules:
+  - id: postsrsd-dos-long-input
+    message: "Potential denial of service due to missing input length validation before processing. Long inputs may cause subprocess hang."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          fgets($BUF, sizeof($BUF), $FP);
+          ...
+          strtok($BUF, ...);
+      - pattern: |
+          $LINE = fgets($BUF, sizeof($BUF), $FP);
+          ...
+          strtok($LINE, ...);
+    metavariable-pattern:
+      metavariable: $BUF
+      pattern: "char $BUF[1024]"

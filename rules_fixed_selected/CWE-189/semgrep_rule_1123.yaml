@@ -1,0 +1,32 @@
+rules:
+  - id: cwe-189-signedness-error-libarchive
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $FUNC(..., size_t s) {
+                ...
+                return (($FORMAT_WRITE_DATA)($A, $BUFF, s));
+              }
+          - pattern: |
+              $FUNC(...) {
+                ...
+                size_t s = ...;
+                ...
+                return (($FORMAT_WRITE_DATA)($A, $BUFF, s));
+              }
+    pattern-not-inside: |
+      $FUNC(...) {
+        ...
+        const size_t max_write = INT_MAX;
+        ...
+        if (s > max_write)
+          s = max_write;
+        ...
+        return (($FORMAT_WRITE_DATA)($A, $BUFF, s));
+      }
+    message: "Potential integer signedness error leading to buffer overflow. Ensure size_t values passed to write functions are bounded by INT_MAX to prevent conversion issues."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-189"
+      cve: "CVE-2013-0211"

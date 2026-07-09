@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2015-3194-null-deref
+    message: "NULL pointer dereference vulnerability in rsa_mgf1_decode due to missing null check on alg->parameter. This can lead to denial of service (CVE-2015-3194)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if ($ALG == NULL)
+        return NULL;
+      ...
+      $ALG->parameter->...
+    pattern-not: |
+      if ($ALG == NULL || $ALG->parameter == NULL)
+        return NULL;
+    fix-regex:
+      regex: ''
+      replacement: ''
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2015-3194"

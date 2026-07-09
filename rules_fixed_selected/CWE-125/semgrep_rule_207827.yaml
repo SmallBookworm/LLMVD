@@ -1,0 +1,19 @@
+rules:
+  - id: cwe-125-ntlm-buffer-overread
+    message: "Missing bounds check before reading NTLM target information may lead to heap-based buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (*negotiate_target && target_info) {
+              memcpy (&target, chall + NTLM_CHALLENGE_TARGET_INFORMATION_OFFSET, sizeof (target));
+              ...
+          }
+      - pattern: |
+          if (*negotiate_target && ...) {
+              memcpy (&target, chall + NTLM_CHALLENGE_TARGET_INFORMATION_OFFSET, sizeof (target));
+              ...
+          }
+    metavariable-regex:
+      metavariable: $negotiate_target
+      regex: "negotiate_target"

@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2018-20169-missing-extra-descriptor-size-check
+    message: Missing check for header->bLength against remaining buffer size, which may lead to out-of-bounds access (CVE-2018-20169).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (header->bLength < 2) {
+            ...
+          }
+      - pattern: |
+          if (header->bLength < 2 || ...)
+            ...
+    metavariable-pattern:
+      metavariable: header
+      pattern: struct usb_descriptor_header *
+    pattern-not: |
+      if (header->bLength < 2 || header->bLength > size) {
+        ...
+      }

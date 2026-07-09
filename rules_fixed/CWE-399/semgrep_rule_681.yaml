@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2012-0058-kiocb-batch-free
+    message: "Missing lock and list_empty check in kiocb_batch_free may lead to OOPS (CVE-2012-0058, CWE-399)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          static void kiocb_batch_free(struct kiocb_batch *batch) {
+            ...
+            list_for_each_entry_safe($req, $n, &batch->head, $member) {
+              ...
+            }
+            ...
+          }
+      - pattern: |
+          list_for_each_entry_safe($req, $n, &batch->head, $member) {
+            list_del(&req->ki_batch);
+            kmem_cache_free(kiocb_cachep, req);
+          }
+    metadata:
+      cwe: ["CWE-399"]
+      cve: "CVE-2012-0058"

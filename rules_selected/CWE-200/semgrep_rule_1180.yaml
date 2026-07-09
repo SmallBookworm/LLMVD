@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2014-9419-tls-load-order
+    message: "TLS descriptors are loaded after DS/ES segment switching, which may allow local users to bypass ASLR by reading TLS base addresses. Load TLS before restoring DS and ES segments."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              savesegment(es, ...);
+              if (unlikely(...)) loadsegment(es, ...);
+              savesegment(ds, ...);
+              if (unlikely(...)) loadsegment(ds, ...);
+              ...
+              load_TLS(...);
+          - pattern: |
+              savesegment(ds, ...);
+              if (unlikely(...)) loadsegment(ds, ...);
+              savesegment(es, ...);
+              if (unlikely(...)) loadsegment(es, ...);
+              ...
+              load_TLS(...);
+    metadata:
+      cwe: ["CWE-200"]
+      cve: "CVE-2014-9419"

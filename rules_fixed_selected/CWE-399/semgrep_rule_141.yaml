@@ -1,0 +1,19 @@
+rules:
+  - id: pam_xauth_acl_file_check_missing
+    message: "ACL file is opened without verifying it is a regular file, which may lead to resource consumption via special files (CWE-399)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          fopen($PATH, "r");
+      - pattern: |
+          FILE *$FP = fopen($PATH, "r");
+    metavariable-pattern:
+      metavariable: $PATH
+      pattern-not: |
+        if (!stat(..., &$ST)) {
+          if (!S_ISREG(...))
+            ...
+          else
+            ...
+        }

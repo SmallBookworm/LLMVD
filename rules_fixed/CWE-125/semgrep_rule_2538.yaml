@@ -1,0 +1,15 @@
+rules:
+  - id: cwe-125-mlppp-buffer-overread
+    patterns:
+      - pattern-either:
+          - pattern: |
+              EXTRACT_16BITS($P)
+          - pattern: |
+              *$P
+    message: "Potential buffer over-read in MLPPP handler. Missing bounds check before accessing packet data."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2017-13038"
+    fix: null

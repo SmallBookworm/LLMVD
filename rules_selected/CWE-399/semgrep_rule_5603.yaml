@@ -1,0 +1,21 @@
+rules:
+  - id: cwe-399-v8-gc-issue
+    message: "Missing check for main frame before detaching parent may lead to improper garbage collection (CWE-399)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ($SMARTDATA->frame) {
+              ...
+              $SMARTDATA->frame->loader()->detachFromParent();
+              ...
+          }
+      - pattern: |
+          if ($SMARTDATA->frame) {
+              ...
+              $FRAME->loader()->detachFromParent();
+              ...
+          }
+    metavariable-pattern:
+      metavariable: $SMARTDATA
+      pattern: EWK_FRAME_SD_GET(...)

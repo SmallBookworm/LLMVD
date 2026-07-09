@@ -1,0 +1,19 @@
+rules:
+  - id: minissdpd-out-of-bounds-check
+    message: "Potential out-of-bounds memory access due to unsafe length validation. Use 'l > (unsigned)(buf + n - p)' instead of 'p + l > buf + n' to avoid integer overflow."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (p + l > buf + n) {
+                ...
+              }
+          - pattern: |
+              if (p+l > buf+n) {
+                ...
+              }
+    metavariable-regex:
+      metavariable: $l
+      regex: "l"
+    focus-metavariable: $l

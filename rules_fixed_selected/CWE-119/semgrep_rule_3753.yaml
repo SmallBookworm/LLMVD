@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2018-8786-integer-truncation
+    message: "Integer truncation in allocation size may lead to heap-based buffer overflow (CVE-2018-8786)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          UINT16 count;
+          ...
+          count = $X->number * 2;
+          realloc(..., sizeof(...) * count);
+      - pattern: |
+          UINT16 count = $X->number * 2;
+          realloc(..., sizeof(...) * count);
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2018-8786"

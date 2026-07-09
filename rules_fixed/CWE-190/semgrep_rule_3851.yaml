@@ -1,0 +1,18 @@
+rules:
+  - id: integer-overflow-bounds-check
+    message: "Potential integer overflow in bounds check leading to buffer over-read (CWE-190). Use 'end - *p < n' instead of '*p + n > end'."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (... || *$PTR + $N > $END ...)
+      - pattern: |
+          if (*$PTR + $N > $END ...)
+    metavariable-pattern:
+      metavariable: $N
+      pattern-either:
+        - pattern: (size_t) ...
+        - pattern: ...
+    fix-regex:
+      regex: "\\*\\$PTR \\+ \\$N > \\$END"
+      replacement: "$END - *$PTR < $N"

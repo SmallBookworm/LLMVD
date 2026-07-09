@@ -1,0 +1,30 @@
+rules:
+  - id: glx_request_length_check_missing
+    patterns:
+      - pattern-either:
+          - pattern: |
+              int __glXDispSwap_$(FUNC_NAME)(__GLXclientState *$(CLIENT), GLbyte *pc)
+              {
+                  ...
+                  xGLX$(REQ_TYPE)Req *req = (xGLX$(REQ_TYPE)Req *) pc;
+                  ...
+                  __GLX_SWAP_$(SWAP_TYPE)(&req->$(FIELD));
+                  ...
+              }
+          - pattern: |
+              int __glXDispSwap_$(FUNC_NAME)(__GLXclientState *$(CLIENT), GLbyte *pc)
+              {
+                  ...
+                  xGLX$(REQ_TYPE)Req *req = (xGLX$(REQ_TYPE)Req *) pc;
+                  ...
+                  __GLX_SWAP_$(SWAP_TYPE)($(ARG));
+                  ...
+              }
+      - pattern-not: |
+          REQUEST_SIZE_MATCH(xGLX$(REQ_TYPE)Req);
+    message: "Missing request length validation before swapping GLX request fields. This may lead to buffer over-reads or crashes (CWE-20)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2010-4818"

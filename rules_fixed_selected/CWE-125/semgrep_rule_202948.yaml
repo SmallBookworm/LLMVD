@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2020-0093-out-of-bounds-read
+    message: "Potential out-of-bounds read due to missing bounds check before memcpy. The number of bytes copied (s) may exceed the actual source buffer size (e->size)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (e->data) {
+                  memcpy($DST, e->data, $S);
+              }
+          - pattern: |
+              memcpy($DST, e->data, $S);
+    metavariable-pattern:
+      $S: "exif_format_get_size (e->format) * e->components"
+    pattern-not-inside: |
+      if (e->data) {
+          unsigned int len = $S;
+          if (e->size < $S) len = e->size;
+          memcpy($DST, e->data, len);
+      }

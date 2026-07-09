@@ -1,0 +1,10 @@
+rules:
+  - id: cwe-134-format-string-dkim
+    patterns:
+      - pattern: log_write(0, LOG_MAIN, (char *)$MSG);
+    message: "Potential format string vulnerability. User-controlled data in '$MSG' is passed directly as a format string to 'log_write'."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-134"
+      cve: "CVE-2011-1764"

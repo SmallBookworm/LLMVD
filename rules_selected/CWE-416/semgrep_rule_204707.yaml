@@ -1,0 +1,19 @@
+rules:
+  - id: use-after-free-serial-ir-init-module
+    message: "Use-after-free vulnerability in serial_ir_init_module due to redundant call to serial_ir_exit() after serial_ir_init() fails."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!result)
+                  return 0;
+              serial_ir_exit();
+          - pattern: |
+              if (!result)
+                  return 0;
+              ... 
+              serial_ir_exit();
+    metavariable-regex:
+      metavariable: result
+      regex: result

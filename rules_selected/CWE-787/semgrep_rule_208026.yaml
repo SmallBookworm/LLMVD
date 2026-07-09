@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2021-38166-integer-overflow-kvmalloc
+    message: "Integer overflow in kvmalloc() may lead to out-of-bounds write (CVE-2021-38166, CWE-787). Use kvmalloc_array() instead."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $PTR = kvmalloc($SIZE * $COUNT, ...);
+      - pattern: |
+          $PTR = kvmalloc($COUNT * $SIZE, ...);
+    metavariable-regex:
+      metavariable: $PTR
+      regex: (keys|values)
+    focus-metavariable: $PTR

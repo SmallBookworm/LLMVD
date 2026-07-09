@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2019-20395-stack-consumption
+    message: Potential stack consumption vulnerability due to missing cyclic typedef check in union types with leafrefs.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!strcmp(..., name) && ...->type.base > 0) {
+              ...
+              goto check_leafref;
+          }
+      - pattern: |
+          check_leafref:
+            ...
+            if (...->type.base == LY_TYPE_LEAFREF) {
+              while (!...->type.info.lref.path) {
+                ... = ...->type.der;
+                assert(...);
+              }
+            }

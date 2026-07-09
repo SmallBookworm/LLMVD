@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2013-0918-chrome-navigation-policy
+    message: "Missing check for WebUI scheme in old URL may allow unsafe navigation in response to drag-and-drop (CVE-2013-0918)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              bool should_fork = HasWebUIScheme($URL) ||
+                   ($CUMULATIVE_BINDINGS & BINDINGS_POLICY_WEB_UI) ||
+                   $URL.SchemeIs($VIEW_SOURCE_SCHEME) ||
+                   ($FRAME->isViewSourceModeEnabled() &&
+                      $TYPE != WebKit::WebNavigationTypeReload);
+          - pattern: |
+              bool should_fork = HasWebUIScheme($URL) ||
+                  ($CUMULATIVE_BINDINGS & BINDINGS_POLICY_WEB_UI) ||
+                  $URL.SchemeIs($VIEW_SOURCE_SCHEME) ||
+                  ($FRAME->isViewSourceModeEnabled() &&
+                     $TYPE != WebKit::WebNavigationTypeReload);
+    metavariable-pattern:
+      $CUMULATIVE_BINDINGS: "int"

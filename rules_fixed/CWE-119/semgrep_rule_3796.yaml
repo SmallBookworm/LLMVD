@@ -1,0 +1,18 @@
+rules:
+  - id: missing_tm_feature_check
+    message: Missing CPU feature check for transactional memory (TM) before accessing TM SPRs, which may lead to illegal instruction exceptions on CPUs without TM support.
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (tsk != current)
+        return;
+      
+      if (MSR_TM_SUSPENDED(mfmsr())) {
+        /* ... */
+      } else {
+        tm_enable();
+        tm_save_sprs(...);
+      }
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2018-1091"

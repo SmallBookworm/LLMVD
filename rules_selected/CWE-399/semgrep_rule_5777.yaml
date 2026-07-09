@@ -1,0 +1,17 @@
+rules:
+  - id: use-after-free-indent-outdent-command
+    message: "Potential use-after-free vulnerability due to missing null check after mutation events."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($COND && !$EXPR.inDocument())
+                  break;
+              if ($VAR.isNotNull() && !$VAR.deepEquivalent().inDocument()) {
+                  ASSERT_NOT_REACHED();
+                  return;
+              }
+    metadata:
+      cwe: "CWE-399"
+      cve: "CVE-2013-2926"

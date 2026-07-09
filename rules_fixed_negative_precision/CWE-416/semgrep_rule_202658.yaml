@@ -1,0 +1,17 @@
+rules:
+  - id: use-after-free-vim-nv_brackets
+    message: "Potential use-after-free vulnerability when handling ']d' command in nv_brackets. The pointer 'ptr' may be used after being freed if the line is modified during find_pattern_in_path."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ((len = find_ident_under_cursor(&ptr, FIND_IDENT)) == 0)
+              ...
+          else
+          {
+              find_pattern_in_path(ptr, ...);
+              ...
+          }
+    metadata:
+      cwe: ["CWE-416"]
+      cve: "CVE-2022-1898"

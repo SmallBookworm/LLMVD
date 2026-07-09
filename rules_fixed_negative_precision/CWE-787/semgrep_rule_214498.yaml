@@ -1,0 +1,34 @@
+rules:
+  - id: cve-2018-10880-ext4-inline-data-move
+    message: "Potential stack-out-of-bounds write in ext4 filesystem due to moving system.data xattr out of inode body. Missing check for system.data xattr before moving to external block."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (; !IS_LAST_ENTRY($LAST); $LAST = EXT4_XATTR_NEXT($LAST)) {
+                  ...
+                  if ($COND) {
+                      ...
+                      $FUNC(..., $LAST, ...);
+                      ...
+                  }
+                  ...
+              }
+          - pattern: |
+              for (; !IS_LAST_ENTRY($LAST); $LAST = EXT4_XATTR_NEXT($LAST)) {
+                  $TOTAL_SIZE = ...;
+                  ...
+                  if ($TOTAL_SIZE <= $BFREE && ...) {
+                      ...
+                  }
+              }
+    pattern-not: |
+      for (; !IS_LAST_ENTRY($LAST); $LAST = EXT4_XATTR_NEXT($LAST)) {
+          ...
+          if (($LAST->e_name_len == 4) &&
+              ($LAST->e_name_index == EXT4_XATTR_INDEX_SYSTEM) &&
+              !memcmp($LAST->e_name, "data", 4))
+              continue;
+          ...
+      }

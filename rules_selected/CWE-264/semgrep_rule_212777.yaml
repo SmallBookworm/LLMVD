@@ -1,0 +1,14 @@
+rules:
+  - id: unchecked-setuid
+    message: "Return value of setuid() is not checked. This could lead to privilege escalation if the process fails to drop privileges."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: setuid(...)
+      - pattern: setuid(getuid())
+    metavariable-pattern:
+      metavariable: $CALL
+      pattern-not: |
+        if ($CALL == -1) {...}
+      pattern-not-inside: |
+        if (($CALL == -1) && (errno == EAGAIN)) {...}

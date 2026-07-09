@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2013-0926-unsafe-plugin-pasting
+    message: "Missing call to setUnsafePluginPastingEnabled(false) may allow unsafe plugin pasting, leading to potential remote code execution via crafted EMBED elements during copy-and-paste operations."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          $SETTINGS->setUnsafePluginPastingEnabled(false);
+    metavariable-pattern:
+      $SETTINGS: WebSettings*

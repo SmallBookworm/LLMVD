@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2016-4609-libxslt-namespace-node-oob
+    message: "Passing a namespace node directly to xmlGetLineNo may cause out-of-bounds read (CVE-2016-4609)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: xmlGetLineNo($CUR)
+    metavariable-pattern:
+      $CUR:
+        pattern-either:
+          - pattern: $NODE
+          - pattern: $NODESET->nodeTab[...]
+    pattern-not-inside: |
+      if (($CUR != NULL) && ($CUR->type == XML_NAMESPACE_DECL)) {
+          ...
+          $CUR = ...;
+      }
+      ...
+      xmlGetLineNo($CUR)

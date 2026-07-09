@@ -1,0 +1,30 @@
+rules:
+  - id: umts_fp_reserved_ct_value
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: c_t = tvb_get_bits8(..., 4);
+              - pattern-inside: |
+                  {
+                    ...
+                    c_t = tvb_get_bits8(..., 4);
+                    ...
+                    lchId_type_table[c_t + 1];
+                    ...
+                  }
+          - patterns:
+              - pattern: c_t = tvb_get_bits8(..., 4);
+              - pattern-inside: |
+                  {
+                    ...
+                    c_t = tvb_get_bits8(..., 4);
+                    ...
+                    lchId_rlc_map[c_t + 1];
+                    ...
+                  }
+    message: "Unbounded C/T value used as array index may lead to out-of-bounds access. Reserved C/T value (0xf) must be handled safely."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2016-5353"

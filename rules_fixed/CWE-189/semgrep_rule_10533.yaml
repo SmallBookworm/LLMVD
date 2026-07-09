@@ -1,0 +1,15 @@
+rules:
+  - id: postgresql_integer_overflow_path_in
+    message: "Potential integer overflow in allocation size calculation leading to buffer overflow (CVE-2014-0064)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $SIZE = offsetof($TYPE, $MEMBER) + sizeof($TYPE->$MEMBER[0]) * $NPTS;
+          $PTR = ($TYPE *) palloc($SIZE);
+      - pattern: |
+          $SIZE = offsetof($TYPE, $MEMBER) + $NPTS * sizeof($TYPE->$MEMBER[0]);
+          $PTR = ($TYPE *) palloc($SIZE);
+    metadata:
+      cwe: ["CWE-189"]
+      cve: "CVE-2014-0064"

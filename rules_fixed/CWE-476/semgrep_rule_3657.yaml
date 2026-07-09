@@ -1,0 +1,28 @@
+rules:
+  - id: xfs_inode_extent_count_validation_missing
+    message: Missing validation for inode extent count in extent format, which may lead to memory corruption (CVE-2018-13095, CWE-476).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          switch (dip->di_format) {
+          case XFS_DINODE_FMT_LOCAL:
+              ...
+          case XFS_DINODE_FMT_EXTENTS:
+          case XFS_DINODE_FMT_BTREE:
+              break;
+          ...
+          }
+      - pattern: |
+          switch (dip->di_aformat) {
+          case XFS_DINODE_FMT_LOCAL:
+              ...
+          case XFS_DINODE_FMT_EXTENTS:
+          case XFS_DINODE_FMT_BTREE:
+              break;
+          ...
+          }
+    metavariable-pattern:
+      metavariable: dip
+      pattern: struct xfs_dinode *
+    fix: ""

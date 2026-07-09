@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2019-15212-double-free-rio500
+    message: "Global state in USB rio500 driver allows multiple devices to be probed simultaneously, leading to double-free (CWE-415). Missing check for existing device instance."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          struct rio_usb_data *rio = &rio_instance;
+          ...
+          rio->present = 1;
+      - pattern: |
+          struct rio_usb_data *rio = &rio_instance;
+          ...
+          if (!(rio->obuf = kmalloc(...))) { ... }
+    metavariable-regex:
+      metavariable: $...
+      regex: "(?s).*"
+    fixes:
+      - message: "Add check for existing device instance to prevent double-free"
+        lines: []

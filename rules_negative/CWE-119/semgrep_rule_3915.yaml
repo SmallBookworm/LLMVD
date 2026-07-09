@@ -1,0 +1,17 @@
+rules:
+  - id: pam_p11_fixed_signature_buffer_size
+    message: "Fixed-size signature buffer may cause buffer overflow for large RSA keys. Use EVP_PKEY_size() to allocate sufficient space."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          unsigned char signature[256];
+      - pattern: |
+          unsigned char signature[$SIZE];
+    metavariable-regex:
+      metavariable: $SIZE
+      regex: "^[0-9]+$"
+    filters:
+      - not:
+          pattern: |
+            unsigned char *signature = NULL;

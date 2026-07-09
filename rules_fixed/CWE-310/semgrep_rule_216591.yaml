@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2016-2107-padding-check
+    message: "Missing constant-time padding length validation may lead to padding oracle attack (CVE-2016-2107)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              pad = out[len - 1];
+              maxpad = len - (SHA_DIGEST_LENGTH + 1);
+              ...
+              inp_len = len - (SHA_DIGEST_LENGTH + pad + 1);
+          - pattern: |
+              pad = out[len - 1];
+              maxpad = len - (SHA_DIGEST_LENGTH + 1);
+              ...
+              ret &= (int)mask;
+    metavariable-regex:
+      - metavariable: $FUNC
+        regex: aesni_cbc_hmac_sha1_cipher
+    fix-regex:
+      enabled: false

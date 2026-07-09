@@ -1,0 +1,8 @@
+rules:
+  - id: use-after-free-ldt-context-init
+    message: "init_new_context ignores error code from init_new_context_ldt, potentially causing use-after-free (CVE-2017-17053, CWE-416)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      init_new_context_ldt(...);
+      return 0;

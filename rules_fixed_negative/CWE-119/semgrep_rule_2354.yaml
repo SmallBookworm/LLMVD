@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2017-1000249-buffer-overflow
+    message: "Potential buffer overflow due to incorrect bounds check (descsz >= 4 || descsz <= 20) which is always true. Should be (descsz >= 4 && descsz <= 20)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      (descsz >= 4 || descsz <= 20)
+    metavariable-regex:
+      metavariable: $descsz
+      regex: "descsz"

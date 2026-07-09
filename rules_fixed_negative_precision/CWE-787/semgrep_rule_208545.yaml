@@ -1,0 +1,21 @@
+rules:
+  - id: cwe-787-buffer-overflow-gamma-table-access
+    message: "Potential buffer overflow due to unclamped index into gamma table. Values used as indices should be clamped to valid range (e.g., <= 255) to prevent out-of-bounds access."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          dev->bjc_gamma_tableC[(*row) + (*(row+3))]
+      - pattern: |
+          dev->bjc_gamma_tableM[(*(row+1)) + (*(row+3))]
+      - pattern: |
+          dev->bjc_gamma_tableY[(*(row+2)) + (*(row+3))]
+      - pattern: |
+          dev->bjc_gamma_tableC[(*row) + row[3]]
+      - pattern: |
+          dev->bjc_gamma_tableM[row[1] + row[3]]
+      - pattern: |
+          dev->bjc_gamma_tableY[row[2] + row[3]]
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2020-16297"

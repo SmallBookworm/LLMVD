@@ -1,0 +1,21 @@
+rules:
+  - id: memcached_long_line_dos
+    message: "Potential denial of service due to unsafe string comparison on unbounded input. Use strncmp instead of strcmp to limit memory allocation."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (strcmp($PTR, "get ") && strcmp($PTR, "gets "))
+          - pattern: |
+              if (strcmp("get ", $PTR) && strcmp($PTR, "gets "))
+          - pattern: |
+              if (strcmp($PTR, "get ") && strcmp("gets ", $PTR))
+          - pattern: |
+              if (strcmp("get ", $PTR) && strcmp("gets ", $PTR))
+    metavariable-pattern:
+      $PTR: 
+        pattern: $EXPR
+    fix-regex:
+      regex: "strcmp"
+      replacement: "strncmp"

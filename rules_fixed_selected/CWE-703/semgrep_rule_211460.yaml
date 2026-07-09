@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2015-8790-utf8-out-of-bounds-read
+    message: "Potential out-of-bounds read in UTF-8 to wchar_t conversion due to missing bounds check before accessing UTF8string[i+N]."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-703"
+      cve: "CVE-2015-8790"
+    pattern-either:
+      - pattern: |
+          UTF8string[i+1]
+      - pattern: |
+          UTF8string[i+2]
+      - pattern: |
+          UTF8string[i+3]
+    pattern-not-inside: |
+      if (($i + $CHARLEN) > $SRCLEN) {
+        ...
+        break;
+      }
+    fix-regex:
+      regex: ""
+      replacement: ""
+      enabled: false

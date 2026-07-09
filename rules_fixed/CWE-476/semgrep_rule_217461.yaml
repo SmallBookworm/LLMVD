@@ -1,0 +1,20 @@
+rules:
+  - id: sqlcipher-null-pointer-dereference
+    message: "Potential NULL pointer dereference in sqlcipher_exportFunc due to missing NULL check on argv parameters before calling sqlite3_value_text."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $TARGETDB = (const char*) sqlite3_value_text(argv[0]);
+          ...
+          sqlite3StrICmp("main", $TARGETDB)
+      - pattern: |
+          $SOURCEDB = (argc == 2) ? (char *) sqlite3_value_text(argv[1]) : "main";
+    metavariable-regex:
+      - metavariable: $TARGETDB
+        regex: '[a-zA-Z_][a-zA-Z0-9_]*'
+      - metavariable: $SOURCEDB
+        regex: '[a-zA-Z_][a-zA-Z0-9_]*'
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2021-3119"

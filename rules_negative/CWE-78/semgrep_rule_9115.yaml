@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2019-13638-shell-injection
+    patterns:
+      - pattern-either:
+          - pattern: execl("/bin/sh", "sh", "-c", $BUF, (char *) 0);
+          - pattern: execl("/bin/sh", "sh", "-c", $BUF, (char *)NULL);
+    message: "Detected shell command injection vulnerability (CWE-78). Use of execl with /bin/sh -c can lead to arbitrary command execution if $BUF contains untrusted input."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-78"
+      cve: "CVE-2019-13638"

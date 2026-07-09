@@ -1,0 +1,35 @@
+rules:
+  - id: cwe-703-integer-underflow-upx-skew
+    message: "Integer underflow vulnerability in UPX unpacking code may lead to out-of-bounds read. Ensure skew offset is validated against section size."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if(upxfn) {
+              int skew = ...;
+              if(... || skew <= 0 || skew > 0xfff) {
+                  skew = 0;
+              }
+              else {
+                  ...
+              }
+              ...
+          }
+      - pattern: |
+          if(upxfn) {
+              int skew = ...;
+              if(... || skew <= 0 || skew > 0xfff) {
+                  skew = 0; 
+              }
+              else if(skew > ssize) {
+                  ...
+                  skew = 0;
+              }
+              else {
+                  ...
+              }
+              ...
+          }
+    fix-regex:
+      regex: ''
+      replacement: ''

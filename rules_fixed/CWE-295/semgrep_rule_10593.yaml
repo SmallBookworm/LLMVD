@@ -1,0 +1,22 @@
+rules:
+  - id: cwe-295-expired-cert-validation-missing
+    message: "Expired SSL certificate validation is not properly enforced. This may allow attackers to use expired certificates to impersonate trusted hosts."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (ret != GNUTLS_E_SUCCESS)
+                inf_gnutls_set_error(&error, ret);
+              else if (verify & GNUTLS_CERT_INVALID)
+                inf_gnutls_certificate_verification_set_error(&error, verify);
+          - pattern: |
+              if (ret != GNUTLS_E_SUCCESS)
+                inf_gnutls_set_error(&error, ret);
+              else if(verify & GNUTLS_CERT_INVALID)
+                inf_gnutls_certificate_verification_set_error(&error, verify);
+    metavariable-regex:
+      - metavariable: $ret
+        regex: ret
+    fix-regex:
+      enabled: false

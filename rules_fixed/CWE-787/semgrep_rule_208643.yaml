@@ -1,0 +1,17 @@
+rules:
+  - id: cryptsetup-luks2-overflow-malloc
+    message: "Potential heap overflow due to missing overflow check before malloc in LUKS2 segment validation."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          $FIRST_BACKUP = ...;
+          ...
+          intervals = malloc($FIRST_BACKUP * sizeof(*intervals));
+          if (!$intervals) {
+            ...
+            return 1;
+          }
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2020-14382"

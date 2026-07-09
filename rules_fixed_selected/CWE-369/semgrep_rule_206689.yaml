@@ -1,0 +1,10 @@
+rules:
+  - id: cwe-369-oss-buffer-pos-modulo
+    message: "Division by zero or incorrect modulo operation due to using hw->pos_emul instead of hw->size_emul in buffer position calculation."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          $HW->pos_emul = ($HW->pos_emul + $TO_COPY) % $HW->pos_emul;
+    fix: |
+          $HW->pos_emul = ($HW->pos_emul + $TO_COPY) % $HW->size_emul;

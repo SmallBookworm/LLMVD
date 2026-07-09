@@ -1,0 +1,11 @@
+rules:
+  - id: cwe-59-lxc-symlink-vulnerability
+    message: "Potential symlink vulnerability due to unsafe lock file path '/lock/lxc/'. Use '/lxc/lock/' instead to prevent arbitrary file creation."
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: 'snprintf(..., "%s/lock/lxc/%s", ...)'
+      - pattern: 'snprintf(..., "%s/lock/lxc/%s/%s", ...)'
+    metadata:
+      cwe: "CWE-59"
+      cve: "CVE-2015-1331"

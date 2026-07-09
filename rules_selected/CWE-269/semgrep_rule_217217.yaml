@@ -1,0 +1,22 @@
+rules:
+  - id: cwe-269-condump-extension-check-missing
+    message: "Missing file extension validation in Con_Dump_f allows writing files with unintended extensions, which may lead to privilege escalation or code execution (CWE-269, CVE-2017-6903)."
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          Q_strncpyz($FILENAME, ..., ...);
+          COM_DefaultExtension($FILENAME, ..., ".txt");
+          ...
+          FS_FOpenFileWrite($FILENAME);
+      - pattern: |
+          Q_strncpyz($FILENAME, ..., ...);
+          COM_DefaultExtension($FILENAME, ..., ".txt");
+          ...
+          $F = FS_FOpenFileWrite($FILENAME);
+    pattern-not: |
+      Q_strncpyz($FILENAME, ..., ...);
+      COM_DefaultExtension($FILENAME, ..., ".txt");
+      if (!COM_CompareExtension($FILENAME, ".txt")) { ... }
+      ...
+      FS_FOpenFileWrite($FILENAME);

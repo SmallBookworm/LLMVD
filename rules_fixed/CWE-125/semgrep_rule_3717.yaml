@@ -1,0 +1,15 @@
+rules:
+  - id: cwe-125-out-of-bounds-read-delta-overflow
+    message: "Potential out-of-bounds read due to missing overflow check in delta application. An integer overflow in 'off + len' may bypass the bounds check, leading to reading memory before the base object."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: ["CWE-125"]
+      cve: "CVE-2018-10887"
+    pattern-either:
+      - pattern: |
+          if (base_len < off + len)
+            ...
+      - pattern: |
+          if (off + len > base_len)
+            ...

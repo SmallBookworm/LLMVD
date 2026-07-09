@@ -1,0 +1,25 @@
+rules:
+  - id: hns_nic_net_xmit_use_after_free
+    message: "Use-after-free vulnerability in hns_nic_net_xmit: skb may be freed in hns_nic_net_xmit_hw but is still accessed afterward."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: |
+                  if (hns_nic_net_xmit_hw(..., $SKB, ...) == NETDEV_TX_OK) {
+                    ...;
+                    $SKB->...;
+                    ...;
+                  }
+          - patterns:
+              - pattern: |
+                  $RET = hns_nic_net_xmit_hw(..., $SKB, ...);
+                  if ($RET == NETDEV_TX_OK) {
+                    ...;
+                    $SKB->...;
+                    ...;
+                  }
+    metadata:
+      cwe: ["CWE-416"]
+      cve: "CVE-2017-18218"

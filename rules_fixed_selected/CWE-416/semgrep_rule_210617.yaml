@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2018-9422-use-after-free-futex
+    message: "Potential use-after-free in get_futex_key due to improper locking when accessing page->mapping. This may lead to local privilege escalation."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              lock_page($PAGE);
+              $MAPPING = compound_head($PAGE)->mapping;
+          - pattern: |
+              lock_page($PAGE);
+              ... 
+              $MAPPING = $PAGE->mapping;
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2018-9422"
+      references:
+        - "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=65d8fc777f6dcfee12785c057a6b57f679641c90"

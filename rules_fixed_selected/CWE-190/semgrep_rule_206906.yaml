@@ -1,0 +1,16 @@
+rules:
+  - id: mujs_js_strtod_integer_overflow
+    message: "Potential integer overflow in js_strtod due to missing lower bound check on exponent before negation. This may lead to undefined behavior or incorrect floating-point conversion."
+    severity: ERROR
+    languages: [c]
+    cwe: ["CWE-190"]
+    pattern: |
+      if (exp < 0) {
+        expSign = TRUE;
+        exp = -exp;
+      } else {
+        expSign = FALSE;
+      }
+      if (exp > maxExponent) {
+        ...
+      }

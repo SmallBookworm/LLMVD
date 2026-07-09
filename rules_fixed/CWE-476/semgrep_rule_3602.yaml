@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2018-15855-null-pointer-dereference-xkbcommon
+    message: "Unchecked NULL pointer dereference when handling xkb_geometry sections. Geometry sections were previously ignored by returning NULL, which could lead to crashes when later dereferenced."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (file->file_type < FIRST_KEYMAP_FILE_TYPE ||
+              file->file_type > LAST_KEYMAP_FILE_TYPE) {
+            log_err(...);
+            continue;
+          }
+      - pattern: |
+          if (file->file_type < FIRST_KEYMAP_FILE_TYPE ||
+              file->file_type > LAST_KEYMAP_FILE_TYPE) {
+            ...
+            continue;
+          }
+    metavariable-pattern:
+      metavariable: file
+      pattern: XkbFile *
+    fix-regex:
+      regex: ""

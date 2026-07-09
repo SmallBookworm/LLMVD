@@ -1,0 +1,16 @@
+rules:
+  - id: cwe-125-ghostscript-jmpr-bounds-check
+    message: "Missing bounds check before pointer arithmetic in Ins_JMPR may lead to heap-based buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      CUR.IP += (Int)(args[0]);
+    pattern-not: |
+      if (BOUNDS(CUR.IP + args[0], CUR.codeSize)) {
+        ...
+        return;
+      }
+      CUR.IP += (Int)(args[0]);
+    metadata:
+      cwe: ["CWE-125"]
+      cve: "CVE-2017-9739"

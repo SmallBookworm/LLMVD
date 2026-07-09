@@ -1,0 +1,22 @@
+rules:
+  - id: firejail-shell-command-injection-cve-2017-5207
+    message: "Use of untrusted shell (cfg.shell) when executing privileged command may lead to privilege escalation (CVE-2017-5207)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!cfg.shell)
+            cfg.shell = guess_shell();
+          ...
+          char *arg[...];
+          arg[0] = cfg.shell;
+          ...
+          execvp(arg[0], arg);
+      - pattern: |
+          char *arg[...];
+          arg[0] = cfg.shell;
+          ...
+          execvp(arg[0], arg);
+    metadata:
+      cwe: "CWE-269"
+      cve: "CVE-2017-5207"

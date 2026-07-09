@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2017-7273
+    message: "Missing validation of report size before accessing rdesc may lead to integer underflow (CWE-703)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          for ($I = 0; $I < *$RSIZE - 4; $I++)
+            ...
+      - pattern: |
+          for ($I = 0; $I < (*$RSIZE) - 4; $I++)
+            ...
+    metavariable-pattern:
+      metavariable: $RSIZE
+      pattern: '*$... && ...'
+    pattern-not-inside: |
+      if (*$RSIZE < 4)
+        return ...;
+      ...
+      for (... < *$RSIZE - 4; ...)
+        ...

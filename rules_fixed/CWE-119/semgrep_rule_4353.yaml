@@ -1,0 +1,28 @@
+rules:
+  - id: scpr_decode_unit_buffer_overflow
+    message: "Missing bounds check on 'x' and 'c' may lead to heap-based buffer overflow (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - patterns:
+        - pattern: |
+            while (x < 16) { ... }
+        - pattern: |
+            while (c < 256) { ... }
+        - pattern: |
+            if ((ret = s->decode(...)) < 0)
+      - patterns:
+        - pattern: |
+            while (x < 16) { ... }
+        - pattern: |
+            while (c < 256) { ... }
+        - pattern: |
+            pixel->freq[c] = ...
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern: |
+        static int decode_unit(...)
+    pattern-not: |
+      if (x >= 16 || c >= 256) {
+          return AVERROR_INVALIDDATA;
+      }

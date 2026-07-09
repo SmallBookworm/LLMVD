@@ -1,0 +1,14 @@
+rules:
+  - id: cwe-125-heap-buffer-overread-libebml
+    message: "Potential heap-based buffer over-read in EbmlElement::FindNextElement due to incorrect loop condition using DataStream.getFilePointer() instead of ReadSize."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              do {
+                ...
+              } while ( $MAXDATA > DataStream.getFilePointer() - $SIZEIDX + $POSSIBLEIDLEN );
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2019-13615"

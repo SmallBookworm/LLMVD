@@ -1,0 +1,29 @@
+rules:
+  - id: tensorflow-dequantize-axis-oob
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (axis_ > -1) {
+                ...
+                input.dim_size(axis_);
+                ...
+              }
+          - pattern: |
+              for (int i = 0; i < axis_; ++i) {
+                ...
+              }
+          - pattern: |
+              for (int i = axis_ + 1; i < float_output.dims(); ++i) {
+                ...
+              }
+    pattern-not: |
+      OP_REQUIRES(
+          ctx, axis_ < input.dims(),
+          errors::InvalidArgument(...)
+      );
+    message: "Missing validation for 'axis_' against input tensor dimensions may lead to out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2022-21726"

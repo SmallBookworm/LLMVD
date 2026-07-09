@@ -1,0 +1,19 @@
+rules:
+  - id: cwe-362-double-fetch-audit-execve
+    message: "Double fetch vulnerability detected in audit_log_single_execve_arg. User-controlled data is fetched twice (e.g., via strnlen_user and copy_from_user), allowing a race condition where the data may be modified between accesses."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-362"
+      cve: "CVE-2016-6136"
+    pattern-either:
+      - patterns:
+        - pattern: strnlen_user($PTR, ...)
+        - pattern-inside: |
+            ...
+        - pattern: copy_from_user($BUF, $PTR, ...)
+      - patterns:
+        - pattern: copy_from_user($BUF1, $PTR, ...)
+        - pattern-inside: |
+            ...
+        - pattern: copy_from_user($BUF2, $PTR, ...)

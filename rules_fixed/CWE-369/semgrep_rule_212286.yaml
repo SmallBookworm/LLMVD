@@ -1,0 +1,12 @@
+rules:
+  - id: imagemagick-divide-by-zero-srgbtransform
+    message: Division by zero vulnerability in sRGBTransformImage due to missing PerceptibleReciprocal guard.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              pow(..., ... * PerceptibleReciprocal($VAR))
+          - pattern: |
+              log10(... / (... * PerceptibleReciprocal($VAR)))
+    mode: search

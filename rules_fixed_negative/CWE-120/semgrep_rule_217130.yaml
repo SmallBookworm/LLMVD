@@ -1,0 +1,24 @@
+rules:
+  - id: pam_buffer_overflow_parse_user_name
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while (*ptr != '\\0') {
+                if ((*ptr == ' ') || (*ptr == '\\t'))
+                  break;
+                else {
+                  $BUF[$INDEX] = *ptr;
+                  $INDEX++;
+                  ptr++;
+                }
+              }
+          - pattern: |
+              if (($RET = malloc($INDEX + 1)) == NULL)
+                ...
+              (void) strcpy($RET, $BUF);
+    message: "Buffer overflow vulnerability in parse_user_name due to missing bounds check before writing to fixed-size buffer and unsafe use of strcpy."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-120"
+      cve: "CVE-2020-27678"

@@ -1,0 +1,30 @@
+rules:
+  - id: cve-2018-11508-uninitialized-tai
+    message: "Missing memset may lead to uninitialized kernel memory disclosure via adjtimex (CVE-2018-11508)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          int compat_get_timex(struct timex *txc, ...)
+          {
+            ...
+            if (copy_from_user(...)) return ...;
+            ...
+            txc->modes = ...;
+            ...
+          }
+      - pattern: |
+          int compat_get_timex(struct timex *txc, ...)
+          {
+            ...
+            if (copy_from_user(...)) return ...;
+            txc->modes = ...;
+            ...
+          }
+    pattern-not: |
+      int compat_get_timex(struct timex *txc, ...)
+      {
+        ...
+        memset(txc, 0, sizeof(struct timex));
+        ...
+      }

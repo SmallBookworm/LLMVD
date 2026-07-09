@@ -1,0 +1,30 @@
+rules:
+  - id: bpf_jump_offset_overflow
+    message: "Potential buffer overflow due to unchecked BPF jump offset truncation. Missing bounds check against S16_MIN/S16_MAX before assigning to insn->off."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              #define BPF_EMIT_JMP ...
+              do {
+                ...
+                if (target >= len || target < 0)
+                  goto err;
+                insn->off = addrs ? addrs[target] - addrs[i] - 1 : 0;
+                insn->off -= insn - tmp_insns;
+                ...
+              } while (0)
+          - pattern: |
+              #define BPF_EMIT_JMP ...
+              do {
+                ...
+                if (target >= len || target < 0)
+                  goto err;
+                $OFF = addrs ? addrs[target] - addrs[i] - 1 : 0;
+                $OFF -= insn - tmp_insns;
+                insn->off = $OFF;
+                ...
+              } while (0)
+    metavariable-pattern:
+      $OFF: { pattern: "off" }

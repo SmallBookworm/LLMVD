@@ -1,0 +1,18 @@
+rules:
+  - id: imlib2-pnm-divide-by-zero
+    message: "Potential divide-by-zero vulnerability when v is 0 in PNM image processing. This can lead to a denial of service (CVE-2014-9763)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (v == 255) {
+                ...
+              } else {
+                ... ((... * 255) / v) ...
+              }
+          - pattern: |
+              if (v == 255)
+                 ...
+              else
+                 ... ((... * 255) / v) ...

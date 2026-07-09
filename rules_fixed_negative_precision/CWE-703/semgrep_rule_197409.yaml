@@ -1,0 +1,15 @@
+rules:
+  - id: off_by_one_array_access_core_java
+    message: "Off-by-one array access vulnerability detected. Loop bound should be 'END_CMDS - 1' to prevent overflow."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      for (; $I < END_CMDS; $I++) {
+        ...
+        if (!strncmp($INPUT + 5, JAVA_CMDS[$I].name, JAVA_CMDS[$I].name_len)) {
+          ...
+          JAVA_CMDS[$I].handler(...);
+          ...
+        }
+        ...
+      }

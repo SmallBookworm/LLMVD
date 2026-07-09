@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2015-0205-dh-cert-verify-bypass
+    message: "Client certificate verification bypass with DH certificates. Missing check for CertificateVerify message when client sends a DH certificate."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ((peer != NULL) && (type & EVP_PKT_SIGN))
+          {
+            ...
+            goto f_err;
+          }
+    metadata:
+      cwe: ["CWE-310"]
+      cve: "CVE-2015-0205"

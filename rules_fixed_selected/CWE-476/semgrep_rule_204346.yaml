@@ -1,0 +1,28 @@
+rules:
+  - id: openexr-multipart-null-deref
+    message: "Missing check for empty headers list in multipart file parsing may lead to NULL pointer dereference (CVE-2021-20299)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          for (size_t i = 0; i < _data->_headers.size(); i++)
+          {
+              ...
+              _data->_headers[i].$METHOD(...);
+          }
+      - pattern: |
+          for (size_t i = 0; i < _data->_headers.size(); i++)
+              _data->parts.push_back(...);
+    metavariable-pattern:
+      metavariable: $METHOD
+      pattern: sanityCheck(...)
+    pattern-not-inside: |
+      if (_data->_headers.size() == 0)
+      {
+          throw ...;
+      }
+      ...
+      for (size_t i = 0; i < _data->_headers.size(); i++)
+      {
+          ...
+      }

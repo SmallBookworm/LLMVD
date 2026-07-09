@@ -1,0 +1,13 @@
+rules:
+  - id: collect_mounts_unmounted_check_missing
+    message: "Missing check for unmounted filesystem in collect_mounts may lead to use-after-unmount and system crash (CVE-2015-4177)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      struct vfsmount *collect_mounts(struct path *path)
+      {
+        ...
+        namespace_lock();
+        $TREE = copy_tree(real_mount(path->mnt), path->dentry, ...);
+        ...
+      }

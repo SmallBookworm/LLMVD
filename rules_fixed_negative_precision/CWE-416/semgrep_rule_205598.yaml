@@ -1,0 +1,14 @@
+rules:
+  - id: use-after-free-cpia2-usb-disconnect
+    message: "Use-after-free vulnerability in cpia2_usb_disconnect: v4l2_device_put() is called before wake_up_interruptible(), which may access freed memory."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          v4l2_device_put(&$CAM->v4l2_dev);
+          ...
+          wake_up_interruptible(&$CAM->wq_stream);
+      - pattern: |
+          v4l2_device_put(&$CAM.v4l2_dev);
+          ...
+          wake_up_interruptible(&$CAM.wq_stream);

@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2016-7117-use-after-free-recvmmsg
+    message: Use-after-free vulnerability in __sys_recvmmsg due to accessing sock->sk after fput_light.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (datagrams != 0) {
+              if (err != -EAGAIN) {
+                  sock->sk->sk_err = -err;
+              }
+              return datagrams;
+          }
+          return err;
+      - pattern: |
+          if (datagrams != 0) {
+              ...
+              sock->sk->sk_err = -err;
+              ...
+              return datagrams;
+          }
+          return err;

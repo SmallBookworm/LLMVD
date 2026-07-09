@@ -1,0 +1,16 @@
+rules:
+  - id: ekiga-debug-plugin-load-from-tmp
+    message: "Debug code loads plugins from /tmp directory, which may allow arbitrary code execution (CWE-94)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          #ifdef DEBUG
+          $X = g_build_path(..., g_get_tmp_dir(), ..., NULL)
+          $Y
+          #endif
+      - pattern: |
+          #if defined(DEBUG)
+          $X = g_build_path(..., g_get_tmp_dir(), ..., NULL)
+          $Y
+          #endif

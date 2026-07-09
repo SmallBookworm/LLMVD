@@ -1,0 +1,13 @@
+rules:
+  - id: cwe-476-dccp-slab-name-truncation
+    message: "Use of 'sizeof(slab_name_fmt)' on a pointer leads to buffer truncation; should use explicit buffer size (e.g., CCID_SLAB_NAME_LENGTH)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          vsnprintf($BUF, sizeof($BUF), $FMT, $ARGS)
+      - metavariable-pattern:
+          metavariable: $BUF
+          patterns:
+            - pattern-either:
+                - pattern: slab_name_fmt

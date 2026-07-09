@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2017-6210-null-pointer-deref-context-zero
+    message: "Destruction of context 0 may lead to NULL pointer dereference. Context 0 must not be destroyed in vrend_renderer_context_destroy."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (handle >= VREND_MAX_CTX)
+             return;
+          ...
+          ctx = dec_ctx[handle];
+      - pattern: |
+          ctx = dec_ctx[handle];
+          if (!ctx)
+             return;
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2017-6210"

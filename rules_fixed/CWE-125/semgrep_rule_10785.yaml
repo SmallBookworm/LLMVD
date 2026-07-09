@@ -1,0 +1,24 @@
+rules:
+  - id: wavpack-out-of-bounds-read-channel-reordering
+    message: "Missing bounds check on channel reordering index may lead to out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (bytecnt) {
+        ...
+        wpc->channel_reordering [i] = *byteptr++;
+        bytecnt--;
+        ...
+      }
+    pattern-not: |
+      if (bytecnt) {
+        ...
+        wpc->channel_reordering [i] = *byteptr++;
+        if (wpc->channel_reordering [i] >= nchans)
+          wpc->channel_reordering [i] = 0;
+        bytecnt--;
+        ...
+      }
+    fix-regex:
+      regex: "wpc->channel_reordering \\[i\\] = \\*byteptr\\+\\+;"
+      replacement: "wpc->channel_reordering [i] = *byteptr++;\n        if (wpc->channel_reordering [i] >= nchans)\n          wpc->channel_reordering [i] = 0;"

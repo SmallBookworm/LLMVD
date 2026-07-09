@@ -1,0 +1,12 @@
+rules:
+  - id: php-exif-integer-overflow-cve-2016-10158
+    message: "Signed integer division without overflow protection may cause denial of service (CVE-2016-10158)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              return php_ifd_get32s(...) / s_den;
+    metadata:
+      cwe: ["CWE-189"]
+      cve: "CVE-2016-10158"

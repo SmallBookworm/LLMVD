@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2016-2430-backtrace-demangle
+    message: "Use of __cxa_demangle on untrusted symbol names may lead to privilege escalation (CVE-2016-2430)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              char* name = __cxa_demangle(...);
+              ...
+              free(name);
+    metadata:
+      cwe: ["CWE-264"]
+      cve: "CVE-2016-2430"

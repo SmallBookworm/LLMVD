@@ -1,0 +1,22 @@
+rules:
+  - id: imagemagick-pcd-memory-leak
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (pcd_table[$I] == (PCDTable *) NULL)
+                {
+                  buffer=(unsigned char *) RelinquishMagickMemory(buffer);
+                  ThrowBinaryException(...);
+                }
+          - pattern: |
+              if (r->length > 16)
+                {
+                  buffer=(unsigned char *) RelinquishMagickMemory(buffer);
+                  return(MagickFalse);
+                }
+    message: "Memory leak detected in DecodeImage function. Allocated pcd_table entries are not properly freed before early return."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-399"
+      cve: "CVE-2019-7175"

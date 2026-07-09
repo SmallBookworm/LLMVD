@@ -1,0 +1,17 @@
+rules:
+  - id: php_cgi_mmap_oob_read_cve_2014_9427
+    message: "Out-of-bounds read vulnerability in PHP CGI when processing invalid .php files via mmap (CVE-2014-9427, CWE-119). The loop condition does not check buffer bounds when scanning for newline after a '#' character."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          while (c != '\n' && c != '\r' && c != EOF) {
+              c = file_handle.handle.stream.mmap.buf[i++];
+          }
+      - pattern: |
+          while (c != '\n' && c != '\r' && c != EOF) {
+              c = ...[i++];
+          }
+    metavariable-pattern:
+      metavariable: $C
+      pattern: c

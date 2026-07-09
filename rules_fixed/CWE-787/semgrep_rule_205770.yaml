@@ -1,0 +1,32 @@
+rules:
+  - id: sm712fb_oob_read
+    message: "Out-of-bounds memory access in smtcfb_read due to unsafe pointer manipulation with fb_readb()."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (;;) {
+                ...
+                if (i & 1) {
+                  ... = fb_readb(++$PTR);
+                } else {
+                  ... = fb_readb(--$PTR);
+                  $PTR += 2;
+                }
+                ...
+              }
+          - pattern: |
+              for (;;) {
+                ...
+                if (i & 1) {
+                  fb_readb(++$PTR);
+                } else {
+                  fb_readb(--$PTR);
+                  $PTR += 2;
+                }
+                ...
+              }
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2022-2380"

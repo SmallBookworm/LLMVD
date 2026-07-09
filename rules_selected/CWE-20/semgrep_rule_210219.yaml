@@ -1,0 +1,10 @@
+rules:
+  - id: libxml2-recursive-entity-dos
+    message: "Potential infinite recursion in xmlStringGetNodeList when handling recursive entities, leading to denial of service (CVE-2016-3627)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      ent->children = xmlStringGetNodeList(...)
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2016-3627"

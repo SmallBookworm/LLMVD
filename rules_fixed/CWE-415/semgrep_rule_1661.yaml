@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2016-9806-double-free-netlink-dump
+    message: "Potential double-free vulnerability in netlink_dump due to race condition when freeing cb->skb after unlocking. Save cb->skb and cb->module before unlocking to avoid use-after-free or double-free."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          consume_skb(cb->skb);
+          ...
+          mutex_unlock($MUTEX);
+      - pattern: |
+          module_put(cb->module);
+          ...
+          mutex_unlock($MUTEX);

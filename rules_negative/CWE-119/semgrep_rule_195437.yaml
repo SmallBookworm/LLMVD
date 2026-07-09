@@ -1,0 +1,20 @@
+rules:
+  - id: pcd_decode_buffer_overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (x = 0; x < state->xsize; x++) {
+                  ...
+                  out += 4;
+              }
+          - pattern: |
+              for (x = 0; x < state->xsize; x++) {
+                  ...
+                  out += 4;
+              }
+    message: "Buffer overflow vulnerability in PCD decoder due to incorrect buffer increment (out += 4 instead of out += 3)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2016-2533"

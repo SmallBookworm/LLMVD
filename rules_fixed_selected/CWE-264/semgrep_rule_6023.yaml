@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2013-0922-http-auth-brute-force
+    message: "HTTP Basic Authentication does not restrict brute-force attempts for blocked cross-origin resources, leading to potential security bypass (CVE-2013-0922)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (resource_type == HTTP_AUTH_RESOURCE_BLOCKED_CROSS)
+            return false;
+      - pattern: |
+          if (resource_type == HTTP_AUTH_RESOURCE_BLOCKED_CROSS) {
+            return false;
+          }
+    metavariable-regex:
+      metavariable: $...
+      regex: .*HTTP_AUTH_RESOURCE_BLOCKED_CROSS.*

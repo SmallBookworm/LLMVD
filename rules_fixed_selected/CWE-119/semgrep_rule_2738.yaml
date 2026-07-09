@@ -1,0 +1,25 @@
+rules:
+  - id: ffmpeg-webp-pix-fmt-uninitialized
+    message: "pix_fmt is not always set before use, which may lead to heap-based buffer overflow (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!...->initialized) {
+                  ...
+                  if (...->has_alpha)
+                      $AVCTX->pix_fmt = ...;
+              }
+          - pattern: |
+              if (!...->initialized) {
+                  ...
+                  if ($COND)
+                      $AVCTX->pix_fmt = ...;
+                  ...
+              }
+              ...
+              $AVCTX->pix_fmt = ... ? ... : ...;
+    metavariable-pattern:
+      $AVCTX:
+        pattern: AVCodecContext *

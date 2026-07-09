@@ -1,0 +1,14 @@
+rules:
+  - id: openssl-edipartyname-null-deref-cve-2020-1971
+    message: "Detected vulnerable ASN1_item_ex_i2d implementation missing validation for implicit tagging on ASN1_ITYPE_MSTRING or ASN1_ITYPE_CHOICE, which may lead to NULL pointer dereference (CVE-2020-1971, CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          case ASN1_ITYPE_MSTRING:
+            return asn1_i2d_ex_primitive(...);
+      - pattern: |
+          case ASN1_ITYPE_CHOICE:
+            if (asn1_cb != NULL && ...) {
+              ...
+            }

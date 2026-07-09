@@ -1,0 +1,22 @@
+rules:
+  - id: w3m-wc_any_to_ucs-buffer-overflow
+    message: "Potential global buffer overflow in wc_any_to_ucs due to missing map_size assignment for PCS case."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          case WC_CCS_A_PCS:
+            ...
+            map = pcs_ucs_map[...];
+            cc.code &= 0x7f;
+      - pattern: |
+          case WC_CCS_A_PCS:
+            ...
+            map = pcs_ucs_map[...];
+            ...
+            if (map_size == 0 || cc.code > map_size - 1)
+              ...
+            cc.code = map[cc.code];
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2016-9632"

@@ -1,0 +1,18 @@
+rules:
+  - id: vim-use-after-free-cve-2022-0156
+    message: Use-after-free vulnerability detected in Vim9 execution context. This can lead to arbitrary code execution or crashes.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              define_function(&ea, NULL, &line_to_free);
+              vim_free(line_to_free);
+          - patterns:
+            - pattern: define_function(&ea, NULL, $VAR);
+            - pattern: ga_clear_strings($VAR);
+    metadata:
+      cwe: "CWE-416: Use After Free"
+      cve: "CVE-2022-0156"
+      references:
+        - https://github.com/vim/vim/commit/143367256836b0f69881dc0c65ff165ae091dbc5

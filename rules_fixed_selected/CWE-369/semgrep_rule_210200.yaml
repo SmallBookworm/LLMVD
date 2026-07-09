@@ -1,0 +1,14 @@
+rules:
+  - id: cwe-369-divide-by-zero-double64-init
+    message: "Missing upper bound check on psf->sf.channels may lead to integer overflow and subsequent divide-by-zero in blockwidth calculation."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (psf->sf.channels < 1)
+        { ... }
+    pattern-not: |
+      if (psf->sf.channels < 1 || psf->sf.channels > SF_MAX_CHANNELS)
+        { ... }
+    fix-regex:
+      regex: 'if $$(psf->sf\.channels < 1$$)'
+      replacement: 'if (psf->sf.channels < 1 || psf->sf.channels > SF_MAX_CHANNELS)'

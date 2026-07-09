@@ -1,0 +1,28 @@
+rules:
+  - id: cve-2013-1415-null-deref-pkinit
+    message: "NULL pointer dereference in pkinit_check_kdc_pkid when freeing 'is' after early goto cleanup. This can lead to denial of service via malformed PKINIT request."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($IS == NULL)
+                  goto $LABEL;
+              ...
+              $LABEL:
+                  X509_NAME_free($IS->issuer);
+          - pattern: |
+              if ($IS == NULL)
+                  goto $LABEL;
+              ...
+              $LABEL:
+                  ASN1_INTEGER_free($IS->serial);
+          - pattern: |
+              if ($IS == NULL)
+                  goto $LABEL;
+              ...
+              $LABEL:
+                  free($IS);
+    metavariable-pattern:
+      metavariable: $IS
+      pattern: "PKCS7_ISSUER_AND_SERIAL *"

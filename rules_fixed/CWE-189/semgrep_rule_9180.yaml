@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2012-2384-integer-overflow
+    message: "Integer overflow in kmalloc size calculation for cliprects allocation. On 32-bit systems, a large args->num_cliprects can cause an overflow leading to an undersized allocation and potential out-of-bounds write."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              kmalloc($NUM_CLIPRECTS * sizeof(*$CLIPRECTS), ...)
+          - pattern: |
+              kmalloc($NUM_CLIPRECTS * $SIZEOF, ...)
+      - pattern-not-inside: |
+          if ($NUM_CLIPRECTS > UINT_MAX / sizeof(*$CLIPRECTS)) {
+            ...
+            return ...;
+          }
+          ...
+          kmalloc($NUM_CLIPRECTS * sizeof(*$CLIPRECTS), ...)
+      - metavariable-pattern:
+          metavariable: $NUM_CLIPRECTS
+          patterns:
+            - pattern: args->num_cliprects

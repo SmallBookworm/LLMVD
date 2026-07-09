@@ -1,0 +1,41 @@
+rules:
+  - id: spl_object_storage_unserialize_non_object_key
+    message: "SplObjectStorage::unserialize allows non-object keys, leading to potential uninitialized memory access (CVE-2016-7480, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!php_var_unserialize(&entry, &p, s + buf_len, &var_hash)) {
+              ...
+          }
+          if (Z_TYPE(entry) != IS_OBJECT) {
+              zval_ptr_dtor(&entry);
+              goto outexcept;
+          }
+          ...
+          if (*p == ',') {
+              ...
+              if (!php_var_unserialize(&inf, &p, s + buf_len, &var_hash)) {
+                  zval_ptr_dtor(&entry);
+                  goto outexcept;
+              }
+          }
+      - pattern: |
+          if (!php_var_unserialize(&entry, &p, s + buf_len, &var_hash)) {
+              ...
+          }
+          if (*p == ',') {
+              ...
+              if (!php_var_unserialize(&inf, &p, s + buf_len, &var_hash)) {
+                  zval_ptr_dtor(&entry);
+                  goto outexcept;
+              }
+          }
+          if (Z_TYPE(entry) != IS_OBJECT) {
+              zval_ptr_dtor(&entry);
+              zval_ptr_dtor(&inf);
+              goto outexcept;
+          }
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: SPL_METHOD\s*\(SplObjectStorage,\s*unserialize

@@ -1,0 +1,20 @@
+rules:
+  - id: imagemagick-cli-list-operator-images-memory-leak
+    message: "Direct memory leak in CLIListOperatorImages due to missing image destruction on error path (CVE-2019-13296)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              image=RemoveFirstImageFromList(&_images);
+              reconstruct_image=RemoveFirstImageFromList(&_images);
+              if (reconstruct_image == (Image *) NULL)
+                break;
+          - pattern: |
+              magnitude_image=RemoveFirstImageFromList(&_images);
+              phase_image=RemoveFirstImageFromList(&_images);
+              if (phase_image == (Image *) NULL)
+                break;
+    metadata:
+      cwe: "CWE-399"
+      cve: "CVE-2019-13296"

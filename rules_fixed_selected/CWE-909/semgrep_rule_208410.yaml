@@ -1,0 +1,16 @@
+rules:
+  - id: cwe-909-kernel-info-leak-usb
+    message: "Uninitialized kernel memory may be leaked to USB devices. Use kzalloc() instead of kmalloc() to zero-initialize the buffer."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $BUF = kmalloc($SIZE, $GFP);
+              ...
+              pcan_usb_pro_send_req(..., $BUF, ...);
+    metadata:
+      cwe: "CWE-909"
+      cve: "CVE-2019-19536"
+      references:
+        - https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=ead16e53c2f0ed946d82d4037c630e2f60f4ab69

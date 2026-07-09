@@ -1,0 +1,13 @@
+rules:
+  - id: imagemagick-cve-2020-27758-integer-overflow
+    message: "Potential integer overflow due to missing lower bound check before casting to unsigned type. This may lead to undefined behavior (CWE-190)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          ScaleAnyToQuantum((QuantumAny) ($X + 0.5), $RANGE)
+    metavariable-pattern:
+      metavariable: $X
+      patterns:
+        - pattern-not: |
+            MagickMax($X + 0.5, 0.0)

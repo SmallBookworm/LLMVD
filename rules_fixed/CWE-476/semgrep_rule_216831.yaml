@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2021-23841-x509-issuer-and-serial-hash-null-deref
+    message: "Missing NULL check after X509_NAME_oneline() may lead to NULL pointer dereference (CVE-2021-23841, CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      X509_NAME_oneline(...);
+      if (!EVP_DigestInit_ex(...))
+    pattern-not: |
+      f = X509_NAME_oneline(...);
+      if (f == NULL) {
+        ...
+      }
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2021-23841"

@@ -1,0 +1,17 @@
+rules:
+  - id: use-after-free-script-processor-handler
+    message: "Potential use-after-free vulnerability due to unsafe CrossThreadUnretained(this) usage in ScriptProcessorHandler::Process."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          CrossThreadBind(
+              &ScriptProcessorHandler::FireProcessEvent,
+              CrossThreadUnretained(this), ...)
+      - pattern: |
+          CrossThreadBind(
+              &ScriptProcessorHandler::FireProcessEventForOfflineAudioContext,
+              CrossThreadUnretained(this), ...)
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2017-5129"

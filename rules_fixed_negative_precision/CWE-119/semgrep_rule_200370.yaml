@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2017-9763-variable-length-array
+    message: "Use of variable-length array may lead to excessive stack usage and denial of service (CVE-2017-9763)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          grub_uint32_t $VAR[$SIZE / 4];
+      - pattern: |
+          GRUB_PROPERLY_ALIGNED_ARRAY($BUF, EXT2_BLOCK_SIZE($DATA));
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2017-9763"

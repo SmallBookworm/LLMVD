@@ -1,0 +1,7 @@
+rules:
+  - id: imagemagick-xcf-out-of-bounds-read
+    message: "Potential out-of-bounds read due to insufficient memory allocation in XCF tile loading. Allocation size should account for both data_length and image dimensions."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      AcquireQuantumMemory(data_length, sizeof(*xcfdata))

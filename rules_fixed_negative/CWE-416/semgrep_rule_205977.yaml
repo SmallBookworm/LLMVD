@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2019-15214-use-after-free
+    message: "Use-after-free vulnerability due to premature clearing of snd_cards and snd_cards_lock. This may lead to a race condition during card disconnection."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              mutex_lock(&snd_card_mutex);
+              snd_cards[$CARD->number] = NULL;
+              clear_bit($CARD->number, snd_cards_lock);
+              mutex_unlock(&snd_card_mutex);
+              ...
+              snd_info_card_disconnect($CARD);
+          - pattern: |
+              mutex_lock(&snd_card_mutex);
+              snd_cards[$X] = NULL;
+              clear_bit($X, snd_cards_lock);
+              mutex_unlock(&snd_card_mutex);
+              ...
+              snd_info_card_disconnect($Y);
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2019-15214"

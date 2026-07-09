@@ -1,0 +1,17 @@
+rules:
+  - id: stb_vorbis_cve-2019-13219_unchecked_null_get_window
+    message: "Unchecked NULL pointer returned by get_window() may lead to NULL pointer dereference (CVE-2019-13219)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-not-inside: |
+          $WINDOW = get_window(...);
+          if (!$WINDOW) { ... }
+      - pattern-either:
+          - pattern: |
+              $WINDOW = get_window(...);
+              ... $WINDOW ...
+          - pattern: |
+              ... get_window(...) ...
+    metavariable-regex:
+      $WINDOW: '^[a-zA-Z_][a-zA-Z0-9_]*$'

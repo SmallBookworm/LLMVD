@@ -1,0 +1,30 @@
+rules:
+  - id: cve-2013-2862-skia-gpu-authenticator-null-check
+    message: Missing null check for 'host_' before use may lead to memory corruption (CWE-119).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $CERT = $KEY_PAIR.GenerateCertificate();
+          if ($CERT.empty()) {
+            ...
+            return;
+          }
+          ... new ...($CERT, ..., $HOST_SECRET_HASH);
+          $HOST->SetAuthenticatorFactory(...);
+      - pattern: |
+          std::string $CERT = $KEY_PAIR.GenerateCertificate();
+          if ($CERT.empty()) {
+            ...
+            return;
+          }
+          scoped_ptr<...> $FACTORY(new ...($CERT, ..., $HOST_SECRET_HASH));
+          $HOST->SetAuthenticatorFactory($FACTORY.Pass())
+    metavariable-pattern:
+      - metavariable: $HOST
+        patterns:
+          - pattern: host_
+          - pattern-not: |
+              if (!$HOST || ...) return;
+              ...
+              $HOST->SetAuthenticatorFactory(...)

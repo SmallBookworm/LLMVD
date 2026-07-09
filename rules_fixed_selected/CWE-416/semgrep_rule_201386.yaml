@@ -1,0 +1,26 @@
+rules:
+  - id: use-after-free-dvb-usb-exit
+    message: "Use-after-free vulnerability in dvb_usb_device_exit: device name is accessed after dvb_usb_exit() frees the device structure."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($D != NULL && $D->$DESC != NULL) {
+                  $NAME = $D->$DESC->name;
+                  dvb_usb_exit($D);
+                  ...
+                  info(..., $NAME, ...);
+              }
+          - pattern: |
+              const char *$NAME = ...;
+              ...
+              if ($D != NULL && $D->$DESC != NULL) {
+                  $NAME = $D->$DESC->name;
+                  dvb_usb_exit($D);
+              }
+              ...
+              info(..., $NAME, ...);
+    metavariable-regex:
+      metavariable: $DESC
+      regex: "desc"

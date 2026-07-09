@@ -1,0 +1,7 @@
+rules:
+  - id: bson_ensure_space_int_overflow
+    message: "Use of 'int' for 'bytesNeeded' in bson_ensure_space may lead to integer overflow (CWE-190). Should use 'size_t'."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      int bson_ensure_space(..., int bytesNeeded)

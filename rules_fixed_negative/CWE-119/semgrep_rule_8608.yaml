@@ -1,0 +1,7 @@
+rules:
+  - id: cve-2017-0591-buffer-overflow-libavc
+    message: "Potential buffer overflow in ih264d_decode_gaps_in_frame_num due to unsafe field_pic_flag reset. This may lead to memory corruption (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      ps_cur_slice->u1_field_pic_flag = 0;

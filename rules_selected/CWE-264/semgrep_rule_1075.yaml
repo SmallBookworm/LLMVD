@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2013-1774-null-deref-chase-port
+    message: "NULL pointer dereference in chase_port() when tty is NULL during hangup. Missing NULL check before using tty->write_wait."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              struct tty_struct *tty = tty_port_tty_get(...);
+              ...
+              add_wait_queue(&tty->write_wait, ...);
+          - pattern: |
+              struct tty_struct *tty = tty_port_tty_get(...);
+              ...
+              remove_wait_queue(&tty->write_wait, ...);
+    metavariable-pattern:
+      tty:
+        pattern-not: |
+          if (!tty) return;

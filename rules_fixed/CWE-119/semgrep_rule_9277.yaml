@@ -1,0 +1,35 @@
+rules:
+  - id: cve-2014-0749-buffer-overflow
+    message: "Stack-based buffer overflow due to missing bounds check before reading into fixed-size buffer 'scratch'."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              char scratch[...];
+              ...
+              switch (...)
+              {
+              case '-':
+              case '+':
+                ...
+                (*dis_gets)(stream, scratch, count)
+          - pattern: |
+              char scratch[...];
+              ...
+              switch (...)
+              {
+              case '1':
+              case '2':
+              case '3':
+              case '4':
+              case '5':
+              case '6':
+              case '7':
+              case '8':
+              case '9':
+                ...
+                (*dis_gets)(stream, scratch + 1, count - 1)
+    metavariable-regex:
+      - metavariable: scratch
+        regex: "scratch"

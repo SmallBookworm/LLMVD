@@ -1,0 +1,11 @@
+rules:
+  - id: irssi-double-cap-use-after-free
+    message: Use-after-free vulnerability when handling duplicate CAP entries due to unsafe g_hash_table_insert usage.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: g_hash_table_insert($TABLE, $KEY, $VAL);
+      - pattern: g_hash_table_insert($TABLE, $KEY, $VAL);
+    metavariable-regex:
+      metavariable: $TABLE
+      regex: server->cap_supported

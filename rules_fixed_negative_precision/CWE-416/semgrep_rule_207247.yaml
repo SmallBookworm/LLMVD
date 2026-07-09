@@ -1,0 +1,15 @@
+rules:
+  - id: use-after-free-in-ep_loop_check_proc
+    message: "Potential use-after-free vulnerability due to missing check after get_file_rcu. This could lead to memory corruption and privilege escalation."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (list_empty(&...->f_tfile_llink)) {
+                  get_file(...);
+                  list_add(..., &tfile_check_list);
+              }
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2021-1048"

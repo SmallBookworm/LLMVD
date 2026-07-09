@@ -1,0 +1,17 @@
+rules:
+  - id: collectd-parse-packet-buffer-overflow
+    message: "Heap-based buffer overflow in parse_packet due to missing buffer_size update. This may lead to denial of service or remote code execution (CVE-2016-6254)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          buffer = ((char *) buffer) + $PKG_LENGTH;
+          continue;
+      - pattern: |
+          buffer = ((char *) buffer) + $PKG_LENGTH;
+          }
+    metavariable-regex:
+      - metavariable: $PKG_LENGTH
+        regex: pkg_length
+    fix-regex:
+      enabled: false

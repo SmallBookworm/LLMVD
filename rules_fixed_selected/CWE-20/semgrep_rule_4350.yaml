@@ -1,0 +1,21 @@
+rules:
+  - id: imagemagick-missing-seekable-stream
+    message: "Missing 'seekable_stream=MagickTrue' for CACHE image format may lead to denial of service (CVE-2017-11449)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      entry = SetMagickInfo("CACHE");
+      ...
+      entry->seekable_stream = MagickTrue;
+    pattern-not: |
+      entry = SetMagickInfo("CACHE");
+      ...
+      entry->seekable_stream = MagickTrue;
+      ...
+      (void) RegisterMagickInfo(entry);
+    fix-regex:
+      regex: ''
+      replacement: ''
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2017-11449"

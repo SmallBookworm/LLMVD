@@ -1,0 +1,17 @@
+rules:
+  - id: cipso_v4_validate_infinite_loop
+    message: "Infinite loop possible in cipso_v4_validate when opt[opt_iter + 1] is zero and CONFIG_NETLABEL is disabled."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      for (...; ...; ...) {
+        ...
+        if (opt[opt_iter + 1] > (opt_len - opt_iter)) {
+          ...
+        }
+        opt_iter += opt[opt_iter + 1];
+        ...
+      }
+    metavariable-regex:
+      metavariable: "opt_iter"
+      regex: "opt_iter"

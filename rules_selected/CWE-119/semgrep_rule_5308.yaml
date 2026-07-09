@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2012-2874-skia-oob-write
+    patterns:
+      - pattern: |
+          DCHECK($PROFILE);
+          $PROFILE_ = $PROFILE;
+    message: "Missing null check for profile_ may lead to out-of-bounds write (CVE-2012-2874)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: ["CWE-119"]
+      references:
+        - https://github.com/chromium/chromium/commit/76a3314ac3b711e01fae3b76a5d85f0eddeeec0b

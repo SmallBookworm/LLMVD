@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2019-12110-null-desc-dereference
+    message: "Potential NULL pointer dereference when 'desc' is passed to functions like syslog or upnp_redirect_internal without being checked. This can lead to denial of service (CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          syslog(..., $DESC);
+      - pattern: |
+          upnp_redirect_internal(..., $DESC, ...);
+    metavariable-pattern:
+      metavariable: $DESC
+      pattern: desc
+    focus-metavariable: $DESC

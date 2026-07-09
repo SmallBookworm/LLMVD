@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2017-6497-null-deref
+    message: "Potential NULL pointer dereference due to missing NULL check after CloneImage. This may lead to denial of service (CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $mask = CloneImage(...);
+          $mask->matte = ...;
+      - pattern: |
+          $mask = CloneImage(...);
+          $channel_image = $mask;

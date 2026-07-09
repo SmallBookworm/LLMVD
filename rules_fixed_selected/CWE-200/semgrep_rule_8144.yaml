@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2016-3837-wifi-mac-parsing
+    message: "Potential information disclosure due to insufficient input validation when parsing MAC address hex bytes. Missing null-byte check may lead to out-of-bounds read."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              byte $B = parseHexChar($STR[0]);
+              if ($STR[1] == ':' || $STR[1] == '\0') {
+                  $STR += 2;
+                  return $B;
+              }
+          - pattern: |
+              byte $B = parseHexChar($STR[0]);
+              if ($STR[1] == ':' || $STR[1] == '\0') {
+                  ...
+                  $STR += 2;
+                  ...
+              }
+    metadata:
+      cwe: ["CWE-200"]
+      cve: "CVE-2016-3837"

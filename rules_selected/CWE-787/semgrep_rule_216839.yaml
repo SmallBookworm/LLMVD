@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2021-3507-fdc-test-missing-regression
+    message: "Missing regression test for CVE-2021-3507 (heap buffer overflow in floppy disk emulator). This may indicate the vulnerable code is not properly tested or patched."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      qtest_add_func("/fdc/fuzz/cve_2021_20196", ...)
+    pattern-not: |
+      qtest_add_func("/fdc/fuzz/cve_2021_3507", ...)
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: test_cve_2021_20196

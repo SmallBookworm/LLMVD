@@ -1,0 +1,15 @@
+rules:
+  - id: tun_missing_dev_get_valid_name
+    message: "Missing call to dev_get_valid_name() before register_netdevice() may lead to NULL pointer dereference (CVE-2018-7191)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          register_netdevice($dev);
+      - pattern: |
+          $ret = register_netdevice($dev);
+    metavariable-pattern:
+      $dev:
+        pattern-not: |
+          dev_get_valid_name(..., $dev, ...)
+    fix: ""

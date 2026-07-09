@@ -1,0 +1,28 @@
+rules:
+  - id: tty_open_missing_kref_put_on_lookup_failure
+    message: "Missing tty_driver_kref_put(driver) in error path after tty_driver_lookup_tty failure. This can lead to a reference leak and potential NULL pointer dereference (CVE-2011-5321)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          tty = tty_driver_lookup_tty(...);
+          if (IS_ERR(tty)) {
+              ...
+              return PTR_ERR(tty);
+          }
+      - pattern: |
+          tty = tty_driver_lookup_tty(...);
+          if (IS_ERR(tty)) {
+              ...
+              mutex_unlock(&tty_mutex);
+              return PTR_ERR(tty);
+          }
+    metavariable-pattern:
+      patterns:
+        - pattern-either:
+            - pattern: tty
+        - pattern: $DRIVER = ...
+      constraints:
+        - metavariable: tty
+          patterns:
+            - pattern: $DRIVER

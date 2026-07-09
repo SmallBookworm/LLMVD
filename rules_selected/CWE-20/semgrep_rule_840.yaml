@@ -1,0 +1,16 @@
+rules:
+  - id: missing_access_ok_check_before_copy_from_user
+    patterns:
+      - pattern-either:
+          - pattern: |
+              __copy_from_user(..., $USER_PTR, ...);
+          - pattern: |
+              __copy_from_user(..., &$USER_PTR->..., ...);
+    pattern-not-inside: |
+      if (!access_ok(..., $USER_PTR, ...))
+        return ...;
+      ...
+      __copy_from_user(..., $USER_PTR, ...);
+    message: "Missing access_ok() validation before __copy_from_user() may lead to arbitrary kernel memory read (CWE-20)."
+    severity: ERROR
+    languages: [c]

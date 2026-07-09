@@ -1,0 +1,10 @@
+rules:
+  - id: imagemagick-pes-infinite-loop
+    message: "Infinite loop vulnerability in ReadPESImage due to incorrect EOF check (CWE-835)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      while (EOFBlob($IMAGE) != EOF)
+      {
+        ...
+      }

@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2018-17456-gitmodules-path-validation
+    message: Missing validation for submodule 'path' values that start with a dash, which may lead to remote code execution in older Git versions.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!strcmp(key, "url") && value &&
+                  looks_like_command_line_option(value))
+                  ...
+          - pattern: |
+              if (!strcmp(key, "path") && value &&
+                  looks_like_command_line_option(value))
+                  ...
+    metavariable-comparison:
+      - regex: ".*!strcmp\\(key, \"path\"\\).*"
+        metavariable: $...
+        comparison: "<"
+    fix-regex:
+      enabled: false

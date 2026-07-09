@@ -1,0 +1,17 @@
+rules:
+  - id: cwe-125-base64decode-buffer-overread
+    message: "Potential buffer over-read in base64decode due to unsafe pointer comparison (CWE-125)."
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (*ptr == '\0' || ptr >= buf+len) {
+            break;
+          }
+      - pattern: |
+          if (l > 3 && ptr+l <= buf+len) {
+            ...
+          }
+    metadata:
+      cwe: ["CWE-125"]
+      cve: "CVE-2017-5209"

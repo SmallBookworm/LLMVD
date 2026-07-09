@@ -1,0 +1,18 @@
+rules:
+  - id: qemu-rndis-integer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $bufoffs = le32_to_cpu($$buf->InformationBufferOffset) + 8;
+              $buflen = le32_to_cpu($$buf->InformationBufferLength);
+              if ($bufoffs + $buflen > $length)
+                ...
+          - pattern: |
+              $bufoffs = le32_to_cpu($$buf->InformationBufferOffset) + 8;
+              $buflen = le32_to_cpu($$buf->InformationBufferLength);
+              if ($bufoffs + $buflen > $length) {
+                ...
+              }
+    message: "Missing bounds checks on RNDIS buffer offset and length may lead to integer overflow (CVE-2016-2538)."
+    severity: ERROR
+    languages: [c]

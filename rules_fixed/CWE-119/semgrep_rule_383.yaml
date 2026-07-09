@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2016-2176-x509-name-oneline-ebcdic-overread
+    message: "Potential buffer over-read in X509_NAME_oneline on EBCDIC systems when handling long ASN.1 strings. This may lead to information disclosure or denial of service (CVE-2016-2176)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          #ifdef CHARSET_EBCDIC
+          ...
+          ascii2ebcdic(ebcdic_buf, q, (num > sizeof ebcdic_buf) ? sizeof ebcdic_buf : num);
+          ...
+          #endif
+      - pattern: |
+          #ifdef CHARSET_EBCDIC
+          ...
+          ascii2ebcdic(ebcdic_buf, q, ($X > sizeof ebcdic_buf) ? sizeof ebcdic_buf : $X);
+          ...
+          #endif

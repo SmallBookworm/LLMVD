@@ -1,0 +1,14 @@
+rules:
+  - id: missing_error_check_before_user_space_allocation
+    message: Missing error check after get_user() calls may lead to leaking kernel stack memory (CVE-2013-1928, CWE-200).
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $ERR = get_user(...);
+          $ERR |= get_user(...);
+          $UP_NATIVE = compat_alloc_user_space(...);
+      - pattern: |
+          $ERR  = get_user(...);
+          $ERR |= get_user(...);
+          $UP_NATIVE = compat_alloc_user_space(...);

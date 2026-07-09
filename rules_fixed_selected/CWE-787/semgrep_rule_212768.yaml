@@ -1,0 +1,16 @@
+rules:
+  - id: libvncserver-unix-socket-buffer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              strcpy(addr.sun_path, $SOCKFILE);
+          - pattern: |
+              strcpy($ADDR.sun_path, $SOCKFILE);
+    message: "Potential buffer overflow in UNIX socket path assignment. Ensure the socket filename length is checked against sizeof(addr.sun_path) before copying."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2019-20839"
+      references:
+        - https://github.com/LibVNC/libvncserver/commit/3fd03977c9b35800d73a865f167338cb4d05b0c1

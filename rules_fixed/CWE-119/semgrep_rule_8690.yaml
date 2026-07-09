@@ -1,0 +1,33 @@
+rules:
+  - id: cve-2015-3835-buffer-overflow
+    message: Buffer overflow vulnerability due to missing bounds check on rangeOffset and rangeLength before assigning to buffer header fields.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $HEADER->nFilledLen = $RANGELENGTH;
+              $HEADER->nOffset = $RANGEOFFSET;
+          - pattern: |
+              $HEADER->nOffset = $RANGEOFFSET;
+              $HEADER->nFilledLen = $RANGELENGTH;
+      - metavariable-pattern:
+          metavariable: $HEADER
+          patterns:
+            - pattern: OMX_BUFFERHEADERTYPE *
+      - pattern-not-inside: |
+          if ($RANGEOFFSET > $HEADER->nAllocLen
+                  || $RANGELENGTH > $HEADER->nAllocLen - $RANGEOFFSET) {
+              ...
+          }
+          ...
+          $HEADER->nFilledLen = $RANGELENGTH;
+          $HEADER->nOffset = $RANGEOFFSET;
+      - pattern-not-inside: |
+          if ($RANGEOFFSET > $HEADER->nAllocLen
+                  || $RANGELENGTH > $HEADER->nAllocLen - $RANGEOFFSET) {
+              ...
+          }
+          ...
+          $HEADER->nOffset = $RANGEOFFSET;
+          $HEADER->nFilledLen = $RANGELENGTH;

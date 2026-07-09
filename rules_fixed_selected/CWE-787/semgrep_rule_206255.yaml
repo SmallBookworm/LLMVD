@@ -1,0 +1,34 @@
+rules:
+  - id: nginx-error-page-request-smuggling
+    message: "Missing call to ngx_http_discard_request_body before redirecting via error_page may lead to HTTP request smuggling (CVE-2019-20372)."
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (uri.len && uri.data[0] == '@') {
+              return ngx_http_named_location(r, &uri);
+          }
+
+          location = ngx_list_push(&r->headers_out.headers);
+      - pattern: |
+          if (uri.len && uri.data[0] == '@') {
+              return ngx_http_named_location(r, &uri);
+          }
+
+          ... 
+          location = ngx_list_push(&r->headers_out.headers);
+    metavariable-pattern:
+      metavariable: location
+      pattern: $location = ngx_list_push(...)
+    pattern-not: |
+      if (uri.len && uri.data[0] == '@') {
+          return ngx_http_named_location(r, &uri);
+      }
+
+      r->expect_tested = 1;
+
+      if (ngx_http_discard_request_body(r) != NGX_OK) {
+          r->keepalive = 0;
+      }
+
+      location = ngx_list_push(&r->headers_out.headers);

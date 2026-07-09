@@ -1,0 +1,16 @@
+rules:
+  - id: unbounded_memcpy_nfs_lookup_reply
+    message: "Unbounded memcpy in nfs_lookup_reply may lead to buffer overflow (CVE-2022-30767). Missing length validation before memcpy."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (supported_nfs_versions & NFSV2_FLAG) {
+              memcpy(filefh, rpc_pkt.u.reply.data + 1, NFS_FHSIZE);
+          }
+      - pattern-inside: |
+          } else {
+            ...
+          }
+        pattern: |
+          memcpy(filefh, rpc_pkt.u.reply.data + 2, filefh3_length);

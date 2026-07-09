@@ -1,0 +1,18 @@
+rules:
+  - id: libmatroska-ebml-lacing-buffer-check
+    message: "Missing validation of EBML lace sizes against available buffer space may lead to out-of-bounds memory access (CVE-2015-8792)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              FrameSize = ReadCodedSizeValue(...);
+              SizeList[0] = FrameSize;
+          - pattern: |
+              FrameSize += ReadCodedSizeSignedValue(...);
+              SizeList[...] = FrameSize;
+    metavariable-pattern:
+      metavariable: FrameSize
+      pattern: int32
+    fixes:
+      - regex: {}

@@ -1,0 +1,27 @@
+rules:
+  - id: cve-2016-0807-build-id-buffer-check
+    message: "Missing validation of n_descsz before reading into fixed-size buffer may lead to buffer overflow (CVE-2016-0807)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (nhdr.n_namesz > sizeof($BUF)) {
+                ...
+                return false;
+              }
+              if (backtrace->Read(..., $BUF, nhdr.n_descsz) != nhdr.n_descsz) {
+                return false;
+              }
+          - pattern: |
+              if ($COND) {
+                ...
+              }
+              if (backtrace->Read(..., $BUF, nhdr.n_descsz) != nhdr.n_descsz) {
+                return false;
+              }
+              ...
+              for (...; ... < nhdr.n_descsz; ...) {...}
+    metavariable-pattern:
+      metavariable: $BUF
+      pattern: uint8_t[$SIZE]

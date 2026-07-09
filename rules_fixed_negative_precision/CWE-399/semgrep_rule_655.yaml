@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2012-1583-double-free-xfrm6-tunnel
+    message: "Potential double free vulnerability due to improper error handling in xfrm6_tunnel_rcv. This may lead to a denial of service (panic) via crafted IPv6 packets."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              return xfrm6_rcv_spi($SKB, $SPI);
+    metadata:
+      cwe: ["CWE-399"]
+      cve: "CVE-2012-1583"

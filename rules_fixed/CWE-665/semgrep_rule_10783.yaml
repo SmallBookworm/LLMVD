@@ -1,0 +1,26 @@
+rules:
+  - id: wavpack-uninitialized-variable-caf-desc-check
+    message: "Missing check for 'desc' chunk in CAF file parsing may lead to use of uninitialized variable (CWE-457)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!strncmp (caf_chunk_header.mChunkType, "data", 4)) {
+              ...
+              if (!DoReadFile (infile, &mEditCount, sizeof (mEditCount), &bcount) ||
+                  bcount != sizeof (mEditCount)) {
+              ...
+          - pattern: |
+              else if (!strncmp (caf_chunk_header.mChunkType, "data", 4)) {
+              ...
+              if (!DoReadFile (infile, &mEditCount, sizeof (mEditCount), &bcount) ||
+                  bcount != sizeof (mEditCount)) {
+              ...
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern: |
+        int ParseCaffHeaderConfig(...)
+    pattern-not: |
+      if (!desc_chunk || !DoReadFile (infile, &mEditCount, sizeof (mEditCount), &bcount) ||
+          bcount != sizeof (mEditCount)) {

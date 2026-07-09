@@ -1,0 +1,19 @@
+rules:
+  - id: yara-regex-escape-sequence-null-check-missing
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (text[1] == EOF)
+                return 0;
+          - pattern: |
+              if (text[2] == EOF)
+                return 0;
+          - pattern: |
+              if (text[3] == EOF)
+                return 0;
+    message: "Missing null/EOF and hex digit validation in escape sequence parsing may lead to out-of-bounds read (CWE-476)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2017-8294"

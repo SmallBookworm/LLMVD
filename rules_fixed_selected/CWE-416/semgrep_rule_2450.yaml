@@ -1,0 +1,22 @@
+rules:
+  - id: sctp_peeloff_netns_check_missing
+    message: "Missing netns check in sctp_do_peeloff may lead to use-after-free (CVE-2017-15115)"
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      int sctp_do_peeloff(...) {
+        ...
+        if (!asoc)
+          return -EINVAL;
+        ...
+      }
+    pattern-not: |
+      int sctp_do_peeloff(...) {
+        ...
+        if (!net_eq(..., ...))
+          return -EINVAL;
+        ...
+      }
+    fix-regex:
+      regex: ''
+      replacement: ''

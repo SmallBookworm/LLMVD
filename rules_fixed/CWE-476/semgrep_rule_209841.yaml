@@ -1,0 +1,24 @@
+rules:
+  - id: cwe-476-null-dereference-http-header
+    message: "Potential NULL pointer dereference when parsing HTTP headers. http_header_value may be NULL when passed to atoi(), leading to segmentation fault (CVE-2018-14884)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!strncasecmp($HDR_NAME, "Content-Length:", sizeof("Content-Length") - 1)) {
+                ... = atoi($HTTP_HEADER_VALUE);
+              }
+          - pattern: |
+              if (!strncasecmp($HDR_NAME, "Transfer-Encoding:", sizeof("Transfer-Encoding") - 1)) {
+                ... = atoi($HTTP_HEADER_VALUE);
+              }
+    metavariable-regex:
+      metavariable: $HTTP_HEADER_VALUE
+      regex: http_header_value
+    metavariable-pattern:
+      metavariable: $HTTP_HEADER_VALUE
+      pattern-not: |
+        if ($HTTP_HEADER_VALUE) {
+          ...
+        }

@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2015-2716-buffer-overflow
+    message: "Potential buffer overflow due to missing integer overflow checks in XML_GetBuffer. This could lead to arbitrary code execution (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (len > bufferLim - bufferEnd) {
+            int neededSize = len + (int)(bufferEnd - bufferPtr);
+            ...
+          }
+      - pattern: |
+          do {
+            bufferSize *= 2;
+          } while (bufferSize < neededSize);
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2015-2716"

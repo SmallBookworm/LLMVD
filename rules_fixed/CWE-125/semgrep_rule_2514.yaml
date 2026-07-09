@@ -1,0 +1,27 @@
+rules:
+  - id: cve-2017-13055-buffer-overread
+    message: "Buffer over-read vulnerability in IS-IS parser. Missing length check before accessing sub-TLV data for bandwidth constraints cases."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              case ISIS_SUBTLV_EXT_IS_REACH_BW_CONSTRAINTS:
+              case ISIS_SUBTLV_EXT_IS_REACH_BW_CONSTRAINTS_OLD:
+                  ND_PRINT(..., *$tptr, ...);
+                  $tptr++;
+                  for (...; ...; ...) {
+                      EXTRACT_32BITS($tptr);
+                      ...
+                  }
+          - pattern: |
+              case ISIS_SUBTLV_EXT_IS_REACH_BW_CONSTRAINTS_OLD:
+              case ISIS_SUBTLV_EXT_IS_REACH_BW_CONSTRAINTS:
+                  ND_PRINT(..., *$tptr, ...);
+                  $tptr++;
+                  for (...; ...; ...) {
+                      EXTRACT_32BITS($tptr);
+                      ...
+                  }
+    metavariable-pattern:
+      tptr: { type: "const uint8_t *" }

@@ -1,0 +1,28 @@
+rules:
+  - id: wildmidi_buffer_overflow_check_missing
+    message: "Missing check for minimum buffer size before memcmp may lead to heap-based buffer overflow (CVE-2017-1000418)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ((mididata = (uint8_t *) _WM_BufferFile(..., &midisize)) == NULL) {
+              ...
+          }
+          if (memcmp(mididata, "HMIMIDIP", 8) == 0) { ... }
+      - pattern: |
+          if ((mididata = (uint8_t *) _WM_BufferFile(..., &midisize)) == NULL) {
+              ...
+          }
+          if (memcmp(mididata, "HMI-MIDISONG061595", 18) == 0) { ... }
+      - pattern: |
+          if ((mididata = (uint8_t *) _WM_BufferFile(..., &midisize)) == NULL) {
+              ...
+          }
+          if (memcmp(mididata, ..., 4) == 0) { ... }
+    metavariable-pattern:
+      metavariable: midisize
+      pattern-not: |
+        if (midisize < 18) {
+            ...
+            return (NULL);
+        }

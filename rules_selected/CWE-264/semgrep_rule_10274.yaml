@@ -1,0 +1,8 @@
+rules:
+  - id: insecure_umask_in_daemon
+    patterns:
+      - pattern: |
+          umask(0);
+    message: "Insecure umask(0) in daemon function may lead to files being created with overly permissive permissions (CWE-264, CVE-2013-2007)."
+    severity: WARNING
+    languages: [c]

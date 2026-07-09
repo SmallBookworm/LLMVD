@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2018-18710
+    message: "Casting unsigned long to int before bounds check may cause integer truncation and lead to out-of-bounds access (CWE-200)."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      (int)$ARG >= $CAPACITY
+    metavariable-pattern:
+      $ARG:
+        pattern-either:
+          - pattern: arg
+          - pattern: $X

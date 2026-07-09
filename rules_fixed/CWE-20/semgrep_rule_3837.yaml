@@ -1,0 +1,27 @@
+rules:
+  - id: cve-2017-18221-mlock-accounting-corruption
+    message: "Potential NR_MLOCK accounting corruption due to incorrect delta_munlocked calculation in __munlock_pagevec. This may lead to denial of service via crafted mlockall/munlockall usage."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              static void __munlock_pagevec(...) {
+                ...
+                int delta_munlocked;
+                ...
+                delta_munlocked = -nr + pagevec_count(&pvec_putback);
+                ...
+              }
+          - pattern: |
+              static void __munlock_pagevec(...) {
+                ...
+                int delta_munlocked = -nr;
+                ...
+                if (TestClearPageMlocked(...)) {
+                  ...
+                }
+                // missing else clause that increments delta_munlocked
+                ...
+              }
+    fix: ""

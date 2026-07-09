@@ -1,0 +1,13 @@
+rules:
+  - id: cwe-190-heap-buffer-overread-pt_long
+    message: "Heap-based buffer over-read in PT_LONG handling due to incorrect pointer cast. Use 'int*' instead of 'long*' for 4-byte data."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          case PT_LONG:
+            ...
+            *((long *)...)
+    metadata:
+      cwe: "CWE-190"
+      cve: "CVE-2017-6800"

@@ -1,0 +1,31 @@
+rules:
+  - id: cve-2017-12877-use-after-free
+    message: "Potential use-after-free vulnerability due to dangling pointer 'image2' after DeleteImageFromList in error handling path."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ((p->rows == 0) || (p->columns == 0)) {
+            ...
+            DeleteImageFromList(&tmp);
+            ...
+          }
+      - pattern: |
+          while (... != (Image *) NULL)
+          {
+            Image *tmp=...;
+            if ((...->rows == 0) || (...->columns == 0)) {
+              ...
+              DeleteImageFromList(&tmp);
+              ...
+            }
+            ...
+          }
+    metavariable-pattern:
+      metavariable: tmp
+      patterns:
+        - pattern-either:
+            - pattern: tmp == image2
+            - pattern: image2 == tmp
+    fix-regex:
+      enabled: false

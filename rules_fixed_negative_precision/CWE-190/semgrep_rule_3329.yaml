@@ -1,0 +1,14 @@
+rules:
+  - id: cwe-190-integer-overflow-mem-check-range
+    message: Integer overflow possible in range check due to unchecked addition of 'iova + length'. This may lead to memory corruption or information disclosure.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              (iova + length) > (mem->iova + mem->length)
+          - pattern: |
+              iova + length
+    metadata:
+      cwe: "CWE-190"
+      cve: "CVE-2016-8636"

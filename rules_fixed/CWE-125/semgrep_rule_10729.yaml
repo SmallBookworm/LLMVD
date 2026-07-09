@@ -1,0 +1,13 @@
+rules:
+  - id: cwe-125-yara-buffer-overread
+    message: "Potential buffer over-read in yr_re_fast_exec due to missing bounds check after incrementing bytes_matched (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              bytes_matched += $X->min;
+              ip = $Y;
+          - pattern: |
+              bytes_matched += $X;
+              ip = $Y;

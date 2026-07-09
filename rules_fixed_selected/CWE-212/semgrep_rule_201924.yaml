@@ -1,0 +1,23 @@
+rules:
+  - id: varnish-cache-err-code-not-cleared
+    message: "Missing initialization of req->err_code and req->err_reason may lead to information disclosure from previous requests (CVE-2019-20637)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          req->vdc->retval = 0;
+          req->is_hit = 0;
+          req->is_hitmiss = 0;
+          req->is_hitpass = 0;
+          ...
+          // missing req->err_code = 0;
+      - pattern: |
+          req->vdc->retval = 0;
+          req->is_hit = 0;
+          req->is_hitmiss = 0;
+          req->is_hitpass = 0;
+          ...
+          // missing req->err_reason = NULL;
+    metavariable-regex:
+      metavariable: $...
+      regex: "(?!.*req->err_code = 0;.*req->err_reason = NULL;)"

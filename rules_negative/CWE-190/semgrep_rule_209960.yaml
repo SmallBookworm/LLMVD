@@ -1,0 +1,17 @@
+rules:
+  - id: cryptopp-inflator-bad-distance-check
+    message: "Missing bounds check on m_distance before array access may lead to out-of-bounds read (CWE-190)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          CRYPTOPP_ASSERT(...);
+          bits = (m_distance >= COUNTOF(distanceExtraBits)) ? distanceExtraBits[29] : distanceExtraBits[m_distance];
+      - pattern: |
+          CRYPTOPP_ASSERT(...);
+          bits = distanceExtraBits[m_distance];
+          ...
+          m_distance = m_reader.GetBits(bits) + distanceStarts[m_distance];
+    metavariable-regex:
+      metavariable: $...
+      regex: ".*"

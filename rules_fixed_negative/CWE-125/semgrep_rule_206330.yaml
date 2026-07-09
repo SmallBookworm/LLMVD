@@ -1,0 +1,15 @@
+rules:
+  - id: cwe-125-iref-box-null-check
+    message: "Missing null check for iref_box before dereference may lead to out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $IREF_BOX = $GET_IREF_BOX();
+          $IREF_BOX->$METHOD(...);
+      - pattern: |
+          $IREF_BOX = $GET_IREF_BOX();
+          std::vector<...> $REFS = $IREF_BOX->get_references(...);
+    metavariable-pattern:
+      metavariable: $GET_IREF_BOX
+      pattern: m_heif_file->get_iref_box

@@ -1,0 +1,14 @@
+rules:
+  - id: cwe-125-out-of-bounds-read-libsass
+    message: "Potential out-of-bounds read due to missing null check after sequence parsing in parse_url_function_argument. This may lead to denial of service or information disclosure (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (peek< exactly< hash_lbrace > >()) {
+        const char* pp = position;
+        while (pp && peek< exactly< hash_lbrace > >(pp)) {
+          pp = sequence< interpolant, real_uri_value >(pp);
+        }
+        position = pp;
+        return parse_interpolated_chunk(...);
+      }

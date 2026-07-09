@@ -1,0 +1,15 @@
+rules:
+  - id: imagemagick-psd-memory-leak-cve-2019-7395
+    message: Memory leak in WritePSDChannel when deflateInit fails; compressed_pixels not freed.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (deflateInit(..., ...) != Z_OK)
+            {
+              quantum_info=DestroyQuantumInfo(quantum_info);
+              return(0);
+            }
+    metadata:
+      cwe: "CWE-399"
+      cve: "CVE-2019-7395"

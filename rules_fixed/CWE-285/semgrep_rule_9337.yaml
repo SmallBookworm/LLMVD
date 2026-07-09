@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2016-7143-sasl-authenticate-validation
+    message: "Missing validation of AUTHENTICATE parameter allows spoofing via leading ':' or spaces (CVE-2016-7143, CWE-285)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (*parv[1] == ':' || strchr(parv[1], ' '))
+      {
+        ...
+      }
+    pattern-not-inside: |
+      if (*parv[1] == ':' || strchr(parv[1], ' '))
+      {
+        exit_client(...);
+        return 0;
+      }

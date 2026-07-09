@@ -1,0 +1,25 @@
+rules:
+  - id: cve-2011-2182-ldm-frag-add-buffer-overflow
+    message: "Missing bounds check on 'rec' against 'f->num' before memcpy may lead to buffer overflow (CVE-2011-2182)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          found:
+          if (f->map & (1 << rec)) {
+            ...
+            return false;
+          }
+          ...
+          memcpy(...);
+      - pattern: |
+          found:
+          f->map |= (1 << rec);
+          ...
+          memcpy(...);
+    metavariable-pattern:
+      metavariable: f
+      pattern: struct frag *
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2011-2182"

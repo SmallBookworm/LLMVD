@@ -1,0 +1,16 @@
+rules:
+  - id: ffmpeg-parser-realloc-error-missing-reset
+    message: "Missing reset of index and overread_index on realloc failure may lead to out-of-bounds access (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!new_buffer)
+              return AVERROR(ENOMEM);
+      - pattern: |
+          if(!new_buffer)
+              return AVERROR(ENOMEM);
+    metavariable-pattern:
+      metavariable: new_buffer
+      pattern: av_fast_realloc(...)
+    focus-metavariable: new_buffer

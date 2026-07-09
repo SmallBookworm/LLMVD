@@ -1,0 +1,25 @@
+rules:
+  - id: cxxtools-double-percent-infinite-recursion
+    message: "Potential infinite recursion due to unhandled '%%' in URL query parsing. When _cnt == 0 and a '%' is encountered in state_keyesc or state_valueesc, the original code recursively calls parse('%'), which can lead to infinite recursion on '%%'."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (_cnt == 0)
+              {
+                if (_state == state_keyesc)
+                  _state = state_key;
+                else
+                  _state = state_value;
+                parse('%');
+              }
+          - pattern: |
+              if (_cnt == 0)
+              {
+                if (_state == state_keyesc)
+                  _state = state_key;
+                else
+                  _state = state_value;
+                parse('%');
+              }

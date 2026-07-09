@@ -1,0 +1,15 @@
+rules:
+  - id: integer-overflow-in-sampletable
+    message: "Unchecked multiplication in array allocation may lead to integer overflow (CWE-189)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (data_size < 8 + $NUM * 12) {
+              return ERROR_MALFORMED;
+          }
+          ...
+          new SampleToChunkEntry[$NUM];
+    metadata:
+      cwe: "CWE-189"
+      cve: "CVE-2015-1538"

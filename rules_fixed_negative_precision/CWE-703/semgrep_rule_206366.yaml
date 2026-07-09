@@ -1,0 +1,18 @@
+rules:
+  - id: haproxy-unbounded-loop-set-cookie2
+    message: "Unbounded loop in http_manage_server_side_cookies due to missing 'is_cookie2' check before http_find_header('Set-Cookie'). This may lead to denial of service (CVE-2022-0711)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!http_find_header(..., ist("Set-Cookie"), ..., 1)) {
+                  if (!http_find_header(..., ist("Set-Cookie2"), ..., 1))
+                      break;
+                  ...
+              }
+    metadata:
+      cwe: "CWE-703"
+      cve: "CVE-2022-0711"
+      references:
+        - https://github.com/haproxy/haproxy/commit/bfb15ab34ead85f64cd6da0e9fb418c9cd14cee8

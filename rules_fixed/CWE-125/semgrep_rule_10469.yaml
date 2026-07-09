@@ -1,0 +1,28 @@
+rules:
+  - id: cirrus_negative_pitch_out_of_bounds
+    message: "Missing handling of negative pitch in cirrus_invalidate_region may lead to out-of-bounds access (CWE-125, CVE-2017-18030)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-inside: |
+          static void cirrus_invalidate_region(..., int off_begin, int off_pitch, int bytesperline, int lines)
+          {
+            ...
+            for (...; ...; ...) {
+              ...
+              memory_region_set_dirty(..., off_cur, off_cur_end - off_cur);
+              ...
+            }
+            ...
+          }
+      - pattern: |
+          if (off_pitch < 0) {
+              ...
+          }
+      - pattern-not: |
+          if (off_pitch < 0) {
+              off_begin -= bytesperline - 1;
+          }
+    metavariable-regex:
+      metavariable: function
+      regex: cirrus_invalidate_region

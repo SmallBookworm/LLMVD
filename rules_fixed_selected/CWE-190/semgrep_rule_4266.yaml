@@ -1,0 +1,14 @@
+rules:
+  - id: integer-overflow-gdImageWebpCtx
+    message: Integer overflow possible in gdImageWebpCtx due to missing overflow checks before multiplication.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              gdMalloc(gdImageSX($IM) * 4 * gdImageSY($IM))
+          - pattern: |
+              gdMalloc(gdImageSX($IM) * $N * gdImageSY($IM))
+    metadata:
+      cwe: "CWE-190"
+      cve: "CVE-2016-7568"

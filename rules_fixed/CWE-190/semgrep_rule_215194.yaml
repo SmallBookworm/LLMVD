@@ -1,0 +1,7 @@
+rules:
+  - id: cwe-190-integer-overflow-xim-data-len
+    message: "Integer overflow vulnerability due to signed data_len parameter in _XimAttributeToValue. This can lead to heap-buffer overflow when used in memory allocation or copy operations."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      _XimAttributeToValue(..., INT16 data_len, ...)

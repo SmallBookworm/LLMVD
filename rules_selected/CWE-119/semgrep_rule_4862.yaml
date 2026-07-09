@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2011-2806-missing-braces
+    message: "Missing braces in if statement may lead to memory corruption (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if ($COND)
+          return $X;
+      
+      return $Y;

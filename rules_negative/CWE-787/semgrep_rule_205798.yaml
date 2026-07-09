@@ -1,0 +1,21 @@
+rules:
+  - id: sudo-pwfeedback-buffer-overflow
+    message: "Potential stack-based buffer overflow in getln() when pwfeedback is enabled and input is not a tty (CVE-2019-18634)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (write($FD, "\b \b", 3) == -1)
+            break;
+          --$CP;
+          $LEFT++;
+      - pattern: |
+          while ($CP > $BUF) {
+            if (write($FD, "\b \b", 3) == -1)
+              break;
+            --$CP;
+          }
+          $LEFT = $BUFSIZ;
+    metadata:
+      cwe: ["CWE-787"]
+      cve: "CVE-2019-18634"

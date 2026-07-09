@@ -1,0 +1,27 @@
+rules:
+  - id: null_pointer_dereference_ap4_dataatom
+    message: "Potential NULL pointer dereference in AP4_DataAtom constructor. If the constructor returns early due to insufficient size, m_Source may be uninitialized and later dereferenced."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              AP4_DataAtom::AP4_DataAtom(..., AP4_ByteStream& stream) :
+                  AP4_Atom(___), 
+                  ___
+              {
+                  if (size < ___) return;
+                  ___
+                  m_Source = new ___;
+              }
+          - pattern: |
+              AP4_DataAtom::AP4_DataAtom(..., AP4_ByteStream& stream) :
+                  AP4_Atom(___)
+              {
+                  if (size < ___) return;
+                  ___
+                  m_Source = new ___;
+              }
+    metavariable-patterns:
+      - metavariable: m_Source
+        pattern: m_Source

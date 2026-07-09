@@ -1,0 +1,24 @@
+rules:
+  - id: jq-tokenadd-off-by-one
+    message: "Off-by-one error in tokenadd may cause heap-based buffer overflow (CVE-2015-8863)"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($POS == $LEN) {
+                ...
+                $BUF = jv_mem_realloc($BUF, $LEN);
+              }
+          - pattern: |
+              if ($POS >= $LEN) {
+                ...
+                $BUF = jv_mem_realloc($BUF, $LEN);
+              }
+    metavariable-patterns:
+      - metavariable: $POS
+        pattern: p->tokenpos
+      - metavariable: $LEN
+        pattern: p->tokenlen
+      - metavariable: $BUF
+        pattern: p->tokenbuf

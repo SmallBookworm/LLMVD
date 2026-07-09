@@ -1,0 +1,17 @@
+rules:
+  - id: vfio_pci_set_irqs_integer_overflow
+    message: "Integer overflow vulnerability in VFIO_DEVICE_SET_IRQS ioctl due to missing overflow checks on user-supplied hdr.count and hdr.start."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (hdr.argsz - minsz < hdr.count * $SIZE ||
+                  hdr.start >= $MAX || hdr.start + hdr.count > $MAX)
+                  return -EINVAL;
+          - pattern: |
+              if (hdr.argsz - minsz < hdr.count * $SIZE)
+                  return -EINVAL;
+    metavariable-regex:
+      - metavariable: $SIZE
+        regex: "(sizeof\\(uint8_t\\)|sizeof\\(int32_t\\))"

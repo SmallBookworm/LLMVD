@@ -1,0 +1,22 @@
+rules:
+  - id: mysql-wsrep-command-injection
+    message: "Unsanitized input from 'msg' used in SST method may lead to command injection (CVE-2020-15180)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              const char *method = msg.data();
+              ...
+              sst_donate_other(method, ...);
+          - pattern: |
+              const char *method = msg.data();
+              size_t method_len = strlen(method);
+              const char *data = method + method_len + 1;
+              ...
+              sst_donate_other(method, data, ...);
+    metavariable-regex:
+      metavariable: msg
+      regex: "msg"
+    fix-regex:
+      enabled: false

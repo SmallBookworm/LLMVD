@@ -1,0 +1,23 @@
+rules:
+  - id: powermate_null_pointer_dereference
+    message: "Missing check for bNumEndpoints may lead to NULL pointer dereference (CVE-2016-2186)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $interface = $intf->cur_altsetting;
+          $endpoint = $interface->endpoint[0].desc;
+      - pattern: |
+          $interface = $intf->cur_altsetting;
+          ...
+          $endpoint = $interface->endpoint[0].desc;
+    metavariable-pattern:
+      metavariable: $interface
+      pattern: struct usb_host_interface *
+    pattern-not-inside: |
+      $interface = $intf->cur_altsetting;
+      if ($interface->desc.bNumEndpoints < 1) {
+        ...
+      }
+      ...
+      $endpoint = $interface->endpoint[0].desc;

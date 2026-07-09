@@ -1,0 +1,36 @@
+rules:
+  - id: imagemagick-pdf-memory-leak-cve-2019-7397
+    message: "Memory leak in WritePDFImage due to missing xref cleanup on error paths."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (status == MagickFalse)
+            {
+              (void) CloseBlob(image);
+              return(MagickFalse);
+            }
+      - pattern: |
+          if (status == MagickFalse)
+            {
+              tile_image=DestroyImage(tile_image);
+              ThrowPDFException(...);
+            }
+      - pattern: |
+          if (pixel_info == (MemoryInfo *) NULL)
+            {
+              tile_image=DestroyImage(tile_image);
+              ThrowPDFException(...);
+            }
+      - pattern: |
+          if (pixel_info == (MemoryInfo *) NULL)
+            {
+              xref=(MagickOffsetType *) RelinquishMagickMemory(xref);
+              ThrowPDFException(...);
+            }
+    metavariable-pattern:
+      metavariable: $...
+      patterns:
+        - pattern-regex: "ResourceLimitError"
+    fix-regex:
+      enabled: false

@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2018-6139-chrome-debugger-target-handler
+    message: "Unrestricted addition of TargetHandler in restricted DevTools sessions may lead to arbitrary code execution (CVE-2018-6139)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-not-inside: |
+          if (!session->restricted()) {
+            ...
+            session->AddHandler(base::WrapUnique(new protocol::TargetHandler(...)));
+            ...
+          }
+      - pattern-either:
+          - pattern: 'session->AddHandler(base::WrapUnique(new protocol::TargetHandler(...)));'
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2018-6139"

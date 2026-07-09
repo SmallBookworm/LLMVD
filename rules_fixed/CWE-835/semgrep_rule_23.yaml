@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2018-20482-infinite-read-loop
+    message: "Missing check for zero bytes read in sparse_dump_region may cause infinite loop when file shrinks during read (CVE-2018-20482, CWE-835)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          while ($BYTES_LEFT > 0)
+            {
+              $BYTES_READ = safe_read($FD, $BUF, $SIZE);
+              if ($BYTES_READ == SAFE_READ_ERROR)
+                { ... return false; }
+              $BYTES_LEFT -= $BYTES_READ;
+              ...
+            }
+    metavariable-pattern:
+      - metavariable: $BYTES_READ
+        pattern-not: |
+          if ($BYTES_READ == 0)
+            { ... return false; }

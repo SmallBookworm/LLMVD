@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2013-4512-buffer-overflow
+    message: |
+      Buffer overflow vulnerability in exitcode_proc_write. The 'count' parameter is used directly in copy_from_user without being capped to the size of the destination buffer 'buf', which can lead to a buffer overflow. Ensure 'count' is limited to 'sizeof(buf)'.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              copy_from_user($BUF, $BUFFER, $COUNT)
+          - pattern: |
+              copy_from_user(..., ..., $COUNT)
+      - metavariable-regex:
+          metavariable: $BUF
+          regex: \bbuf\b
+      - metavariable-regex:
+          metavariable: $COUNT
+          regex: \bcount\b
+      - pattern-not: |
+          min($COUNT, sizeof($BUF))
+      - pattern-not-inside: |
+          min(..., sizeof(...))

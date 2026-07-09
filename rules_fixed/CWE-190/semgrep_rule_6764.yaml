@@ -1,0 +1,11 @@
+rules:
+  - id: integer-overflow-opj_tcd_get_decoded_tile_size
+    message: Potential integer overflow leading to heap-based buffer overflow in opj_tcd_get_decoded_tile_size.
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      $size = $a * $b;
+      ... malloc($size) ...
+    metadata:
+      cwe: "CWE-190"
+      cve: "CVE-2016-5152"

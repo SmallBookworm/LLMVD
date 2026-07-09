@@ -1,0 +1,35 @@
+rules:
+  - id: cve-2011-2859-permissions-check-missing
+    message: "Missing validation against allowed download URL patterns may lead to incorrect permissions for non-gallery pages (CVE-2011-2859)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          bool $FUNC(...) {
+            ...
+            bool download_valid = (...);
+            ...
+            if (!download_valid) {
+              std::string download_tld = net::RegistryControlledDomainService::GetDomainAndRegistry(...);
+              download_valid = (download_tld == ...);
+            }
+            ...
+          }
+      - pattern: |
+          bool $FUNC(...) {
+            ...
+            bool download_valid = (...);
+            ...
+            GURL store_url = ...;
+            if (!store_url.is_empty()) {
+              ...
+              if (!download_valid) {
+                std::string download_tld = net::RegistryControlledDomainService::GetDomainAndRegistry(...);
+                download_valid = (download_tld == store_tld);
+              }
+            }
+            ...
+          }
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern: "IsDownloadFromGallery"

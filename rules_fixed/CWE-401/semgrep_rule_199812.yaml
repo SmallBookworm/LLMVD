@@ -1,0 +1,18 @@
+rules:
+  - id: imagemagick-dib-memory-leak-cve-2019-7398
+    message: "Memory leak in WriteDIBImage due to missing RelinquishMagickMemory call on error path (CVE-2019-7398, CWE-401)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ($PTR == (unsigned char *) NULL)
+            ThrowWriterException($ERROR, $MSG);
+      - pattern: |
+          if ($PTR == (unsigned char *) NULL)
+            return $VALUE;
+    metavariable-pattern:
+      metavariable: PTR
+      patterns:
+        - pattern: (unsigned char *) AcquireQuantumMemory(...)
+    fix-regex:
+      enabled: false

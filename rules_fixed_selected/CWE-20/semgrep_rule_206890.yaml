@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2014-0155-ioapic-rtc-pending-eoi-assignment
+    message: "Unvalidated return value from kvm_irq_delivery_to_apic assigned to ioapic->rtc_status.pending_eoi may cause host crash (CVE-2014-0155)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              ioapic->rtc_status.pending_eoi = $RET;
+          - pattern: |
+              $IOAPIC->rtc_status.pending_eoi = $RET;
+    metavariable-pattern:
+      $RET:
+        pattern-not: |
+          ($RET < 0 ? 0 : $RET)
+    fix: ""

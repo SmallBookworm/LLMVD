@@ -1,0 +1,14 @@
+rules:
+  - id: openjpeg-integer-overflow-cve-2016-7163
+    message: "Integer overflow in opj_calloc argument due to missing size_t cast before multiplication. This can lead to out-of-bounds read/write (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          opj_calloc($X * $Y, sizeof(...))
+      - pattern: |
+          opj_calloc($X * $Y * ..., sizeof(...))
+    metavariable-pattern:
+      metavariable: $X
+      language: c
+      pattern-not: (size_t)...

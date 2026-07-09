@@ -1,0 +1,15 @@
+rules:
+  - id: imlib2-off-by-one-out-of-bounds-read
+    message: "Off-by-one error leading to out-of-bounds read in __imlib_MergeUpdate (CVE-2016-3993)"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          for ($xx = $x + 1, $ww = 1;
+               (T($xx, $y).used & T_USED) && ($xx < $tw); $xx++, $ww++);
+      - pattern: |
+          for ($xx = $x + 1, $ww = 1;
+               (T($xx, $y).used & T_USED) && ($xx < $th); $xx++, $ww++);
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2016-3993"

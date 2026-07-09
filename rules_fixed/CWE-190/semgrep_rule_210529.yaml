@@ -1,0 +1,12 @@
+rules:
+  - id: cwe-190-integer-overflow-isbidi
+    message: "Potential integer overflow in loop condition due to unsigned underflow when decrementing 'llen'."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      while ($LLen-- > 0) {
+        ...
+      }
+    metavariable-pattern:
+      $LLen: 
+        type: "size_t"

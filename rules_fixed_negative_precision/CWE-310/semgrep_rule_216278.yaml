@@ -1,0 +1,20 @@
+rules:
+  - id: lucky_thirteen_vulnerable_mac_rotation
+    message: "Detected vulnerable CBC MAC rotation logic susceptible to Lucky Thirteen timing attack (CVE-2013-0169)."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              #if defined(CBC_MAC_ROTATE_IN_PLACE)
+              unsigned char rotated_mac_buf[EVP_MAX_MD_SIZE*2];
+              ...
+              rotated_mac = (unsigned char*) (((intptr_t)(rotated_mac_buf + 64)) & ~63);
+          - pattern: |
+              #if defined(CBC_MAC_ROTATE_IN_PLACE)
+              ...
+              for (i = 0; i < md_size; i++)
+                  {
+                  out[j++] = rotated_mac[rotate_offset++];
+                  rotate_offset &= constant_time_lt(rotate_offset,md_size);
+                  }

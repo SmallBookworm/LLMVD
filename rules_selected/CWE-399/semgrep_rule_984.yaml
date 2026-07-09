@@ -1,0 +1,32 @@
+rules:
+  - id: cve-2013-4162-udp_v6_push_pending_frames-missing-af_inet-check
+    message: "Missing check for AF_INET pending data in udp_v6_push_pending_frames may cause kernel panic (CVE-2013-4162)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              static int udp_v6_push_pending_frames(struct sock *sk)
+              {
+                  ...
+                  struct flowi6 *fl6 = &inet->cork.fl.u.ip6;
+                  ...
+                  err = ip6_push_pending_frames(sk);
+                  ...
+              }
+          - pattern: |
+              static int udp_v6_push_pending_frames(struct sock *sk)
+              {
+                  ...
+                  struct flowi6 *fl6;
+                  ...
+                  fl6 = &inet->cork.fl.u.ip6;
+                  ...
+                  err = ip6_push_pending_frames(sk);
+                  ...
+              }
+    metavariable-pattern:
+      metavariable: fl6
+      pattern-not: |
+          if (up->pending == AF_INET)
+              return udp_push_pending_frames(sk);

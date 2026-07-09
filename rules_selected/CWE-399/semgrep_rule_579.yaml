@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2012-4467-incorrect-compat-put-time-args
+    patterns:
+      - pattern-either:
+          - pattern: compat_put_timeval($USER_PTR, $KERNEL_PTR)
+          - pattern: compat_put_timespec($USER_PTR, $KERNEL_PTR)
+    message: "Incorrect argument order in compat_put_time* may lead to information disclosure or DoS (CVE-2012-4467)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-399"
+      confidence: HIGH

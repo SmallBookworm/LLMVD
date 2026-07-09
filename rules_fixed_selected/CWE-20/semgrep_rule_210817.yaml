@@ -1,0 +1,7 @@
+rules:
+  - id: cwe-20-ogg-vendor-length-int-overflow
+    message: Storing the result of ByteVector::toUInt() in an 'int' may lead to integer overflow or underflow. Use 'uint' instead.
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      int $VAR = $DATA.mid(...).toUInt(...);

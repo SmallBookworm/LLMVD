@@ -1,0 +1,13 @@
+rules:
+  - id: miniupnpc-buffer-overflow-igdstartelt
+    patterns:
+      - pattern-either:
+          - pattern: |
+              memcpy($BUF, $SRC, $LEN);
+              $BUF[$LEN] = '\0';
+    message: "Buffer overflow vulnerability in IGDstartelt: missing bounds check before memcpy may lead to arbitrary code execution or denial of service (CVE-2015-6031)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      confidence: HIGH

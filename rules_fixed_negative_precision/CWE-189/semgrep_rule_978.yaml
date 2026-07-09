@@ -1,0 +1,17 @@
+rules:
+  - id: cifs-off-by-one-build_unc_path_to_root
+    message: "Off-by-one buffer overflow in build_unc_path_to_root due to incorrect pointer arithmetic after writing separator."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (...)
+              {
+                *$POS++ = ...;
+                strncpy($POS, ..., $PPLEN);
+                $POS += $PPLEN;
+              }
+    metavariable-pattern:
+      metavariable: $PPLEN
+      pattern: strlen(...) + 1

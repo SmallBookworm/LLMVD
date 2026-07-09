@@ -1,0 +1,14 @@
+rules:
+  - id: mongodb-x509-auth-crash-cve-2014-3971
+    message: "Unsafe substring extraction from X.509 subject name may cause denial of service when ',OU=' is not found (CVE-2014-3971)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $S.substr($S.find(",OU="))
+          - pattern: |
+              $S.substr($S.find(",OU="))
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2014-3971"

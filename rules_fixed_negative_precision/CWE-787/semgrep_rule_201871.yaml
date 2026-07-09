@@ -1,0 +1,7 @@
+rules:
+  - id: cimg_bmp_buffer_overflow
+    message: "Heap-based buffer overflow in CImg::_load_bmp due to unsafe buffer allocation. Use 'buf_size' instead of computed pixel size to prevent overflow (CVE-2019-13568)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      buffer.assign(cimg::abs(dy) * (dx_bytes + align_bytes), 1, 1, 1, 0);

@@ -1,0 +1,15 @@
+rules:
+  - id: mutt-imap-qresync-oob-read
+    patterns:
+      - pattern: |
+          iter->substr_end = strchr(..., ',');
+          if (!iter->substr_end)
+            iter->substr_end = iter->eostr;
+          else
+            *(iter->substr_end) = '\0';
+    message: "Out-of-bounds read vulnerability in IMAP sequence set parsing when ending with a comma (CVE-2021-32055, CWE-125). The substr_end pointer is not advanced past the comma, leading to potential buffer overread in subsequent iterations."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2021-32055"

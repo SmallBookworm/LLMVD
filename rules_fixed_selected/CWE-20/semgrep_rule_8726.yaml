@@ -1,0 +1,11 @@
+rules:
+  - id: bluetooth_enable_privilege_escalation
+    message: "Bluetooth enable function may allow privilege escalation due to improper status handling (CVE-2016-3760)."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern: |
+          $RET = ($EXPR == BT_STATUS_SUCCESS || $EXPR == BT_STATUS_DONE) ? JNI_TRUE : JNI_FALSE;
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2016-3760"

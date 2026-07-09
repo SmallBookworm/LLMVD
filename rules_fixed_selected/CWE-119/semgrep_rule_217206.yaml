@@ -1,0 +1,26 @@
+rules:
+  - id: buffer-overflow-in-loop-boundary
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for ($I = 0; $I < $INPUT_STRING_SIZE; $I++)
+              {
+                ...
+                $TAGNAME[$TAGNAME_IDX] = ...;
+                $TAGNAME_IDX++;
+                ...
+              }
+          - pattern: |
+              for ($I = 0; $I < $INPUT_STRING.size(); $I++)
+              {
+                ...
+                $TAGNAME[$TAGNAME_IDX] = ...;
+                $TAGNAME_IDX++;
+                ...
+              }
+    message: "Loop bound not restricted by buffer size may lead to buffer overflow (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2017-2920"

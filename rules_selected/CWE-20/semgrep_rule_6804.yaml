@@ -1,0 +1,7 @@
+rules:
+  - id: chrome-fullscreen-omnibox-spoofing-cve-2016-5187
+    message: "Use of custom Equals() method instead of == operator may lead to incorrect callback comparison, potentially enabling UI spoofing (CVE-2016-5187)."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      (*callbacks)[...].Equals(...)

@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2014-1438-amd-fxsave-leak
+    message: "Missing 'fnclex' before 'emms' in AMD FXSAVE workaround may lead to floating-point exceptions and potential privilege escalation (CVE-2014-1438, CWE-284)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          alternative_input(
+            ...,
+            $EMMS:"emms\\n\\t" ... "fildl ..." ...,
+            X86_FEATURE_FXSAVE_LEAK,
+            ...
+          );
+      - pattern: |
+          alternative_input(
+            ...,
+            $EMMS:"emms" ... "fildl ..." ...,
+            X86_FEATURE_FXSAVE_LEAK,
+            ...
+          );
+    metadata:
+      cwe: ["CWE-284"]
+      cve: "CVE-2014-1438"

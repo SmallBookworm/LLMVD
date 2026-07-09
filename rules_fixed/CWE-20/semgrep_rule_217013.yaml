@@ -1,0 +1,26 @@
+rules:
+  - id: cve-2009-3627-incomplete-entity-check
+    message: "Missing bounds check for 's < end' before dereferencing '*s' in entity decoding loop may cause infinite loop on incomplete entities."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while (s < end) {
+                ...
+                if ((*t++ = *s++) != '&')
+                    continue;
+                ...
+                if (*s == '#') {
+                  ...
+                }
+          - pattern: |
+              while (s < end) {
+                ...
+                if ((*t++ = *s++) != '&')
+                    continue;
+                ...
+                while (isALNUM(*s))
+                    s++;
+                ...
+              }

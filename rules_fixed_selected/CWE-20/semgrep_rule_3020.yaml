@@ -1,0 +1,13 @@
+rules:
+  - id: bubblewrap-missing-setsid
+    message: Missing setsid() call before executing sandboxed code may allow TIOCSTI-based sandbox escape (CVE-2017-5226).
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (execvp ($CMD, $ARGS) == -1)
+        ...
+    pattern-not: |
+      if (setsid () == (pid_t) -1)
+        ...
+      if (execvp ($CMD, $ARGS) == -1)
+        ...

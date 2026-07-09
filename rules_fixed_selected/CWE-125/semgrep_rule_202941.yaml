@@ -1,0 +1,31 @@
+rules:
+  - id: openexr-rawtiledat-invalid-tile-check-missing
+    message: "Missing validation of tile coordinates after readNextTileData in non-multipart files may lead to out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (isMultiPart(...))
+          {
+              ...
+              if (... != ... || ... != ... || ... != ... || ... != ...)
+              {
+                  throw ...;
+              }
+          }
+          $PIXELDATA = ...;
+      - pattern: |
+          if (isMultiPart(...))
+          {
+              ...
+              if (... != ... || ... != ... || ... != ... || ... != ...)
+                  throw ...;
+          }
+          $PIXELDATA = ...;
+    metavariable-pattern:
+      metavariable: $PIXELDATA
+      pattern: pixelData
+    fixes:
+      - regex: .*
+        replacement: ""
+        count: 0

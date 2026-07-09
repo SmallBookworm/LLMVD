@@ -1,0 +1,7 @@
+rules:
+  - id: cve-2020-8265-use-after-free-tlswrap-dowrite
+    message: "Detected vulnerable TLSWrap::DoWrite function using raw WriteWrap pointer, which may lead to use-after-free (CWE-416). Upgrade to fixed version using std::unique_ptr."
+    severity: ERROR
+    languages: [c++]
+    pattern: |
+      int TLSWrap::DoWrite(WriteWrap* w);

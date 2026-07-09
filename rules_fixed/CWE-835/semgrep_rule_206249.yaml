@@ -1,0 +1,10 @@
+rules:
+  - id: qemu_lan9118_infinite_loop_reentrancy
+    message: "Potential infinite loop due to reentrant DMA in loopback mode. Use qemu_receive_packet() to prevent reentrancy issues (CVE-2021-3416)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      lan9118_receive(qemu_get_queue($NIC), $DATA, $LEN)
+    metadata:
+      cwe: "CWE-835"
+      cve: "CVE-2021-3416"

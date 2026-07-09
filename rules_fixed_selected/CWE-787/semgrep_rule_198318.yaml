@@ -1,0 +1,23 @@
+rules:
+  - id: vlc_mp4_readbox_string_buffer_overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              malloc($SIZE + 1 - 8)
+          - pattern: |
+              memcpy(..., ..., $SIZE - 8)
+    pattern-inside: |
+      static int MP4_ReadBox_String(...) {
+        ...
+        $SIZE = p_box->i_size;
+        ...
+      }
+    message: "Potential buffer overflow due to missing bounds check on p_box->i_size before use in malloc/memcpy. See CVE-2014-9627."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-787"
+      vulnerability: "Out-of-bounds Write"
+      references:
+        - "https://github.com/videolan/vlc/commit/2e7c7091a61aa5d07e7997b393d821e91f593c39"
+        - "https://nvd.nist.gov/vuln/detail/CVE-2014-9627"

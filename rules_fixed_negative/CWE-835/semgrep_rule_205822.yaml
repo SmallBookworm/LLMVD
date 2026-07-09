@@ -1,0 +1,9 @@
+rules:
+  - id: mongodb-infinite-loop-pow
+    message: "Potential infinite loop in $pow expression due to unbounded repeated multiplication with large exponent."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      for (int i = 0; i < expLong; i++) {
+          result *= baseLong;
+      }

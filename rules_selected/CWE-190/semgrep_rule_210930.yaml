@@ -1,0 +1,30 @@
+rules:
+  - id: expat-integer-overflow-CVE-2016-9063
+    message: "Potential signed integer overflow when allocating buffer memory in Expat XML parser (CVE-2016-9063)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (buffer == NULL || ... > bufferLim - buffer) {
+                ...
+                temp = (buffer == NULL
+                        ? (char *)MALLOC(len * 2)
+                        : (char *)REALLOC(buffer, len * 2));
+                ...
+              }
+          - pattern: |
+              if (buffer == NULL || ... > bufferLim - buffer) {
+                ...
+                temp = (char *)MALLOC(len * 2);
+                ...
+              }
+          - pattern: |
+              if (buffer == NULL || ... > bufferLim - buffer) {
+                ...
+                temp = (char *)REALLOC(buffer, len * 2);
+                ...
+              }
+    metavariable-regex:
+      metavariable: len
+      regex: "len"

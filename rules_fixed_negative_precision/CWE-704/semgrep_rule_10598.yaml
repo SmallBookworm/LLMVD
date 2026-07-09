@@ -1,0 +1,14 @@
+rules:
+  - id: redis-xgroup-type-confusion
+    message: "Missing type check for stream object in xgroupCommand may lead to type confusion (CVE-2018-12453)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (o == NULL) return;
+      s = o->ptr;
+    pattern-not: |
+      if (o == NULL || checkType(c,o,OBJ_STREAM)) return;
+      s = o->ptr;
+    fix-regex:
+      regex: ''
+      replacement: ''

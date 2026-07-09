@@ -1,0 +1,19 @@
+rules:
+  - id: ffmpeg-vf_fps-double-free-cve-2013-7021
+    message: "Potential double free due to missing FIFO size check before use in filter_frame. See CVE-2013-7021."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (buf->pts == AV_NOPTS_VALUE) {
+                  return write_to_fifo(...);
+              }
+          - pattern: |
+              if (buf->pts == AV_NOPTS_VALUE || av_fifo_size(...) <= 0) {
+                  ...
+              }
+    pattern-not: |
+      if (buf->pts == AV_NOPTS_VALUE || av_fifo_size(...) <= 0) {
+          return write_to_fifo(...);
+      }

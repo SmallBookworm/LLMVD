@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2009-1046-console-selection-off-by-two
+    message: "Potential off-by-two memory corruption in console selection when UTF-8 is enabled. The allocated buffer size does not properly account for the inclusive loop range when multiplier > 1."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $multiplier = use_unicode ? 3 : 1;
+              ...
+              kmalloc((sel_end - sel_start) / 2 * $multiplier + 1, ...)
+          - pattern: |
+              $multiplier = use_unicode ? 3 : 1;
+              ...
+              kmalloc(($multiplier * (sel_end - sel_start)) / 2 + 1, ...)
+    fix: ""

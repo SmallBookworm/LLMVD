@@ -1,0 +1,10 @@
+rules:
+  - id: format-string-vulnerability-in-exo_job_info_message
+    message: "Possible format string vulnerability: file display name is passed directly to exo_job_info_message without format specifier."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: exo_job_info_message($JOB, g_file_info_get_display_name($INFO));
+    metadata:
+      cwe: "CWE-399"
+      cve: "CVE-2011-1588"

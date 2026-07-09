@@ -1,0 +1,7 @@
+rules:
+  - id: cve-2016-7030-ipa-kdb-password-policy-search-scope
+    message: "Password policy search is limited to realm subtree, which may prevent finding global policies and lead to account lockout denial of service (CVE-2016-7030)."
+    severity: HIGH
+    languages: [c]
+    pattern: |
+      ipadb_simple_search(..., ipactx->realm_base, LDAP_SCOPE_SUBTREE, ...)

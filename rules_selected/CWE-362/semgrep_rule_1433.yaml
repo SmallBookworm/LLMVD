@@ -1,0 +1,25 @@
+rules:
+  - id: rds_sendmsg_race_condition
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (daddr == 0 || rs->rs_bound_addr == 0) {
+                ...
+              }
+          - pattern: |
+              if (rs->rs_bound_addr == 0 || daddr == 0) {
+                ...
+              }
+    pattern-not-inside: |
+      lock_sock(...);
+      ...
+      if ($DADDR == 0 || rs->rs_bound_addr == 0) {
+        ...
+      }
+      release_sock(...);
+    message: "Race condition detected: accessing rs->rs_bound_addr without holding socket lock. This may lead to NULL pointer dereference (CVE-2015-7990)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-362"
+      confidence: HIGH

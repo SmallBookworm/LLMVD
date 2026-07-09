@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2017-9150-bpf-ptr-leak
+    message: "Potential pointer leak in BPF verifier log. Sensitive map addresses may be exposed to unprivileged users via print_bpf_insn."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          verbose("(%02x) r%d = 0x%x\n",
+            $CODE, $DST_REG, $IMM);
+      - pattern: |
+          verbose("(%02x) r%d = 0x%llx\n",
+            $CODE, $DST_REG, $IMM);
+    metavariable-pattern:
+      $IMM:
+        pattern-either:
+          - pattern: insn->imm
+          - pattern: ((u64)(insn + 1)->imm << 32) | (u32)insn->imm
+    focus-metavariable: $IMM

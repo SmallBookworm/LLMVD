@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2021-3712-openssl-asn1-string-not-null-terminated
+    message: "Potential read buffer overrun due to assumption that ASN1_STRING data is NUL-terminated. Use length-limited format specifier (e.g., %.*s) instead of %s."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: 'BIO_printf(..., "%s", $STR->data)'
+          - pattern: 'BIO_printf(..., "%s", ..., $STR->data, ...)'
+          - pattern: 'BIO_printf(..., $FMT, ..., $STR->data)'
+    metavariable-pattern:
+      $STR:
+        pattern-either:
+          - pattern: ASN1_STRING *
+          - pattern: ASN1_IA5STRING *
+          - pattern: ASN1_UTF8STRING *
+          - pattern: ASN1_PRINTABLESTRING *
+          - pattern: ASN1_T61STRING *
+          - pattern: ASN1_VISIBLESTRING *
+          - pattern: ASN1_UNIVERSALSTRING *
+          - pattern: ASN1_BMPSTRING *
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2021-3712"

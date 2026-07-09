@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2016-10050-buffer-overflow
+    message: "Heap-based buffer overflow vulnerability in RLE image parsing. Missing offset underflow check before buffer access."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              offset = ...;
+              ...
+              if (offset + ((size_t) operand * number_planes) > pixel_info_length)
+                ...
+          - pattern: |
+              if (offset + ((size_t) operand * number_planes) > pixel_info_length)
+                ...
+    metavariable-pattern:
+      metavariable: offset
+      pattern: (ssize_t)...
+    fix-regex:
+      regex: ""
+      replacement: ""

@@ -1,0 +1,18 @@
+rules:
+  - id: division-by-zero-muraster
+    message: Division by zero possible when min_band_mem is zero. Ensure min_band_mem > 0 before division.
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      $MIN_BAND_MEM = ...;
+      ...
+      (int)($MAX_BAND_MEMORY / $MIN_BAND_MEM)
+    pattern-not: |
+      if ($MIN_BAND_MEM > 0)
+        ...
+        (int)($MAX_BAND_MEMORY / $MIN_BAND_MEM)
+    fixes:
+      - regex: \(\s*int\s*\)\(\s*\$MAX_BAND_MEMORY\s*\/\s*\$MIN_BAND_MEM\s*\)
+        replacement: ($MIN_BAND_MEM > 0 ? (int)($MAX_BAND_MEMORY / $MIN_BAND_MEM) : 0)
+    fix-regex:
+      enabled: false

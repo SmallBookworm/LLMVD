@@ -1,0 +1,17 @@
+rules:
+  - id: clamav-recursion-level-crash
+    patterns:
+      - pattern: |
+          cli_magic_scandesc(..., cctx);
+      - pattern-not: |
+          cctx->recursion++;
+          cli_magic_scandesc(..., cctx);
+          cctx->recursion--;
+    message: "Missing recursion level tracking before cli_magic_scandesc call may lead to denial of service (CVE-2011-3627)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-189"
+      references:
+        - "http://git.clamav.net/gitweb?p=clamav-devel.git;a=commit;h=3d664817f6ef833a17414a4ecea42004c35cc42f"
+        - "https://nvd.nist.gov/vuln/detail/CVE-2011-3627"

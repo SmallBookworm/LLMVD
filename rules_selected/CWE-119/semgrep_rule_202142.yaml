@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2014-8962-buffer-overflow
+    message: "Potential stack-based buffer overflow due to missing bounds check on 'id' before accessing ID3V2_TAG_[id]."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (x == ID3V2_TAG_[id]) {
+            ...
+          }
+      - pattern: |
+          if (x == ID3V2_TAG_[id])
+            ...
+    metavariable-pattern:
+      metavariable: id
+      pattern-not: |
+        if (id >= 3)
+          return false;
+        if (x == ID3V2_TAG_[id])
+          ...

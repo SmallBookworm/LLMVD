@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2008-3272-missing-device-validation
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (dp->synths[dev].is_midi) { ... }
+          - pattern: |
+              if ((rec = get_synthdev(dp, dev)) == NULL) ... 
+    pattern-not: |
+      if (dev < 0 || dev >= dp->max_synthdev)
+        return -ENXIO;
+    message: "Missing validation of device number 'dev' against 'dp->max_synthdev' may lead to information disclosure (CVE-2008-3272)."
+    severity: WARNING
+    languages: [c]

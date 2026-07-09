@@ -1,0 +1,11 @@
+rules:
+  - id: missing_skcipher_setkey_check
+    patterns:
+      - pattern: |
+          skcipher->setkey = alg->setkey;
+    message: "Missing API setkey checks for key size and alignment; may lead to NULL pointer dereference (CWE-476)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: ["CWE-476"]
+      cve: "CVE-2017-9211"

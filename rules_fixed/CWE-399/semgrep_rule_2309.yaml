@@ -1,0 +1,15 @@
+rules:
+  - id: cuse_memory_leak_cwe399
+    message: "Missing fuse_conn_put() call may cause a memory leak in cuse_channel_release (CWE-399)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      rc = fuse_dev_release($...);
+    pattern-not: |
+      fuse_conn_put($...);
+      rc = fuse_dev_release($...);
+    metavariable-pattern:
+      $...:
+        pattern-either:
+          - pattern: "&$CC->fc"
+          - pattern: "$CC->fc"

@@ -1,0 +1,14 @@
+rules:
+  - id: adis_memory_leak_cve_2019_19061
+    message: Memory leak in adis_update_scan_mode_burst. If adis->buffer allocation fails, adis->xfer is not freed.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $XFER = kcalloc(...);
+              if (!$XFER)
+                  return -ENOMEM;
+              $BUFFER = kzalloc(...);
+              if (!$BUFFER)
+                  return -ENOMEM;

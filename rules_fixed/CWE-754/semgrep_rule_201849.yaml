@@ -1,0 +1,16 @@
+rules:
+  - id: cwe-754-sqlite-integrity-check-not-null
+    message: "PRAGMA integrity_check may mishandle NOT NULL constraints on generated columns. Upgrade to SQLite 3.31.0 or later."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          sqlite3ExprCodeGetColumnOfTable($VDBE, $TABLE, $CUR, $COL, $REG);
+          sqlite3VdbeChangeP5($VDBE, OPFLAG_TYPEOFARG);
+          sqlite3VdbeAddOp1($VDBE, OP_NotNull, $REG, $LABEL);
+      - pattern: |
+          sqlite3ExprCodeGetColumnOfTable($VDBE, $TABLE, $CUR, $COL, $REG);
+          sqlite3VdbeAddOp1($VDBE, OP_NotNull, $REG, $LABEL);
+    fix-regex:
+      regex: ''
+      replacement: ''

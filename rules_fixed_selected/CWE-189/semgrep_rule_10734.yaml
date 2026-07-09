@@ -1,0 +1,12 @@
+rules:
+  - id: poppler-integer-overflow-gmalloc
+    message: "Use of gmalloc with multiplication may lead to integer overflow. Use gmallocn instead to safely allocate arrays."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: gmalloc($X * $Y)
+          - pattern: gmalloc($X * $Y * $Z)
+    metadata:
+      cwe: "CWE-189"
+      cve: "CVE-2009-3605"

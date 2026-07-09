@@ -1,0 +1,14 @@
+rules:
+  - id: sssd-nonposix-group-membership-bypass
+    message: "Non-POSIX groups may be excluded during initgr, leading to access bypass (CVE-2014-0249)"
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          state->base_filter = talloc_asprintf_append(state->base_filter,
+                                          "(&(%s=*)(!(%s=0))))",
+                                          ...,
+                                          ...);
+    metadata:
+      cwe: "CWE-264"
+      cve: "CVE-2014-0249"

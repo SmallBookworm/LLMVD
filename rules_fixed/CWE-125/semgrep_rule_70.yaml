@@ -1,0 +1,12 @@
+rules:
+  - id: cwe-125-mupdf-fz_chartorune-buffer-overread
+    message: "Missing check for str->pos == -1 before accessing str->utf8[str->pos] may lead to heap-based buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (str->utf8 == NULL)
+            return;
+    pattern-not: |
+      if (str->utf8 == NULL || str->pos == -1)
+        return;

@@ -1,0 +1,11 @@
+rules:
+  - id: cwe-20-see_mask_flag_no_ui
+    patterns:
+      - pattern: |
+          $INFO.fMask = ... | SEE_MASK_FLAG_NO_UI;
+    message: "Use of SEE_MASK_FLAG_NO_UI may bypass OS malware checks. This flag should be removed to allow proper security UI."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2018-6115"

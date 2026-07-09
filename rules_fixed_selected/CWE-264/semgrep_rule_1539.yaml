@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2015-1593-stack-aslr-bypass
+    message: "Insufficient entropy in stack randomization due to use of 'unsigned int' for random_variable, leading to integer overflow and reduced ASLR effectiveness (CVE-2015-1593)."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              unsigned int random_variable = ...;
+              ...
+              random_variable = get_random_int() & STACK_RND_MASK;
+              random_variable <<= PAGE_SHIFT;
+          - pattern: |
+              unsigned int random_variable = 0;
+              ...
+              random_variable = get_random_int() & STACK_RND_MASK;
+              random_variable <<= PAGE_SHIFT;
+    metadata:
+      cwe: ["CWE-264"]
+      cve: "CVE-2015-1593"

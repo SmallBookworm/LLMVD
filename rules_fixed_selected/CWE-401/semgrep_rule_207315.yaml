@@ -1,0 +1,17 @@
+rules:
+  - id: ext4_expand_extra_isize_vulnerability
+    message: "Potential use-after-free due to insufficient validation of s_want_extra_isize against inode size. This may lead to memory corruption (CWE-401)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (EXT4_GOOD_OLD_INODE_SIZE + sbi->s_want_extra_isize > sbi->s_inode_size) {
+            ...
+          }
+      - pattern: |
+          if (sbi->s_want_extra_isize == 0) {
+            ...
+          }
+    metavariable-regex:
+      metavariable: sbi
+      regex: "sbi"

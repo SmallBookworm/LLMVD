@@ -1,0 +1,41 @@
+rules:
+  - id: cwe-787-firebird-buffer-check-missing
+    message: Missing buffer size and length validation before calling isc_vax_integer(), which may lead to out-of-bounds read or memory corruption (CWE-787).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (result[0] == isc_info_sql_records) {
+              ...
+              unsigned i = 3, result_size = isc_vax_integer(&result[1],2);
+              while (result[i] != isc_info_end && i < result_size) {
+                  short len = (short)isc_vax_integer(&result[i+1],2);
+                  ...
+              }
+          }
+      - pattern: |
+          if (result[0] == isc_info_sql_records) {
+              ...
+              unsigned i = 3, result_size = isc_vax_integer(&result[1],2);
+              while (result[i] != isc_info_end && i < result_size) {
+                  short len = (short)isc_vax_integer(&result[i+1], 2);
+                  ...
+              }
+          }
+    pattern-not-inside: |
+      if (result[0] == isc_info_sql_records) {
+          ...
+          unsigned i = 3, result_size = isc_vax_integer(&result[1],2);
+          if (result_size > sizeof(result)) {
+              ...
+              goto ...;
+          }
+          while (result[i] != isc_info_end && i < result_size) {
+              short len = (short)isc_vax_integer(&result[i+1],2);
+              if (len != 1 && len != 2 && len != 4) {
+                  ...
+                  goto ...;
+              }
+              ...
+          }
+      }

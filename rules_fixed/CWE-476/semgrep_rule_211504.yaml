@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2018-16428-null-deref-gmarkup
+    message: |
+      Potential NULL pointer dereference in g_markup_parse_context_end_parse when handling
+      closing tags without a corresponding opening tag. Missing null check on context->tag_stack
+      before calling current_element(context).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          case STATE_AFTER_CLOSE_TAG_SLASH:
+          case STATE_INSIDE_CLOSE_TAG_NAME:
+          case STATE_AFTER_CLOSE_TAG_NAME:
+            set_error (..., current_element (context));
+      - pattern: |
+          case STATE_AFTER_CLOSE_TAG_SLASH:
+          case STATE_INSIDE_CLOSE_TAG_NAME:
+          case STATE_AFTER_CLOSE_TAG_NAME:
+            ... set_error (..., current_element (context));
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2018-16428"

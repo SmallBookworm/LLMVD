@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2021-38207-ll-temac-tx-bd-overflow
+    message: "Buffer overflow vulnerability in ll_temac TX path due to insufficient BD space check (CVE-2021-38207). The second check should validate 'num_frag + 1' buffers, not just 'num_frag'."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (temac_check_tx_bd_space(..., $num_frag)) {
+            ...
+            if (temac_check_tx_bd_space(..., $num_frag))
+              ...
+          }
+    metavariable-pattern:
+      $num_frag: 
+        pattern: num_frag

@@ -1,0 +1,37 @@
+rules:
+  - id: cwe-125-advancecomp-png-chunk-size-check
+    message: Missing chunk size validation before accessing data buffer may lead to out-of-bounds read (CWE-125).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          case ADV_MNG_CN_MHDR :
+            ...
+            be_uint32_read(data+24);
+      - pattern: |
+          case ADV_MNG_CN_DHDR :
+            be_uint16_read(data+0);
+      - pattern: |
+          case ADV_MNG_CN_DEFI :
+            be_uint16_read(data+0);
+      - pattern: |
+          case ADV_MNG_CN_MOVE :
+            be_uint16_read(data+0); be_uint16_read(data+2);
+            be_uint32_read(data + 5); be_uint32_read(data + 9);
+      - pattern: |
+          case ADV_MNG_CN_PPLT :
+            switch (data[0]) { ... }
+      - pattern: |
+          case ADV_PNG_CN_IHDR :
+            be_uint32_read(data); be_uint32_read(data + 4);
+            (unsigned)data[8]; (unsigned)data[9]; (unsigned)data[10]; (unsigned)data[11]; (unsigned)data[12];
+    metavariable-regex:
+      metavariable: $...
+      regex: ".*"
+    pattern-not-inside: |
+      case $TYPE :
+        if (size < $MIN_SIZE) {
+          ...
+          break;
+        }
+        ...

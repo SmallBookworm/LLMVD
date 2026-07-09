@@ -1,0 +1,20 @@
+rules:
+  - id: cwe-352-origin-validation
+    message: Insufficient Origin header validation using substring match may allow CSRF bypass.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (...; ...; ...) {
+                if (strstr($ORIGIN, $ALLOWED_ORIGIN)) {...}
+              }
+          - pattern: |
+              for (...; ...; ...)
+                if (strstr($ORIGIN, $ALLOWED_ORIGIN)) {...}
+    metavariable-pattern:
+      metavariable: $ORIGIN
+      pattern: origin
+    metavariable-pattern:
+      metavariable: $ALLOWED_ORIGIN
+      pattern: origins[...]

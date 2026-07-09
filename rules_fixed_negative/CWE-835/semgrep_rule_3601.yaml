@@ -1,0 +1,8 @@
+rules:
+  - id: xkbcommon-infinite-loop-eof-keysym
+    message: "Infinite loop possible when parsing unterminated keysym literal at EOF. Missing 'eof(s)' check in loop condition."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      while (peek(s) != '>' && !eol(s))
+        buf_append(s, next(s));

@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2015-0241-buffer-overread
+    message: "Potential buffer over-read in to_char() due to unchecked pointer increment. This may lead to denial of service or arbitrary code execution (CVE-2015-0241)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              ++Np->number_p;
+          - pattern: |
+              Np->number_p++;
+    metavariable-pattern:
+      metavariable: Np
+      pattern: NUMProc *
+    focus-metavariable: Np

@@ -1,0 +1,14 @@
+rules:
+  - id: cwe-787-integer-overflow-before-malloc
+    message: Integer overflow in len before malloc may lead to buffer overflow (CWE-787).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          uint32_t len = GetDWBE(...);
+          ...
+          malloc(len + sizeof(...));
+      - pattern: |
+          uint32_t len = GetDWBE(...);
+          ...
+          $PTR = malloc(len + $SIZE);

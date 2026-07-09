@@ -1,0 +1,15 @@
+rules:
+  - id: integer-overflow-checkmov
+    message: "Integer overflow vulnerability in CheckMov due to insufficient atomsize validation. May lead to buffer overread or denial of service."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (atomsize <= 0)
+                break;
+          - pattern: |
+              int atomsize = ...;
+    metadata:
+      cwe: "CWE-189"
+      cve: "CVE-2014-7908"

@@ -1,0 +1,13 @@
+rules:
+  - id: ntpq-saveconfig-unsafe-open
+    message: "saveconfig uses open() without O_EXCL, allowing potential file overwrite or unsafe character handling."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          open(..., O_CREAT | O_TRUNC | O_WRONLY, ...)
+      - pattern: |
+          open(..., (O_CREAT | O_TRUNC | O_WRONLY), ...)
+    metadata:
+      cwe: "CWE-254"
+      cve: "CVE-2015-7976"

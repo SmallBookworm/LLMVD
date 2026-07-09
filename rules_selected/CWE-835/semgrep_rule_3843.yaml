@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2017-18208-madvise-willneed-dax-infinite-loop
+    message: "Missing assignment to *prev before returning in madvise_willneed for DAX mappings may cause infinite loop (CVE-2017-18208)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (IS_DAX(...)) {
+              return 0;
+          }
+      - pattern: |
+          if (IS_DAX(...))
+              return 0;
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern: |
+        static long madvise_willneed(...)
+    focus-metavariable: $FUNC

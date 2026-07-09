@@ -1,0 +1,49 @@
+rules:
+  - id: cwe-704-type-confusion-collect-values-entries
+    message: "Potential type confusion leading to remote code execution in CollectValuesOrEntriesImpl due to missing object map integrity check during iteration."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: |
+                  for ($COND; $UPDATE; $INC) {
+                    $STMTS1
+                    if ($OBJ->kind() == kData) {
+                      $DATA = $OBJ->GetImpl($ARGS1);
+                    } else {
+                      $STMTS2
+                      Object::GetProperty($ARGS2);
+                    }
+                    $STMTS3
+                    $VALUES_OR_ENTRIES->set($KEY, $VALUE);
+                    $STMTS4
+                  }
+              - metavariable-comparison:
+                  metavariable: $OBJ
+                  comparison: $OBJ == $VALUES_OR_ENTRIES
+          - patterns:
+              - pattern: |
+                  for ($COND; $UPDATE; $INC) {
+                    $STMTS1
+                    uint32_t entry = $OBJ1->GetEntryForIndexImpl($IDX);
+                    $STMTS2
+                    PropertyDetails details = $OBJ2->GetDetailsImpl(entry);
+                    $STMTS3
+                    if (details.kind() == kData) {
+                      $DATA = $OBJ3->GetImpl($ARGS1);
+                    } else {
+                      $STMTS4
+                      Object::GetProperty($ARGS2);
+                    }
+                    $STMTS5
+                    $VALUES_OR_ENTRIES->set($KEY, $VALUE);
+                    $STMTS6
+                  }
+              - metavariable-comparison:
+                  metavariable: $OBJ1
+                  comparison: $OBJ1 == $VALUES_OR_ENTRIES
+    metavariable-pattern:
+      metavariable: $object
+      pattern: Handle<JSObject>
+    focus-metavariable: $object

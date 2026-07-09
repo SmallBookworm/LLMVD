@@ -1,0 +1,11 @@
+rules:
+  - id: cifs_missing_is_path_accessible_check
+    message: "Missing is_path_accessible check when prepathlen is zero may lead to denial of service via DFS referral at root share (CVE-2011-3363)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (!rc && cifs_sb->prepathlen && tcon) {
+        ...
+        rc = is_path_accessible(...);
+        ...
+      }

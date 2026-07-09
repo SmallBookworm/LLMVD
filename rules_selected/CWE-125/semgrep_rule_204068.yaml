@@ -1,0 +1,31 @@
+rules:
+  - id: libxml2-heap-buffer-overread-CVE-2016-1833
+    message: "Detected potential heap-based buffer over-read in xmlNextChar due to missing input validation before accessing ctxt->input->cur. This may lead to denial of service (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (ctxt->charset == XML_CHAR_ENCODING_UTF8) {
+            ...
+            const unsigned char *cur;
+            ...
+            cur = ctxt->input->cur;
+            ...
+            if (cur[1] == 0) { ... }
+            ...
+            if (cur[2] == 0) { ... }
+            ...
+            if (cur[3] == 0) { ... }
+            ...
+          }
+      - pattern: |
+          if (ctxt->charset != XML_CHAR_ENCODING_UTF8) {
+            ...
+            ctxt->input->cur++;
+            ...
+            if (*ctxt->input->cur == 0) { ... }
+            ...
+          }
+    metavariable-pattern:
+      metavariable: ctxt
+      pattern: xmlParserCtxtPtr

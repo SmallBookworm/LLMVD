@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2019-19242-null-ptr-deref
+    message: "Potential NULL pointer dereference when accessing pExpr->y.pTab without checking for NULL. This can occur in generated columns that evaluate to a constant in an index used in a join."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              sqlite3TableColumnAffinity(pExpr->y.pTab, ...)
+          - pattern: |
+              pExpr->y.pTab->...
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2019-19242"

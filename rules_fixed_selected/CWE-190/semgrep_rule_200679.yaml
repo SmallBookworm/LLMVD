@@ -1,0 +1,16 @@
+rules:
+  - id: cwe-190-integer-overflow-decode-digit
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $T decode_digit($T2 cp)
+              {
+                return cp - 48 < 10 ? cp - 22 : cp - 65 < 26 ? cp - 65 :
+                       cp - 97 < 26 ? cp - 97 : base;
+              }
+    message: "Potential integer overflow in decode_digit function due to unchecked arithmetic on unsigned input. Consider using signed input and explicit casting to avoid undefined behavior."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-190"
+      cve: "CVE-2017-14062"

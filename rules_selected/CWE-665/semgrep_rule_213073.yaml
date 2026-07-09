@@ -1,0 +1,10 @@
+rules:
+  - id: imagemagick-uninitialized-rectangleinfo
+    message: "Uninitialized RectangleInfo structure may lead to use of uninitialized memory (CWE-665)."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      RectangleInfo
+        $GEOMETRY;
+      ...
+      ParseAbsoluteGeometry(..., &$GEOMETRY);

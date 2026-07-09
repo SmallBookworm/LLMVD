@@ -1,0 +1,20 @@
+rules:
+  - id: genl_register_family_memory_leak
+    message: "Memory leak in genl_register_family(): 'family->attrbuf' is not freed when idr_alloc() fails."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (family->id < 0) {
+              ...
+              goto errout_locked;
+          }
+      - pattern: |
+          if (family->id < 0) {
+              ...
+              goto errout_remove;
+          }
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: genl_register_family
+    focus-metavariable: $FUNC

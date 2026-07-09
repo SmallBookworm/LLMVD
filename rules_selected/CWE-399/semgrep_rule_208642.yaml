@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2014-9620-elf-note-loop
+    message: "Potential denial of service due to missing loop termination condition in ELF note parsing. This may allow an attacker to cause excessive resource consumption via a large number of notes."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (*flags & FLAGS_DID_NOTE)
+                  goto core;
+          - pattern: |
+              if (*flags & FLAGS_DID_NOTE)
+                  ...
+                  goto core;
+    metadata:
+      cwe: ["CWE-399"]
+      cve: "CVE-2014-9620"
+      references:
+        - "https://github.com/file/file/commit/956a45ab1c54b11304b367056f41905e72a02380#diff-bc5c24ef9f39a5f4963ca28ecbc645b3L423"

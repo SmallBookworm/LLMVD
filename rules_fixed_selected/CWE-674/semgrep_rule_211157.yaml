@@ -1,0 +1,7 @@
+rules:
+  - id: imagemagick-svg-xml-parse-huge
+    message: "Use of XML_PARSE_HUGE without proper restriction may lead to denial of service (CWE-674)."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      xmlCtxtUseOptions($CTX, XML_PARSE_HUGE)

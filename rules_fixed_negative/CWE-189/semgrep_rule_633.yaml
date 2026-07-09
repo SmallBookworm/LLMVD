@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2012-2375-nfs4-acl-buffer-overread
+    message: "Use of incorrect length 'res.acl_len' instead of 'acl_len' in _copy_from_pages may lead to buffer overread (CVE-2012-2375, CWE-189)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: '_copy_from_pages(..., res.acl_len);'
+    metavariable-pattern:
+      metavariable: '$X'
+      pattern: 'res.acl_len'
+    fix: ""

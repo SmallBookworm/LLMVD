@@ -1,0 +1,33 @@
+rules:
+  - id: missing-host-validation-devtools
+    message: Missing host validation in DevTools HTTP handler may allow arbitrary code execution via crafted HTML page.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          if (!RequestIsSafeToServe(...)) {
+            ...
+            return;
+          }
+      - pattern-either:
+          - pattern: |
+              void $FUNC(int $CONN_ID, const net::HttpServerRequestInfo& $INFO) {
+                ...
+                if (base::StartsWith($INFO.path, "/json", ...)) { ... }
+                ...
+              }
+          - pattern: |
+              void $FUNC(int $CONN_ID, const net::HttpServerRequestInfo& $INFO) {
+                ...
+                if ($INFO.path.empty() || $INFO.path == "/") { ... }
+                ...
+              }
+          - pattern: |
+              void $FUNC(int $CONN_ID, const net::HttpServerRequestInfo& $INFO) {
+                ...
+                if (!base::StartsWith($INFO.path, "/devtools/", ...)) { ... }
+                ...
+              }
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: "OnHttpRequest"

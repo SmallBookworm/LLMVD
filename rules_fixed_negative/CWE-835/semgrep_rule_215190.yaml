@@ -1,0 +1,20 @@
+rules:
+  - id: imagemagick-bmp-infinite-loop-cve-2018-20467
+    message: "Potential infinite loop in BMP image parsing due to missing validation of ba_offset before seeking. This may lead to denial of service (CWE-835)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (bmp_info.ba_offset != 0)
+            {
+              offset=SeekBlob(image,(MagickOffsetType) bmp_info.ba_offset,SEEK_SET);
+              ...
+            }
+      - pattern: |
+          if (bmp_info.ba_offset != 0)
+            offset=SeekBlob(image,(MagickOffsetType) bmp_info.ba_offset,SEEK_SET);
+    metadata:
+      cwe: "CWE-835"
+      cve: "CVE-2018-20467"
+      references:
+        - https://github.com/ImageMagick/ImageMagick6/commit/4dd53a3f790147aaf18b2dd4d15f2a19f9432d3f

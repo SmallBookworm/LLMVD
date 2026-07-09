@@ -1,0 +1,27 @@
+rules:
+  - id: bluez-double-free-disconnect-cb
+    message: "Double free vulnerability in disconnect_cb due to missing in_disc guard during queue cleanup (CVE-2020-27153, CWE-415)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          queue_remove_all($ATT->req_queue, NULL, NULL, disc_att_send_op);
+          ...
+          queue_remove_all($ATT->ind_queue, NULL, NULL, disc_att_send_op);
+          ...
+          queue_remove_all($ATT->write_queue, NULL, NULL, disc_att_send_op);
+          ...
+          bt_att_chan_free($CHAN);
+      - pattern: |
+          bt_att_chan_free($CHAN);
+          ...
+          queue_remove_all($ATT->req_queue, NULL, NULL, disc_att_send_op);
+          ...
+          queue_remove_all($ATT->ind_queue, NULL, NULL, disc_att_send_op);
+          ...
+          queue_remove_all($ATT->write_queue, NULL, NULL, disc_att_send_op);
+    metavariable-regex:
+      - metavariable: $ATT
+        regex: "att"
+      - metavariable: $CHAN
+        regex: "chan"

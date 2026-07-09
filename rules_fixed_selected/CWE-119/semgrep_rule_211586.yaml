@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2014-2013-buffer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              n = count_commas(...);
+              ...
+              while (i < n)
+              {
+                samples[i++] = ...;
+              }
+          - pattern: |
+              n = count_commas(...) + 1;
+              ...
+              while (i < n)
+              {
+                samples[i++] = ...;
+              }
+    message: "Potential stack-based buffer overflow due to missing bound check on 'n' against FZ_MAX_COLORS before writing to 'samples' array."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2014-2013"

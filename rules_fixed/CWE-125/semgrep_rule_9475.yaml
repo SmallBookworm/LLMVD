@@ -1,0 +1,25 @@
+rules:
+  - id: cve-2017-6307-oob-write
+    message: |
+      Out-of-bounds write vulnerability detected. Missing bounds check before accessing buffer.
+      This could lead to memory corruption. Ensure proper validation with assert() or similar checks.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (...; ...; ...) {
+                ...
+                $DATA = CHECKED_XMALLOC(..., $LEN);
+                for (...; ...; ...) $DATA[...] = ($BUF + $IDX)[...];
+                ...
+              }
+          - pattern: |
+              $DATA = CHECKED_XMALLOC(..., $LEN);
+              memmove($DATA, $BUF + $IDX, $LEN);
+    pattern-not-inside: |
+      assert(...);
+      ...
+    metadata:
+      fix-regex:
+        enabled: false

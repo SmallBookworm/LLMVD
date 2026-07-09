@@ -1,0 +1,15 @@
+rules:
+  - id: cwe-125-xmlrpc-out-of-bounds-read
+    message: "Potential out-of-bounds read in xml_elem_parse_buf due to unsafe access of in_buf based on byte_idx without validating bounds. This may lead to heap buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (byte_idx >= 0) {
+              snprintf(..., in_buf + (byte_idx > 10 ? byte_idx - 10 : byte_idx));
+          }
+      - pattern: |
+          snprintf(..., "\n\tdata beginning %ld before byte index: %s\n", ..., in_buf + (...));
+    metavariable-pattern:
+      metavariable: in_buf
+      pattern: const char*

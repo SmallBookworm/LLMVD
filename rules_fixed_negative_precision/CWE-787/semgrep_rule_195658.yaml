@@ -1,0 +1,20 @@
+rules:
+  - id: oniguruma_invalid_code_point_check_missing
+    message: Missing check for code point values exceeding 0xff in single-byte character class handling, leading to potential heap out-of-bounds write (CWE-787).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (*type == CCV_SB) {
+            BITSET_SET_BIT(..., (int )(*vs));
+          }
+      - pattern: |
+          if (*type == CCV_SB) {
+            ...;
+            BITSET_SET_BIT(..., (int )(*vs));
+          }
+    metavariable-pattern:
+      metavariable: $BODY
+      pattern-not: |
+        if (*vs > 0xff)
+          return ...;

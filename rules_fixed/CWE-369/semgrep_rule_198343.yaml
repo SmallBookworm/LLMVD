@@ -1,0 +1,19 @@
+rules:
+  - id: tensorflow-savev2-validation-bypass
+    message: "Missing check for context status after ValidateInputs may lead to null pointer dereference (CVE-2021-37648)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          ValidateInputs(..., $context, ...);
+          ...
+          const int $fixedInputs = ...;
+      - pattern: |
+          ValidateInputs(..., $context, ...);
+          ...
+          const int $numTensors = ...;
+    metavariable-regex:
+      - metavariable: $fixedInputs
+        regex: "kFixedInputs"
+      - metavariable: $numTensors
+        regex: "num_tensors"

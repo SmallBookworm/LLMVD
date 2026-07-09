@@ -1,0 +1,18 @@
+rules:
+  - id: imagemagick-cve-2017-12806
+    message: "Potential memory exhaustion vulnerability in format8BIM due to unchecked allocation size from untrusted input (CVE-2017-12806)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $COUNT = ReadBlobMSBSignedLong($IFILE);
+              ...
+              AcquireQuantumMemory((size_t) $COUNT, sizeof(*$STR));
+          - pattern: |
+              $COUNT = (ssize_t) ReadBlobMSBSignedLong($IFILE);
+              ...
+              AcquireQuantumMemory((size_t) $COUNT, sizeof(*$STR));
+    metadata:
+      cwe: "CWE-400"
+      cve: "CVE-2017-12806"

@@ -1,0 +1,7 @@
+rules:
+  - id: android-sdcard-off-by-one
+    message: "Off-by-one buffer overflow vulnerability in get_node_path_locked due to incorrect bufsize calculation (CVE-2016-2494)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      get_node_path_locked(..., buf, bufsize - namelen - 2)

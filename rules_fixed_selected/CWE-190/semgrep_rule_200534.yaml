@@ -1,0 +1,17 @@
+rules:
+  - id: gdimagecreate-integer-overflow
+    message: "Potential integer overflow in gdImageCreate due to missing overflow check on 'sx' before allocation. This may lead to heap-based buffer overflow (CWE-190)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (overflow2(sizeof (unsigned char *), sy)) {
+            gdFree(...);
+            return NULL;
+          }
+      - pattern: |
+          if (overflow2(sizeof (unsigned char *), sy)) {
+            return NULL;
+          }
+          ...
+          im->pixels[i] = (unsigned char *) gdCalloc(sx, sizeof (unsigned char));

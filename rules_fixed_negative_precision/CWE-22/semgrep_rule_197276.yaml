@@ -1,0 +1,14 @@
+rules:
+  - id: uftpd-directory-traversal-cve-2020-5221
+    message: "Potential directory traversal vulnerability due to incorrect path validation. The check uses 'dir' instead of 'rpath', which may allow escaping the intended root directory."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          if (!chrooted && strncmp(dir, home, strlen(home))) {
+              ...
+              return NULL;
+          }
+    metadata:
+      cwe: "CWE-22"
+      cve: "CVE-2020-5221"

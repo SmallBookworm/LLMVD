@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2016-7170-vmsvga-cursor-oob-write
+    message: "Potential out-of-bounds write in vmsvga DEFINE_CURSOR command due to incorrect array size check. The code compares computed sizes against 'sizeof cursor.mask' and 'sizeof cursor.image' instead of the number of elements, which may lead to buffer overflow (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (... ||
+              SVGA_BITMAP_SIZE($X, $Y) > sizeof $CURSOR.mask ||
+              SVGA_PIXMAP_SIZE($X, $Y, $BPP) > sizeof $CURSOR.image) {
+            ...
+          }
+      - pattern: |
+          if (... ||
+              SVGA_BITMAP_SIZE($X, $Y) > sizeof($CURSOR.mask) ||
+              SVGA_PIXMAP_SIZE($X, $Y, $BPP) > sizeof($CURSOR.image)) {
+            ...
+          }

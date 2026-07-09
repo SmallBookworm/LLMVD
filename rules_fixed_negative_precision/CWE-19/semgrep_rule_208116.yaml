@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2015-4147-soap-type-confusion
+    message: "Potential type confusion vulnerability in SoapClient::__call due to missing type check on __default_headers (CVE-2015-4147)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (zend_hash_find(..., "enc_namens", ..., (void **)&znamens) == SUCCESS &&
+              Z_TYPE_PP(zname) == IS_STRING) {
+            ...
+          }
+    metadata:
+      cwe: ["CWE-19"]
+      cve: "CVE-2015-4147"

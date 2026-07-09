@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2016-2339-fiddle-heap-overflow
+    message: "Potential heap overflow in Fiddle::Function.new due to unsafe use of RARRAY_LEN(args) after allocation. Arguments should be validated and array length fixed before allocation."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: arg_types = xcalloc(RARRAY_LEN(args) + 1, sizeof(ffi_type *));
+              - pattern: for ($I = 0; $I < RARRAY_LEN(args); $I++)
+          - pattern: arg_types = xcalloc(RARRAY_LEN(args) + 1, sizeof(ffi_type *));
+            after-pattern: arg_types[RARRAY_LEN(args)] = NULL;
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2016-2339"

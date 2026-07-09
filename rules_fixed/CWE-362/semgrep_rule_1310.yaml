@@ -1,0 +1,30 @@
+rules:
+  - id: cwe-362-mac80211-ps-race-condition
+    message: "Race condition in mac80211 power-save buffering due to missing synchronization lock around ps_tx_buf access. This may lead to use-after-free or NULL pointer dereference (CVE-2014-2706)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (unlikely((test_sta_flag($STA, WLAN_STA_PS_STA) ||
+                        test_sta_flag($STA, WLAN_STA_PS_DRIVER)) &&
+                       !($INFO->flags & IEEE80211_TX_CTL_NO_PS_BUFFER))) {
+            ...
+            skb_queue_tail(&$STA->ps_tx_buf[$AC], $SKB);
+            ...
+          }
+      - pattern: |
+          if (unlikely((test_sta_flag($STA, WLAN_STA_PS_STA) ||
+                        test_sta_flag($STA, WLAN_STA_PS_DRIVER)) &&
+                       !($INFO->flags & IEEE80211_TX_CTL_NO_PS_BUFFER))) {
+            ...
+            if (skb_queue_len(&$STA->ps_tx_buf[$AC]) >= ...) {
+              ...
+            } else {
+              ...
+            }
+            ...
+            skb_queue_tail(&$STA->ps_tx_buf[$AC], $SKB);
+            ...
+          }
+    metavariable-pattern:
+      $STA: "struct sta_info *"

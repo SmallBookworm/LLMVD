@@ -1,0 +1,43 @@
+rules:
+  - id: vmxnet3-use-after-free
+    patterns:
+      - pattern-either:
+          - pattern: |
+              vmxnet3_io_bar0_write(..., void *opaque, ...)
+              {
+                  VMXNET3State *s = opaque;
+                  ...
+                  if (VMW_IS_MULTIREG_ADDR(...)) { ... }
+                  ...
+              }
+          - pattern: |
+              vmxnet3_io_bar0_write(..., void *opaque, ...)
+              {
+                  VMXNET3State *s = opaque;
+                  ...
+                  VMW_CBPRN(...);
+                  ...
+              }
+          - pattern: |
+              vmxnet3_io_bar0_write(..., void *opaque, ...)
+              {
+                  VMXNET3State *s = opaque;
+                  ...
+                  vmxnet3_on_interrupt_mask_changed(s, ...);
+                  ...
+              }
+    pattern-not: |
+        vmxnet3_io_bar0_write(..., void *opaque, ...)
+        {
+            VMXNET3State *s = opaque;
+            if (!s->device_active) {
+                return;
+            }
+            ...
+        }
+    message: "Use-after-free vulnerability in vmxnet3_io_bar0_write: missing check for 'device_active' before accessing device state."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2016-6833"

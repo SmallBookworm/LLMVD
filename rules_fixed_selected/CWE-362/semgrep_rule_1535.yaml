@@ -1,0 +1,19 @@
+rules:
+  - id: openssl-cve-2015-1791-race-condition
+    message: "Detected potential race condition in ssl3_get_new_session_ticket leading to double free (CVE-2015-1791, CWE-362). Missing session duplication and replacement logic when reusing a session ticket in multi-threaded clients."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          OPENSSL_free($SESSION->tlsext_tick);
+          $SESSION->tlsext_ticklen = 0;
+          $SESSION->tlsext_tick = OPENSSL_malloc(...);
+          ...
+          EVP_Digest(..., $SESSION->session_id, &$SESSION->session_id_length, ...);
+      - pattern: |
+          $SESSION->tlsext_tick = OPENSSL_malloc(...);
+          ...
+          EVP_Digest(..., $SESSION->session_id, &$SESSION->session_id_length, ...);
+    metavariable-pattern:
+      $SESSION: "s->session"
+    focus-metavariable: $SESSION

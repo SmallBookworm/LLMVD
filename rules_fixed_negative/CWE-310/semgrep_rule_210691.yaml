@@ -1,0 +1,22 @@
+rules:
+  - id: lucky_thirteen_timing_vulnerability
+    message: "Potential Lucky Thirteen timing side-channel vulnerability in TLS CBC padding validation."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          pad = ciphertext->data[ciphertext->size - 1] + 1;
+          ...
+          for (i = 2; i <= pad; i++)
+            {
+              if (ciphertext->data[ciphertext->size - i] !=
+                  ciphertext->data[ciphertext->size - 1])
+                pad_failed = GNUTLS_E_DECRYPTION_FAILED;
+            }
+      - pattern: |
+          if (pad > (int) ciphertext->size - tag_size)
+            {
+              ...
+              pad_failed = GNUTLS_E_DECRYPTION_FAILED;
+              pad %= blocksize;
+            }

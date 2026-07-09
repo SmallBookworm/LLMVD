@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2017-14641-null-pointer-dereference
+    message: "Potential NULL pointer dereference in AP4_DataAtom constructor due to uninitialized m_Source member. This may lead to a segmentation fault and remote denial of service (CWE-476, CVE-2017-14641)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      AP4_DataAtom::AP4_DataAtom(...) :
+        $HEAD,
+        m_Source($ARG)
+      {
+        ...
+      }
+    pattern-not: |
+      AP4_DataAtom::AP4_DataAtom(...) :
+        $HEAD,
+        m_Source(NULL)
+      {
+        ...
+      }

@@ -1,0 +1,13 @@
+rules:
+  - id: qemu-ohci-iso-td-error-return
+    message: "ohci_service_iso_td returns 0 on ohci_read_iso_td failure, potentially causing an infinite loop (CVE-2017-9330)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (ohci_read_iso_td(...)) {
+        ...
+        return 0;
+      }
+    metadata:
+      cwe: "CWE-835"
+      cve: "CVE-2017-9330"

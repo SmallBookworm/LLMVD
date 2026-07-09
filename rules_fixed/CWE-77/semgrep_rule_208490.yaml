@@ -1,0 +1,50 @@
+rules:
+  - id: amanda_runtar_command_injection
+    message: "Potential command injection in runtar due to lack of argument validation. This can lead to arbitrary command execution as root (CVE-2016-10729)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (...; argv[...]; ...) {
+                  ...
+                  g_ptr_array_add(..., quote_string(argv[...]));
+                  ...
+              }
+          - pattern: |
+              for (...; argv[...]; ...) {
+                  g_ptr_array_add(..., quote_string(argv[...]));
+                  ...
+              }
+    metavariable-pattern:
+      metavariable: $LOOP
+      pattern: |
+        for (...; argv[...]; ...) {
+            ...
+            g_ptr_array_add(..., quote_string(argv[...]));
+            ...
+        }
+    pattern-not-inside: |
+      for (...; argv[...]; ...) {
+          ...
+          if (... <= 0) {
+              if (g_str_has_prefix(..., "--rsh-command") || ... || g_str_has_prefix(..., "--use-compress-program")) {
+                  ...
+              } else if (g_str_has_prefix(..., "--create") || ... || g_str_has_prefix(..., "--numeric-owner")) {
+                  ...
+              } else if (g_str_has_prefix(..., "--blocking-factor") || ... || g_str_has_prefix(..., "--files-from")) {
+                  ...
+              } else if (argv[...][0] != '-') {
+                  ...
+              }
+          }
+          if (... <= 0) {
+              error(...);
+          }
+          ...
+          g_ptr_array_add(..., quote_string(argv[...]));
+          ...
+      }
+    fix-regex:
+      regex: ""
+      replacement: ""

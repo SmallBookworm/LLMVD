@@ -1,0 +1,20 @@
+rules:
+  - id: inotify_fsnotify_mark_refcount_leak
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!fsn_mark)
+                  return ...;
+              else if (create)
+                  return -EEXIST;
+          - pattern: |
+              if (!fsn_mark)
+                  return ...;
+              else if (create)
+                  return ...;
+    message: "Missing fsnotify_put_mark() call when IN_MASK_CREATE is set, leading to a refcount leak (CWE-401)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-401"
+      cve: "CVE-2019-9857"

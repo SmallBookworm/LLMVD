@@ -1,0 +1,34 @@
+rules:
+  - id: cve-2018-7725-zziplib-invalid-deref
+    message: "Potential invalid memory address dereference in zzip_disk_entry_fopen due to unchecked header leading to denial of service (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $file->header = zzip_disk_entry_to_file_header($disk, $entry);
+          if (!$file->header) { ... }
+          ...
+          zzip_file_header_usize($file->header);
+      - pattern: |
+          $file->header = zzip_disk_entry_to_file_header($disk, $entry);
+          if (!$file->header) { ... }
+          ...
+          zzip_file_header_data_stored($file->header);
+      - pattern: |
+          $file->header = zzip_disk_entry_to_file_header($disk, $entry);
+          if (!$file->header) { ... }
+          ...
+          zzip_file_header_to_data($file->header);
+      - pattern: |
+          $file->header = zzip_disk_entry_to_file_header($disk, $entry);
+          if (!$file->header) { ... }
+          ...
+          zzip_file_header_csize($file->header);
+      - pattern: |
+          $file->header = zzip_disk_entry_to_file_header($disk, $entry);
+          if (!$file->header) { ... }
+          ...
+          zzip_file_header_data_deflated($file->header);
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2018-7725"

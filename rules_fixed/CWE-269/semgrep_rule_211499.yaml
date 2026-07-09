@@ -1,0 +1,7 @@
+rules:
+  - id: exim_invalid_free_pam_converse
+    message: "Use of string_copy_malloc instead of strdup may lead to invalid free by PAM (CWE-269)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      reply[$INDEX].resp = CS string_copy_malloc($ARGS...)

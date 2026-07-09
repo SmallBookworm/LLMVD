@@ -1,0 +1,24 @@
+rules:
+  - id: exim-host-name-lookup-buffer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              int count = 0;
+              ...
+              for (...; ...; ...) if (...->type == T_PTR)
+                count++;
+              ...
+              aptr = sender_host_aliases = store_get(count * sizeof(uschar *), ...);
+          - pattern: |
+              int count = 0;
+              ...
+              while (...->type == T_PTR)
+                count++;
+              ...
+              aptr = sender_host_aliases = store_get(count * sizeof(uschar *), ...);
+    message: "Heap-based buffer overflow vulnerability in host_name_lookup due to insufficient allocation for alias list (CWE-787). Missing space for terminating NULL."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2022-37452"

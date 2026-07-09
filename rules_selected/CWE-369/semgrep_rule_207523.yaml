@@ -1,0 +1,12 @@
+rules:
+  - id: imagemagick-cve-2020-27750-division-by-zero
+    message: Division by zero possible due to unsafe division by (1.0 - black). Use PerceptibleReciprocal to avoid undefined behavior.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: (1.0 - black)
+          - pattern: (cyan - black) / (1.0 - black)
+          - pattern: (magenta - black) / (1.0 - black)
+          - pattern: (yellow - black) / (1.0 - black)
+    pattern-not: PerceptibleReciprocal(...) * (...)

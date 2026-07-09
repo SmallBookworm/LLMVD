@@ -1,0 +1,21 @@
+rules:
+  - id: lucky_thirteen_timing_vulnerability
+    message: "Potential Lucky Thirteen timing side-channel vulnerability in TLS CBC padding validation. Ensure constant-time padding and MAC verification."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-310"
+      cve: "CVE-2013-0169"
+    patterns:
+      - pattern-either:
+          - pattern: |
+              pad = ciphertext->data[ciphertext->size - 1] + 1;
+              ...
+              for (..., ..., ...)
+                {
+                if (ciphertext->data[...] != ciphertext->data[ciphertext->size - 1])
+                  pad_failed = ...;
+                }
+          - pattern: |
+              if (memcmp (tag, ..., tag_size) != 0 || pad_failed != 0)
+                return ...;

@@ -1,0 +1,14 @@
+rules:
+  - id: bridge_multicast_timer_unchecked_mod_timer
+    patterns:
+      - pattern: |
+          if (!mp->ports && !mp->mglist && netif_running(...))
+            mod_timer(&mp->timer, ...);
+    message: "Missing check for whether the multicast timer is armed before calling mod_timer. This can lead to a kernel BUG and denial of service (CVE-2013-4129)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-20"
+      references:
+        - https://github.com/torvalds/linux/commit/c7e8e8a8f7a70b343ca1e0f90a31e35ab2d16de1
+        - https://nvd.nist.gov/vuln/detail/CVE-2013-4129

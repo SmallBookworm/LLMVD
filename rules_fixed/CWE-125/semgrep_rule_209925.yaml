@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2019-15926-out-of-bounds-array-access
+    message: |
+      Out-of-bounds array access vulnerability. The variable 'reply->ac' is used as an index into the array 'wmi->stream_exist_for_ac',
+      which has only WMM_NUM_AC (4) elements, but 'reply->ac' is of type u8 and can be up to 255. A bounds check is missing.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              struct wmi_cac_event *reply = $EXPR;
+              ... wmi->stream_exist_for_ac[reply->ac] ...
+          - pattern: |
+              struct wmi_cac_event *reply;
+              ... reply = $EXPR;
+              ... wmi->stream_exist_for_ac[reply->ac] ...

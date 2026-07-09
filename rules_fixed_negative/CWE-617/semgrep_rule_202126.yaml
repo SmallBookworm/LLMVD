@@ -1,0 +1,10 @@
+rules:
+  - id: cwe-617-libnbd-assertion-failure
+    message: "Assertion failure may lead to denial of service when server disconnects unexpectedly during option negotiation. Missing check for DEAD state in assertion."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      assert (nbd_internal_is_state_negotiating (get_next_state (h)));
+    metadata:
+      cwe: "CWE-617"
+      cve: "CVE-2021-20286"

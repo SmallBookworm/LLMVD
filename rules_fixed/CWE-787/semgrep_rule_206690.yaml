@@ -1,0 +1,42 @@
+rules:
+  - id: cwe-787-nfc-llcp-sdreq-tlv-bounds-check
+    message: Missing bounds check on uri_len before assigning to u8 tlv_len may lead to out-of-bounds write (CWE-787).
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (WARN_ON_ONCE($X > U8_MAX - 4))
+        return NULL;
+    pattern-not-inside: |
+      if (WARN_ON_ONCE(uri_len > U8_MAX - 4))
+        return NULL;
+      ...
+      $FUNC(..., size_t uri_len)
+      {
+        ...
+      }
+    fix: ""
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2018-9518"
+    patterns:
+      - pattern-not: |
+          if (WARN_ON_ONCE(uri_len > U8_MAX - 4))
+            return NULL;
+      - pattern-either:
+          - pattern: |
+              $FUNC(..., size_t uri_len)
+              {
+                ...
+                $TLV_LEN = uri_len + 3;
+                ...
+              }
+          - pattern: |
+              $FUNC(..., size_t uri_len)
+              {
+                ...
+                kzalloc($TLV_LEN + 1, ...);
+                ...
+              }
+    paths:
+      include:
+        - "llcp_commands.c"

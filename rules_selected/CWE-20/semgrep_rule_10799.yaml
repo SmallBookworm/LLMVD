@@ -1,0 +1,26 @@
+rules:
+  - id: virtio-zero-sized-buffer-check
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while ($SZ) {
+                  ...
+              }
+          - pattern: |
+              while ($SZ != 0) {
+                  ...
+              }
+    pattern-not-inside: |
+      if (!$SZ) {
+          ...
+          exit(...);
+      }
+      while ($SZ) {
+          ...
+      }
+    message: "Missing check for zero-sized buffer in virtqueue_map_desc may lead to infinite loop (CVE-2016-6490)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2016-6490"

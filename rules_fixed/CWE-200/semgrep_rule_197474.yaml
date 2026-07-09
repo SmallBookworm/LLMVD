@@ -1,0 +1,26 @@
+rules:
+  - id: libsixel-dither-ncolors-validation
+    message: "Missing validation for ncolors < 1 may lead to illegal memory access (CWE-200, CVE-2020-21048)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (ncolors < 0) {
+              ...
+          } else {
+              ...
+              if (ncolors < 2) {
+                  ncolors = 2;
+              }
+              ...
+          }
+      - pattern: |
+          if (ncolors < 0) {
+              ...
+          } else {
+              ...
+              if (ncolors < 2) {
+                  ncolors = 2;
+              }
+              ...
+          }

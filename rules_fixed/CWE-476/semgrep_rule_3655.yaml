@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2018-13301-null-ptr-deref
+    message: "Missing check of profile value before setting it may lead to NULL pointer dereference (CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          s->avctx->profile = $VAL;
+          ...
+          if (s->avctx->profile == FF_PROFILE_MPEG4_SIMPLE_STUDIO && ...)
+      - pattern: |
+          if (s->avctx->profile == FF_PROFILE_MPEG4_SIMPLE_STUDIO && ...)
+    metavariable-regex:
+      metavariable: $VAL
+      regex: "FF_PROFILE_MPEG4_SIMPLE_STUDIO"

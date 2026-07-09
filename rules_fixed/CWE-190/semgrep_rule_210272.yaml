@@ -1,0 +1,31 @@
+rules:
+  - id: cwe-190-integer-overflow-ptp_unpack_OPL
+    message: "Potential integer overflow due to missing input length validation before reading prop_count in ptp_unpack_OPL. This may lead to out-of-bounds memory access (CWE-190)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $FUNC (..., unsigned char* data, ..., unsigned int len)
+          {
+            ...
+            uint32_t prop_count = dtoh32a(data);
+            ...
+            if (prop_count >= INT_MAX/sizeof(void*))
+            {
+              ...
+              return ...;
+            }
+            ...
+          }
+      - pattern: |
+          $FUNC (..., unsigned char* data, ..., unsigned int len)
+          {
+            ...
+            uint32_t prop_count = dtoh32a(data);
+            ...
+            props = malloc(prop_count * sizeof(void*));
+            ...
+          }
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern: ptp_unpack_OPL

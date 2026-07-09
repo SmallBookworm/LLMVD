@@ -1,0 +1,17 @@
+rules:
+  - id: screen-m-scroll-v-recursion
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (n > 256) {
+                MScrollV(..., n - 256, ...);
+                ...
+              }
+          - pattern: |
+              if (n < -256) {
+                MScrollV(..., n + 256, ...);
+                ...
+              }
+    message: "Unbounded recursion in MScrollV may lead to stack overflow (CVE-2015-6806, CWE-119)."
+    severity: ERROR
+    languages: [c]

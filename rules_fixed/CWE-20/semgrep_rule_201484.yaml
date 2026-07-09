@@ -1,0 +1,11 @@
+rules:
+  - id: imagemagick-getpixelchannel-buffer-overread
+    message: "Potential heap-based buffer over-read in GetPixelChannel due to unchecked channel index. See CVE-2019-13299."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (image->channel_map[channel].traits == UndefinedPixelTrait)
+        return((Quantum) 0);
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2019-13299"

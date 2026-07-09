@@ -1,0 +1,28 @@
+rules:
+  - id: systemd-button-open-memleak
+    pattern-either:
+      - patterns:
+          - pattern: |
+              $B->io_event_source = sd_event_source_unref($B->io_event_source);
+              ...
+              r = sd_event_add_io(..., &$B->io_event_source, ...);
+          - pattern: |
+              r = sd_event_add_io(..., &$B->io_event_source, ...);
+              ...
+              if (r < 0) {
+                ...
+                goto fail;
+              }
+              ...
+              fail:
+              ...
+      - pattern-not: |
+          $B->io_event_source = sd_event_source_unref($B->io_event_source);
+          r = sd_event_add_io(..., &$B->io_event_source, ...);
+          if (r < 0) {
+            ...
+            goto fail;
+          }
+    message: "Missing sd_event_source_unref before sd_event_add_io may cause memory leak (CWE-401)."
+    severity: WARNING
+    languages: [c]

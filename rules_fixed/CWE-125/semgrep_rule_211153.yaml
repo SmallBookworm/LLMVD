@@ -1,0 +1,14 @@
+rules:
+  - id: imagemagick-cve-2019-11598
+    message: "Heap-based buffer over-read in SetGrayscaleImage due to insufficient allocation size for colormap_index. This may lead to out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              AcquireQuantumMemory(image->colors+1, sizeof(*colormap_index))
+          - pattern: |
+              AcquireQuantumMemory(MaxColormapSize+1, sizeof(*colormap_index))
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2019-11598"

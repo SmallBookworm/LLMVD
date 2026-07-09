@@ -1,0 +1,16 @@
+rules:
+  - id: exim-base64d-buffer-overflow
+    message: "Potential buffer overflow in base64 decoding due to insufficient buffer allocation. This could lead to remote code execution (CVE-2018-6789)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              uschar *result = store_get(3*(Ustrlen($CODE)/4) + 1);
+          - pattern: |
+              uschar *result = store_get(3 * (Ustrlen($CODE) / 4) + 1);
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2018-6789"
+      references:
+        - https://github.com/Exim/exim/commit/cf3cd306062a08969c41a1cdd32c6855f1abecf1

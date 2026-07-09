@@ -1,0 +1,22 @@
+rules:
+  - id: cwe-787-out-of-bounds-write-nsc_rle_decode
+    message: Detected potential out-of-bounds write in nsc_rle_decode due to missing output buffer size checks. This may lead to memory corruption (CWE-787).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          *((UINT32*)$OUT) = *((UINT32*)$IN);
+      - pattern: |
+          FillMemory($OUT, $LEN, $VALUE);
+          ...
+          $OUT += $LEN;
+    metavariable-pattern:
+      $OUT:
+        patterns:
+          - pattern: $OUT
+          - regex: out
+    fix-regex:
+      enabled: false
+    paths:
+      include:
+        - "*nsc*.c"

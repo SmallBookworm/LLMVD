@@ -1,0 +1,44 @@
+rules:
+  - id: cve-2015-0243-buffer-overflow
+    message: "Buffer overflow vulnerability in pullf_read_max due to missing 'len -= res' update in loop, potentially leading to out-of-bounds write (CWE-120)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while ($LEN > 0)
+              {
+                  ...
+                  memcpy($TMPBUF + $TOTAL, $TMP, $RES);
+                  $TOTAL += $RES;
+              }
+          - pattern: |
+              for (...; $LEN > 0; ...)
+              {
+                  ...
+                  memcpy($TMPBUF + $TOTAL, $TMP, $RES);
+                  $TOTAL += $RES;
+              }
+      - metavariable-pattern:
+          metavariable: $LEN
+          pattern: len
+      - metavariable-pattern:
+          metavariable: $TMPBUF
+          pattern: tmpbuf
+      - metavariable-pattern:
+          metavariable: $TOTAL
+          pattern: total
+      - metavariable-pattern:
+          metavariable: $RES
+          pattern: res
+      - metavariable-pattern:
+          metavariable: $TMP
+          pattern: tmp
+      - pattern-not: |
+          while ($LEN > 0)
+          {
+              ...
+              memcpy($TMPBUF + $TOTAL, $TMP, $RES);
+              $TOTAL += $RES;
+              $LEN -= $RES;
+          }

@@ -1,0 +1,25 @@
+rules:
+  - id: cwe-119-phar-set-inode-buffer-overflow
+    message: |
+      Stack-based buffer overflow in phar_set_inode due to unchecked memcpy operations.
+      The code copies data into a fixed-size buffer without ensuring the total length
+      does not exceed MAXPATHLEN, leading to potential memory corruption.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              memcpy($BUF, $SRC1, $LEN1);
+              memcpy($BUF + $OFFSET, $SRC2, $LEN2);
+          - pattern: |
+              $TMP_LEN = $LEN1 + $LEN2;
+              memcpy($BUF, $SRC1, $LEN1);
+              memcpy($BUF + $LEN1, $LEN2);
+    metavariable-pattern:
+      $BUF: "tmp"
+      $SRC1: "entry->phar->fname"
+      $SRC2: "entry->filename"
+      $LEN1: "entry->phar->fname_len"
+      $LEN2: "entry->filename_len"
+      $OFFSET: "entry->phar->fname_len"
+    focus-metavariable: $BUF

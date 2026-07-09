@@ -1,0 +1,11 @@
+rules:
+  - id: imagemagick-profile-integer-overflow-cve-2016-5841
+    message: "Potential integer overflow due to unsafe string formatting in profile handling (CVE-2016-5841)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          FormatLocaleString($PROPERTY, $SIZE, "%s:sans", $NAME);
+    metadata:
+      cwe: ["CWE-190"]
+      cve: "CVE-2016-5841"

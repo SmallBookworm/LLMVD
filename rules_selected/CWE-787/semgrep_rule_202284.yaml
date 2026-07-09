@@ -1,0 +1,7 @@
+rules:
+  - id: imagemagick-svg-xml-parse-huge-unrestricted
+    message: "Unrestricted use of XML_PARSE_HUGE in SVG parsing can lead to denial of service (CWE-787)."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      xmlCtxtUseOptions($CTX, XML_PARSE_HUGE);

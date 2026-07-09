@@ -1,0 +1,36 @@
+rules:
+  - id: modbus_write_multiple_coils_oob_read
+    message: Out-of-bounds read vulnerability in MODBUS_FC_WRITE_MULTIPLE_COILS due to missing validation of byte count against number of bits.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          case MODBUS_FC_WRITE_MULTIPLE_COILS:
+          {
+            ...
+            int nb = (req[offset + 3] << 8) + req[offset + 4];
+            ...
+            if (nb < 1 || MODBUS_MAX_WRITE_BITS < nb) {
+              ...
+            } else if (...) {
+              ...
+            }
+            ...
+          }
+      - pattern: |
+          case MODBUS_FC_WRITE_MULTIPLE_REGISTERS:
+          {
+            ...
+            int nb = (req[offset + 3] << 8) + req[offset + 4];
+            ...
+            if (nb < 1 || MODBUS_MAX_WRITE_REGISTERS < nb) {
+              ...
+            } else if (...) {
+              ...
+            }
+            ...
+          }
+    metavariable-comparison:
+      metavariable: nb
+      comparison: "<="
+      expression: "MODBUS_MAX_WRITE_BITS"

@@ -1,0 +1,18 @@
+rules:
+  - id: lftp-unsafe-file-removal
+    message: "Unsafe file removal or chmod operation without './' prefix may lead to unintended file deletion (CWE-401, CVE-2018-10916)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          ArgV *args = new ArgV("rm");
+          args->Append($FILE);
+      - pattern: |
+          ArgV *args = new ArgV("chmod");
+          args->Append($FILE);
+      - pattern: |
+          ArgV *args = new ArgV("rmdir");
+          args->Append($FILE);
+    metavariable-pattern:
+      $FILE:
+        pattern-not: dir_file(".", ...)

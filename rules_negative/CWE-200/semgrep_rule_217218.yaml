@@ -1,0 +1,11 @@
+rules:
+  - id: mxnet-listen-on-all-interfaces
+    message: "MXNet listens on all interfaces (0.0.0.0) instead of the user-specified hostname, exposing the service to unintended networks."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: 'std::string addr = local ? "ipc:///tmp/" : "tcp://*:";'
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2018-1281"

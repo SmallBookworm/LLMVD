@@ -1,0 +1,13 @@
+rules:
+  - id: cwe-787-out-of-bounds-write-malloc
+    message: "Unvalidated size used in malloc may lead to out-of-bounds write (CWE-787). Use safe allocation with zero and sanity checks."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      malloc($SZ + 1)
+    fix-regex:
+      regex: ''
+      replacement: ''
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2019-14934"

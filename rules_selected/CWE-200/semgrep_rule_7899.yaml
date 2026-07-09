@@ -1,0 +1,17 @@
+rules:
+  - id: css-paint-api-cross-origin-leak
+    message: "CSS Paint API may leak cross-origin data when used inside a link. Ensure early exit if style is inside a link."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!generator_) {
+                ...
+              }
+              if (!ParseInputArguments(...))
+                return nullptr;
+              return generator_->Paint(...);
+    metadata:
+      cwe: ["CWE-200"]
+      cve: ["CVE-2018-6137"]

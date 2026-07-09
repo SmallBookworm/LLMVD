@@ -1,0 +1,32 @@
+rules:
+  - id: dbus-fd-leak-msg-ctrunc
+    message: "File descriptors may be leaked when MSG_CTRUNC is set because received fds are not closed. This can lead to denial of service via resource exhaustion (CVE-2020-12049)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (m.msg_flags & MSG_CTRUNC)
+            {
+              ...
+              errno = ENOSPC;
+              ...
+              return -1;
+            }
+      - pattern: |
+          if (m.msg_flags & MSG_CTRUNC)
+            {
+              ...
+              return -1;
+            }
+    metavariable-pattern:
+      metavariable: m
+      pattern: m
+    pattern-not-inside: |
+      if (m.msg_flags & MSG_CTRUNC)
+        {
+          ...
+          for (...; ...; ...)
+            close(...);
+          ...
+          return -1;
+        }

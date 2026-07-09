@@ -1,0 +1,20 @@
+rules:
+  - id: cgminer-stratum-buffer-overflow
+    message: "Potential heap-based buffer overflow due to missing input validation in parse_notify. Ensure all hex strings are validated before use."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!job_id || !prev_hash || !coinbase1 || !coinbase2 || !bbversion || !nbit || !ntime) {
+                ...
+              }
+          - pattern: |
+              if (!valid_hex(job_id) || !valid_hex(prev_hash) || !valid_hex(coinbase1) ||
+                  !valid_hex(coinbase2) || !valid_hex(bbversion) || !valid_hex(nbit) ||
+                  !valid_hex(ntime)) {
+                ...
+              }
+    metavariable-regex:
+      metavariable: $X
+      regex: valid_hex

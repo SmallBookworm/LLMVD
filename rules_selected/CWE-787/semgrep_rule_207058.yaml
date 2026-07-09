@@ -1,0 +1,20 @@
+rules:
+  - id: ghostscript-buffer-overflow-cve-2020-16304
+    message: "Buffer overflow vulnerability due to incorrect per-component decrement instead of per-pixel in landscape mode (CVE-2020-16304, CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          for (j = 0; j < spp_out; j++) {
+              *(devc_contone[j] + position) = (psrc_plane[j])[i];
+              position -= LAND_BITS;
+          }
+      - pattern: |
+          for (j = 0; j < spp_out; j++)
+              *(devc_contone[j] + position) = (psrc_plane[j])[i];
+          position -= LAND_BITS;
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2020-16304"
+      references:
+        - "http://git.ghostscript.com/?p=ghostpdl.git;a=commitdiff;h=027c546e0dd11e0526f1780a7f3c2c66acffe209"

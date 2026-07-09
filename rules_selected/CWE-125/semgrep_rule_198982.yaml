@@ -1,0 +1,15 @@
+rules:
+  - id: nasm-unterminated-string-buffer-overread
+    message: "Potential heap-based buffer over-read due to unterminated string handling in tokenize function"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          p = nasm_skip_string(p - 1) + 1;
+      - pattern: |
+          p = nasm_skip_string(p - 1);
+          if (*p)
+              p++;
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2018-8881"

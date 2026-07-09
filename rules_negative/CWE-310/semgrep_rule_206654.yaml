@@ -1,0 +1,10 @@
+rules:
+  - id: jansson_hash_dos_cve_2013_6401
+    message: "Use of __ATOMIC_ACQ_REL memory model in __atomic_store_n may lead to denial of service via hash collisions (CVE-2013-6401)."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern: '__atomic_store_n(..., __ATOMIC_ACQ_REL)'
+    metadata:
+      cwe: "CWE-310"
+      cve: "CVE-2013-6401"

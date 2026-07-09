@@ -1,0 +1,15 @@
+rules:
+  - id: tensorflow-bmp-integer-overflow
+    message: "Potential integer overflow in BMP decoder leading to out-of-bounds read (CVE-2018-21233). Missing validation on image dimensions and header size before arithmetic operations."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          const int row_size = (8 * $CHANNELS * $WIDTH + 31) / 32 * 4;
+          const int last_pixel_offset = $HEADER_SIZE + (abs($HEIGHT) - 1) * row_size + ($WIDTH - 1) * $CHANNELS;
+      - pattern: |
+          const int expected_file_size = $LAST_PIXEL_OFFSET + $CHANNELS;
+          OP_REQUIRES(context, (expected_file_size <= $INPUT_SIZE), ...);
+    metavariable-pattern:
+      $CHANNELS: "channels_"
+    focus-metavariable: $WIDTH

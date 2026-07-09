@@ -1,0 +1,13 @@
+rules:
+  - id: cwe-189-timing-attack-denormal-fp-svg
+    message: "Potential timing attack vulnerability due to denormalized floating point arithmetic (CWE-189)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          (*annotations)["resources_verison"] = info->resources_version();
+      - pattern: |
+          (*annotations)["gms_core_version"] = info->gms_version_code();
+    metadata:
+      cwe: ["CWE-189"]
+      cve: "CVE-2016-5224"

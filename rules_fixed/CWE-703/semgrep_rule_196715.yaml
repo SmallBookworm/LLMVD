@@ -1,0 +1,27 @@
+rules:
+  - id: tensorflow_fractionalmaxpoolgrad_missing_validation
+    message: "Missing validation for input and output tensors in FractionalMaxPoolGrad may lead to undefined behavior or denial of service (CVE-2021-29580)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      const Tensor& tensor_in = context->input(0);
+      const Tensor& tensor_out = context->input(1);
+      ...
+      constexpr int tensor_in_and_out_dims = 4;
+      std::vector<int64> input_size(tensor_in_and_out_dims);
+      ...
+      OP_REQUIRES_OK(...);
+    metavariable-comparison:
+      metavariable: $...
+      comparison: "<"
+      operand: "OP_REQUIRES"
+    patterns:
+      - pattern-not: |
+          OP_REQUIRES(context, tensor_in.dims() == 4,
+                      errors::InvalidArgument("tensor_in must be 4-dimensional"));
+          OP_REQUIRES(context, tensor_in.NumElements() > 0,
+                      errors::InvalidArgument("tensor_in must not be empty"));
+          OP_REQUIRES(context, tensor_out.dims() == 4,
+                      errors::InvalidArgument("tensor_out must be 4-dimensional"));
+          OP_REQUIRES(context, tensor_out.NumElements() > 0,
+                      errors::InvalidArgument("tensor_out must not be empty"));

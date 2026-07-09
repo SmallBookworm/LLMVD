@@ -1,0 +1,21 @@
+rules:
+  - id: gnutls-use-after-free-pre_shared_key
+    message: Use-after-free vulnerability in client_send_params due to unsafe buffer reallocation before binder computation.
+    severity: ERROR
+    languages: [c]
+    cwe: ["CWE-416"]
+    pattern-either:
+      - pattern: |
+          client_hello.data = extdata->data + sizeof(mbuffer_st);
+          client_hello.size = extdata->length - sizeof(mbuffer_st);
+          ...
+          _gnutls_buffer_append_prefix(extdata, ...);
+      - pattern: |
+          client_hello.data = extdata->data + sizeof(mbuffer_st);
+          client_hello.size = extdata->length - sizeof(mbuffer_st);
+          ...
+          _gnutls_buffer_append_data_prefix(extdata, ...);
+    metadata:
+      cve: "CVE-2021-20232"
+      references:
+        - https://gitlab.com/gnutls/gnutls/-/commit/75a937d97f4fefc6f9b08e3791f151445f551cb3

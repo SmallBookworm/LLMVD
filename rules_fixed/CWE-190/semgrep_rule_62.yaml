@@ -1,0 +1,17 @@
+rules:
+  - id: bunzip2-runCnt-integer-overflow
+    message: "Integer overflow in runCnt may lead to buffer overflow. Use 'unsigned' for runCnt, dbufCount, and runPos to prevent signed integer overflow (CWE-190)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          int dbufCount, ..., runPos, ..., runCnt = ...;
+      - pattern: |
+          int ..., dbufCount, ..., runPos, ..., runCnt = ...;
+      - pattern: |
+          int ..., runPos, ..., dbufCount, ..., runCnt = ...;
+      - pattern: |
+          int ..., runCnt = ..., dbufCount, ..., runPos;
+    metadata:
+      cwe: ["CWE-190"]
+      cve: ["CVE-2017-15873"]

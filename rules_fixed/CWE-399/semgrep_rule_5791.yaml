@@ -1,0 +1,21 @@
+rules:
+  - id: use-after-free-color-chooser-dialog
+    message: "Potential use-after-free vulnerability due to accessing 'listener_' after it may have been freed by EndRun()."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - patterns:
+        - pattern: if (!listener_) return;
+        - pattern-inside: |
+            ...
+            EndRun(...);
+            ...
+        - pattern: listener_->...
+      - patterns:
+        - pattern: if (!listener_) return;
+        - pattern-inside: |
+            ...
+            EndRun(...);
+            ...
+            if (...) { ... }
+        - pattern: listener_->...

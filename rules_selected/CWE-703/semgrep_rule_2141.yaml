@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2016-2782-treo-attach-null-deref
+    message: "Missing endpoint validation before accessing bulk-in or interrupt-in URBs may lead to NULL pointer dereference."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!((... == HANDSPRING_VENDOR_ID) || (... == KYOCERA_VENDOR_ID)) ||
+              (serial->num_interrupt_in == 0))
+              return 0;
+          ...
+          COPY_PORT(..., ...);
+      - pattern: |
+          if (!((le16_to_cpu(...) == HANDSPRING_VENDOR_ID) || (le16_to_cpu(...) == KYOCERA_VENDOR_ID)) ||
+              (serial->num_interrupt_in == 0))
+              return 0;
+          ...
+          COPY_PORT(..., ...);
+    metavariable-pattern:
+      metavariable: COPY_PORT
+      pattern: |
+        do { ... dest->read_urbs[i]->context = dest; ... dest->interrupt_in_urb->context = dest; ... } while (0)

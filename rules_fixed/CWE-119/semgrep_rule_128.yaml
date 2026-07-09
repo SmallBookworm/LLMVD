@@ -1,0 +1,25 @@
+rules:
+  - id: cve-2017-10971-sendevent-generic-event-check
+    message: "Missing check for GenericEvent in SendEvent request may lead to buffer overflow (CVE-2017-10971)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (!((...->event.u.u.type > X_Reply && ...->event.u.u.type < LASTEvent) ||
+            (...->event.u.u.type >= EXTENSION_EVENT_BASE && ...->event.u.u.type < (unsigned) lastEvent))) {
+        ...
+        return BadValue;
+      }
+      ...
+      if (...->event.u.u.type == ClientMessage && ...)
+    pattern-not: |
+      if (!((...->event.u.u.type > X_Reply && ...->event.u.u.type < LASTEvent) ||
+            (...->event.u.u.type >= EXTENSION_EVENT_BASE && ...->event.u.u.type < (unsigned) lastEvent))) {
+        ...
+        return BadValue;
+      }
+      if (...->event.u.u.type == GenericEvent) {
+        ...
+        return BadValue;
+      }
+      ...
+      if (...->event.u.u.type == ClientMessage && ...)

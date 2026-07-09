@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2015-5070-pbl-check-case-sensitive
+    message: "Use of case-sensitive '.pbl' file check may allow bypass on case-insensitive filesystems. Use looks_like_pbl() instead."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: ends_with($FILENAME, ".pbl")
+    metadata:
+      cwe: ["CWE-200"]
+      cve: "CVE-2015-5070"

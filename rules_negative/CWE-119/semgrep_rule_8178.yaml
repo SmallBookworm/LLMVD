@@ -1,0 +1,20 @@
+rules:
+  - id: jhead-exif-integer-overflow-cve-2016-3822
+    message: "Potential integer overflow leading to out-of-bounds access in EXIF parsing. Missing overflow check before addition (OffsetVal + ByteCount)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          if (OffsetVal > UINT32_MAX - ByteCount || OffsetVal + ByteCount > ExifLength) {
+            ...
+          }
+      - pattern-either:
+          - pattern: |
+              if (OffsetVal + ByteCount > ExifLength) {
+                ...
+              }
+          - pattern: |
+              if (OffsetVal + ByteCount > ...)
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2016-3822"

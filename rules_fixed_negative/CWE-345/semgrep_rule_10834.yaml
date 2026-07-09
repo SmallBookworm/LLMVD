@@ -1,0 +1,14 @@
+rules:
+  - id: cwe-345-authentication-error-message-disclosure
+    patterns:
+      - pattern-either:
+          - pattern: |
+              pcap_snprintf(errbuf, PCAP_ERRBUF_SIZE, "Authentication failed: user name or password incorrect");
+          - pattern: |
+              pcap_snprintf(errbuf, PCAP_ERRBUF_SIZE, "Authentication failed: user name or password incorrect");
+    message: "Authentication failure message reveals whether the username or password was incorrect, aiding user enumeration (CWE-345). Use a generic 'Authentication failed' message instead."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-345"
+      cve: "CVE-2019-15162"

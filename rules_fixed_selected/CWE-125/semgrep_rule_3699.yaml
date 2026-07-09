@@ -1,0 +1,21 @@
+rules:
+  - id: cwe-125-out-of-bounds-read-vertical-byte
+    message: Missing height validation for 'vertical_byte' option may lead to out-of-bounds read (CWE-125).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (jsvGetBoolAndUnLock(jsvObjectGetChild($OPTIONS, "vertical_byte", 0))) {
+            if ($GFX.data.bpp==1)
+              ...
+            else
+              jsWarn("vertical_byte only works for 1bpp ArrayBuffers\n");
+          }
+      - pattern: |
+          if (jsvGetBoolAndUnLock(jsvObjectGetChild($OPTIONS, "vertical_byte", 0))) {
+            if ($GFX.data.bpp==1)
+              ...
+            else {
+              jsWarn("vertical_byte only works for 1bpp ArrayBuffers\n");
+            }
+          }

@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2016-7155-pvscsi-page-count-check-missing
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((ri->reqRingNumPages > PVSCSI_SETUP_RINGS_MAX_NUM_PAGES)
+                  || (ri->cmpRingNumPages > PVSCSI_SETUP_RINGS_MAX_NUM_PAGES)) {
+                  return -1;
+              }
+              ...
+              $REQ_RING_SIZE = ri->reqRingNumPages * PVSCSI_MAX_NUM_REQ_ENTRIES_PER_PAGE;
+          - pattern: |
+              if ((ri->reqRingNumPages > PVSCSI_SETUP_RINGS_MAX_NUM_PAGES)
+                  || (ri->cmpRingNumPages > PVSCSI_SETUP_RINGS_MAX_NUM_PAGES)) {
+                  return -1;
+              }
+              ...
+              $CMP_RING_SIZE = ri->cmpRingNumPages * PVSCSI_MAX_NUM_CMP_ENTRIES_PER_PAGE;
+    message: "Missing validation of ring page counts before use may lead to out-of-bounds access or infinite loop (CVE-2016-7155, CWE-125)."
+    severity: ERROR
+    languages: [c]

@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2017-18360-div-by-zero
+    message: "Division by zero possible when baud rate is too high. Missing upper bound check on baud rate before division."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $baud = tty_get_baud_rate($tty);
+          if (! $baud) {
+            ...
+          } else
+            tty_encode_baud_rate($tty, $baud, $baud);
+          ...
+          (461550L / $baud)
+      - pattern: |
+          $baud = tty_get_baud_rate($tty);
+          if (! $baud) {
+            ...
+          } else
+            tty_encode_baud_rate($tty, $baud, $baud);
+          ...
+          ((461550L + $baud / 2) / $baud)

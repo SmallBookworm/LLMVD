@@ -1,0 +1,14 @@
+rules:
+  - id: cwe-125-out-of-bounds-read-7zip
+    message: "Potential out-of-bounds read in 7zip decompression due to insufficient data returned by get_uncompressed_data. This may lead to a crash (denial of service) when processing a specially crafted 7zip file."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              *buff = __archive_read_ahead(a, 1, &bytes_avail);
+          - pattern: |
+              __archive_read_ahead(a, 1, &bytes_avail);
+    metadata:
+      cwe: ["CWE-125"]
+      cve: "CVE-2019-1000019"

@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2013-1416-null-deref-strlcpy
+    message: "Potential NULL pointer dereference when calling strlcpy with comp1->data or comp2->data without NULL check. This can lead to a denial of service (CVE-2013-1416)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              strlcpy(..., $COMP->data, ...);
+          - pattern: |
+              strlcpy($DST, $COMP->data, $SIZE);
+    metavariable-pattern:
+      $COMP:
+        pattern-either:
+          - pattern: comp1
+          - pattern: comp2

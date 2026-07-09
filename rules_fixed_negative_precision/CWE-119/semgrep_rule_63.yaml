@@ -1,0 +1,15 @@
+rules:
+  - id: lzw_decompressor_buffer_overflow
+    message: "LZW decompressor missing stack overflow check may lead to heap-based buffer overflow (CVE-2011-2895, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          while ( $CODE >= 256 )
+          {
+            *$STACKP++ = $TAB_SUFFIX[$CODE];
+            $CODE = $TAB_PREFIX[$CODE];
+          }
+    metadata:
+      cwe: ["CWE-119"]
+      cve: ["CVE-2011-2895"]

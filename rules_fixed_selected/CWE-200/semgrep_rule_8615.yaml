@@ -1,0 +1,32 @@
+rules:
+  - id: cve-2017-0557-libmpeg2-info-disclosure
+    message: "Potential information disclosure due to missing validation of leading zeros in MPEG-2 bitstream decoding. This could allow out-of-bounds memory access."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while (1) {
+                ...
+                u4_sym_len = 17;
+                IBITS_NXT(..., u4_bits, u4_sym_len);
+                ...
+                lead_zeros = CLZ(u4_bits) - 20;
+                ...
+              }
+          - pattern: |
+              while (1) {
+                ...
+                u4_sym_len = 17;
+                IBITS_NXT(..., u4_bits, u4_sym_len);
+                ...
+                lead_zeros = CLZ(u4_bits) - 15;
+                ...
+              }
+    metavariable-pattern:
+      metavariable: lead_zeros
+      patterns:
+        - pattern-not: |
+            if (lead_zeros > 11) {
+              return ...;
+            }

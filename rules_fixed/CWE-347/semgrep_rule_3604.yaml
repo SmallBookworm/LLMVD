@@ -1,0 +1,29 @@
+rules:
+  - id: cwe-347-pkcs1-padding-verification-missing
+    message: "PKCS#1 v1.5 signature verification does not validate padding bytes, allowing signature forgery (CWE-347)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (s[0] != 0x00
+                  || s[1] != 0x01
+                  || s[padlen + 2] != 0x00) {
+                ...
+              }
+              ...
+              $psig = s + padlen + 3;
+          - pattern: |
+              if (s[0] != 0x00
+                  || s[1] != 0x01
+                  || s[padlen+2] != 0x00) {
+                ...
+              }
+              ...
+              (*$psig) = s + padlen + 3;
+    metavariable-pattern:
+      metavariable: $psig
+      pattern: "*"
+    fix-regex:
+      regex: ""
+      replacement: ""

@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2016-6699-mediahttp-use-after-free
+    message: "Potential use-after-free vulnerability due to unsafe usage of 'uri' after assignment to 'mLastURI'. This may lead to memory corruption (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              mLastURI = $URI;
+              ...
+              $CONN->connect($URI, ...);
+          - pattern: |
+              mLastURI = $URI;
+              ...
+              uriDebugString($URI);
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2016-6699"

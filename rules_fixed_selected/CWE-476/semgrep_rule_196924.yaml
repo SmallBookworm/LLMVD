@@ -1,0 +1,23 @@
+rules:
+  - id: tensorflow-null-dereference-cve-2021-29616
+    patterns:
+      - pattern-either:
+          - pattern: |
+              Status TrySimplify(NodeDef* consumer, string* simplified_node_name) override {
+                ...
+                TF_RETURN_IF_ERROR(GetInputNode(consumer->input(0), &...));
+                ...
+              }
+          - pattern: |
+              Status TrySimplify(NodeDef* consumer, string* simplified_node_name) override {
+                ...
+                NodeDef* producer;
+                TF_RETURN_IF_ERROR(GetInputNode(consumer->input(0), &producer));
+                ...
+              }
+    message: "Missing input size check before accessing consumer->input(0) may lead to null pointer dereference (CVE-2021-29616, CWE-476)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2021-29616"

@@ -1,0 +1,16 @@
+rules:
+  - id: libevent-evbuffer-integer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              size_t need = $BUF->misalign + $BUF->off + $DATALEN;
+              ...
+              if ($BUF->totallen < need) { ... }
+          - pattern: |
+              if ($BUF->totallen < $BUF->misalign + $BUF->off + $DATALEN) { ... }
+    message: "Potential integer overflow in evbuffer_add due to unsafe size calculation. Use subtraction-based overflow check instead."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-189"
+      cve: "CVE-2014-6272"

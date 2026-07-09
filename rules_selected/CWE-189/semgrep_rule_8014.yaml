@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2015-3836-negative-dataSize-check
+    message: "Missing check for negative dataSize may lead to integer overflow or buffer overflow (CWE-189)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (dataSize > MAX_DLS_WAVE_SIZE)
+          {
+              return ...;
+          }
+    metadata:
+      cwe: ["CWE-189"]
+      cve: "CVE-2015-3836"

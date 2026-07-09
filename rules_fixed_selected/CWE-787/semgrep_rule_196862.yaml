@@ -1,0 +1,19 @@
+rules:
+  - id: ffmpeg-exr-out-of-bounds-write
+    patterns:
+      - pattern-either:
+          - pattern: |
+              ymax = FFMAX(0, $YMAX + 1);
+              for ($I = 0; $I < $PLANES; $I++) {
+                  $PTR = $PICTURE->data[$I] + (ymax * $PICTURE->linesize[$I]);
+                  for ($Y = ymax; $Y < $AVCTX->height; $Y++) {
+                      memset($PTR, 0, $OUT_LINE_SIZE);
+                      $PTR += $PICTURE->linesize[$I];
+                  }
+              }
+    message: "Out-of-bounds write due to missing bounds check before zeroing image data. CVE-2020-35965 (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2020-35965"

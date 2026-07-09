@@ -1,0 +1,24 @@
+rules:
+  - id: hid-inputs-list-access-without-check
+    message: "Accessing 'sc->hdev->inputs.next' without checking if the list is empty may lead to out-of-bounds write (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          list_entry($HDEV->inputs.next, struct hid_input, list)
+      - pattern: |
+          list_entry($HDEV->inputs.next, struct hid_input, $FIELD)
+    metavariable-pattern:
+      $HDEV:
+        pattern: sc->hdev
+    patterns:
+      - pattern-not-inside: |
+          if (!list_empty(&$HDEV->inputs)) { ... }
+      - pattern-not-inside: |
+          if (list_empty(&$HDEV->inputs)) { ... return ...; }
+      - pattern-not-inside: |
+          if ($X) {
+            ...
+            list_entry($HDEV->inputs.next, ...)
+            ...
+          }

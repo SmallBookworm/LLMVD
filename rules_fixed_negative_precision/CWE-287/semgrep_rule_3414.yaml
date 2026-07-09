@@ -1,0 +1,7 @@
+rules:
+  - id: cwe-287-pgbouncer-auth-user-early-set
+    message: "Auth user is set too early, potentially allowing login as auth_user with unknown username (CWE-287, CVE-2015-6817)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      client->auth_user = client->db->auth_user;

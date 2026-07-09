@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2015-7513-kvm-pit-zero-divide
+    message: "PIT counter restoration only loads channel 0, leaving channels 1 and 2 vulnerable to divide-by-zero if count is zero."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              kvm_pit_load_count($kvm, 0, $kvm->arch.vpit->pit_state.channels[0].count, $start);
+          - pattern: |
+              kvm_pit_load_count($kvm, 0, $expr, $start);
+    metavariable-pattern:
+      $expr: 
+        pattern-either:
+          - pattern: $kvm->arch.vpit->pit_state.channels[0].count

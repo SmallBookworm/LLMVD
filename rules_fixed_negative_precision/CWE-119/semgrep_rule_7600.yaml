@@ -1,0 +1,13 @@
+rules:
+  - id: heap_buffer_overflow_blob_api
+    message: "Potential heap buffer overflow due to unchecked integer addition in Blob API. Use base::CheckAdd to prevent out-of-bounds read."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (input_element.offset() + length > ref_entry->total_size()) {
+            ...
+          }
+    metadata:
+      cwe: ["CWE-119"]
+      cve: ["CVE-2017-15416"]

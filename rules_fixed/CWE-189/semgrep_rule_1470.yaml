@@ -1,0 +1,34 @@
+rules:
+  - id: udf_read_inode_missing_length_check
+    message: Missing validation of extended attribute and allocation descriptor lengths may lead to integer overflow or OOPS.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (iinfo->i_alloc_type == ICBTAG_FLAG_AD_IN_ICB) {
+              ...
+              if (iinfo->i_lenAlloc != inode->i_size)
+                  goto out;
+              if (inode->i_size > bs - udf_file_entry_alloc_offset(inode))
+                  goto out;
+          }
+      - pattern: |
+          switch (fe->icbTag.fileType) {
+              ...
+          }
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern: |
+        static int udf_read_inode(...)
+    pattern-not-inside: |
+      static int udf_read_inode(...) {
+          ...
+          if (iinfo->i_lenEAttr > bs || iinfo->i_lenAlloc > bs)
+              goto out;
+          if (udf_file_entry_alloc_offset(inode) + iinfo->i_lenAlloc > bs)
+              goto out;
+          ...
+      }
+    fix-regex:
+      regex: ""
+      replacement: ""

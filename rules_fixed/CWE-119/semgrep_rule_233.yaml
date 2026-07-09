@@ -1,0 +1,31 @@
+rules:
+  - id: cve-2017-6542-buffer-overflow
+    message: "Potential buffer overflow in SSH agent channel data handling due to missing input validation (CVE-2017-6542)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              static void ssh_agentf_callback(void *cv, void *reply, int replylen) {
+                struct ssh_channel *c = (struct ssh_channel *)cv;
+                const void *sentreply = reply;
+                c->u.a.pending = NULL;
+                c->u.a.outstanding_requests--;
+                if (!sentreply) {
+                  /* Fake SSH_AGENT_FAILURE. */
+                  sentreply = "\0\0\0\1\5";
+                  replylen = 5;
+                }
+                ssh_send_channel_data(c, sentreply, replylen);
+              }
+          - pattern: |
+              static void ssh_agentf_callback(void *cv, void *reply, int replylen) {
+                struct ssh_channel *c = (struct ssh_channel *)cv;
+                ...
+                ssh_send_channel_data(c, sentreply, replylen);
+              }
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2017-6542"
+      references:
+        - "https://git.tartarus.org/?p=simon/putty.git;a=commitdiff;h=4ff22863d895cb7ebfced4cf923a012a614adaa8"

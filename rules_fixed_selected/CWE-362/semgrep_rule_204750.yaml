@@ -1,0 +1,44 @@
+rules:
+  - id: missing-lock-in-pipe-resize-ring
+    message: "Missing spinlock acquisition in pipe_resize_ring() may lead to a race condition (CWE-362)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          int pipe_resize_ring(...) {
+            ...
+            $MASK = pipe->ring_size - 1;
+            $HEAD = pipe->head;
+            $TAIL = pipe->tail;
+            $N = pipe_occupancy(...);
+            ...
+          }
+      - pattern: |
+          int pipe_resize_ring(...) {
+            ...
+            kcalloc(...);
+            ...
+            $MASK = pipe->ring_size - 1;
+            $HEAD = pipe->head;
+            $TAIL = pipe->tail;
+            $N = pipe_occupancy(...);
+            ...
+          }
+    metavariable-pattern:
+      $MASK: "mask"
+      $HEAD: "head"
+      $TAIL: "tail"
+      $N: "n"
+    pattern-not: |
+      int pipe_resize_ring(...) {
+        ...
+        spin_lock_irq(&pipe->rd_wait.lock);
+        ...
+        $MASK = pipe->ring_size - 1;
+        $HEAD = pipe->head;
+        $TAIL = pipe->tail;
+        $N = pipe_occupancy(...);
+        ...
+        spin_unlock_irq(&pipe->rd_wait.lock);
+        ...
+      }

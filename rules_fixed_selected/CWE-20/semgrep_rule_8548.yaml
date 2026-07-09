@@ -1,0 +1,28 @@
+rules:
+  - id: cve-2016-0815-buffer-overflow
+    message: "Potential buffer overflow due to missing size validation before memcpy (CVE-2016-0815, CWE-20)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (nalLength == 0) {
+              continue;
+          }
+          ...
+          dstData[dstOffset++] = 0;
+          dstData[dstOffset++] = 0;
+          dstData[dstOffset++] = 0;
+          dstData[dstOffset++] = 1;
+          memcpy(&dstData[dstOffset], &mSrcBuffer[srcOffset], nalLength);
+      - pattern: |
+          if (nalLength == 0) {
+              continue;
+          }
+          ...
+          memcpy(&dstData[dstOffset], ..., nalLength);
+    metavariable-pattern:
+      metavariable: dstOffset
+      pattern-not: |
+        if (... || dstOffset + 4 + nalLength > mBuffer->size()) {
+            ...
+        }

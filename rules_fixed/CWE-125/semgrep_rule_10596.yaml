@@ -1,0 +1,15 @@
+rules:
+  - id: cwe-125-out-of-bounds-read-liblouis
+    message: "Out-of-bounds read due to missing input length check in matchCurrentInput. This can lead to denial of service (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      for ($X; $Y < $Z + passInstructions[$W + 1]; $A) {
+        if (input->chars[$Y] == $B || passInstructions[$C] != input->chars[$Y++])
+          $D;
+      }
+    pattern-not: |
+      for ($X; ($Y < $Z + passInstructions[$W + 1]) && ($Y < input->length); $A) {
+        if (input->chars[$Y] == $B || passInstructions[$C] != input->chars[$Y++])
+          $D;
+      }

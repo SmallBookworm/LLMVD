@@ -1,0 +1,18 @@
+rules:
+  - id: ntp-saveconfig-directory-traversal
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (strchr(filename, '\\') || strchr(filename, '/')) {
+                ...
+              }
+          - pattern: |
+              if (strchr(filename, '/') || strchr(filename, '\\')) {
+                ...
+              }
+    message: "Directory traversal vulnerability in save_config due to insufficient filename validation. Use strpbrk with platform-specific illegal characters instead."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-22"
+      cve: "CVE-2015-7851"

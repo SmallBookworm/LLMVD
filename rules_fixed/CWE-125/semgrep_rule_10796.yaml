@@ -1,0 +1,19 @@
+rules:
+  - id: cwe-125-radare2-buffer-overread
+    message: "Potential buffer over-read due to missing bounds check on reg_index when accessing op->regs and op->scale arrays."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (reg != X86R_UNDEFINED) {
+                op->regs[reg_index] = reg;
+                op->scale[reg_index] = temp;
+                ++reg_index;
+              }
+          - pattern: |
+              op->offset += temp;
+              op->regs[reg_index] = X86R_UNDEFINED;
+        metavariable-regex:
+          metavariable: reg_index
+          regex: reg_index

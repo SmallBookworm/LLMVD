@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2022-31626-buffer-overflow
+    message: "Buffer overflow vulnerability in pdo_mysql with mysqlnd driver when handling excessively long passwords (CVE-2022-31626, CWE-120)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          zend_uchar * const buffer = pfc->cmd_buffer.length >= packet->auth_data_len ? pfc->cmd_buffer.buffer : mnd_emalloc(packet->auth_data_len);
+      - pattern: |
+          zend_uchar * const buffer = pfc->cmd_buffer.length >= $X ? pfc->cmd_buffer.buffer : mnd_emalloc($X);
+    metavariable-pattern:
+      $X: packet->auth_data_len

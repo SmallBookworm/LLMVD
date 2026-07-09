@@ -1,0 +1,16 @@
+rules:
+  - id: double-free-in-spl-offsetset
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (index < 0 || index >= intern->llist->count) {
+                  zval_ptr_dtor(value);
+                  zend_throw_exception(...);
+                  return;
+              }
+    message: "Double free vulnerability due to premature zval_ptr_dtor on 'value' before exception in offsetSet."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-415"
+      cve: "CVE-2016-3132"

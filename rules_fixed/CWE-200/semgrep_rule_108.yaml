@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2015-3195-asn1-combine-leak
+    message: "ASN1_TFLG_COMBINE flag mishandling may cause memory leak on error (CVE-2015-3195)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          ASN1_item_ex_free((ASN1_VALUE**) $pval, $it);
+      - pattern: |
+          goto err;
+    metavariable-pattern:
+      metavariable: $pval
+      pattern: "ASN1_VALUE **"
+    focus-metavariable: $pval
+    pattern-not-inside: |
+      int combine = ...;
+      ...
+      if (combine == 0) {
+          ASN1_item_ex_free((ASN1_VALUE**) $pval, $it);
+      }

@@ -1,0 +1,30 @@
+rules:
+  - id: imagemagick-txt-infinite-loop-cve-2017-11523
+    message: "Missing EOF check in ReadTXTImage may cause infinite loop (CVE-2017-11523, CWE-835)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          do {
+            ...
+            (void) ReadBlobString(image, text);
+            if (LocaleNCompare((char *) text, MagickID, strlen(MagickID)) == 0) {
+              ...
+            }
+          } while (LocaleNCompare((char *) text, MagickID, strlen(MagickID)) == 0);
+      - pattern: |
+          do {
+            ...
+            (void) ReadBlobString(image, text);
+            ...
+          } while (LocaleNCompare((char *) text, MagickID, strlen(MagickID)) == 0);
+    pattern-not-inside: |
+      do {
+        ...
+        if (EOFBlob(image) != MagickFalse) {
+          ...
+          break;
+        }
+        (void) ReadBlobString(image, text);
+        ...
+      } while (LocaleNCompare((char *) text, MagickID, strlen(MagickID)) == 0);

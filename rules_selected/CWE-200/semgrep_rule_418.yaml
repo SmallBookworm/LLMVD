@@ -1,0 +1,35 @@
+rules:
+  - id: cve-2016-0701-dh-check-pubkey-missing-q-validation
+    message: "Missing validation that pub_key^q == 1 mod p in DH_check_pub_key, which may allow small subgroup attacks (CVE-2016-0701)."
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (BN_cmp(pub_key, ...) <= 0)
+              *ret |= DH_CHECK_PUBKEY_TOO_SMALL;
+          ...
+          if (BN_cmp(pub_key, ...) >= 0)
+              *ret |= DH_CHECK_PUBKEY_TOO_LARGE;
+          ...
+          ok = 1;
+      - pattern: |
+          if (BN_cmp(pub_key, ...) <= 0)
+              *ret |= DH_CHECK_PUBKEY_TOO_SMALL;
+          ...
+          if (BN_cmp(pub_key, ...) >= 0)
+              *ret |= DH_CHECK_PUBKEY_TOO_LARGE;
+          ...
+          return (ok);
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern: |
+        int DH_check_pub_key(...) {
+          ...
+        }
+    pattern-not: |
+      if (dh->q != NULL) {
+          if (!BN_mod_exp(..., pub_key, dh->q, dh->p, ...))
+              goto err;
+          if (!BN_is_one(...))
+              *ret |= DH_CHECK_PUBKEY_INVALID;
+      }

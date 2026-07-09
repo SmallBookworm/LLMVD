@@ -1,0 +1,16 @@
+rules:
+  - id: null_pointer_deref_zr364xx_vidioc_querycap
+    message: "Potential NULL pointer dereference when accessing cam->udev->product without a NULL check before strscpy."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              strscpy(..., cam->udev->product, ...);
+          - pattern: |
+              strscpy($CAP_FIELD, cam->udev->product, $SIZE);
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2019-15217"
+      references:
+        - https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=5d2e73a5f80a5b5aff3caf1ec6d39b5b3f54b26e

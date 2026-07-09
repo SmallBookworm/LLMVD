@@ -1,0 +1,18 @@
+rules:
+  - id: redis_lua_struct_offset_integer_overflow
+    message: "Integer overflow in Lua struct unpack offset handling may lead to out-of-bounds memory access."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              size_t pos = luaL_optinteger(..., ..., 1) - 1;
+              ...
+              luaL_argcheck(..., pos + size <= ld, ...);
+          - pattern: |
+              size_t pos = luaL_optinteger(L, 3, 1) - 1;
+              ...
+              luaL_argcheck(L, pos+size <= ld, 2, ...);
+    metadata:
+      cwe: ["CWE-190"]
+      cve: "CVE-2018-11219"

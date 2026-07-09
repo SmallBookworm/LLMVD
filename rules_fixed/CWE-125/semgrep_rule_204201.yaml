@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2019-11036-exif-out-of-bounds-read
+    message: "Potential out-of-bounds read in exif_process_IFD_TAG due to missing check 'dir_entry <= offset_base'. This may lead to heap buffer over-read (CWE-125)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (byte_count > IFDlength || offset_val > IFDlength - byte_count || value_ptr < dir_entry || offset_val < (size_t)(dir_entry - offset_base)) {
+                ...
+              }
+          - pattern: |
+              if (byte_count > IFDlength || offset_val > IFDlength-byte_count || value_ptr < dir_entry || offset_val < (size_t)(dir_entry-offset_base)) {
+                ...
+              }
+    fix-regex:
+      regex: (if \(byte_count > IFDlength \|\| offset_val > IFDlength(-?)byte_count \|\| value_ptr < dir_entry \|\| offset_val < \(size_t\)\(dir_entry(-?)offset_base\))
+      replacement: \1 || dir_entry <= offset_base

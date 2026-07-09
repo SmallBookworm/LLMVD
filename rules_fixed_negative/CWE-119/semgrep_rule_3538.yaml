@@ -1,0 +1,18 @@
+rules:
+  - id: t1_check_unusual_charstring_buffer_overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (sscanf(..., "%i", ...) != 1) {
+                  strcpy($BUF, $LINE);
+                  t1_getline();
+                  strcat($BUF, $LINE);
+                  strcpy($LINE, $BUF);
+                  ...
+              }
+    message: "Potential buffer overflow in t1_check_unusual_charstring due to unsafe string operations without bounds checking."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2018-17407"

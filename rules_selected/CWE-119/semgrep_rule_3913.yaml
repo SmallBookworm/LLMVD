@@ -1,0 +1,36 @@
+rules:
+  - id: ngiflib-deinterlacing-buffer-overflow
+    message: "Heap-based buffer overflow in WritePixels due to improper deinterlacing bounds check for small pictures (CVE-2019-16347)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          switch(context->pass) {
+          case 1:
+              ...
+              if(context->curY >= p->height) {
+                  context->pass++;
+                  context->curY = i->posY + 4;
+              }
+              ...
+          }
+      - pattern: |
+          switch(context->pass) {
+          case 2:
+              ...
+              if(context->curY >= p->height) {
+                  context->pass++;
+                  context->curY = i->posY + 2;
+              }
+              ...
+          }
+      - pattern: |
+          switch(context->pass) {
+          case 3:
+              ...
+              if(context->curY >= p->height) {
+                  context->pass++;
+                  context->curY = i->posY + 1;
+              }
+              ...
+          }

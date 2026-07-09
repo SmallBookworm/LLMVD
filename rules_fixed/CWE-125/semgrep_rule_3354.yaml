@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2016-7528-out-of-bounds-read-viff
+    message: "Potential out-of-bounds read in VIFF image parsing due to insufficient buffer allocation (CVE-2016-7528, CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          pixels=(unsigned char *) AcquireQuantumMemory(max_packets,
+            bytes_per_pixel*sizeof(*pixels));
+      - pattern: |
+          pixels=(unsigned char *) AcquireQuantumMemory($MAX_PACKETS,
+            $BYTES_PER_PIXEL*sizeof(*pixels));
+    metavariable-conditions:
+      - pattern: $MAX_PACKETS
+        metavariable: $MAX_PACKETS
+        patterns:
+          - pattern: max_packets
+      - pattern: $BYTES_PER_PIXEL
+        metavariable: $BYTES_PER_PIXEL
+        patterns:
+          - pattern: bytes_per_pixel

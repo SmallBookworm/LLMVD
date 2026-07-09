@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2013-0881
+    message: "Potential incorrect read operation due to unsafe call to fixedRootBackgroundLayer() without disabling compositing query asserts (CVE-2013-0881)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!m_renderView->rootBackgroundIsEntirelyFixed())
+                  return;
+              blink::Platform::current()->histogramEnumeration(..., !!fixedRootBackgroundLayer() ? ... : ..., ...);
+          - pattern: |
+              if (!m_renderView->rootBackgroundIsEntirelyFixed())
+                  return;
+              ...
+              blink::Platform::current()->histogramEnumeration(..., !!fixedRootBackgroundLayer() ? ... : ..., ...);
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2013-0881"

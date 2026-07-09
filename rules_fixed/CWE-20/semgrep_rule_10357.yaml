@@ -1,0 +1,27 @@
+rules:
+  - id: cve-2016-5338-esp-oob-access
+    message: "Out-of-bounds read/write in ESP FIFO buffer due to missing index validation. This could lead to denial of service or arbitrary code execution."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              s->ti_buf[s->ti_rptr++]
+          - pattern: |
+              s->ti_buf[... s->ti_rptr ...]
+          - pattern: |
+              s->ti_buf[... s->ti_wptr ...]
+    pattern-not-inside: |
+      if ($COND) {
+        ...
+        s->ti_buf[...]
+        ...
+      }
+    metavariable-pattern:
+      metavariable: $COND
+      patterns:
+        - pattern-either:
+            - pattern: s->ti_rptr < s->ti_wptr
+            - pattern: s->ti_wptr < TI_BUFSZ
+            - pattern: s->ti_rptr < TI_BUFSZ
+    fix: ""

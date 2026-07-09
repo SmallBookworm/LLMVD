@@ -1,0 +1,21 @@
+rules:
+  - id: tensorflow-conv2dbackpropfilter-divide-by-zero
+    message: "Potential divide-by-zero in Conv2DBackpropFilter due to missing validation of work_unit_size before division. This can lead to heap buffer overflow (CVE-2021-29540, CWE-369)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          const size_t work_unit_size = ...;
+          const size_t shard_size =
+              (target_working_set_size + work_unit_size - 1) / work_unit_size;
+      - pattern: |
+          const size_t shard_size =
+              (target_working_set_size + ... - 1) / ...;
+    metavariable-pattern:
+      metavariable: work_unit_size
+      pattern: |
+        const size_t work_unit_size = ...;
+    pattern-not-inside: |
+      OP_REQUIRES(
+          context, work_unit_size != 0,
+          errors::InvalidArgument(...));

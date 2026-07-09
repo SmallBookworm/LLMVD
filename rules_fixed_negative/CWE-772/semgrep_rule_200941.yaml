@@ -1,0 +1,9 @@
+rules:
+  - id: imagemagick-pcd-memory-leak
+    message: Memory leak in ReadPCDImage due to missing cleanup on allocation failure.
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if ((chroma1 == (unsigned char *) NULL) ||
+          (chroma2 == (unsigned char *) NULL) || (luma == (unsigned char *) NULL))
+        ThrowReaderException(ResourceLimitError,"MemoryAllocationFailed");

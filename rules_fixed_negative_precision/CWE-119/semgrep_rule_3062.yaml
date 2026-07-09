@@ -1,0 +1,12 @@
+rules:
+  - id: libtiff-readcontigstrips-buffer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              bufp += bytes_read;
+    message: "Heap-based buffer overflow vulnerability in readContigStripsIntoBuffer. Buffer pointer should be incremented by 'stripsize', not 'bytes_read'."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2016-10092"

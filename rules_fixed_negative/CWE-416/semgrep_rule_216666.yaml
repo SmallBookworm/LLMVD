@@ -1,0 +1,19 @@
+rules:
+  - id: cwe-416-mysql-prune-stmt-list
+    message: "Use-after-free vulnerability in mysql_prune_stmt_list due to modifying list element->next while iterating"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (; $ELEMENT; $ELEMENT = $ELEMENT->next)
+              {
+                ...
+                $PRUNED_LIST = list_add($PRUNED_LIST, $ELEMENT);
+                ...
+              }
+    metadata:
+      cwe: ["CWE-416"]
+      cve: "CVE-2017-3302"
+      references:
+        - https://github.com/MariaDB/server/commit/eef21014898d61e77890359d6546d4985d829ef6

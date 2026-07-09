@@ -1,0 +1,25 @@
+rules:
+  - id: ffmpeg-mvdec-dos-no-eof-check
+    message: "Loop over nb_frames without EOF check may lead to DoS via excessive resource consumption (CVE-2017-14055)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          for ($X; $Y < $VST->nb_frames; $Z) {
+            $A = avio_rb32($PB);
+            $B = avio_rb32($PB);
+            $C = avio_rb32($PB);
+            ...
+          }
+      - pattern: |
+          for ($X; $Y < $VST->nb_frames; $Z) {
+            ...;
+            $A = avio_rb32($PB);
+            $B = avio_rb32($PB);
+            $C = avio_rb32($PB);
+            ...
+          }
+    metavariable-pattern:
+      metavariable: $PB
+      pattern: pb
+    focus-metavariable: $VST

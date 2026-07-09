@@ -1,0 +1,29 @@
+rules:
+  - id: cve-2019-1354-backslash-in-tree-path
+    message: "Detected missing backslash validation in tree entry path on Windows, which may lead to remote code execution (CVE-2019-1354)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!*path) {
+            ...
+            return -1;
+          }
+          ...
+          desc->entry.path = path;
+      - pattern: |
+          if (!*path) {
+            ...
+            return -1;
+          }
+          len = strlen(path) + 1;
+    metavariable-pattern:
+      metavariable: path
+      pattern: path
+    pattern-not: |
+      #ifdef GIT_WINDOWS_NATIVE
+      if (protect_ntfs && strchr(path, '\\')) {
+        ...
+        return -1;
+      }
+      #endif

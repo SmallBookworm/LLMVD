@@ -1,0 +1,20 @@
+rules:
+  - id: kdeconnect-unrestricted-tcp-port
+    message: "Unrestricted TCP port usage from untrusted input may lead to Denial of Service (CWE-400). Ensure port is within allowed range before connecting."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              int tcpPort = ...;
+              ...
+              socket->connectToHost(..., tcpPort);
+          - pattern: |
+              ...->connectToHost(..., tcpPort);
+    metavariable-pattern:
+      metavariable: tcpPort
+      pattern-not: |
+        if (tcpPort < MIN_TCP_PORT || tcpPort > MAX_TCP_PORT) {
+          ...
+          continue;
+        }

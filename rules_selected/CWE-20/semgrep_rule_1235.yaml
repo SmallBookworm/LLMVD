@@ -1,0 +1,9 @@
+rules:
+  - id: cve-2014-4503-hex2bin-quit
+    message: "hex2bin failure leads to application exit via quit(), allowing denial of service. Use error handling instead."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          if (unlikely(!hex2bin(...)))
+            quit(1, ...);

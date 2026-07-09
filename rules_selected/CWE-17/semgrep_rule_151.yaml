@@ -1,0 +1,28 @@
+rules:
+  - id: cve-2015-0290-multiblock-null-pointer
+    message: "Potential NULL pointer dereference in ssl3_write_bytes due to missing BIO retry check after ssl3_write_pending failure in multiblock mode (CVE-2015-0290)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (i <= 0) {
+              if (i < 0) {
+                  OPENSSL_free(wb->buf);
+                  wb->buf = NULL;
+              }
+              ...
+              return i;
+          }
+      - pattern: |
+          if (i <= 0) {
+              if (i < 0 && $COND) {
+                  OPENSSL_free(wb->buf);
+                  wb->buf = NULL;
+              }
+              ...
+              return i;
+          }
+    metavariable-pattern:
+      metavariable: $COND
+      pattern-not: |
+        (!s->wbio || !BIO_should_retry(s->wbio))

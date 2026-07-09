@@ -1,0 +1,24 @@
+rules:
+  - id: imagemagick-pcx-memory-leak-cve-2017-12668
+    message: "Memory leak in WritePCXImage: 'pcx_colormap' is not freed on allocation failure of 'pixel_info'."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $pcx_colormap = AcquireQuantumMemory(...);
+          ...
+          if ($pcx_colormap == (unsigned char *) NULL)
+            ThrowWriterException(...);
+          ...
+          $pixel_info = AcquireVirtualMemory(...);
+          if ($pixel_info == (MemoryInfo *) NULL)
+            ThrowWriterException(...);
+      - pattern: |
+          $pcx_colormap = AcquireQuantumMemory(...);
+          ...
+          if ($pcx_colormap == (unsigned char *) NULL)
+            ThrowWriterException(...);
+          ...
+          $pixel_info = AcquireVirtualMemory(...);
+          if ($pixel_info == (MemoryInfo *) NULL)
+            return ...;

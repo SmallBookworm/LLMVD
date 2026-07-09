@@ -1,0 +1,18 @@
+rules:
+  - id: cwe-362-inet-frag-race-condition
+    message: "Race condition vulnerability in inet_frag_intern: inet_frag_lru_add() is called after releasing the hash bucket lock, which may lead to use-after-free (CVE-2014-0100)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              spin_unlock(&$HB->chain_lock);
+              ...
+              inet_frag_lru_add($NF, $QP);
+          - pattern: |
+              read_unlock(&$F->lock);
+              ...
+              inet_frag_lru_add($NF, $QP);
+    metadata:
+      cwe: ["CWE-362"]
+      cve: "CVE-2014-0100"

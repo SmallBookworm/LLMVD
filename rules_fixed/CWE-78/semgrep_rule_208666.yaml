@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2019-5736-runc-proc-self-exe
+    message: "Missing ensure_cloned_binary() call may allow host runc binary overwrite via /proc/self/exe (CVE-2019-5736)"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          void nsexec(void)
+          {
+              ...
+              pipenum = initpipe();
+              if (pipenum == -1)
+                  return;
+              ...
+              nl_parse(...);
+              ...
+          }

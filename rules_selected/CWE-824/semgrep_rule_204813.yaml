@@ -1,0 +1,20 @@
+rules:
+  - id: cwe-824-uninitialized-pointer-gnutls
+    message: "Uninitialized handshake_buffer_st variable 'hsk' may lead to use of uninitialized memory (CWE-824)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          handshake_buffer_st $H;
+          ...
+          _gnutls_handshake_io_recv_int(..., &$H, ...);
+      - pattern: |
+          handshake_buffer_st $H;
+          ...
+          _gnutls13_recv_key_update(..., &$H.data);
+      - pattern: |
+          handshake_buffer_st $H;
+          ...
+          _gnutls13_recv_session_ticket(..., &$H.data);
+    metavariable-pattern:
+      $H: "handshake_buffer_st"

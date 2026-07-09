@@ -1,0 +1,15 @@
+rules:
+  - id: imagemagick-bmp-out-of-bounds-write-cve-2018-12599
+    message: "Potential out-of-bounds write in BMP image handling due to unsafe memory allocation. Upgrade to patched version."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          pixel_info=AcquireVirtualMemory((size_t) bmp_info.image_size,
+            sizeof(*pixels));
+    metadata:
+      cwe: ["CWE-787"]
+      cve: "CVE-2018-12599"
+      references:
+        - https://github.com/ImageMagick/ImageMagick/issues/1177
+        - https://github.com/ImageMagick/ImageMagick/commit/ae04fa4be910255e5d363edebd77adeee99a525d

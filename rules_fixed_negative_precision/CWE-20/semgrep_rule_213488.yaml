@@ -1,0 +1,16 @@
+rules:
+  - id: weechat_hook_process_shell_injection
+    message: "Potential shell injection via execvp with untrusted command passed to 'sh -c'. Use string_split_shell to safely parse command arguments."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              char *exec_args[...] = { "sh", "-c", ..., ... };
+              ...
+              execvp(exec_args[0], exec_args);
+          - pattern: |
+              char *exec_args[4] = { "sh", "-c", NULL, NULL };
+              ...
+              exec_args[2] = ...;
+              execvp(exec_args[0], exec_args);

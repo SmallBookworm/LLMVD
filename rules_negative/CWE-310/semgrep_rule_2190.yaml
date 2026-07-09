@@ -1,0 +1,12 @@
+rules:
+  - id: asn1_ber_decoder_data_overrun_vulnerability
+    message: "ASN.1 BER decoder may skip non-optional elements on data overrun, leading to denial of service (CVE-2016-2053)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if ((op & ASN1_OP_MATCH__COND && flags & FLAG_MATCHED) ||
+          dp == datalen) {
+        flags &= ~FLAG_LAST_MATCHED;
+        pc += asn1_op_lengths[op];
+        goto next_op;
+      }

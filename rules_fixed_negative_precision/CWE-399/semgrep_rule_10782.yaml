@@ -1,0 +1,42 @@
+rules:
+  - id: qemu-v9fs-read-memory-leak
+    message: "Memory leak in v9fs_read: QEMUIOVector objects are not properly destroyed on all error paths."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (fidp->fid_type == P9_FID_FILE) {
+              ...
+              QEMUIOVector qiov_full;
+              QEMUIOVector qiov;
+              ...
+              v9fs_init_qiov_from_pdu(&qiov_full, ...);
+              qemu_iovec_init(&qiov, ...);
+              ...
+              if (err < 0) {
+                  goto out;
+              }
+              ...
+              qemu_iovec_destroy(&qiov);
+              qemu_iovec_destroy(&qiov_full);
+          }
+      - pattern: |
+          if (fidp->fid_type == P9_FID_FILE) {
+              ...
+              QEMUIOVector qiov_full;
+              QEMUIOVector qiov;
+              ...
+              v9fs_init_qiov_from_pdu(&qiov_full, ...);
+              qemu_iovec_init(&qiov, ...);
+              ...
+              if (len < 0) {
+                  ...
+                  goto out;
+              }
+              ...
+              qemu_iovec_destroy(&qiov);
+              qemu_iovec_destroy(&qiov_full);
+          }
+    metadata:
+      cwe: "CWE-399"
+      cve: "CVE-2016-8577"

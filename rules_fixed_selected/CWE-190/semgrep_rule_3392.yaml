@@ -1,0 +1,23 @@
+rules:
+  - id: lhasa_integer_underflow_cve_2016_2347
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (header_len > LEVEL_3_MAX_HEADER_LEN) {
+                return 0;
+              }
+          - pattern: |
+              if (header_len > LEVEL_3_MAX_HEADER_LEN
+                  || ...)
+              {
+                return 0;
+              }
+      - pattern-not: |
+          if (header_len > LEVEL_3_MAX_HEADER_LEN
+              || header_len < RAW_DATA_LEN(...))
+          {
+            return 0;
+          }
+    message: "Missing check for integer underflow in header length validation. This may lead to heap corruption via crafted archive (CVE-2016-2347)."
+    severity: ERROR
+    languages: [c]

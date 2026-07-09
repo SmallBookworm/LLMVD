@@ -1,0 +1,11 @@
+rules:
+  - id: imagemagick-getpixelalpha-buffer-overread
+    message: "Heap-based buffer over-read in GetPixelAlpha() due to incorrect image reference. Use 'picon' instead of 'image' to avoid out-of-bounds read."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          if (GetPixelAlpha(image, $PTR) == (Quantum) TransparentAlpha)
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2022-0284"

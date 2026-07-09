@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2018-12910-empty-hostname-check
+    message: "Missing check for empty hostname may lead to out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (!uri->host)
+        return NULL;
+    pattern-not: |
+      if (!uri->host || !uri->host[0])
+        return NULL;
+    fix-regex:
+      regex: 'if \(!uri->host\)\s*return NULL;'
+      replacement: 'if (!uri->host || !uri->host[0])\n\t\treturn NULL;'

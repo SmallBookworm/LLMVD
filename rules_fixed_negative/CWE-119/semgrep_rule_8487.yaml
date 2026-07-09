@@ -1,0 +1,28 @@
+rules:
+  - id: uninitialized_metadata_buffer_type
+    message: "Uninitialized MetadataBufferType variable may lead to information disclosure (CVE-2016-2418, CWE-119)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          MetadataBufferType type;
+          ... 
+          $FUNC(..., &type);
+      - pattern: |
+          MetadataBufferType type;
+          ... 
+          createInputSurface(..., &type);
+      - pattern: |
+          MetadataBufferType type;
+          ... 
+          setInputSurface(..., &type);
+      - pattern: |
+          MetadataBufferType type;
+          ... 
+          storeMetaDataInBuffers(..., &type);
+    metavariable-pattern:
+      metavariable: $FUNC
+      patterns:
+        - pattern: createInputSurface
+        - pattern: setInputSurface
+        - pattern: storeMetaDataInBuffers

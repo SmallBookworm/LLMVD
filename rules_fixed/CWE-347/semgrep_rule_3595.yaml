@@ -1,0 +1,15 @@
+rules:
+  - id: cwe-347-axtls-x509-sig-verify
+    message: "PKCS#1 v1.5 signature verification does not properly verify ASN.1 metadata, allowing signature forgery (CWE-347, CVE-2018-16253)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          while (block[i++] && i < sig_len) { }
+          ... get_signature(&block[i], &len);
+      - pattern: |
+          i = 10;
+          while (block[i++] && i < sig_len) { }
+    metadata:
+      cwe: ["CWE-347"]
+      cve: "CVE-2018-16253"

@@ -1,0 +1,17 @@
+rules:
+  - id: clamav-off-by-one-cli_hm_scan
+    message: "Off-by-one error in binary search may cause out-of-bounds read in cli_hm_scan (CVE-2011-2721)"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              r = $SZH->items;
+              while (l <= r) {
+                ...
+                $SZH->hash_array[$INDEX * c]
+                ...
+              }
+    metadata:
+      cwe: "CWE-189"
+      cve: "CVE-2011-2721"

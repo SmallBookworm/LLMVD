@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2021-20221-arm-gic-sgir-irq-mask
+    message: "Out-of-bounds heap buffer access due to insufficient masking of interrupt ID in GICD_SGIR register (CVE-2021-20221). Interrupt ID must be masked to 4 bits (0xf), not 10 bits (0x3ff)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      irq = value & 0x3ff;
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2021-20221"

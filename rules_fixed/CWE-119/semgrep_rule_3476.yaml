@@ -1,0 +1,32 @@
+rules:
+  - id: cwe-119-buffer-overflow-libxsmm-csc-reader
+    message: "Potential heap-based buffer overflow due to missing validation of parsed matrix dimensions before allocation. This may lead to out-of-bounds writes if o_row_count, o_column_count, or o_element_count are zero."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (sscanf($..., $row_count, $column_count, $element_count) == 3) {
+                ...
+                malloc($... * (*$element_count));
+                malloc($... * ((size_t)(*$column_count) + 1));
+                ...
+              }
+          - pattern: |
+              if (3 == sscanf($..., $row_count, $column_count, $element_count)) {
+                ...
+                malloc($... * (*$element_count));
+                malloc($... * ((size_t)(*$column_count) + 1));
+                ...
+              }
+      - pattern-not: |
+          if (3 == sscanf($..., $row_count, $column_count, $element_count) &&
+              0 != *$row_count && 0 != *$column_count && 0 != *$element_count) {
+            ...
+            malloc($... * (*$element_count));
+            malloc($... * ((size_t)(*$column_count) + 1));
+            ...
+          }
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2018-20542"

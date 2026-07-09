@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2017-0396-information-disclosure
+    message: "Potential information disclosure due to missing bounds checks on user-controlled parameters (CVE-2017-0396)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              case VISUALIZER_PARAM_CAPTURE_SIZE:
+                  pContext->mCaptureSize = *((uint32_t *)p->data + 1);
+          - pattern: |
+              int32_t capturePoint = pContext->mCaptureIdx - captureSize - deltaSmpl;

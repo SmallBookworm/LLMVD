@@ -1,0 +1,34 @@
+rules:
+  - id: cve-2011-3193-buffer-overflow
+    message: "Missing bounds check after while loop may lead to heap-based buffer overflow (CVE-2011-3193, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while ( ... )
+              {
+                ...
+              }
+              $ERR = _HB_OPEN_Coverage_Index(..., IN_GLYPH($J), ...);
+          - pattern: |
+              while ( ... )
+              {
+                ...
+              }
+              if ($ERR)
+                ...
+              if ($MARK_INDEX >= $ARRAY->MarkCount)
+                ...
+      - metavariable-pattern:
+          metavariable: $J
+          pattern: j
+      - pattern-not: |
+          while ( ... )
+          {
+            ...
+          }
+          if (i > buffer->in_pos)
+            return ...;
+          ...
+          _HB_OPEN_Coverage_Index(..., IN_GLYPH(j), ...);

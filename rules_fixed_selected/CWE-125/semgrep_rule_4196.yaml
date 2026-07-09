@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2018-14462-icmp-buffer-overread
+    message: "Missing bounds check on icmp_cksum field may lead to buffer over-read (CVE-2018-14462, CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (sum != 0) {
+            uint16_t icmp_sum = EXTRACT_16BITS(&dp->icmp_cksum);
+            ...
+          }
+      - pattern: |
+          if (sum != 0) {
+            ...;
+            uint16_t icmp_sum = EXTRACT_16BITS(&dp->icmp_cksum);
+            ...
+          }
+    metavariable-pattern:
+      metavariable: dp
+      pattern: (const struct icmp *)...

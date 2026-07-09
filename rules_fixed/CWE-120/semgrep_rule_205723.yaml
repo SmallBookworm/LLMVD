@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2018-15688-buffer-overflow
+    message: |
+      Buffer overflow vulnerability in dhcp6 client due to insufficient buffer size check before copying data.
+      The check should ensure enough space for the DHCP6 option header (offsetof(DHCP6Option, data)) plus payload.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (*$BUFLEN < $LEN)
+                  return -ENOBUFS;
+          - pattern: |
+              if ($BUFLEN < $LEN)
+                  return -ENOBUFS;
+    metavariable-pattern:
+      metavariable: $LEN
+      pattern-not: |
+        offsetof(DHCP6Option, data) + ...

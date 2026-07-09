@@ -1,0 +1,17 @@
+rules:
+  - id: oniguruma_dmax_invalid_pointer_dereference
+    message: "Potential invalid pointer dereference due to unchecked reg->dmax value in forward_search_range. This may lead to denial-of-service (CVE-2017-9229)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (reg->dmax != ONIG_INFINITE_DISTANCE) {
+            *low = p - reg->dmax;
+            ...
+          }
+      - pattern: |
+          *low = p - reg->dmax;
+          if (*low > s) { ... }
+    metavariable-pattern:
+      metavariable: $reg
+      pattern: regex_t*

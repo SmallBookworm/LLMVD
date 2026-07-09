@@ -1,0 +1,18 @@
+rules:
+  - id: kde_plasma_notification_ip_leak
+    message: "Notification body is not properly sanitized, potentially leaking client IP addresses via embedded URLs (e.g., in IMG src)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $BODYFINAL = $BODY;
+          ...
+          $BODYFINAL = $BODYFINAL.trimmed();
+          $BODYFINAL = $BODYFINAL.replace(...);
+      - pattern: |
+          QString bodyFinal = ...;
+          bodyFinal = bodyFinal.trimmed();
+          bodyFinal = bodyFinal.replace(...);
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2018-6790"

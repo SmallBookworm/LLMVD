@@ -1,0 +1,14 @@
+rules:
+  - id: hhvm-strrpos-out-of-bounds
+    message: "Potential out-of-bounds memory access in strrpos/strripos due to insufficient boundary checks."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              bstrrstr(..., len + pos + s_len, ...)
+          - pattern: |
+              bstrrcasestr(..., len + pos + s_len, ...)
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2019-3561"

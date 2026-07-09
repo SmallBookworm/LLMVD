@@ -1,0 +1,13 @@
+rules:
+  - id: exiv2-heap-buffer-overread-cve-2017-17723
+    message: "Potential heap-based buffer over-read due to integer overflow in allocation size calculation. The expression (size*count + pad+20) is cast to long long after multiplication, which may overflow if size and count are large uint32_t values."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          (long long) ( $SIZE * $COUNT + $PAD + 20 )
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2017-17723"
+      references:
+        - https://github.com/Exiv2/exiv2/commit/74cb5bab132ed76adf15df172c5e8b58cddaa96c

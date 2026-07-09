@@ -1,0 +1,42 @@
+rules:
+  - id: cve-2017-18183-infinite-loop-qpdfwriter
+    message: "Potential infinite loop in QPDFWriter::enqueueObject due to missing loop detection for self-referential object streams."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (obj_renumber.count($OG) == 0)
+          {
+              if (this->object_to_object_stream.count($OG))
+              {
+                  ...
+                  enqueueObject(...);
+              }
+              ...
+          }
+      - pattern: |
+          if (obj_renumber.count($OG) == 0)
+          {
+              ...
+          }
+          else if (obj_renumber[$OG] == 0)
+          {
+              ...
+          }
+    metavariable-pattern:
+      $OG: QPDFObjGen
+    pattern-not-inside: |
+        if (obj_renumber.count($OG) == 0)
+        {
+            if (this->object_to_object_stream.count($OG))
+            {
+                ...
+                obj_renumber[$OG] = 0;
+                enqueueObject(...);
+            }
+            ...
+        }
+        else if (obj_renumber[$OG] == 0)
+        {
+            ...
+        }

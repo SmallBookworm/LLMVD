@@ -1,0 +1,31 @@
+rules:
+  - id: missing_install_button_timeout_initialization
+    message: "Missing initialization of install button timeout state may lead to unwanted extension installation (CVE-2018-6169)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          ExtensionInstallDialogView::ExtensionInstallDialogView(...) :
+            ...,
+            handled_result_(false)
+          {
+            InitView();
+          }
+      - pattern: |
+          ExtensionInstallDialogView::ExtensionInstallDialogView(...) :
+            ...,
+            handled_result_(false),
+            ...
+          {
+            InitView();
+          }
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern-not: |
+        ExtensionInstallDialogView::ExtensionInstallDialogView(...) :
+          ...,
+          install_button_enabled_(...),
+          ...
+        {
+          InitView();
+        }

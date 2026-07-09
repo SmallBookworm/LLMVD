@@ -1,0 +1,15 @@
+rules:
+  - id: cwe-119-jsvGetString-buffer-overflow
+    message: "Buffer overflow vulnerability in jsvGetString due to incorrect null-termination check. This may lead to denial of service (CVE-2018-11596)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while (*$S && $L < $LEN) {
+                $STR[$L] = $S[$L];
+                $L++;
+              }
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2018-11596"

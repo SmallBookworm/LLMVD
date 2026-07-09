@@ -1,0 +1,20 @@
+rules:
+  - id: imagemagick-pop-hex-pixel-buffer-overflow
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: q = PopHexPixel(..., ..., q);
+              - pattern: if ((q - pixels + ...) >= 80)
+          - pattern: |
+              if ((q - pixels + ...) >= 80)
+              {
+                *q++='\n';
+                (void) WriteBlob(image, q - pixels, pixels);
+                q = pixels;
+              }
+    message: "Potential stack-based buffer overflow in PopHexPixel usage. The buffer 'pixels' may be overflowed if the offset calculation does not properly account for the maximum buffer size (2048 bytes)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2019-9956"

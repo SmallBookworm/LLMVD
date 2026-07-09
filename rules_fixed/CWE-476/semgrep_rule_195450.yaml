@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2017-14638-null-deref
+    message: "Missing NULL check before calling SetType() on atom pointer may lead to NULL pointer dereference (CWE-476)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $ATOM = AP4_HvccAtom::Create(...);
+              $ATOM->SetType(...);
+          - pattern: |
+              $ATOM = AP4_AvccAtom::Create(...);
+              $ATOM->SetType(...);
+    metavariable-pattern:
+      $ATOM:
+        type: "AP4_Atom*"

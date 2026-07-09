@@ -1,0 +1,19 @@
+rules:
+  - id: cwe-119-buffer-overflow-libarchive
+    message: "Potential stack-based buffer overflow due to array index out-of-bounds. The check 'argc > MAX_PACK_ARGS' occurs after writing to 'numbers[argc]', which may write past the end of the array."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (argc > $MAX) {
+            ...
+          }
+          $ARR[argc++] = ...;
+      - pattern: |
+          $ARR[argc++] = ...;
+          if (argc > $MAX) {
+            ...
+          }
+    metavariable-pattern:
+      $MAX: "MAX_PACK_ARGS"
+      $ARR: "numbers"

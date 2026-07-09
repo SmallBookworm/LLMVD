@@ -1,0 +1,28 @@
+rules:
+  - id: imagemagick-ps-reader-missing-eof-check
+    message: "Missing EOF check before reading Photoshop profile data may lead to DoS via excessive CPU consumption (CVE-2017-14172)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (LocaleNCompare(PhotoshopProfile, $A, $B) == 0)
+              {
+                $C;
+                count = (ssize_t) sscanf($D, PhotoshopProfile " %lu", &extent);
+                if (count != 1)
+                  continue;
+                length = extent;
+                profile = BlobToStringInfo((const void *) NULL, length);
+                if (profile != (StringInfo *) NULL)
+                {
+                  $E;
+                  for ($F = 0; $F < (ssize_t) length; $F++)
+                    $G = (unsigned char) ProfileInteger($H, $I);
+                  $J;
+                }
+                continue;
+              }
+    metadata:
+      cwe: "CWE-703"
+      cve: "CVE-2017-14172"

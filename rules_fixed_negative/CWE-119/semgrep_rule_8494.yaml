@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2016-1621-buffer-overread-libvpx
+    message: "Potential buffer overread due to use of incorrect plane constants (PLANE_* instead of VPX_PLANE_*), which may lead to memory corruption (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              mImg->planes[PLANE_Y]
+          - pattern: |
+              mImg->planes[PLANE_U]
+          - pattern: |
+              mImg->planes[PLANE_V]
+          - pattern: |
+              mImg->stride[PLANE_Y]
+          - pattern: |
+              mImg->stride[PLANE_U]
+          - pattern: |
+              mImg->stride[PLANE_V]
+          - pattern: |
+              CHECK_EQ(mImg->fmt, IMG_FMT_I420)
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2016-1621"

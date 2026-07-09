@@ -1,0 +1,19 @@
+rules:
+  - id: cwe-362-uninitialized-ipc-object
+    message: "IPC object is added via ipc_addid() before being fully initialized, leading to a race condition (CWE-362)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $ID = ipc_addid(...);
+          ...
+          $OBJ->$FIELD = ...;
+      - pattern: |
+          $ID = ipc_addid(...);
+          ...
+          INIT_LIST_HEAD(&$OBJ->$LIST_FIELD);
+    metavariable-pattern:
+      metavariable: $OBJ
+      pattern-not: 
+        pattern: $ANYTHING
+        language: c

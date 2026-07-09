@@ -1,0 +1,19 @@
+rules:
+  - id: integer-overflow-in-allocatesetdata
+    message: Integer overflow possible in AllocateDataSet due to missing bounds check before multiplication, leading to heap-based buffer overflow.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $t->nSamples = atoi($...);
+          $t->nPatches = atoi($...);
+          ...
+          AllocChunk($..., ((cmsUInt32Number) $t->nSamples + 1) * ((cmsUInt32Number) $t->nPatches + 1) * sizeof($...))
+      - pattern: |
+          $t->nPatches = atoi($...);
+          $t->nSamples = atoi($...);
+          ...
+          AllocChunk($..., ((cmsUInt32Number) $t->nSamples + 1) * ((cmsUInt32Number) $t->nPatches + 1) * sizeof($...))
+    metavariable-pattern:
+      metavariable: $t
+      pattern: TABLE*

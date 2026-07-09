@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2016-2180-out-of-bounds-read
+    message: "Potential out-of-bounds read in TS_OBJ_print_bio due to misuse of OBJ_obj2txt return value. The return value may exceed the buffer size, leading to undefined behavior (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      $LEN = OBJ_obj2txt($BUF, $SIZE, $OBJ, $NO_NAME);
+      BIO_write($BIO, $BUF, $LEN);
+    metavariable-patterns:
+      - metavariable: $LEN
+        patterns:
+          - pattern: $LEN = OBJ_obj2txt($BUF, $SIZE, $OBJ, $NO_NAME)

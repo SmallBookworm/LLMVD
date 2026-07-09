@@ -1,0 +1,26 @@
+rules:
+  - id: cve-2016-10088-sg-write-kernel-ds-check-missing
+    message: "Missing check for KERNEL_DS in sg_write() may lead to use-after-free (CWE-416)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          sg_write(struct file *filp, const char __user *buf, size_t count, loff_t * ppos)
+          {
+              ...
+              if ((!(sfp = (Sg_fd *) filp->private_data)) || (!(sdp = sfp->parentdp)))
+              ...
+          }
+      - pattern: |
+          bsg_write(struct file *filp, const char __user *buf, size_t count, loff_t * ppos)
+          {
+              ...
+              if ((!(sfp = (Sg_fd *) filp->private_data)) || (!(sdp = sfp->parentdp)))
+              ...
+          }
+    pattern-not: |
+      if (unlikely(segment_eq(get_fs(), KERNEL_DS)))
+          return -EINVAL;
+    fix-regex:
+      regex: ''
+      replacement: ''

@@ -1,0 +1,8 @@
+rules:
+  - id: cve-2018-1140-missing-null-check
+    message: Missing NULL check after calling ldb_dn_get_casefold() may lead to denial of service (CVE-2018-1140).
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      val.data = (uint8_t *)((uintptr_t)ldb_dn_get_casefold(...));
+      val.length = strlen((char *)val.data);

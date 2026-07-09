@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2017-13139-out-of-bounds-read-mng-clip
+    patterns:
+      - pattern: |
+          for (i=(int) first_object; i <= (int) last_object; i++)
+          {
+            ...
+            if ((p-chunk) < (ssize_t) (length-17))
+              mng_info->object_clip[i] = mng_read_box(...);
+            ...
+          }
+    message: "Potential out-of-bounds read in MNG CLIP chunk processing due to missing bounds check on object index 'i'."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2017-13139"

@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2014-3670-exif-heap-corruption
+    message: "Heap corruption vulnerability in exif_ifd_make_value due to incorrect handling of floating-point arrays. This may lead to denial of service or arbitrary code execution."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              memmove($PTR, &$INFO_DATA->value.f, $BYTE_COUNT);
+          - pattern: |
+              memmove($PTR, &$INFO_DATA->value.d, $BYTE_COUNT)

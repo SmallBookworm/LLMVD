@@ -1,0 +1,26 @@
+rules:
+  - id: cve-2018-9363-hidp-process-report-integer-overflow
+    message: "Potential integer overflow in hidp_process_report leading to buffer overflow (CWE-787, CVE-2018-9363). The 'len' parameter should be unsigned to prevent negative values from bypassing the size check."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          static void hidp_process_report(..., int len, ...)
+          {
+            ...
+            if (len > HID_MAX_BUFFER_SIZE)
+              len = HID_MAX_BUFFER_SIZE;
+            ...
+            memcpy(..., ..., len);
+            ...
+          }
+      - pattern: |
+          void hidp_process_report(..., int len, ...)
+          {
+            ...
+            if (len > HID_MAX_BUFFER_SIZE)
+              len = HID_MAX_BUFFER_SIZE;
+            ...
+            memcpy(..., ..., len);
+            ...
+          }

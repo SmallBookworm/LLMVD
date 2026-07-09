@@ -1,0 +1,19 @@
+rules:
+  - id: eap_pwd_hunting_and_pecking_side_channel
+    message: "EAP-pwd Hunting and Pecking loop exits after only 10 iterations, leading to a side-channel information leak (CVE-2019-13456)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern: |
+          while (1) {
+              if (ctr > 10) {
+                  ...
+                  goto fail;
+              }
+              ...
+          }
+    metadata:
+      cwe: "CWE-284"
+      cve: "CVE-2019-13456"
+      references:
+        - https://github.com/FreeRADIUS/freeradius-server/commit/3ea2a5a026e73d81cd9a3e9bbd4300c433004bfa

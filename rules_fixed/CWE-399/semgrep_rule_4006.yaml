@@ -1,0 +1,20 @@
+rules:
+  - id: imagemagick-bmp-memory-leak-cve-2019-13134
+    message: "Memory leak in ReadBMPImage due to missing RelinquishVirtualMemory on early return path."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (GetNextImageInList(image) == (Image *) NULL)
+            {
+              status=MagickFalse;
+              return((Image *) NULL);
+            }
+      - pattern: |
+          if (GetNextImageInList(image) == (Image *) NULL)
+            {
+              status=MagickFalse;
+              return(DestroyImageList(image));
+            }
+    fix-regex:
+      regex: false

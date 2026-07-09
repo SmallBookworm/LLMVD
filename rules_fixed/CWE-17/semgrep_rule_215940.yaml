@@ -1,0 +1,24 @@
+rules:
+  - id: usbvision_invalid_interface_access
+    message: "Accessing USB interface without validating bNumInterfaces may lead to denial of service (CVE-2015-7833)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (usbvision_device_data[$model].interface >= 0)
+              $interface = &dev->actconfig->interface[usbvision_device_data[$model].interface]->altsetting[0];
+          else
+              $interface = &dev->actconfig->interface[$ifnum]->altsetting[0];
+      - pattern: |
+          $interface = &dev->actconfig->interface[$ifnum]->altsetting[0];
+    metavariable-pattern:
+      $ifnum: "intf->altsetting->desc.bInterfaceNumber"
+    fix-regex:
+      regex: ""
+      replacement: ""
+    # Ensure we don't match the fixed version which includes bounds check
+    pattern-not: |
+      if ($ifnum < dev->actconfig->desc.bNumInterfaces)
+          $interface = &dev->actconfig->interface[$ifnum]->altsetting[0];
+      else
+          ...

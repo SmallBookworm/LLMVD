@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2015-6640-prctl-set-vma-anon-name
+    message: "Use of 'end' instead of 'tmp' in prctl_update_vma_anon_name may lead to VMA list corruption (CVE-2015-6640)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          prctl_update_vma_anon_name($vma, &$prev, $start, $end, $arg)
+    metadata:
+      cwe: "CWE-264"
+      references:
+        - "https://android.googlesource.com/kernel%2Fcommon/+/69bfe2d957d903521d32324190c2754cb073be15"
+        - "CVE-2015-6640"

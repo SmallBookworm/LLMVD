@@ -1,0 +1,17 @@
+rules:
+  - id: virtio_gpu_object_create_memory_leak
+    message: Memory leak in virtio_gpu_object_create when drm_gem_object_init fails. Missing kfree(bo) on error path.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          ret = drm_gem_object_init(..., &bo->gem_base, ...);
+          if (ret != 0)
+            return ret;
+      - pattern: |
+          ret = drm_gem_object_init(..., &bo->gem_base, ...);
+          if (ret)
+            return ret;
+    metavariable-regex:
+      metavariable: bo
+      regex: 'bo'

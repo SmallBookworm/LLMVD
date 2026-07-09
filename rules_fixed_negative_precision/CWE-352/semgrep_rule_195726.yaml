@@ -1,0 +1,12 @@
+rules:
+  - id: unsafe_static_cast_text_identification_frame
+    message: "Unsafe static_cast to TextIdentificationFrame without type check may lead to undefined behavior (CWE-352). Use dynamic_cast and check for null."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              static_cast<TextIdentificationFrame *>(...->frameList("TDRC").front())
+    metadata:
+      cwe: ["CWE-352"]
+      cve: "CVE-2017-12678"

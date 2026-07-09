@@ -1,0 +1,17 @@
+rules:
+  - id: ffmpeg-ape-integer-overflow
+    message: "Integer overflow in ape_decode_frame may lead to out-of-bounds access (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!nblocks || nblocks > INT_MAX) {
+                ...
+              }
+          - pattern: |
+              av_fast_malloc(&s->decoded_buffer, &s->decoded_size,
+                             2 * FFALIGN(blockstodecode, 8) * sizeof(*s->decoded_buffer));
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2017-11399"

@@ -1,0 +1,13 @@
+rules:
+  - id: qemu-ehci-itd-memory-leak
+    message: "Memory leak in ehci_process_itd: qemu_sglist_destroy is not called before returning early when pg == 6"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (pg == 6) {
+              return -1;
+          }
+      - pattern: |
+          if (pg == 6)
+              return -1;

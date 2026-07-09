@@ -1,0 +1,16 @@
+rules:
+  - id: mandril-uri-validation-bypass
+    patterns:
+      - pattern: |
+          if (mk_security_check_url($URI) < 0) {
+              ...
+          }
+      - metavariable-pattern:
+          metavariable: $URI
+          pattern: sr->uri
+    message: "Use of raw URI instead of decoded URI (sr->uri_processed) in mk_security_check_url may allow bypass via encoded characters."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-264"
+      cve: "CVE-2013-2182"

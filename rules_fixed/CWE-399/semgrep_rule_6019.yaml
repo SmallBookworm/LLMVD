@@ -1,0 +1,26 @@
+rules:
+  - id: use-after-free-bookmarks-api
+    message: "Potential use-after-free vulnerability due to missing null check on dispatcher()"
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (!dispatcher())
+        return;
+    pattern-not-inside: |
+      if (!dispatcher())
+        return;
+      ...
+    patterns:
+      - pattern-not: |
+          if (!dispatcher())
+            return;
+      - pattern-either:
+          - pattern: |
+              AddRef();
+              ...
+              dispatcher()->...
+          - pattern: |
+              WebContents* web_contents = dispatcher()->delegate()->GetAssociatedWebContents();
+    metadata:
+      cwe: "CWE-399"
+      cve: "CVE-2013-0920"

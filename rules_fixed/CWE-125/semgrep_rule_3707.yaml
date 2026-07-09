@@ -1,0 +1,32 @@
+rules:
+  - id: cwe-125-heap-oob-read-mach0-parser
+    message: "Potential heap-based out-of-bounds read in Mach-O parser due to missing bounds check on indirect symbol index."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for ($I = 0; $I + $OFFSET < $STRUCT->nindirectsyms; $I++) {
+                if ($COND == $STRUCT->indirectsyms[$STRUCT->reserved1 + $OFFSET]) {
+                  ...
+                }
+              }
+          - pattern: |
+              for ($I = 0; $I + $OFFSET < $STRUCT->nindirectsyms; $I++) {
+                int $IDX = $STRUCT->reserved1 + $OFFSET;
+                if ($COND == $STRUCT->indirectsyms[$IDX]) {
+                  ...
+                }
+              }
+    metavariable-pattern:
+      metavariable: $IDX
+      pattern: $BASE + $OFFSET
+    pattern-not-inside: |
+      for (...; ...; ...) {
+        ...
+        int $TMP = ...->reserved1 + ...;
+        if ($TMP < 0 || $TMP >= ...->nindirectsyms) {
+          break;
+        }
+        ...
+      }

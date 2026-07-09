@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2018-10877-ext4-depth-validation
+    message: Missing validation of extent tree depth may lead to out-of-bounds access (CVE-2018-10877).
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              depth = ext_depth($INODE);
+              if ($PATH) { ... }
+          - pattern: |
+              depth = ext_depth($INODE);
+              if (!$PATH) { ... }
+    metavariable-regex:
+      metavariable: $INODE
+      regex: 'inode'

@@ -1,0 +1,11 @@
+rules:
+  - id: inconsistent_bits_per_raw_sample
+    message: "Inconsistent bits_per_raw_sample may lead to assertion violation and denial of service (CVE-2018-12459)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (!s->studio_profile && s->avctx->bits_per_raw_sample != 8)
+          s->avctx->bits_per_raw_sample = 0;
+    pattern-not-inside: |
+      if (!s->studio_profile && s->avctx->bits_per_raw_sample != 8)
+          s->avctx->bits_per_raw_sample = 0;

@@ -1,0 +1,15 @@
+rules:
+  - id: wget-xattr-sensitive-url-info
+    message: "Sensitive information (e.g., credentials) may be stored in extended file attributes via user.xdg.origin.url or user.xdg.referrer.url."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern-regex: set_file_metadata\s*$$const char\s*\*\s*origin_url,\s*const char\s*\*\s*referrer_url,\s*FILE\s*\*\s*fp$$
+          - pattern: |
+              write_xattr_metadata ("user.xdg.origin.url", escnonprint_uri ($URL), $FP)
+          - pattern: |
+              write_xattr_metadata ("user.xdg.referrer.url", escnonprint_uri ($URL), $FP)
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2018-20483"

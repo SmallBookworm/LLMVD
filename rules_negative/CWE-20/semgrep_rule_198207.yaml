@@ -1,0 +1,29 @@
+rules:
+  - id: ffmpeg-cve-2019-1000016-uvlc-overflow
+    message: "Potential buffer overflow in uvlc decoding due to insufficient bounds checking on zeroes count (CVE-2019-1000016, CWE-20)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          char bits[65];
+          ...
+          while (1) {
+              ...
+              if (get_bits1(gbc)) {
+                  bits[...] = '1';
+                  break;
+              } else {
+                  bits[...] = '0';
+                  ++zeroes;
+              }
+          }
+      - pattern: |
+          char bits[65];
+          ...
+          zeroes = ...;
+          ...
+          for (j = 0; j < zeroes; j++)
+              bits[...] = ...;
+    metavariable-regex:
+      metavariable: zeroes
+      regex: '\d+'

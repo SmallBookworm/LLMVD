@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2015-3144
+    message: "Potential out-of-bounds read/write due to missing length check before accessing host->name[len-1]."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          len = strlen(...);
+          if (host->name[len-1] == '.')
+            host->name[len-1] = 0;
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2015-3144"

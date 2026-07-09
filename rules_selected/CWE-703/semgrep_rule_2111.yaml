@@ -1,0 +1,17 @@
+rules:
+  - id: digi_acceleport_missing_endpoint_check
+    message: Missing sanity check for USB endpoint count before accessing ports, leading to potential NULL pointer dereference (CVE-2016-3140).
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      serial_priv->ds_oob_port = serial->port[serial_priv->ds_oob_port_num];
+    pattern-not-inside: |
+      if (serial->num_port_pointers < serial->type->num_ports + 1) {
+        ...
+        return ...;
+      }
+      ...
+      serial_priv->ds_oob_port = serial->port[serial_priv->ds_oob_port_num];
+    metadata:
+      cwe: ["CWE-703"]
+      cve: "CVE-2016-3140"

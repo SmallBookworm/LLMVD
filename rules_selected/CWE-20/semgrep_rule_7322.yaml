@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2018-18346-blink-alert-ui-mishandling
+    message: "Potential UI confusion vulnerability due to improper handling of session metadata parsing. This may allow a remote attacker to present misleading browser UI."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern: |
+          if ($STORAGE_KEY.empty() ||
+              !$SPECIFICS.ParseFromString(std::move($RECORD.value))) {
+            ...
+            continue;
+          }
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2018-18346"

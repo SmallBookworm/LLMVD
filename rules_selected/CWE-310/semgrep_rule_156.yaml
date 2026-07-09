@@ -1,0 +1,8 @@
+rules:
+  - id: cve-2015-0285-unseeded-prng
+    message: "Handshake may proceed with unseeded PRNG, leading to predictable client random values (CVE-2015-0285)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (i)
+          ssl_fill_hello_random(s, 0, p, sizeof(s->s3->client_random));

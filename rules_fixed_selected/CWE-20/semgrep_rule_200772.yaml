@@ -1,0 +1,10 @@
+rules:
+  - id: radvd-privsep-short-read-loop
+    message: "Short read in privsep_read_loop may cause infinite loop; should return instead of continuing."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (ret != sizeof(...)) {
+          ...
+          continue;
+      }

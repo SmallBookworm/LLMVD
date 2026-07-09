@@ -1,0 +1,16 @@
+rules:
+  - id: cwe-125-buffer-overread-g_ntohl
+    message: "Potential buffer over-read due to multiple evaluations of g_ntohl() argument, which may lead to out-of-bounds memory access (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $H->$FIELD = g_ntohl(*($P++));
+          - pattern: |
+              g_ntohl(*($P++))
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2022-2301"
+      references:
+        - https://github.com/hpjansson/chafa/commit/56fabfa18a6880b4cb66047fa6557920078048d9

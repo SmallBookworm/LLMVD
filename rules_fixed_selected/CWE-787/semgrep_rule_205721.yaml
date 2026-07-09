@@ -1,0 +1,27 @@
+rules:
+  - id: udp_gro_receive_segment_missing_olen_check
+    message: "Missing validation of UDP payload length against skb_gro_len may lead to slab-out-of-bounds memory corruption (CVE-2019-11683, CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          struct udphdr *uh = ...;
+          ...
+          if (!uh->check) { ... }
+          ...
+          skb_gro_pull(skb, sizeof(struct udphdr));
+      - pattern: |
+          struct udphdr *uh = ...;
+          ...
+          if (!uh->check) { ... }
+          ...
+          list_for_each_entry(..., head, ...) { ... }
+    metavariable-pattern:
+      metavariable: uh
+      pattern: udp_hdr(...)
+    pattern-not: |
+      unsigned int ulen = ntohs(uh->len);
+      if (ulen <= sizeof(*uh) || ulen != skb_gro_len(skb)) {
+          NAPI_GRO_CB(skb)->flush = 1;
+          return NULL;
+      }

@@ -1,0 +1,28 @@
+rules:
+  - id: systemd-dns-stream-use-after-free
+    patterns:
+      - pattern-either:
+          - pattern: |
+              static int dns_stream_complete(DnsStream *s, int error) {
+                  ...
+                  if (s->complete)
+                      s->complete(s, error);
+                  else
+                      dns_stream_unref(s);
+                  ...
+              }
+          - pattern: |
+              static int on_stream_io(...) {
+                  ...
+                  if (s->complete)
+                      s->complete(s, error);
+                  else
+                      dns_stream_unref(s);
+                  ...
+              }
+    message: "Use-after-free vulnerability due to missing reference count increment before invoking callbacks that may unref the DnsStream object."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-703"
+      cve: "CVE-2022-2526"

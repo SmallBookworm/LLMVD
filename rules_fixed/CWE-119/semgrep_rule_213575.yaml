@@ -1,0 +1,31 @@
+rules:
+  - id: cve-2016-9439-null-deref-in-rendercOTable
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for ($$$; $$$; $$$) {
+                $$$
+                $t = $tbl->tables[$$$].ptr;
+                $$$
+                if ($t->total_width == $$$)
+                  $$$
+                else if ($t->total_width > $$$)
+                  $$$
+                else
+                  $$$
+                renderTable($t, $$$, $$$);
+                $$$
+              }
+          - pattern: |
+              for ($$$; $$$; $$$) {
+                $$$
+                $t = $tbl->tables[$$$].ptr;
+                $$$
+                $$$ = $t->total_width;
+                $$$
+                renderTable($t, $$$, $$$);
+                $$$
+              }
+    message: "Missing null check for 't' before dereferencing 't->total_width' may lead to null pointer dereference (CVE-2016-9439)."
+    severity: ERROR
+    languages: [c]

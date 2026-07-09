@@ -1,0 +1,20 @@
+rules:
+  - id: cwe-125-buffer-overread-findnextelement
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (DataStream.read(&PossibleIdNSize[ReadIndex++], 1) == 0) {
+                return NULL;
+              }
+              ReadSize++;
+          - pattern: |
+              if( DataStream.read( &PossibleIdNSize[SizeIdx++], 1 ) == 0 ) {
+                return NULL;
+              }
+              ReadSize++;
+    message: "Missing check against MaxDataSize before reading data may lead to heap-based buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2019-13615"

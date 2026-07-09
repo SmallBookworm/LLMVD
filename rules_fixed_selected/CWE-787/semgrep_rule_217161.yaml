@@ -1,0 +1,7 @@
+rules:
+  - id: pam_radius_auth_buffer_overflow
+    message: "Buffer overflow vulnerability in add_password: memcpy uses strlen(password) instead of bounded 'length', risking stack-based overflow (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      memcpy(hashed, password, strlen(password))

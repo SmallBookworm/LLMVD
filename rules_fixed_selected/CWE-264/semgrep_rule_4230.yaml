@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2013-1959-userns-fsuid-check
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (uid_eq(..., current_fsuid()))
+                  return true;
+          - pattern: |
+              if (gid_eq(..., current_fsgid()))
+                  return true;
+    message: "Use of current_fsuid()/current_fsgid() instead of file->f_cred->fsuid/fsgid in user namespace id mapping check may allow privilege escalation (CVE-2013-1959)."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-264"
+      confidence: MEDIUM

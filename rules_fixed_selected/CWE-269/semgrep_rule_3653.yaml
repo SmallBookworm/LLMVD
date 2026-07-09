@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2018-13405-sgid-file-creation
+    message: "SGID bit not cleared for non-directory files created by non-group members in SGID directories, leading to potential privilege escalation (CVE-2018-13405)."
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (dir && dir->i_mode & S_ISGID) {
+            ...
+            if (S_ISDIR(mode))
+              mode |= S_ISGID;
+          }
+      - pattern: |
+          if (dir && (dir->i_mode & S_ISGID)) {
+            ...
+            if (S_ISDIR(mode))
+              mode |= S_ISGID;
+          }

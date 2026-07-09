@@ -1,0 +1,25 @@
+rules:
+  - id: cve-2016-6198-vfs-open-missing-vfs_select_inode
+    message: "Missing use of vfs_select_inode() may lead to denial of service via self-hardlink rename in OverlayFS."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              struct dentry *dentry = $PATH->dentry;
+              struct inode *inode = dentry->d_inode;
+              ...
+              if (dentry->d_flags & DCACHE_OP_SELECT_INODE) {
+                inode = dentry->d_op->d_select_inode(dentry, $FLAGS);
+                if (IS_ERR(inode))
+                  return PTR_ERR(inode);
+              }
+          - pattern: |
+              struct dentry *dentry = $PATH->dentry;
+              struct inode *inode = dentry->d_inode;
+              ...
+              if (dentry->d_flags & DCACHE_OP_SELECT_INODE)
+                inode = dentry->d_op->d_select_inode(dentry, $FLAGS);
+    metadata:
+      cwe: ["CWE-284"]
+      cve: "CVE-2016-6198"

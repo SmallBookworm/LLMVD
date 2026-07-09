@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2017-9217-null-deref
+    message: "Potential null pointer dereference of p->question leading to denial of service (CVE-2017-9217)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (p->question->n_keys != 1)
+        return 0;
+    metavariable-pattern:
+      p: DnsPacket *

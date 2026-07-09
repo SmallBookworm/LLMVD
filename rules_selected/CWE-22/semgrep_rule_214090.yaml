@@ -1,0 +1,29 @@
+rules:
+  - id: cwe-22-directory-traversal-file-roller
+    message: "Potential directory traversal vulnerability due to missing check for external symbolic links during archive extraction."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (_g_path_get_relative_basename_safe(..., ..., ...) == NULL) {
+              ...
+              continue;
+          }
+          ...
+          file = g_file_get_child(..., ...);
+      - pattern: |
+          relative_path = _g_path_get_relative_basename_safe(..., ..., ...);
+          if (relative_path == NULL) {
+              ...
+              continue;
+          }
+          ...
+          file = g_file_get_child(..., ...);
+    metavariable-pattern:
+      metavariable: file
+      pattern-not: |
+          if (_g_path_is_external_to_destination(...)) {
+              ...
+              continue;
+          }
+          file = g_file_get_child(..., ...);

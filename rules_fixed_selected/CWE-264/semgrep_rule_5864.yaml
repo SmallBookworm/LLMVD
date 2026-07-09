@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2013-2874-devtools-bypass
+    message: "Missing intercepted_page_beforeunload_ reset may allow screen data access bypass via GL textures (CVE-2013-2874)."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      web_contents_->GetRenderViewHost()->ClosePage();
+    pattern-not: |
+      intercepted_page_beforeunload_ = false;
+      web_contents_->GetRenderViewHost()->ClosePage();

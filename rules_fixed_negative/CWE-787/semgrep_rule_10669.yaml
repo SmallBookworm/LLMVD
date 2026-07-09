@@ -1,0 +1,15 @@
+rules:
+  - id: wavpack-dsdiff-integer-overflow
+    message: "Potential integer overflow in bytes_to_copy calculation leading to insufficient memory allocation (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          int bytes_to_copy = (chunk_header.ckSize + 1) & ~1L;
+          char *buff = malloc (bytes_to_copy);
+      - pattern: |
+          int bytes_to_copy = (chunk_header.ckSize + 1) & ~1;
+          char *buff = malloc (bytes_to_copy);
+    metadata:
+      cwe: ["CWE-787"]
+      cve: ["CVE-2018-10539"]

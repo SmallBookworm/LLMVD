@@ -1,0 +1,19 @@
+rules:
+  - id: cwe-22-directory-traversal-gnu-patch
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((strip_leading < 0 || s <= 0) && *n)
+                {
+                  memmove (name, n, strlen (n) + 1);
+                  return true;
+                }
+          - pattern: |
+              if ((strip_leading < 0 || s <= 0) && *n)
+                {
+                  memmove(name, n, strlen(n) + 1);
+                  return true;
+                }
+    message: "Potential directory traversal vulnerability due to missing validation of absolute paths or '..' components in file names (CWE-22, CVE-2010-4651)."
+    severity: ERROR
+    languages: [c]

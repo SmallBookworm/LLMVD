@@ -1,0 +1,20 @@
+rules:
+  - id: exfat-utils-vbr-checksum-buffer-overflow
+    message: "Potential heap-based buffer overflow in verify_vbr_checksum due to missing sector size validation. This may lead to denial of service or arbitrary code execution."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (memcmp(..., "EXFAT   ", 8) != 0) { ... }
+              ...
+              $zero_cluster = malloc(CLUSTER_SIZE(*$sb));
+          - pattern: |
+              if (memcmp(..., "EXFAT   ", 8) != 0) { ... }
+              ...
+              malloc(CLUSTER_SIZE(*$sb));
+    metavariable-pattern:
+      metavariable: $sb
+      pattern: ef->sb
+    focus-metavariable: $zero_cluster
+    mode: search

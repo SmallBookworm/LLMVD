@@ -1,0 +1,15 @@
+rules:
+  - id: bubblewrap-tmp-mount-point
+    message: "Use of attacker-controllable temporary mount point in /tmp may lead to denial of service or code execution (CVE-2019-12439)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          base_path = xasprintf ("/tmp/.bubblewrap-%d", real_uid);
+      - pattern: |
+          $TMP = xasprintf ("/tmp/.bubblewrap-%d", $UID);
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2019-12439"
+      references:
+        - https://github.com/projectatomic/bubblewrap/commit/efc89e3b939b4bde42c10f065f6b7b02958ed50e

@@ -1,0 +1,21 @@
+rules:
+  - id: android-imemory-heap-size-check-missing
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (mHeap != 0) {
+                  ...
+                  mOffset = o;
+                  mSize = s;
+              }
+          - pattern: |
+              if (mHeap != 0) {
+                  mOffset = $O;
+                  mSize = $S;
+              }
+    message: "Missing heap size validation before assigning mOffset and mSize. This may lead to privilege escalation as described in CVE-2016-0846."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-264"
+      vulnerability: "Privilege Escalation due to missing heap bounds check"

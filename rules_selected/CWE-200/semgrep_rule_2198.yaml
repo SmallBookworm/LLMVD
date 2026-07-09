@@ -1,0 +1,26 @@
+rules:
+  - id: cve-2016-0823-pagemap-cap-check
+    message: "Missing CAP_SYS_ADMIN capability check in pagemap_open may leak physical address information to unprivileged users (CVE-2016-0823, CWE-200)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          static int pagemap_open(struct inode *inode, struct file *file)
+          {
+            ...
+            return 0;
+          }
+      - pattern: |
+          static int pagemap_open(struct inode *inode, struct file *file)
+          {
+            pr_warn_once(...);
+            return 0;
+          }
+    pattern-not: |
+      static int pagemap_open(struct inode *inode, struct file *file)
+      {
+        ...
+        if (!capable(CAP_SYS_ADMIN))
+          return -EPERM;
+        ...
+      }

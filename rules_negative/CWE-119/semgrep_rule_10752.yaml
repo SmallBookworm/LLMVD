@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2013-1790-uninitialized-refline
+    message: "Uninitialized memory read in refLine array may lead to undefined behavior (CWE-119). Ensure refLine is fully initialized before use."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      for (i = 0; i < columns && codingLine[i] < columns; ++i) {
+        refLine[i] = codingLine[i];
+      }
+      refLine[i++] = columns;
+      refLine[i] = columns;

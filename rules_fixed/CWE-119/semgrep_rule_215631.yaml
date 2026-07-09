@@ -1,0 +1,47 @@
+rules:
+  - id: cve-2011-0904-out-of-bounds-access
+    message: "Missing bounds check on framebuffer update rectangle dimensions may lead to out-of-bounds memory access (CVE-2011-0904)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - patterns:
+            - pattern: |
+                for ($COND; sraRgnIteratorNext($A, &rect); $INC) {
+                  int x = rect.x1;
+                  int y = rect.y1;
+                  int w = rect.x2 - x;
+                  int h = rect.y2 - y;
+                  ...
+                  switch ($ENC) {
+                  case rfbEncodingRaw:
+                    if (!rfbSendRectEncodingRaw($ARGS, x, y, w, h))
+                      ...
+                    break;
+                  ...
+                  }
+                }
+          - pattern: |
+              for ($COND; sraRgnIteratorNext($A, &rect); $INC) {
+                int x = rect.x1;
+                int y = rect.y1;
+                int w = rect.x2 - x;
+                int h = rect.y2 - y;
+                ...
+                if (!rfbSendRectEncodingRaw($ARGS, x, y, w, h))
+                  ...
+              }
+      - pattern-not: |
+          for ($COND; sraRgnIteratorNext($A, &rect); $INC) {
+            int x = rect.x1;
+            int y = rect.y1;
+            int w = rect.x2 - x;
+            int h = rect.y2 - y;
+            ...
+            if (w + x > cl->screen->width || h + y > cl->screen->height)
+              goto $LABEL;
+            ...
+          }
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2011-0904"

@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2018-7051-out-of-bounds-read
+    patterns:
+      - pattern: |
+          while (*p != '\0') {
+            if (*p == '\\') {
+              ...
+              p++;
+              ...
+            } else
+              ...
+            p++;
+          }
+    message: "Potential out-of-bounds read due to missing check for end of string after backslash escape (CWE-125)."
+    severity: ERROR
+    languages: [c]

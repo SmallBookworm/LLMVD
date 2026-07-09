@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2014-0203-missing-last-type-initialization
+    message: "Missing initialization of nd->last_type to LAST_BIND before follow_link(), which may lead to incorrect free operations and system crash (CVE-2014-0203)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      cookie = $DENTRY->d_inode->i_op->follow_link($DENTRY, $ND);
+    pattern-not: |
+      $ND->last_type = LAST_BIND;
+      cookie = $DENTRY->d_inode->i_op->follow_link($DENTRY, $ND);

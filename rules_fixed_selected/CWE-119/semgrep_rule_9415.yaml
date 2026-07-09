@@ -1,0 +1,10 @@
+rules:
+  - id: ffmpeg-sdp-h264-heap-buffer-overflow
+    message: "Heap buffer overflow vulnerability in sdp_parse_fmtp_config_h264 due to missing empty string check for 'sprop-parameter-sets' value (CVE-2017-14767, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (value[strlen(value) - 1] == ',') {
+              ...
+          }

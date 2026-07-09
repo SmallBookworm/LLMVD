@@ -1,0 +1,21 @@
+rules:
+  - id: cdk_pk_get_keyid_buffer_overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (pk->version < 4 && is_RSA(pk->pubkey_algo)) {
+                  ...
+                  _gnutls_mpi_print(..., ..., &n);
+                  ...
+                  p[n - 8] << ...;
+              }
+          - pattern: |
+              if (pk->version < 4 && is_RSA(pk->pubkey_algo)) {
+                  ...
+                  _gnutls_mpi_print(..., ..., &n);
+                  ...
+                  p[n - 4] << ...;
+              }
+    message: "Missing bounds check on 'n' after _gnutls_mpi_print may lead to stack-based buffer overflow (CWE-119)."
+    severity: ERROR
+    languages: [c]

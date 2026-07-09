@@ -1,0 +1,11 @@
+rules:
+  - id: pango_invalid_unicode_assertion
+    message: "Potential denial of service due to invalid Unicode sequences causing empty emoji segments. Ensure progress is made in _pango_emoji_iter_next to prevent assertion failures."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (iter->is_emoji == PANGO_EMOJI_TYPE_IS_EMOJI (current_emoji_type))
+      {
+        iter->is_emoji = !PANGO_EMOJI_TYPE_IS_EMOJI (current_emoji_type);
+        return TRUE;
+      }

@@ -1,0 +1,25 @@
+rules:
+  - id: cve-2019-11039-out-of-bounds-read-iconv
+    message: "Potential out-of-bounds read in _php_iconv_mime_decode due to missing bounds check before decrementing str_left. This may lead to information disclosure or crash (CVE-2019-11039, CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (*(p1 + 1) == '=') {
+              ++p1;
+              --str_left;
+          }
+      - pattern: |
+          if (*(p1 + 1) == '=') {
+              ++p1;
+              if (str_left > 1) {
+                  --str_left;
+              }
+          }
+    pattern-not: |
+      if (*(p1 + 1) == '=') {
+          ++p1;
+          if (str_left > 1) {
+              --str_left;
+          }
+      }

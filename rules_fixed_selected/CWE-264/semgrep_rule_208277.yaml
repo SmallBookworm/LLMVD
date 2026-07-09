@@ -1,0 +1,26 @@
+rules:
+  - id: tor_create_cell_outgoing_check_missing
+    message: "Missing check for outgoing OR connections when processing CREATE cells, which may allow anonymity bypass (CVE-2011-2768)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!server_mode(...)) {
+                ...
+                return;
+              }
+          - pattern: |
+              if (!server_mode(get_options())) {
+                ...
+                return;
+              }
+    metavariable-pattern:
+      metavariable: $COND
+      pattern: "!server_mode(...)"
+    pattern-not: |
+      if (!server_mode(...) ||
+          (!public_server_mode(...) && $CONN->is_outgoing)) {
+        ...
+        return;
+      }

@@ -1,0 +1,21 @@
+rules:
+  - id: inverted-capability-check-skfp-ioctl
+    message: "Inverted logic in capability check: SKFP_CLR_STATS allowed when CAP_NET_ADMIN is absent instead of present."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!capable(CAP_NET_ADMIN)) {
+              $CLEAR;
+          } else {
+              $RET = -EPERM;
+          }
+      - pattern: |
+          if (!capable(CAP_NET_ADMIN))
+              $CLEAR;
+          else
+              $RET = -EPERM;
+    metavariable-regex:
+      metavariable: $CLEAR
+      regex: "memset\\(.*\\)"
+    focus-metavariable: $CLEAR

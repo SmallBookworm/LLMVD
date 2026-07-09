@@ -1,0 +1,18 @@
+rules:
+  - id: rabbitmq-c-integer-overflow-frame-size
+    message: |
+      Missing validation of frame_size against INT32_MAX may lead to integer overflow
+      and heap buffer overflow during memcpy. Ensure frame_size is checked before
+      computing target_size.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          state->target_size = amqp_d32(...) + HEADER_SIZE + FOOTER_SIZE;
+      - pattern: |
+          $FRAME_SIZE = amqp_d32(...);
+          state->target_size = $FRAME_SIZE + HEADER_SIZE + FOOTER_SIZE;
+    metavariable-pattern:
+      $FRAME_SIZE:
+        pattern-not: |
+          if ($FRAME_SIZE >= INT32_MAX) { ... }

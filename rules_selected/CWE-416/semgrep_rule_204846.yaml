@@ -1,0 +1,20 @@
+rules:
+  - id: use-after-free-vim-nv_replace
+    message: "Use-after-free vulnerability detected. The pointer 'ptr' may be used after being freed when 'ins_copychar()' is called before 'ml_get_buf()'."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          ptr = ml_get_buf(..., TRUE);
+          ...
+          $C = ins_copychar(...);
+          ...
+          ptr[...] = ...;
+      - pattern: |
+          $C = ins_copychar(...);
+          ptr = ml_get_buf(..., TRUE);
+          ...
+          ptr[...] = ...;
+    metavariable-regex:
+      metavariable: $C
+      regex: "c"

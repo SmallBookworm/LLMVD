@@ -1,0 +1,37 @@
+rules:
+  - id: integer-overflow-soundtrigger-list-modules
+    message: "Potential integer overflow due to missing upper bound check on numModulesReq before allocation"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: unsigned int numModulesReq = data.readInt32();
+              - pattern-inside: |
+                  unsigned int numModulesReq = data.readInt32();
+                  ...
+                  calloc(numModulesReq, sizeof(...));
+              - metavariable-comparison:
+                  metavariable: numModulesReq
+                  comparison: 'numModulesReq > MAX_ITEMS_PER_LIST'
+            metavariable-pattern:
+              metavariable: numModulesReq
+              pattern-not: |
+                if (numModulesReq > MAX_ITEMS_PER_LIST) {
+                    numModulesReq = MAX_ITEMS_PER_LIST;
+                }
+          - patterns:
+              - pattern: unsigned int numModulesReq = data.readInt32();
+              - pattern-inside: |
+                  unsigned int numModulesReq = data.readInt32();
+                  ...
+                  calloc(numModulesReq, ...);
+              - metavariable-comparison:
+                  metavariable: numModulesReq
+                  comparison: 'numModulesReq > MAX_ITEMS_PER_LIST'
+            metavariable-pattern:
+              metavariable: numModulesReq
+              pattern-not: |
+                if (numModulesReq > MAX_ITEMS_PER_LIST) {
+                    numModulesReq = MAX_ITEMS_PER_LIST;
+                }

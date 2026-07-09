@@ -1,0 +1,10 @@
+rules:
+  - id: cwe-787-xwd-colormap-overflow
+    message: "Heap-based buffer overflow possible due to missing validation that number of colors does not exceed colormap entries (CVE-2013-1978)"
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (xwdhdr.l_colormap_entries > 0) {
+        xwdcolmap = g_new(L_XWDCOLOR, xwdhdr.l_colormap_entries);
+        read_xwd_cols(ifp, &xwdhdr, xwdcolmap);
+      }

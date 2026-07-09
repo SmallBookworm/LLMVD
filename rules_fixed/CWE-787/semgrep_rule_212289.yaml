@@ -1,0 +1,21 @@
+rules:
+  - id: cwe-787-buffer-overflow-newusers-null-line
+    message: "Potential buffer overflow due to incorrect handling of NULL ptr->line in commonio_sort. This may lead to memory corruption (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          for (ptr = db->head;
+               (NULL != ptr)
+          #if KEEP_NIS_AT_END
+               && (NULL != ptr->line)
+               && ('+' != ptr->line[0])
+               && ('-' != ptr->line[0])
+          #endif
+               ;
+               ptr = ptr->next) {
+              ...
+          }
+    metadata:
+      cwe: ["CWE-787"]
+      cve: "CVE-2017-12424"

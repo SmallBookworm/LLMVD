@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2018-18351-samesite-cookie-bypass
+    message: "Missing validation of ancestor frames when determining site_for_cookies may lead to SameSite cookie policy bypass."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          const GURL& site_for_cookies =
+              frame_tree_node_->IsMainFrame() ? common_params_.url : top_document_url;
+      - pattern: |
+          const GURL& site_for_cookies = ... ? ... : ...;
+          ...
+          NavigationURLLoader::Create(..., site_for_cookies, ...);
+    metavariable-pattern:
+      metavariable: site_for_cookies
+      pattern-not: |
+          bool ancestors_are_same_site = ...;
+          ...
+          const GURL& site_for_cookies =
+              ancestors_are_same_site
+                  ? (frame_tree_node_->IsMainFrame() ? common_params_.url : top_document_url)
+                  : GURL::EmptyGURL();

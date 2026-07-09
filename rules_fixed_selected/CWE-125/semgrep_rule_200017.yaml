@@ -1,0 +1,19 @@
+rules:
+  - id: freerdp-ntlm-oob-read-cve-2020-13396
+    message: Detected missing bounds check before CopyMemory which may lead to out-of-bounds read (CWE-125). Fixed version includes 'length > buffer->cbBuffer' check.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          length = (PayloadOffset - StartOffset) + $TARGET_NAME_LEN + $TARGET_INFO_LEN;
+          ...
+          CopyMemory($DST, $SRC, length);
+      - pattern: |
+          length = (PayloadOffset - StartOffset) + $TARGET_NAME_LEN + $TARGET_INFO_LEN;
+          ...
+          if (!sspi_SecBufferAlloc(..., length))
+             ...
+          CopyMemory($DST, $SRC, length);
+    metavariable-pattern:
+      $TARGET_NAME_LEN: message->TargetName.Len
+      $TARGET_INFO_LEN: message->TargetInfo.Len

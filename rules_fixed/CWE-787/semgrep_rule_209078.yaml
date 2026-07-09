@@ -1,0 +1,26 @@
+rules:
+  - id: cve-2018-14551-uninitialized-variable
+    message: "Uninitialized variable 'status' may lead to memory corruption (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      MagickBooleanType status;
+      ...
+      while (... != MagickFalse) {
+        ...
+        if (image_info->ping != MagickFalse) {
+          ...
+          goto skip_reading_current;
+        }
+        ...
+        skip_reading_current:
+        ...
+        if (GetNextImageInList(image) == (Image *) NULL) {
+          status = MagickFalse;
+          break;
+        }
+        ...
+      }
+      ...
+      if (status == MagickFalse)
+        return(DestroyImageList(image));

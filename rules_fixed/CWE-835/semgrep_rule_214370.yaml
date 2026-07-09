@@ -1,0 +1,16 @@
+rules:
+  - id: libvnc-infinite-loop-cve-2018-20021
+    message: "Potential infinite loop due to possible division by zero in raw encoding handling. If bytesPerLine is zero, linesToRead becomes undefined, which may lead to an infinite loop (CWE-835)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              bytesPerLine = ...;
+              linesToRead = RFB_BUFFER_SIZE / bytesPerLine;
+          - pattern: |
+              ... = ...;
+              ... = RFB_BUFFER_SIZE / bytesPerLine;
+    metavariable-pattern:
+      metavariable: bytesPerLine
+      pattern: $X

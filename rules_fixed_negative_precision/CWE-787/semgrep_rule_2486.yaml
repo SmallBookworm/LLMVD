@@ -1,0 +1,7 @@
+rules:
+  - id: openjpeg-pgxtoimage-buffer-overflow
+    message: "Potential stack-based buffer overflow in fscanf due to missing field width specifiers. This may lead to out-of-bounds write (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      fscanf(..., "PG%[ \t]%c%c%[ \t+-]%d%[ \t]%d%[ \t]%d", ...)

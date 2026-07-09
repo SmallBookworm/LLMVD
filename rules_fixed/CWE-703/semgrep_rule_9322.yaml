@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2014-5352-use-after-free-gss-context
+    message: "Potential use-after-free or double free due to improper handling of GSS security context termination. Context is deleted instead of being marked as terminated, leading to dangling pointers."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              return krb5_gss_delete_sec_context($$minor_status, &$$context_handle, GSS_C_NO_BUFFER);
+          - pattern: |
+              krb5_gss_delete_sec_context($$minor_status, &$$context_handle, GSS_C_NO_BUFFER);
+    metadata:
+      cwe: ["CWE-703"]
+      cve: "CVE-2014-5352"

@@ -1,0 +1,16 @@
+rules:
+  - id: cwe-189-integer-overflow-ftp-genlist
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (ptr = data->buf; rcvd; rcvd--, ptr++) {
+                  if (*ptr == '\n' && lastch == '\r') {
+                      lines++;
+                  } else {
+                      size++;
+                  }
+                  lastch = *ptr;
+              }
+    message: "Integer overflow vulnerability due to incorrect size calculation in ftp_genlist. The 'size' variable is incremented twice for the same received data, potentially leading to heap-based buffer overflow (CWE-189, CVE-2015-4022)."
+    severity: ERROR
+    languages: [c]

@@ -1,0 +1,38 @@
+rules:
+  - id: hugetlb_mcopy_atomic_pte_missing_isize_check
+    message: "Missing i_size check in hugetlb_mcopy_atomic_pte may lead to out-of-bounds access (CVE-2017-15128, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (vm_shared) {
+                ...
+                huge_add_to_page_cache(...);
+                ...
+              }
+              ...
+              ptl = huge_pte_lockptr(...);
+              spin_lock(ptl);
+              ...
+              if (!huge_pte_none($PTE)) {
+                goto $LABEL;
+              }
+          - pattern: |
+              if (vm_shared) {
+                struct address_space *mapping = ...;
+                pgoff_t idx = ...;
+                ...
+                huge_add_to_page_cache(...);
+                ...
+              }
+              ...
+              ptl = huge_pte_lockptr(...);
+              spin_lock(ptl);
+              ...
+              if (!huge_pte_none($PTE)) {
+                goto $LABEL;
+              }
+      - metavariable-regex:
+          metavariable: $func
+          regex: hugetlb_mcopy_atomic_pte

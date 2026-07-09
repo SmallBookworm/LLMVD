@@ -1,0 +1,9 @@
+rules:
+  - id: dccp_rebuild_header_vulnerability
+    message: "Use of IPv4-specific inet_sk_rebuild_header() in DCCP reset path may cause memory corruption for IPv6 connections. Use AF-independent rebuild_header instead."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      inet_sk_rebuild_header($SK)
+    fix: |
+      inet_csk($SK)->icsk_af_ops->rebuild_header($SK)

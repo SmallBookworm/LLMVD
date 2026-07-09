@@ -1,0 +1,20 @@
+rules:
+  - id: gtco_probe_null_pointer_dereference
+    message: "Missing check for bNumEndpoints may lead to NULL pointer dereference when accessing endpoint[0]."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          endpoint = &usbinterface->altsetting[0].endpoint[0].desc;
+      - pattern: |
+          &usbinterface->altsetting[0].endpoint[0].desc
+    metavariable-pattern:
+      metavariable: usbinterface
+      pattern: $X
+    pattern-not-inside: |
+      if ($X->altsetting[0].desc.bNumEndpoints < 1) {
+        ...
+      }
+    fix-regex:
+      regex: ""
+      replacement: ""

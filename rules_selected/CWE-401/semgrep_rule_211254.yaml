@@ -1,0 +1,17 @@
+rules:
+  - id: dwc3_pci_probe_memory_leak
+    message: Memory leak in dwc3_pci_probe due to missing error handling after platform_device_add_properties failure.
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (ret < 0)
+        return ret;
+    pattern-inside: |
+      static int dwc3_pci_probe(...) {
+        ...
+        ret = platform_device_add_properties(...);
+        ...
+      }
+    metavariable-regex:
+      metavariable: $...
+      regex: ".*"

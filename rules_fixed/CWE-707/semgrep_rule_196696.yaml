@@ -1,0 +1,11 @@
+rules:
+  - id: nghttp2-settings-flood
+    message: "Potential denial of service due to missing early check for SETTINGS flood. Upgrade to nghttp2 v1.41.0 or later, or implement a callback to limit settings entries."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      case NGHTTP2_SETTINGS:
+        ...
+        iframe->state = NGHTTP2_IB_READ_SETTINGS;
+        ...
+        if (iframe->max_niv - 1 > session->max_settings) {

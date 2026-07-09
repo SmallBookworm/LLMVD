@@ -1,0 +1,28 @@
+rules:
+  - id: imagemagick-xmagickcommand-memory-leak
+    message: Memory leak in XMagickCommand due to missing cleanup of filelist on error path.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ((status == MagickFalse) || (number_files == 0))
+            {
+              if (number_files == 0)
+                {
+                  ...
+                  return((Image *) NULL);
+                }
+              ...
+              return((Image *) NULL);
+            }
+      - pattern: |
+          if ((status == MagickFalse) || (number_files == 0))
+            {
+              ...
+              ThrowXWindowException(...);
+              return((Image *) NULL);
+            }
+    metavariable-pattern:
+      metavariable: $STATUS
+      patterns:
+        - pattern: status

@@ -1,0 +1,22 @@
+rules:
+  - id: cwe-125-out-of-bounds-read-ng-pkt
+    message: "Potential out-of-bounds read due to use of strchr without length restriction in ng_pkt. Use memchr with explicit length instead."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!(... = strchr($LINE, ' '))) {
+                  goto ...;
+              }
+          - pattern: |
+              if (!(... = strchr($LINE, '\n'))) {
+                  goto ...;
+              }
+    metavariable-pattern:
+      $LINE: 
+        pattern-inside: |
+          static int ng_pkt(git_pkt **..., const char *line, size_t len)
+          {
+            ...
+          }

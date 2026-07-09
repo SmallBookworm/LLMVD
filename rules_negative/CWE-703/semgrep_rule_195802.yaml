@@ -1,0 +1,15 @@
+rules:
+  - id: tensorflow-asstring-format-string-vulnerability
+    patterns:
+      - pattern-either:
+          - pattern: |
+              format_ = "%";
+              if (width > -1) {
+                strings::Appendf(&format_, "%s%d", fill_string.c_str(), width);
+              }
+    message: "Potential format string vulnerability in tf.strings.as_string due to unsafe use of fill_string in printf format construction."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-703"
+      cve: "CVE-2020-15203"

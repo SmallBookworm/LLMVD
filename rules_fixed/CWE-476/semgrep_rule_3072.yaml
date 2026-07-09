@@ -1,0 +1,29 @@
+rules:
+  - id: cwe-476-jp2-box-ops-null-deref
+    message: "Potential NULL pointer dereference due to incorrect cleanup of JP2 box data on error (CWE-476). The 'box->ops' is set too early and may be used uninitialized during error handling."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $box = jas_malloc(...);
+          ...
+          $box->ops = &($boxinfo->ops);
+          ...
+          if (... jp2_getuint32(...) ...) {
+            goto error;
+          }
+      - pattern: |
+          $box = jas_malloc(...);
+          ...
+          $box->ops = &(jp2_boxinfo_unk.ops);
+          ...
+          $boxinfo = jp2_boxinfolookup(...);
+          ...
+          $box->ops = &($boxinfo->ops);
+          ...
+          if (... jp2_getuint32(...) ...) {
+            goto error;
+          }
+    metavariable-pattern:
+      metavariable: $box
+      pattern: jp2_box_t *

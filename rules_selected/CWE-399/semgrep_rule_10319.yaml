@@ -1,0 +1,8 @@
+rules:
+  - id: qemu-v9fs-xattrcreate-memory-leak
+    patterns:
+      - pattern: |
+          $XATTR_FIDP->fs.xattr.value = g_malloc0($SIZE);
+    message: "Memory leak in v9fs_xattrcreate: 'fs.xattr.value' is allocated without freeing any previously allocated memory. This can lead to denial of service via memory exhaustion (CVE-2016-9102, CWE-399)."
+    severity: WARNING
+    languages: [c]

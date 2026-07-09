@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2013-4151-virtio-load-oob-write
+    message: |
+      Detected a potential out-of-bounds write in virtio_load. The loop bound 'num' is read from input without validation against VIRTIO_PCI_QUEUE_MAX,
+      which may lead to buffer overflow and arbitrary code execution (CVE-2013-4151, CWE-94).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $NUM = qemu_get_be32($F);
+          for ($I = 0; $I < $NUM; $I++) {
+            $VDEV->vq[$I].vring.num = qemu_get_be32($F);
+            ...
+          }
+    metavariable-regex:
+      - metavariable: $NUM
+        regex: num
+      - metavariable: $VDEV
+        regex: vdev

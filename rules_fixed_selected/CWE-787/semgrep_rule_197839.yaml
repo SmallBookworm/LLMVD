@@ -1,0 +1,12 @@
+rules:
+  - id: cwe-787-null-deref-trak-box-size
+    message: "Missing null check before dereferencing ptr->moov->mov->movieFileMap may lead to NULL pointer dereference (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if ($PTR->sample_encryption && $PTR->sample_encryption->load_needed) {
+        GF_Err $E = senc_Parse($PTR->moov->mov->movieFileMap->bs, ..., $PTR->sample_encryption);
+        ...
+      }
+    metavariable-pattern:
+      $PTR: { type: "GF_TrackBox *" }

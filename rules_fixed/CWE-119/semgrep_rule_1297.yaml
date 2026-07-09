@@ -1,0 +1,29 @@
+rules:
+  - id: cve-2014-3182-logitech-dj-bounds-check
+    message: "Missing bounds check on device_index before use in logi_dj_raw_event may lead to out-of-bounds access (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (dj_report->report_id == REPORT_ID_DJ_SHORT) {
+            ...
+            switch (dj_report->report_type) {
+              case REPORT_TYPE_NOTIF_DEVICE_UNPAIRED:
+                ...
+            }
+            ...
+          }
+      - pattern: |
+          switch (dj_report->report_type) {
+            case REPORT_TYPE_NOTIF_DEVICE_UNPAIRED:
+              ...
+          }
+    metavariable-pattern:
+      metavariable: dj_report
+      pattern: $X
+    pattern-not: |
+      if (($X->device_index < DJ_DEVICE_INDEX_MIN) ||
+          ($X->device_index > DJ_DEVICE_INDEX_MAX)) {
+        ...
+        return ...;
+      }

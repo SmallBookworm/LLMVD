@@ -1,0 +1,29 @@
+rules:
+  - id: cve-2008-3275-vfs-lookup-dead-dir
+    message: "Missing check for dead directory (S_DEAD) before creating child dentry in lookup function. This may lead to denial of service via UBIFS orphan area overflow."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!$result) {
+                  ...
+                  $dentry = d_alloc(...);
+                  ...
+              }
+          - pattern: |
+              if (!$result) {
+                  struct dentry *$dentry;
+                  ...
+                  $dentry = d_alloc(...);
+                  ...
+              }
+    pattern-not: |
+      if (!$result) {
+          ...
+          if (IS_DEADDIR(...))
+              goto ...;
+          ...
+          d_alloc(...);
+          ...
+      }

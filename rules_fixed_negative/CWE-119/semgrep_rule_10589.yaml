@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2016-1245-buffer-overflow
+    message: "Use of system-dependent BUFSIZ instead of actual buffer size may cause stack-based buffer overflow (CVE-2016-1245)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      rtadv_recv_packet(..., buf, BUFSIZ, ...)
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2016-1245"

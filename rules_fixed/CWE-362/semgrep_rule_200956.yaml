@@ -1,0 +1,13 @@
+rules:
+  - id: cwe-362-null-ptr-deref-put_busid_priv
+    message: "Potential NULL pointer dereference in put_busid_priv leading to bad unlock balance (CWE-362, CVE-2018-5814)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      spin_unlock(&bid->busid_lock);
+    pattern-not: |
+      if (bid)
+        spin_unlock(&bid->busid_lock);
+    fix-regex:
+      regex: ''
+      replacement: ''

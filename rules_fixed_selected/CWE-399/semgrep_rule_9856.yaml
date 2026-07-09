@@ -1,0 +1,24 @@
+rules:
+  - id: use-after-free-htmlformelement-prepareforsubmission
+    message: "Potential use-after-free vulnerability in HTMLFormElement::prepareForSubmission. Missing RefPtr protector may lead to object deletion during event dispatch."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      bool HTMLFormElement::prepareForSubmission(...)
+      {
+        ...
+        Frame* frame = document().frame();
+        ...
+        if (dispatchEvent(...))
+            ...
+        ...
+        if (m_shouldSubmit)
+            submit(...);
+        ...
+      }
+    pattern-not: |
+      bool HTMLFormElement::prepareForSubmission(...)
+      {
+        RefPtr<HTMLFormElement> protector(this);
+        ...
+      }

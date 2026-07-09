@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2018-19539-jas_image_readcmpt-null-check
+    message: Missing null check for 'data' parameter in jas_image_readcmpt may lead to denial of service (CWE-617).
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (cmptno < 0 || cmptno >= image->numcmpts_) {
+      ...
+      }
+    pattern-not: |
+      if (data == NULL) {
+        return -1;
+      }
+    pattern-inside: |
+      int jas_image_readcmpt(jas_image_t *image, int cmptno, jas_image_coord_t x,
+        jas_image_coord_t y, jas_image_coord_t width, jas_image_coord_t height,
+        jas_matrix_t *data)
+      {
+        ...
+        if (cmptno < 0 || cmptno >= image->numcmpts_) {
+          ...
+        }
+        ...
+      }

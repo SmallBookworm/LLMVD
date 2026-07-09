@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2016-3951-double-free-cdc_ncm_bind
+    message: "Calling usbnet_link_change in cdc_ncm_bind may lead to a double free if bind fails, as scheduled work may reference a freed netdev."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          usbnet_link_change($dev, 0, 0);
+    metavariable-pattern:
+      $dev: "struct usbnet *"

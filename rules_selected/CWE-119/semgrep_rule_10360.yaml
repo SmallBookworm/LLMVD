@@ -1,0 +1,13 @@
+rules:
+  - id: qemu-acpi-pcihp-out-of-bounds
+    patterns:
+      - pattern: |
+          if ($BSEL < 0 || $BSEL > $MAX_HOTPLUG_BUS) {
+              return 0;
+          }
+    message: "Off-by-one error may lead to out-of-bounds array access in acpi_pcihp_pci_status. Use '>=' instead of '>' for upper bound check."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2014-5388"

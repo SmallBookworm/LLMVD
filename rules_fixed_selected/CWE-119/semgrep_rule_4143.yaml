@@ -1,0 +1,14 @@
+rules:
+  - id: c-buffer-overflow-strcpy-no-bounds-check
+    patterns:
+      - pattern-either:
+          - pattern: strcpy($DST, $SRC);
+          - pattern: strcpy($DST, $SRC + ...);
+    message: "Potential buffer overflow: strcpy is used without bounds checking. Ensure the source length is validated against the destination buffer size."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      references:
+        - "https://github.com/gpac/gpac/commit/35ab4475a7df9b2a4bcab235e379c0c3ec543658"
+        - "CVE-2018-20761"

@@ -1,0 +1,16 @@
+rules:
+  - id: imagemagick-writepdbimage-memory-leak-cve-2018-17966
+    message: "Memory leak in WritePDBImage due to missing cleanup of 'runlength' when AcquireQuantumInfo fails."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          quantum_info=AcquireQuantumInfo(...);
+          if (quantum_info == (QuantumInfo *) NULL)
+            ThrowWriterException(...);
+      - pattern: |
+          quantum_info=AcquireQuantumInfo(...);
+          if (quantum_info == (QuantumInfo *) NULL)
+            return ...;
+    metadata:
+      cwe: "CWE-772"

@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2017-11176-use-after-free-mq-notify
+    message: "Use-after-free vulnerability in mq_notify due to missing 'sock = NULL' before retry. This may lead to denial of service or arbitrary code execution."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (ret == 1)
+                goto retry;
+          - pattern: |
+              if (ret == 1)
+                $S;
+              ...
+              retry:
+    metavariable-pattern:
+      $S: "sock = NULL"
+    fix: ""

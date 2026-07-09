@@ -1,0 +1,35 @@
+rules:
+  - id: cve-2019-15030-powerpc-tm-giveup-all-ordering
+    message: "Missing call to check_if_tm_restore_required before early return in giveup_all may lead to FP/VMX register corruption (CVE-2019-15030)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          void giveup_all(struct task_struct *tsk)
+          {
+              ...
+              unsigned long usermsr = tsk->thread.regs->msr;
+              if ((usermsr & msr_all_available) == 0)
+                  return;
+              ...
+              check_if_tm_restore_required(tsk);
+              ...
+          }
+      - pattern: |
+          void giveup_all(struct task_struct *tsk)
+          {
+              ...
+              unsigned long usermsr;
+              ...
+              usermsr = tsk->thread.regs->msr;
+              if ((usermsr & msr_all_available) == 0)
+                  return;
+              ...
+              check_if_tm_restore_required(tsk);
+              ...
+          }
+    metadata:
+      cwe: ["CWE-862"]
+      cve: "CVE-2019-15030"
+      references:
+        - https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=8205d5d98ef7f155de211f5e2eb6ca03d95a5a60

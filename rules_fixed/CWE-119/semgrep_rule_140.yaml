@@ -1,0 +1,21 @@
+rules:
+  - id: ghostscript-xps-buffer-overflow
+    message: "Potential buffer overflow in xps_load_sfnt_name due to missing length validation before memcpy or string copy. This could lead to denial of service or arbitrary code execution (CVE-2017-9618)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          memcpy($DST, $SRC, $LEN);
+          $DST[$LEN] = 0;
+      - pattern: |
+          for (...; ...; ...)
+          {
+            ...
+            $DST[$IDX] = ...;
+            ...
+          }
+          $DST[$IDX] = 0;
+    metavariable-pattern:
+      metavariable: $DST
+      pattern: namep
+    focus-metavariable: $DST

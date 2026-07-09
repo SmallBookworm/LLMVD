@@ -1,0 +1,21 @@
+rules:
+  - id: apparmor_setprocattr_buffer_overflow
+    message: "Missing buffer size validation in apparmor_setprocattr may lead to buffer overflow (CVE-2016-6187)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ($ARGS[$SIZE - 1] != '\0') {
+              if ($SIZE == PAGE_SIZE)
+                  return -EINVAL;
+              $ARGS[$SIZE] = '\0';
+          }
+      - pattern: |
+          if ($ARGS[$SIZE - 1] != '\0') {
+              $ARGS[$SIZE] = '\0';
+          }
+    metavariable-patterns:
+      - metavariable: $ARGS
+        pattern: value
+      - metavariable: $SIZE
+        pattern: size

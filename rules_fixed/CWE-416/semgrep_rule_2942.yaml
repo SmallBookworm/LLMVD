@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2017-6874-use-after-free-race
+    message: "Use-after-free vulnerability due to race condition in ucount->count manipulation. Decrement/increment must be done under ucounts_lock to prevent concurrent access."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!atomic_add_unless(&$X->count, $INC, INT_MAX))
+              $X = NULL;
+      - pattern: |
+          atomic_set(&$X->count, 0);
+    metadata:
+      cwe: ["CWE-416"]
+      cve: "CVE-2017-6874"

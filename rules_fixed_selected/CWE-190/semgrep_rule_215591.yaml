@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2010-3067-integer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (unlikely(!access_ok(..., $IOCBBP, (nr * sizeof(*$IOCBBP)))))
+                  return -EFAULT;
+          - pattern: |
+              if (unlikely(!access_ok(..., $IOCBBP, nr * sizeof(*$IOCBBP))))
+                  return -EFAULT;
+    message: "Potential integer overflow in access_ok size calculation. Missing overflow check before multiplication (CWE-190)."
+    severity: ERROR
+    languages: [c]

@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2017-16914-null-transfer-buffer
+    message: |
+      Missing null check for urb->transfer_buffer when urb->actual_length > 0.
+      This can lead to a NULL pointer dereference (CWE-476) as seen in CVE-2017-16914.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (usb_pipein($PIPE) &&
+              usb_pipetype($PIPE) != PIPE_ISOCHRONOUS &&
+              $URB->actual_length > 0) {
+            ... $URB->transfer_buffer ...
+          }
+      - pattern: |
+          for (...; ...; ...) {
+            ... $URB->transfer_buffer + ...
+          }
+    pattern-not-inside: |
+      if ($URB->actual_length > 0 && !$URB->transfer_buffer) {
+        ...
+        return ...;
+      }
+      ...

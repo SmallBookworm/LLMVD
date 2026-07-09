@@ -1,0 +1,15 @@
+rules:
+  - id: libssh2-dh-bits-bytes-confusion
+    message: "Potential bits/bytes confusion in Diffie-Hellman key exchange leading to weakened secrets (CVE-2016-0787)."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              _libssh2_bn_rand($x, $group_order, 0, -1);
+          - pattern: |
+              _libssh2_bn_rand(..., $group_order, ...);
+    metavariable-pattern:
+      metavariable: $group_order
+      pattern: $group_order <= 256
+    fix: ""

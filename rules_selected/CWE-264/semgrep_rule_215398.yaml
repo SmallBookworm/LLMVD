@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2008-4554-splice-o-append
+    message: "splice() allows writing to files with O_APPEND flag, which can bypass append-only semantics. This was fixed by rejecting O_APPEND file descriptors in do_splice_from."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (unlikely(!(out->f_mode & FMODE_WRITE)))
+          return -EBADF;
+      ...
+      rw_verify_area(WRITE, out, ppos, len);
+    pattern-not: |
+      if (unlikely(out->f_flags & O_APPEND))
+          return -EINVAL;
+    fix-regex:
+      regex: '(if \(unlikely\(!\(out->f_mode & FMODE_WRITE\)\)\)\s+return -EBADF;)(.*?)(ret = rw_verify_area\(WRITE, out, ppos, len\);)'
+      replacement: '\1\n\n\tif (unlikely(out->f_flags & O_APPEND))\n\t\treturn -EINVAL;\n\n\2\3'
+    metadata:
+      cwe: "CWE-264"
+      cve: "CVE-2008-4554"
+      references:
+        - "http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=commit;h=efc968d450e013049a662d22727cf132618dcb2f"

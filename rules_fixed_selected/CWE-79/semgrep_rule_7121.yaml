@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2017-5069-xss-protection-mime-type-bypass
+    message: "Potential XSS protection bypass due to incorrect session startup preference handling in incognito mode. Use IsOffTheRecord() instead of IncognitoModePrefs::ShouldLaunchIncognito()."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern: |
+          if (pref.type == SessionStartupPref::LAST &&
+              IncognitoModePrefs::ShouldLaunchIncognito($CMD_LINE, $PREFS)) {
+            pref.type = SessionStartupPref::DEFAULT;
+          }

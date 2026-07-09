@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2014-1690-uninitialized-buffer-irc-nat
+    message: "Uninitialized buffer 'buffer' passed to nf_nat_mangle_tcp_packet may lead to information disclosure (CWE-119)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              char $BUF[...];
+              ...
+              nf_nat_mangle_tcp_packet(..., $BUF, strlen($BUF));
+          - pattern: |
+              char $BUF[...];
+              ...
+              ret = nf_nat_mangle_tcp_packet(..., $BUF, strlen($BUF));
+    metavariable-pattern:
+      $BUF: 
+        pattern-not: snprintf($BUF, ..., ...)

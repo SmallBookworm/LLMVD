@@ -1,0 +1,32 @@
+rules:
+  - id: cwe-125-rtreenode-heap-oob-read
+    message: "Potential heap out-of-bounds read in rtreenode() due to missing input validation on rtree dimension and blob size (CVE-2019-8457, CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          tree.nDim = (u8)sqlite3_value_int($ARG0);
+          tree.nDim2 = tree.nDim * 2;
+          ...
+          node.zData = (u8 *)sqlite3_value_blob($ARG1);
+          ...
+          for ($II = 0; $II < NCELL(&node); $II++) { ... }
+      - pattern: |
+          tree.nDim = (u8)sqlite3_value_int($ARG0);
+          ...
+          node.zData = (u8 *)sqlite3_value_blob($ARG1);
+          ...
+          for ($II = 0; $II < NCELL(&node); $II++) { ... }
+    metavariable-regex:
+      - metavariable: $ARG0
+        regex: apArg\[0\]
+      - metavariable: $ARG1
+        regex: apArg\[1\]
+    patterns:
+      - pattern-not: |
+          tree.nDim = (u8)sqlite3_value_int(...);
+          if (tree.nDim < 1 || tree.nDim > 5) return;
+          ...
+          nData = sqlite3_value_bytes(...);
+          if (nData < 4) return;
+          if (nData < NCELL(...) * tree.nBytesPerCell) return;

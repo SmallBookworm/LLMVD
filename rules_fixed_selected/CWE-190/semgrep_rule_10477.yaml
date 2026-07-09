@@ -1,0 +1,12 @@
+rules:
+  - id: qcow2_l1_size_integer_overflow
+    message: "Potential integer overflow in L1 table size calculation. The check 'new_l1_size > INT_MAX' is insufficient; it should be 'new_l1_size > INT_MAX / sizeof(uint64_t)' to prevent overflow when computing allocation size."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (new_l1_size > INT_MAX) {
+        return -EFBIG;
+      }
+    metadata:
+      cwe: "CWE-190"
+      cve: "CVE-2014-0143"

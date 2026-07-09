@@ -1,0 +1,29 @@
+rules:
+  - id: webrtc-macos-buffer-size-cve-2013-0843
+    message: "Insufficient buffer size for 96 kHz audio on macOS may lead to memory corruption (CVE-2013-0843, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          #if defined(OS_MACOSX)
+          ...
+          if (sample_rate == 48000) {
+            buffer_size = 480;
+          } else {
+            buffer_size = 440;
+          }
+          ...
+          #endif
+      - pattern: |
+          #if defined(OS_MACOSX)
+          ...
+          if (sample_rate == 48000) {
+            buffer_size = 480;
+          } else {
+            buffer_size = 440;
+          }
+          ...
+          #endif
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2013-0843"

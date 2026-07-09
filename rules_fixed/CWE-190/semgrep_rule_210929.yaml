@@ -1,0 +1,9 @@
+rules:
+  - id: cve-2020-14363-integer-overflow
+    message: "Integer overflow in 'length' accumulation may lead to double-free (CVE-2020-14363). Use 'unsigned int' for 'length' to prevent overflow."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      int $X, length = 0;
+      ...
+      length += strlen($Y) + 1;

@@ -1,0 +1,17 @@
+rules:
+  - id: unchecked-kstrndup-null-deref
+    message: "Unchecked return value from kstrndup() may lead to NULL pointer dereference (CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $DERIVED_NAME = kstrndup(...);
+          ...;
+          $FACTORS.name = $DERIVED_NAME;
+      - pattern: |
+          $DERIVED_NAME = kstrndup(...);
+          ...;
+          $FACTORS->name = $DERIVED_NAME;
+    metavariable-pattern:
+      $DERIVED_NAME:
+        pattern: char *...

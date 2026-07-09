@@ -1,0 +1,29 @@
+rules:
+  - id: ip_check_mc_rcu-missing-lock
+    message: "Use-after-free vulnerability in ip_check_mc_rcu due to missing lock when accessing im->sources. This may lead to local privilege escalation."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (im) {
+                  if (src_addr) {
+                      for ($psf = im->sources; $psf; $psf = $psf->sf_next) {
+                          ...
+                      }
+                      ...
+                  }
+              }
+          - pattern: |
+              else if (im) {
+                  if (src_addr) {
+                      for ($psf = im->sources; $psf; $psf = $psf->sf_next) {
+                          ...
+                      }
+                      ...
+                  }
+              }
+    metavariable-patterns:
+      - metavariable: $psf
+        patterns:
+          - pattern: psf

@@ -1,0 +1,11 @@
+rules:
+  - id: jwt-timing-attack-vulnerable-comparison
+    patterns:
+      - pattern: |
+          $HMAC == $SIGNATURE
+    message: "JWT signature comparison uses non-constant-time '==' operator, which is vulnerable to timing attacks (CWE-200, CVE-2018-8023). Use a constant-time comparison function instead."
+    severity: HIGH
+    languages: [c]
+    metadata:
+      cwe: ["CWE-200"]
+      cve: ["CVE-2018-8023"]

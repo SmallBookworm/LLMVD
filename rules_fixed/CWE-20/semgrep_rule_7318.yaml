@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2018-18344-set-download-behavior-check
+    message: "Missing permission check before allowing setDownloadBehavior in devtools protocol, which could lead to unauthorized file system access."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (behavior == Page::SetDownloadBehavior::BehaviorEnum::Allow) {
+        ...
+      }
+      if (behavior == Page::SetDownloadBehavior::BehaviorEnum::Default) {
+        ...
+      }
+    pattern-not: |
+      if (!allow_set_download_behavior_) {
+        return Response::Error("");
+      }

@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2017-0547-hdcp-buffer-overflow
+    message: "Potential integer overflow leading to buffer under-allocation in HDCP_ENCRYPT case. This may cause information disclosure (CWE-200)."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              size_t size = data.readInt32();
+              size_t bufSize = 2 * size;
+              if (bufSize > size) {
+                  ... malloc(bufSize);
+              }
+          - pattern: |
+              size_t size = data.readInt32();
+              ... malloc(2 * size);
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2017-0547"
+      references:
+        - "https://android.googlesource.com/platform/frameworks/av/+/9667e3eff2d34c3797c3b529370de47b2c1f1bf6"

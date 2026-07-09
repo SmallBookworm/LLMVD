@@ -1,0 +1,37 @@
+rules:
+  - id: cve-2018-18661-null-pointer-dereference
+    message: |
+      Missing NULL check after _TIFFmalloc may lead to NULL pointer dereference
+      if memory allocation fails (CVE-2018-18661, CWE-476).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - patterns:
+        - pattern: $PTR = (unsigned char*) _TIFFmalloc(...)
+        - pattern-inside: |
+            ...
+        - pattern: $PTR[...]
+      - patterns:
+        - pattern: $PTR = (unsigned char*) _TIFFmalloc(...)
+        - pattern-inside: |
+            ...
+        - pattern: compresspalette(..., $PTR, ...)
+      - patterns:
+        - pattern: $PTR = (unsigned char*) _TIFFmalloc(...)
+        - pattern-inside: |
+            ...
+        - pattern: compresscontig(..., $PTR, ...)
+      - patterns:
+        - pattern: $PTR = (unsigned char*) _TIFFmalloc(...)
+        - pattern-inside: |
+            ...
+        - pattern: compresssep(..., $PTR, ...)
+    metavariable-comparison:
+      metavariable: $PTR
+      comparison: not contains "if (!$PTR)"
+    fix: |
+      $PTR = (unsigned char*) _TIFFmalloc(...);
+      if (!$PTR) {
+          // handle allocation failure
+      }
+      ...

@@ -1,0 +1,23 @@
+rules:
+  - id: mcf_fec_unbounded_tx_descriptor_loop
+    message: "Unbounded loop in mcf_fec_do_tx may lead to denial of service via infinite loop (CVE-2016-7908)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while (1) {
+                ...
+                mcf_fec_read_bd(..., ...);
+                ...
+              }
+          - pattern: |
+              for (;;) {
+                ...
+                mcf_fec_read_bd(..., ...);
+                ...
+              }
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: "mcf_fec_do_tx"
+    focus-metavariable: $FUNC

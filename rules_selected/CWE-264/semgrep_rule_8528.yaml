@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2016-0826-camera-dump-vulnerability
+    message: "CameraClient::dump directly writes sensitive client information without proper permission checks. This may allow privilege escalation via crafted applications."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              status_t CameraClient::dump(int fd, const Vector<String16>& args) {
+                  ...
+                  write(fd, ..., ...);
+                  ...
+              }
+          - pattern: |
+              status_t CameraClient::dump(...) {
+                  ...
+                  write(...);
+                  ...
+              }
+    metadata:
+      cwe: "CWE-264"
+      cve: "CVE-2016-0826"

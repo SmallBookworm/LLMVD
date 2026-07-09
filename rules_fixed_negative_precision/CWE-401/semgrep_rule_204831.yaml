@@ -1,0 +1,11 @@
+rules:
+  - id: nl80211_memory_leak_CVE-2019-19055
+    message: "Memory leak in nl80211_get_ftm_responder_stats: 'msg' is not freed on nl80211hdr_put() failure."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (!hdr)
+        return -ENOBUFS;
+    metadata:
+      cwe: "CWE-401"
+      cve: "CVE-2019-19055"

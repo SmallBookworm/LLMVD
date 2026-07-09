@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2013-2876-screenshot-capture-url-check
+    message: "Use of active URL instead of last committed URL for screenshot capture permission check may allow capturing content from a different page than intended (e.g., interstitial bypass)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!GetExtension()->CanCaptureVisiblePage(
+                    web_contents->GetURL(),
+                    ...,
+                    &error_)) {
+                ...
+              }
+    metadata:
+      cwe: "CWE-264"
+      cve: "CVE-2013-2876"

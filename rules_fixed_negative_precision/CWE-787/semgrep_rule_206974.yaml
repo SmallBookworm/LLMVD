@@ -1,0 +1,9 @@
+rules:
+  - id: cwe-787-oob-write-macho-chained-fixup
+    message: Out-of-bounds write vulnerability in Mach-O chained fixup reconstruction. The condition checks against `maxsize` (in bytes) instead of `page_count` (number of elements), leading to potential buffer overflow.
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (page_index < maxsize) {
+        cur_seg->page_start[page_index] = ...;
+      }

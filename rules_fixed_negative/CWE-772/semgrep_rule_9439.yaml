@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2017-12644-memory-leak
+    patterns:
+      - pattern: |
+          if (length > GetBlobSize(image))
+            ThrowReaderException(...);
+    message: "Potential memory leak due to missing memory deallocation before ThrowReaderException. Use ThrowDCMException instead to ensure cleanup."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-772"
+      cve: "CVE-2017-12644"

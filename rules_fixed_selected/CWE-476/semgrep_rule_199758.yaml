@@ -1,0 +1,17 @@
+rules:
+  - id: ceph-null-pointer-dereference-tagging
+    message: Missing null check for 'tagging' element after XML parsing may lead to NULL pointer dereference (CWE-476).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $TAGGING = static_cast<RGWObjTagging_S3 *>(parser.find_first("Tagging"));
+          $OBJ_TAGS_S3 = static_cast<RGWObjTagSet_S3 *>($TAGGING->find_first("TagSet"));
+      - pattern: |
+          $TAGGING = (RGWObjTagging_S3 *)(parser.find_first("Tagging"));
+          $OBJ_TAGS_S3 = (RGWObjTagSet_S3 *)($TAGGING->find_first("TagSet"));
+    metavariable-regex:
+      - metavariable: $TAGGING
+        regex: (?i)tagging
+      - metavariable: $OBJ_TAGS_S3
+        regex: (?i)obj_tags_s3

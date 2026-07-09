@@ -1,0 +1,24 @@
+rules:
+  - id: matio-memory-leak-cve-2022-1515
+    message: "Memory leak in ReadNextFunctionHandle: allocated matvar_t elements are not freed on error, leading to potential DoS (CVE-2022-1515)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (err) {
+              free(matvar->data);
+              matvar->data = NULL;
+              matvar->data_size = 0;
+              matvar->nbytes = 0;
+          }
+      - pattern: |
+          if ( err ) {
+              free(matvar->data);
+              matvar->data = NULL;
+              matvar->data_size = 0;
+              matvar->nbytes = 0;
+          }
+    metavariable-regex:
+      metavariable: $err
+      regex: "err"
+    focus-metavariable: $err

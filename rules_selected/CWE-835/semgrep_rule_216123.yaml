@@ -1,0 +1,29 @@
+rules:
+  - id: opensips-infinite-loop-gruu
+    message: "Infinite loop vulnerability in GRUU handling due to missing iterator advancement in while loop (CVE-2013-3722, CWE-835)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          while ( $IT ) {
+            if (VALID_CONTACT($IT, $ACT_TIME)) {
+              if ($IT->instance.len - 2 == $SIP_INSTANCE.len &&
+                  memcmp($IT->instance.s + 1, $SIP_INSTANCE.s, $SIP_INSTANCE.len) == 0)
+                if ($IT->last_modified > $PTR->last_modified) {
+                  break;
+                }
+            }
+          }
+      - pattern: |
+          while ( $IT ) {
+            if (VALID_CONTACT($IT,act_time)) {
+              if ($IT->instance.len-2 == $SIP_INSTANCE.len &&
+                  memcmp($IT->instance.s+1,$SIP_INSTANCE.s,$SIP_INSTANCE.len) == 0)
+                if ($IT->last_modified > $PTR->last_modified) {
+                  break;
+                }
+            }
+          }
+    metavariable-pattern:
+      metavariable: $IT
+      pattern: it

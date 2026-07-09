@@ -1,0 +1,13 @@
+rules:
+  - id: heap_buffer_overflow_long_help_argument
+    message: "Potential heap-based buffer overflow due to unsafe string copy into fixed-size buffer. Use snprintf or equivalent bounded functions."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              STRCPY($D, "/\\\\");
+              STRCPY($D + 3, $ARG + 1);
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2021-4019"

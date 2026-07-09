@@ -1,0 +1,27 @@
+rules:
+  - id: cve-2019-5802-download-origin-spoofing
+    message: "Missing WebFeature::kOpenerNavigationDownloadCrossOriginNoGesture in allowed UKM features list may allow domain spoofing via crafted HTML page (CVE-2019-5802)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          std::initializer_list<WebFeature>({
+              ...,
+              WebFeature::kDownloadInAdFrameWithoutUserGesture,
+              WebFeature::kOpenWebDatabase,
+              WebFeature::kV8MediaCapabilities_DecodingInfo_Method,
+              ...
+          })
+      - pattern: |
+          std::initializer_list<WebFeature>({
+              ...,
+              WebFeature::kV8MediaCapabilities_DecodingInfo_Method
+          })
+    metavariable-pattern:
+      metavariable: $LIST
+      pattern-not: |
+        std::initializer_list<WebFeature>({
+            ...,
+            WebFeature::kOpenerNavigationDownloadCrossOriginNoGesture,
+            ...
+        })

@@ -1,0 +1,19 @@
+rules:
+  - id: zip-bomb-undefer-input-cwe-400
+    message: "Potential zip bomb vulnerability due to missing check for negative G.csize before casting to int in undefer_input."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      if (G.incnt_leftover > 0) {
+          ...
+          G.incnt = G.incnt_leftover + (int)G.csize;
+          ...
+      }
+    pattern-not: |
+      if (G.incnt_leftover > 0) {
+          ...
+          if (G.csize < 0L)
+              G.csize = 0L;
+          G.incnt = G.incnt_leftover + (int)G.csize;
+          ...
+      }

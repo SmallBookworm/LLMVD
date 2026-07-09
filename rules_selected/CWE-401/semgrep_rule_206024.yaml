@@ -1,0 +1,34 @@
+rules:
+  - id: nfp_flower_spawn_phy_reprs_memory_leak
+    message: "Memory leak in nfp_flower_spawn_phy_reprs: 'repr_priv' is not freed on error paths after allocation."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          repr_priv = kzalloc(..., GFP_KERNEL);
+          if (!repr_priv) {
+              ...
+              goto err_reprs_clean;
+          }
+          ...
+          if (IS_ERR(port)) {
+              ...
+              nfp_repr_free(repr);
+              goto err_reprs_clean;
+          }
+      - pattern: |
+          repr_priv = kzalloc(..., GFP_KERNEL);
+          if (!repr_priv) {
+              ...
+              goto err_reprs_clean;
+          }
+          ...
+          if (err) {
+              ...
+              nfp_port_free(port);
+              nfp_repr_free(repr);
+              goto err_reprs_clean;
+          }
+    metavariable-regex:
+      metavariable: $...
+      regex: ".*"

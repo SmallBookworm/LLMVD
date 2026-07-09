@@ -1,0 +1,10 @@
+rules:
+  - id: cwe-134-format-string-b43err
+    patterns:
+      - pattern: b43err(..., $ERRMSG);
+    message: "Potential format string vulnerability. User-controlled input '$ERRMSG' is passed directly to b43err() without format specifiers. Use '%s' to safely print the string."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-134"
+      cve: "CVE-2013-2852"

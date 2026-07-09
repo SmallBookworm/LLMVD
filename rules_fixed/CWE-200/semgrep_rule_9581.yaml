@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2018-6412-signedness-error
+    message: "Signedness error in 'index' variable may lead to arbitrary kernel memory disclosure via FBIOGETCMAP_SPARC or FBIOPUTCMAP_SPARC."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          case FBIOPUTCMAP_SPARC:
+            {
+              ...
+              int index, ...;
+              ...
+            }
+      - pattern: |
+          case FBIOGETCMAP_SPARC:
+            {
+              ...
+              int index, ...;
+              ...
+            }

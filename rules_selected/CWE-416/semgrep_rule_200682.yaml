@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2016-4473-use-after-free
+    message: "Use-after-free vulnerability due to mismatched allocation/deallocation (emalloc with free)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              free($X->cwd);
+          - pattern: |
+              free($X.cwd);
+    metavariable-pattern:
+      metavariable: $X
+      pattern: 
+        pattern-regex: "new_state"
+    fix-regex:
+      regex: "free"
+      replacement: "efree"

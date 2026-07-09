@@ -1,0 +1,11 @@
+rules:
+  - id: g_get_tmp_dir_insecure_temp_file
+    message: "Use of g_get_tmp_dir() to construct temporary filenames may lead to predictable filenames and potential file overwrite or disclosure. Use g_file_open_tmp() instead to create unique temporary files."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern: |
+          g_build_filename (g_get_tmp_dir (), ..., NULL)
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2018-12713"

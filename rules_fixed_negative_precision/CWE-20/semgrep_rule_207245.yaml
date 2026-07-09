@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2017-16816-voms-null-check
+    message: "Missing null check for voms_cert after VOMS_Retrieve() may lead to denial of service (CVE-2017-16816)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      voms_cert = voms_data->data[0];
+      ...
+      *voname = strdup(voms_cert->voname);
+    pattern-not: |
+      voms_cert = voms_data->data[0];
+      ...
+      if (voms_cert == NULL) {
+        ...
+      }

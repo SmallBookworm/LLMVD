@@ -1,0 +1,28 @@
+rules:
+  - id: cve-2018-14599-off-by-one
+    message: "Potential off-by-one write due to incorrect buffer boundary check in XListExtensions (CVE-2018-14599)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          chend = $BUF + ($LEN + 1);
+          ...
+          if ($PTR + $L < chend) {
+            ...
+            if ($PTR <= chend) {
+              ...
+              *$PTR = '\0';
+            }
+          }
+      - pattern: |
+          chend = $BUF + ($LEN + 1);
+          ...
+          for (...; ...; ...) {
+            if ($PTR + $L < chend) {
+              ...
+              if ($PTR <= chend) {
+                ...
+                *$PTR = '\0';
+              }
+            }
+          }

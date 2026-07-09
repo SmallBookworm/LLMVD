@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2019-11478-tcp-fragment-memory-check-missing
+    message: Missing memory usage check before TCP fragmentation may lead to denial of service (CVE-2019-11478).
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (skb_unclone($SKB, $GFP))
+        return -ENOMEM;
+    pattern-not: |
+      if (unlikely(($SK->sk_wmem_queued >> 1) > $SK->sk_sndbuf)) {
+        ...
+        return -ENOMEM;
+      }
+    metavariable-regex:
+      metavariable: $SK
+      regex: sk

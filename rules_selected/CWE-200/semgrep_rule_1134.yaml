@@ -1,0 +1,25 @@
+rules:
+  - id: cwe-200-xfrm-usersa-info-uninitialized
+    message: "Uninitialized struct xfrm_usersa_info may leak kernel memory. Add memset(0) before copying data."
+    severity: WARNING
+    languages: [c]
+    pattern-not: |
+      memset($P, 0, sizeof(*$P));
+    pattern-either:
+      - pattern: |
+          copy_to_user_state(..., struct xfrm_usersa_info *$P)
+          {
+            ...
+            memcpy(&$P->id, ..., sizeof($P->id));
+            ...
+          }
+      - pattern: |
+          void copy_to_user_state(..., struct xfrm_usersa_info *$P)
+          {
+            ...
+            memcpy(&$P->id, ..., sizeof($P->id));
+            ...
+          }
+    metavariable-pattern:
+      metavariable: $P
+      pattern: struct xfrm_usersa_info *...

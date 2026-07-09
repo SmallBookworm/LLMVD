@@ -1,0 +1,24 @@
+rules:
+  - id: missing_per_clear_on_fcaps
+    message: "File capabilities (fcaps) are used without clearing dangerous personality flags, which may allow bypassing ASLR and other protections."
+    severity: WARNING
+    languages: [c]
+    pattern-not: |
+      if (!cap_issubset($NEW->cap_permitted, $OLD->cap_permitted))
+          $BPRM->per_clear |= PER_CLEAR_ON_SETID;
+    pattern-either:
+      - pattern: |
+          if (!cap_issubset($NEW->cap_permitted, $OLD->cap_permitted)) {
+              ...
+          }
+      - pattern: |
+          if (($NEW->euid != $OLD->uid ||
+               $NEW->egid != $OLD->gid ||
+               !cap_issubset($NEW->cap_permitted, $OLD->cap_permitted)) && ...)
+    metavariable-regex:
+      - metavariable: $NEW
+        regex: new
+      - metavariable: $OLD
+        regex: old
+      - metavariable: $BPRM
+        regex: bprm

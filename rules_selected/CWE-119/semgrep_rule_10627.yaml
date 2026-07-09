@@ -1,0 +1,17 @@
+rules:
+  - id: optee_unchecked_rmem_bounds
+    message: "Missing boundary check on offset and size in set_rmem_param may lead to memory corruption (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (!mem->mobj)
+          return TEE_ERROR_BAD_PARAMETERS;
+      ...
+      mem->offs = READ_ONCE(...);
+      mem->size = READ_ONCE(...);
+      ...
+      return TEE_SUCCESS;
+    pattern-not: |
+      if (ADD_OVERFLOW(mem->offs, mem->size, &...) ||
+          mem->mobj->size < ...)
+          return TEE_ERROR_SECURITY;

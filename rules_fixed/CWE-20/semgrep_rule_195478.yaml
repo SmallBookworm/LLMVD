@@ -1,0 +1,14 @@
+rules:
+  - id: hhvm-cve-2018-6334-globals-file-upload
+    message: "File upload variables are being registered in the global scope, which can lead to unexpected behavior and security vulnerabilities (CVE-2018-6334)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: 'safe_php_register_variable(..., $globals, ...)'
+        metavariable-comparison:
+          - metavariable: $globals
+            comparison: $globals == "php_globals_as_array()"
+      - pattern: 'safe_php_register_variable($_, ..., $globals, ...)'
+        metavariable-comparison:
+          - metavariable: $globals
+            comparison: $globals == "php_globals_as_array()"

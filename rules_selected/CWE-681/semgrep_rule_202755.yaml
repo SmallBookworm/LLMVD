@@ -1,0 +1,33 @@
+rules:
+  - id: cve-2018-5711-gif-infinite-loop
+    message: "Potential infinite loop in gdImageCreateFromGifCtx due to signedness error (CVE-2018-5711, CWE-681). The check for zero colorsTotal occurs before trimming open palette entries, which may result in an invalid image with no colors being used."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          terminated:
+          if (!im) {
+            return 0;
+          }
+          if (!im->colorsTotal) {
+            gdImageDestroy(im);
+            return 0;
+          }
+          for (...; ...; ...) {
+            ...
+          }
+      - pattern: |
+          terminated:
+          if (!im) {
+            return 0;
+          }
+          for (...; ...; ...) {
+            ...
+          }
+          return im;
+    metavariable-pattern:
+      metavariable: $LOOP
+      pattern: |
+        for (...; ...; ...) {
+          ...
+        }

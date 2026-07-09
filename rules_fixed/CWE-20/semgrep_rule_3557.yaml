@@ -1,0 +1,12 @@
+rules:
+  - id: unchecked-fputc
+    pattern-either:
+      - pattern: (void) fputc(...);
+      - pattern: fputc(...);
+        metavariable-regex:
+          metavariable: $X
+          regex: '^\$[A-Z]+$'
+          inverse: true
+    message: "fputc return value is not checked, which may lead to denial of service (CWE-20)."
+    severity: WARNING
+    languages: [c]

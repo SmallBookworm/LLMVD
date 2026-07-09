@@ -1,0 +1,17 @@
+rules:
+  - id: usbip_unbounded_allocation
+    message: "Unbounded memory allocation in USBIP CMD_SUBMIT path may lead to denial of service (CVE-2017-16913)."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (pdu->u.cmd_submit.transfer_buffer_length > 0) {
+                  ... kzalloc(pdu->u.cmd_submit.transfer_buffer_length, ...);
+              }
+          - pattern: |
+              if (pdu->u.cmd_submit.transfer_buffer_length > 0)
+                  ... kzalloc(pdu->u.cmd_submit.transfer_buffer_length, ...);
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2017-16913"

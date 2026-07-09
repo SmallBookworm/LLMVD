@@ -1,0 +1,14 @@
+rules:
+  - id: libtiff-jbig-out-of-bounds-write
+    patterns:
+      - pattern-either:
+          - pattern: |
+              _TIFFmemcpy($BUF, $IMG, jbg_dec_getsize($DECODER));
+          - pattern: |
+              memcpy($BUF, $IMG, jbg_dec_getsize($DECODER));
+    message: "Potential out-of-bounds write in JBIGDecode due to missing buffer size check before memcpy. Ensure decoded size is validated against buffer size."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2018-18557"

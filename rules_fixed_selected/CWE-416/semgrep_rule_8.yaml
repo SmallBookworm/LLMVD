@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2018-1000039-use-after-free
+    message: "Potential use-after-free vulnerability in add_range due to incorrect 'many' flag propagation when splitting ranges (CVE-2018-1000039, CWE-416)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          add_range(..., high+1, new_high, ..., 0, many);
+      - pattern: |
+          add_range(..., high+1, new_high, ..., 0, $MANY);
+    metavariable-pattern:
+      $MANY:
+        pattern-not: tree[$X].many

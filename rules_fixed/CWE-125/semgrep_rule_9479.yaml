@@ -1,0 +1,35 @@
+rules:
+  - id: cwe-125-yara-grammar-out-of-bounds-read
+    message: "Potential heap-based out-of-bounds read in yara_yyparse due to missing YYERROR in loop handling (CVE-2017-5923)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          case 62:
+          ...
+          {
+            ...
+            if (compiler->loop_depth > 0)
+            {
+              compiler->loop_depth--;
+              compiler->loop_identifier[compiler->loop_depth] = NULL;
+            }
+            ...
+          }
+      - pattern: |
+          case 62:
+          ...
+          {
+            ...
+            if (compiler->loop_depth > 0)
+            {
+              compiler->loop_depth--;
+              compiler->loop_identifier[compiler->loop_depth] = NULL;
+            }
+            $S
+          }
+    metavariable-pattern:
+      $S: { pattern: "break;" }
+    fix-regex:
+      regex: ""
+      replacement: ""

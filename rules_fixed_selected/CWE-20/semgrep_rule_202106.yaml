@@ -1,0 +1,13 @@
+rules:
+  - id: systemd-notify-zero-length-message-dos
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (n == 0)
+                  return -EIO;
+    message: "Zero-length message on notify socket may cause denial of service (CVE-2016-7796)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2016-7796"

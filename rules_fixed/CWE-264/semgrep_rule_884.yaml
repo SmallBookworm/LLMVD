@@ -1,0 +1,9 @@
+rules:
+  - id: ima_lsm_rule_init_missing_null_check
+    message: "Missing null check after security_filter_rule_init may allow bypass of IMA rules when LSM is disabled."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          $result = security_filter_rule_init(..., &$entry->lsm[$lsm_rule].rule);
+          return $result;

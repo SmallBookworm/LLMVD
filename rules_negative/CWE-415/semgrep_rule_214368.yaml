@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2019-2126-double-free
+    message: "Potential double free due to missing reset of freed pointer 'compression_entries_'. This could lead to remote code execution."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!encryption_entries_) {
+                delete[] compression_entries_;
+                return -1;
+              }
+    metadata:
+      cwe: "CWE-415"
+      cve: "CVE-2019-2126"

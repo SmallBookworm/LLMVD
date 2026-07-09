@@ -1,0 +1,12 @@
+rules:
+  - id: cwe-78-ark-arbitrary-code-execution
+    message: "Potential arbitrary code execution via KRun::runUrl without disabling suggested applications. This may allow attackers to execute malicious executables from archives."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern: |
+          KRun::runUrl(..., ..., ..., ..., true)
+      - pattern: |
+          KRun::runUrl(..., ..., ..., ...)
+        pattern-not: |
+          KRun::runUrl(..., ..., ..., ..., false, false)

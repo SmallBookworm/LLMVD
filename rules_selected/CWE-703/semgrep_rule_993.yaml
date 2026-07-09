@@ -1,0 +1,20 @@
+rules:
+  - id: cwe-703-ftrace-lseek-null-deref
+    message: "Possible NULL pointer dereference in ftrace lseek handler when file is opened without FMODE_READ. This may lead to denial of service (CVE-2013-3301)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($FILE->f_mode & FMODE_READ)
+                  $RET = seq_lseek($FILE, $OFFSET, $WHENCE);
+              else
+                  $FILE->f_pos = $RET = 1;
+          - pattern: |
+              if (($FILE)->f_mode & FMODE_READ)
+                  $RET = seq_lseek($FILE, $OFFSET, $WHENCE);
+              else
+                  ($FILE)->f_pos = $RET = 1;
+    metadata:
+      cwe: ["CWE-703"]
+      cve: "CVE-2013-3301"

@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2018-16228-buffer-overread
+    patterns:
+      - pattern-either:
+          - pattern: |
+              char buf[...];
+              $PLENBYTES = decode_prefix6(..., buf, ...);
+              ND_PRINT((..., "%s", buf));
+          - pattern: |
+              char buf[...];
+              $PLENBYTES = decode_prefix6(..., buf, ...);
+              ...
+              ND_PRINT((..., "%s", buf));
+    message: "Buffer over-read vulnerability (CVE-2018-16228): decode_prefix6 may return an error without initializing 'buf', leading to use of uninitialized memory in ND_PRINT."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2018-16228"

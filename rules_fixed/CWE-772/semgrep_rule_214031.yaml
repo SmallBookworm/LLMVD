@@ -1,0 +1,13 @@
+rules:
+  - id: imagemagick-icon-memory-leak-cve-2017-9405
+    message: "Memory leak in ReadICONImage due to missing RelinquishMagickMemory call on error path (CVE-2017-9405)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (count != (ssize_t) (4*image->colors))
+                ThrowReaderException(...);
+          - pattern: |
+              if (count != (ssize_t) (4*$IMAGE->colors))
+                ThrowReaderException(...);

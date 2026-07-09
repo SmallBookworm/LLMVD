@@ -1,0 +1,22 @@
+rules:
+  - id: chromium-cast-ui-fullscreen-obscure-warning
+    message: "Missing fullscreen exit before unblocking WebContents may allow obscuring security warnings."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!blocked && ... && ...)
+                $WEB_CONTENTS->Focus();
+          - pattern: |
+              if (!blocked && ...)
+                $WEB_CONTENTS->Focus();
+    metavariable-pattern:
+      $WEB_CONTENTS:
+        pattern: $WEB_CONTENTS
+        pattern-not: |
+          if ($WEB_CONTENTS->IsFullscreenForCurrentTab())
+            $WEB_CONTENTS->ExitFullscreen(...);
+          ...
+          if (!blocked && ...)
+            $WEB_CONTENTS->Focus();

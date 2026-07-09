@@ -1,0 +1,21 @@
+rules:
+  - id: freetype-unchecked-return-value-font-matrix
+    message: "Return value of T1_ToFixedArray not properly checked; may lead to uninitialized memory access (CWE-20)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $RESULT = T1_ToFixedArray(...);
+          if ($RESULT < 0) { ... }
+      - pattern: |
+          $RESULT = cid_parse_font_matrix(...);
+          if ($RESULT < 0) { ... }
+      - pattern: |
+          $RESULT = t42_parse_font_matrix(...);
+          if ($RESULT < 0) { ... }
+      - pattern: |
+          $RESULT = ps_parser_load_field(...);
+          if ($RESULT < 0) { ... }
+    metavariable-pattern:
+      $RESULT:
+        type: expression

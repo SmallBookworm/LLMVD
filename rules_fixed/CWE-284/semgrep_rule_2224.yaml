@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2015-8845-tm-reclaim-double-call
+    message: "tm_reclaim() is called without checking if TM suspend mode is active, which may cause a TM Bad Thing exception and kernel panic."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              tm_reclaim($thr, $msr, $cause);
+          - pattern: |
+              tm_reclaim(...);
+    metavariable-pattern:
+      $thr: 
+        pattern: struct thread_struct *
+      $msr:
+        pattern: thr->regs->msr
+    pattern-not-inside: |
+      if (!MSR_TM_SUSPENDED(mfmsr()))
+      	return;
+      ...
+      tm_reclaim(...);

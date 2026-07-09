@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2013-1418-null-deref
+    message: "NULL pointer dereference vulnerability in setup_server_realm when sprinc is not checked before use (CVE-2013-1418, CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if ($NUMREALMS > 1) {
+        ... $SPRINC->$FIELD ...
+      }
+    metavariable-pattern:
+      $NUMREALMS: 
+        pattern: $HANDLE->$MEMBER
+      $SPRINC:
+        pattern: $PRINC
+        pattern-not:
+          regex: if\s*$$\s*PRINC\s*==\s*NULL\s*$$
+    fix-regex:
+      disabled: true

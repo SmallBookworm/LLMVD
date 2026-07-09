@@ -1,0 +1,17 @@
+rules:
+  - id: bridge_multicast_timer_unchecked_mod_timer
+    message: "Missing check for timer_armed before calling mod_timer on mp->timer. This can lead to a kernel BUG and denial of service (CVE-2013-4129)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!mp->ports && !mp->mglist &&
+                  netif_running(...))
+                  mod_timer(&mp->timer, ...);
+          - pattern: |
+              if (!mp->ports && !mp->mglist && ...)
+                  mod_timer(&mp->timer, ...);
+    metavariable-pattern:
+      metavariable: mp
+      pattern: { type: "struct net_bridge_mdb_entry *" }

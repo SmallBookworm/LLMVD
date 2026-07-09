@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2014-2241
+    patterns:
+      - pattern-either:
+          - pattern: |
+              FT_ASSERT( $DECODER && $DECODER->globals );
+          - patterns:
+            - pattern: |
+                if ( ... )
+                  return ...;
+            - pattern: |
+                $BUF->start = ... $DECODER->globals[...];
+            - metavariable-regex:
+                metavariable: $DECODER
+                regex: '^[a-zA-Z_][a-zA-Z0-9_]*$'
+    message: "Missing NULL check for 'decoder->globals' before use may lead to assertion failure (CWE-20, CVE-2014-2241)."
+    severity: ERROR
+    languages: [c]

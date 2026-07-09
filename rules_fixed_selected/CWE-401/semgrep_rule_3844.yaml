@@ -1,0 +1,27 @@
+rules:
+  - id: ocfs2_setattr_dio_deadlock
+    message: "Missing inode_dio_wait() before inode lock in ocfs2_setattr() may cause deadlock (CVE-2017-18204)"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (size_change) {
+            ... 
+            $LOCK_CALL;
+            ...
+            inode_dio_wait($INODE);
+            ...
+          }
+      - pattern: |
+          if (size_change) {
+            ...
+            $LOCK_CALL;
+            ...
+          }
+          ...
+          inode_dio_wait($INODE);
+    metavariable-pattern:
+      $LOCK_CALL: 
+        pattern-either:
+          - pattern: ocfs2_rw_lock(...)
+          - pattern: ocfs2_inode_lock_tracker(...)

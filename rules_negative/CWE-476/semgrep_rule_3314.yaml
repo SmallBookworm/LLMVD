@@ -1,0 +1,39 @@
+rules:
+  - id: cwe-476-null-pointer-dereference-jp2-box
+    message: "Potential NULL pointer dereference in jp2_box_destroy due to missing reset of 'box->ops' before error handling."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (jas_stream_copy(..., ..., ...)) {
+              jas_eprintf(...);
+              goto error;
+          }
+      - pattern: |
+          if (jas_stream_copy(..., ..., ...)) {
+              goto error;
+          }
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern-inside: |
+        jp2_box_t *jp2_box_get(...) {
+          ...
+          if (dataflag) {
+            ...
+            if (!(tmpstream = jas_stream_memopen(0, 0))) {
+              goto error;
+            }
+            if (jas_stream_copy(tmpstream, in, box->datalen)) {
+              ...
+              goto error;
+            }
+            ...
+          }
+          ...
+        }
+    pattern-not: |
+      if (jas_stream_copy(..., ..., ...)) {
+          box->ops = &jp2_boxinfo_unk.ops;
+          ...
+          goto error;
+      }

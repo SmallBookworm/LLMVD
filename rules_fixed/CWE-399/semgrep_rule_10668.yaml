@@ -1,0 +1,29 @@
+rules:
+  - id: ffmpeg-asf-build-simple-index-missing-eof-check
+    message: Missing EOF check inside loop in asf_build_simple_index() may lead to DoS via crafted ASF file.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for ($_; $_ < $ict; $_) {
+                $_ = avio_rl32($_);
+                $_ = avio_rl16($_);
+                $_
+                if (pos != last_pos) { $_ }
+              }
+          - pattern: |
+              for ($_; $_ < $ict; $_) {
+                $_ = avio_rl32($pb);
+                $_ = avio_rl16($pb);
+                $_
+              }
+      - metavariable-pattern:
+          metavariable: $ict
+          pattern: avio_rl32($_)
+      - pattern-not: |
+          for ($_; $_ < $ict; $_) {
+            $_
+            if (avio_feof($_)) { $_ }
+            $_
+          }

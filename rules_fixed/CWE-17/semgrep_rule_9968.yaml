@@ -1,0 +1,9 @@
+rules:
+  - id: cve-2015-1217-v8-lazy-event-listener-type-confusion
+    message: "Potential type confusion due to missing isDocument() check before toDocument() cast. This may lead to denial of service or other impact."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (executionContext->isDocument() && ...)
+      ...
+      ASSERT(executionContext->isDocument())

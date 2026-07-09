@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2016-5421-use-after-free
+    message: Use-after-free vulnerability due to missing reset of easy handle's connection pointer before disconnect.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          conn->data = ...;
+          ...
+          (void)Curl_disconnect(conn, ...);
+      - pattern: |
+          conn->data = ...;
+          ...
+          Curl_disconnect(conn, ...);
+    metavariable-pattern:
+      metavariable: conn
+      pattern: struct connectdata *
+    patterns:
+      - pattern-not: |
+          conn->data = ...;
+          ...
+          conn->data->easy_conn = NULL;
+          ...
+          Curl_disconnect(conn, ...);

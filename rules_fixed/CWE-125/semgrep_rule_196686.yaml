@@ -1,0 +1,16 @@
+rules:
+  - id: md4c-uninitialized-memory-read
+    message: "Potential out-of-bounds read due to missing bounds check before accessing input buffer. This may lead to use of uninitialized memory and denial of service (CVE-2021-30027, CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (..., CH($OFF) == ...)
+      - pattern: |
+          if (..., ISANYOF($OFF, ...))
+      - pattern: |
+          if (..., ISANYOF2($OFF, ..., ...))
+      - pattern: |
+          if (..., ISANYOF3($OFF, ..., ..., ...))
+    pattern-not-inside: |
+      if (... && $OFF < $CTX->size && ...)

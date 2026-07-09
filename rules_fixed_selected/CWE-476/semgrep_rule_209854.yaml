@@ -1,0 +1,24 @@
+rules:
+  - id: dccp_sendmsg_null_pointer_dereference
+    message: "Missing check for DCCP_CLOSED state before calling dccp_write_xmit() may lead to null pointer dereference (CVE-2018-1130)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (sk->sk_state == DCCP_CLOSED) {
+                ...
+                goto out_discard;
+              }
+          - pattern: |
+              if ((1 << sk->sk_state) & ~(DCCPF_OPEN | DCCPF_PARTOPEN))
+                ...
+              ...
+              dccp_write_xmit(sk);
+    pattern-not: |
+      if (sk->sk_state == DCCP_CLOSED) {
+        ...
+        goto out_discard;
+      }
+      ...
+      dccp_write_xmit(sk);

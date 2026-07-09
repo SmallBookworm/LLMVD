@@ -1,0 +1,25 @@
+rules:
+  - id: cve-2017-0556-missing-frame-rate-validation
+    message: Missing validation of frame_rate_code may lead to information disclosure (CVE-2017-0556, CWE-200).
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          ps_dec->u2_frame_rate_code = impeg2d_bit_stream_get(ps_stream,4);
+          ...
+          if (...)
+          {
+            ...
+          }
+      - pattern: |
+          ps_dec->u2_frame_rate_code = impeg2d_bit_stream_get(ps_stream,4);
+          ...
+          return ...;
+    pattern-not-inside: |
+        ps_dec->u2_frame_rate_code = impeg2d_bit_stream_get(ps_stream,4);
+        ...
+        if (ps_dec->u2_frame_rate_code > MPEG2_MAX_FRAME_RATE_CODE)
+        {
+            return IMPEG2D_FRM_HDR_DECODE_ERR;
+        }
+        ...

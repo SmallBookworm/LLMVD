@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2017-13011-buffer-overflow-bittok2str_internal
+    message: |
+      Buffer overflow vulnerability in bittok2str_internal() due to unsafe use of snprintf without proper bounds checking on each append.
+      This could lead to memory corruption (CWE-119). Fixed version uses strlcpy with explicit space tracking.
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              static char buf[...];
+              ...
+              buflen += snprintf(buf + buflen, sizeof(buf) - buflen, ...);
+          - pattern: |
+              static char buf[256];
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2017-13011"
+      references:
+        - https://github.com/the-tcpdump-group/tcpdump/commit/9f0730bee3eb65d07b49fd468bc2f269173352fe

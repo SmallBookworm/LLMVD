@@ -1,0 +1,17 @@
+rules:
+  - id: rds_conn_create_null_transport_deref
+    message: "Potential NULL pointer dereference due to missing transport validation in __rds_conn_create. This may lead to denial of service or unspecified impact (CVE-2015-6937)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          conn->c_trans = $TRANS;
+          ...
+          $TRANS->conn_alloc(...);
+      - pattern: |
+          $TRANS->conn_alloc(...);
+    metavariable-pattern:
+      $TRANS:
+        patterns:
+          - pattern-not: |
+              if ($TRANS == NULL) { ... }

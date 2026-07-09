@@ -1,0 +1,22 @@
+rules:
+  - id: cwe-125-out-of-bounds-read-radare2-sts
+    message: "Missing buffer length check before accessing buf[3] may lead to heap-based out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          int k = (buf[3] << 8) | buf[2];
+      - pattern: |
+          ... buf[3] ...
+    metavariable-pattern:
+      metavariable: buf
+      pattern-not: |
+        if (len >= 4) { ... buf[3] ... }
+    pattern-not-inside: |
+      if ($LEN >= 4 || ...) { ... }
+    pattern-not-inside-2: |
+      if ($LEN > 3 || ...) { ... }
+    pattern-not-inside-3: |
+      if (4 <= $LEN || ...) { ... }
+    pattern-not-inside-4: |
+      if (3 < $LEN || ...) { ... }

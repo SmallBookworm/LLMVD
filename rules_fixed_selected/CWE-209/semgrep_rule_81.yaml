@@ -1,0 +1,22 @@
+rules:
+  - id: cwe-209-ghostscript-errorhandler-sandbox-bypass
+    message: "Potential sandbox bypass via errorhandler setup (CWE-209). Insecure error object handling may expose internal details or allow execution in restricted contexts."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (i_ctx_p->LockFilePermissions) {
+              ...
+              code = obj_cvs(...);
+              ...
+              code = name_ref(...);
+              ...
+          }
+      - pattern: |
+          if (i_ctx_p->LockFilePermissions) {
+              ...
+              make_null(...);
+          }
+    metavariable-pattern:
+      metavariable: i_ctx_p
+      pattern: i_ctx_t *

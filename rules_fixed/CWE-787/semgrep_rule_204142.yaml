@@ -1,0 +1,30 @@
+rules:
+  - id: cve-2018-16880-vhost-net-oob-write
+    message: "Out-of-bounds write vulnerability in handle_rx due to missing batched used ring update. This may lead to kernel memory corruption (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          vhost_add_used_and_signal_n(..., $vq->heads, $headcount);
+      - pattern: |
+          vhost_add_used_and_signal_n(&$NET.dev, $VQ, $VQ->heads, $HEADCOUNT);
+    metavariable-patterns:
+      - metavariable: $HEADCOUNT
+        patterns:
+          - pattern-either:
+              - pattern: headcount
+              - pattern: $ANY
+    pattern-not-inside: |
+      int ...;
+      ...
+      s16 headcount, nheads = 0;
+      ...
+      nheads += headcount;
+      ...
+      if (nheads > VHOST_RX_BATCH) {
+        vhost_add_used_and_signal_n(..., vq->heads, nheads);
+        nheads = 0;
+      }
+      ...
+      if (nheads)
+        vhost_add_used_and_signal_n(..., vq->heads, nheads);

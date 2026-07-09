@@ -1,0 +1,11 @@
+rules:
+  - id: qemu-net-tx-pkt-integer-overflow
+    message: "Potential integer overflow due to unchecked multiplication in g_malloc. Use g_new to avoid overflow."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: $X = g_malloc((sizeof *$X) * $Y);
+      - pattern: $X = g_malloc(sizeof($T) * $Y);
+    metadata:
+      cwe: "CWE-190"
+      cve: "CVE-2016-6888"

@@ -1,0 +1,13 @@
+rules:
+  - id: cwe-787-null-pointer-dereference-dcmtk
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $ec = $elem->getString($aString);
+              OFStandard::strlcpy($s, $aString, $bufsize);
+    message: "Potential NULL pointer dereference leading to buffer overflow (CWE-787). getString() may fail and leave aString uninitialized; always check return value before use."
+    severity: ERROR
+    languages: [cpp]
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2021-41689"

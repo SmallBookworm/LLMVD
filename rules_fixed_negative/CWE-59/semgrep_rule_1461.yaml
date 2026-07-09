@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2015-5287-abrt-symlink-attack
+    message: "Potential symlink attack vulnerability when creating core dump files. The code opens a file without using O_EXCL, which may allow an attacker to overwrite arbitrary files via symlinks."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $FD = xopen3($PATH, O_WRONLY | O_CREAT | O_TRUNC, $MODE);
+          - pattern: |
+              $FD = open($PATH, O_WRONLY | O_CREAT | O_TRUNC, $MODE);
+    metadata:
+      cwe: ["CWE-59"]
+      cve: "CVE-2015-5287"
+      references:
+        - https://github.com/abrt/abrt/commit/3c1b60cfa62d39e5fff5a53a5bc53dae189e740e

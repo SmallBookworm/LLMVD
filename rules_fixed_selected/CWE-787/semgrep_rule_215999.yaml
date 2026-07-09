@@ -1,0 +1,56 @@
+rules:
+  - id: cwe-787-fli-buffer-overflow
+    message: Heap-based buffer overflow in FLI RLE decoder due to missing boundary checks on 'xc' before writing to 'pos[xc]'.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (...; ...; ...) {
+                ...
+                if (ps & 0x80) {
+                  ...
+                  for (...; ...; ...) {
+                    pos[xc++] = ...;
+                  }
+                } else {
+                  ...
+                  memset(&(pos[xc]), ..., ps);
+                  xc += ps;
+                }
+                ...
+              }
+          - pattern: |
+              for (...; ...; ...) {
+                ...
+                if (ps & 0x80) {
+                  ...
+                  for (...; ... && xc < ...; ...) {
+                    pos[xc++] = ...;
+                  }
+                } else {
+                  ...
+                  memset(&(pos[xc]), ..., ps);
+                  xc += ps;
+                }
+                ...
+              }
+    pattern-not: |
+      for (...; ...; ...) {
+        ...
+        size_t n = ...;
+        ...
+        if (ps & 0x80) {
+          ...
+          for (...; ... && xc < n; ...) {
+            pos[xc++] = ...;
+          }
+        } else {
+          ...
+          size_t len = MIN(n - xc, ps);
+          ...
+          memset(&(pos[xc]), ..., len);
+          xc += len;
+        }
+        ...
+      }

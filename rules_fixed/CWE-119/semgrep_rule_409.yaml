@@ -1,0 +1,35 @@
+rules:
+  - id: cve-2011-3929-null-pointer-dereference
+    message: "Potential NULL pointer dereference due to missing check for 'c->ach' before calling dv_extract_audio. This may lead to denial of service or arbitrary code execution (CVE-2011-3929)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              dv_extract_audio($BUF, $PPCM, $SYS);
+          - pattern: |
+              ...
+              for (...; ...; ...) { ... }
+              dv_extract_audio($BUF, $PPCM, $SYS);
+      - metavariable-pattern:
+          metavariable: $PPCM
+          patterns:
+            - pattern-inside: uint8_t *$VAR[$N] = {...};
+      - pattern-not-inside: |
+          if ($COND) {
+            ...
+            dv_extract_audio(...);
+            ...
+          }
+      - pattern-not-inside: |
+          if ($X->ach) {
+            ...
+            dv_extract_audio(...);
+            ...
+          }
+      - pattern-not-inside: |
+          if ($X->ach != 0) {
+            ...
+            dv_extract_audio(...);
+            ...
+          }

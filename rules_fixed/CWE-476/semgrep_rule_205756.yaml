@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2020-11609-null-ptr-deref-stv06xx
+    message: Missing sanity check for bNumEndpoints before accessing endpoint descriptor. This may lead to NULL pointer dereference (CWE-476).
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $alt = usb_altnum_to_altsetting(...);
+              if (!$alt)
+                return ...;
+              ... = $alt->endpoint[0].desc.wMaxPacketSize;
+          - pattern: |
+              $alt = usb_altnum_to_altsetting(...);
+              if (!$alt)
+                return ...;
+              ... = le16_to_cpu($alt->endpoint[0].desc.wMaxPacketSize)

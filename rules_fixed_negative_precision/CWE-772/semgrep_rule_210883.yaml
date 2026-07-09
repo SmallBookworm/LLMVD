@@ -1,0 +1,10 @@
+rules:
+  - id: memory-leak-msl-image
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $MSL_IMAGE = CloneImage(...);
+              return ProcessMSLScript(..., &$MSL_IMAGE, ...);
+    message: "Memory leak: 'msl_image' is not destroyed before returning, leading to resource exhaustion (CWE-772)."
+    severity: ERROR
+    languages: [c]

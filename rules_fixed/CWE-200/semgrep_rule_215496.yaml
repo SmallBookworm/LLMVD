@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2009-3001-uninitialized-sockaddr
+    message: "Uninitialized sockaddr structure may leak kernel memory to user space."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: |
+                  $ADDR->can_family = AF_CAN;
+                  $ADDR->can_ifindex = ...;
+              - metavariable-pattern:
+                  metavariable: $ADDR
+                  pattern: (struct sockaddr_can *)...
+          - patterns:
+              - pattern: |
+                  $ADDR->can_ifindex = ...;
+                  $ADDR->can_family = AF_CAN;
+              - metavariable-pattern:
+                  metavariable: $ADDR
+                  pattern: (struct sockaddr_can *)...
+      - pattern-not: |
+          memset($ADDR, 0, sizeof(*$ADDR));

@@ -1,0 +1,29 @@
+rules:
+  - id: cve-2013-0292-dbus-nameownerchanged-spoofing
+    message: "NameOwnerChanged signal is not validated to originate from the D-Bus daemon, allowing local privilege escalation via spoofed signals."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (dbus_message_is_signal($MSG, DBUS_INTERFACE_DBUS, "NameOwnerChanged")) {
+                ...
+                dbus_message_get_args($MSG, ..., DBUS_TYPE_STRING, &$name, DBUS_TYPE_STRING, &$prev_owner, DBUS_TYPE_STRING, &$new_owner, DBUS_TYPE_INVALID);
+                ...
+              }
+          - pattern: |
+              if (dbus_message_is_signal($MSG, DBUS_INTERFACE_DBUS, "NameOwnerChanged") && ...) {
+                ...
+                dbus_message_get_args($MSG, ..., DBUS_TYPE_STRING, &$name, DBUS_TYPE_STRING, &$prev_owner, DBUS_TYPE_STRING, &$new_owner, DBUS_TYPE_INVALID);
+                ...
+              }
+      - pattern-not: |
+          if (g_strcmp0(dbus_message_get_sender($MSG), DBUS_SERVICE_DBUS) == 0 &&
+              dbus_message_is_signal($MSG, DBUS_INTERFACE_DBUS, "NameOwnerChanged")) {
+            ...
+            dbus_message_get_args($MSG, ..., DBUS_TYPE_STRING, &$name, DBUS_TYPE_STRING, &$prev_owner, DBUS_TYPE_STRING, &$new_owner, DBUS_TYPE_INVALID);
+            ...
+          }
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2013-0292"

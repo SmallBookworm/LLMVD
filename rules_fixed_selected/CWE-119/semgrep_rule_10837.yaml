@@ -1,0 +1,28 @@
+rules:
+  - id: wavpack-multiple-format-chunks
+    message: "Multiple 'fmt ' chunks in W64 file can lead to memory corruption (CVE-2018-10537, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!memcmp (chunk_header.ckID, fmt_guid, sizeof (fmt_guid))) {
+            ...
+          }
+      - pattern: |
+          if (!memcmp (chunk_header.ckID, fmt_guid, sizeof (fmt_guid))) {
+            ...;
+            if (format_chunk++) {
+              ...
+              return ...;
+            }
+            ...
+          }
+    pattern-not-inside: |
+      if (!memcmp (chunk_header.ckID, fmt_guid, sizeof (fmt_guid))) {
+        ...;
+        if (format_chunk++) {
+          ...
+          return ...;
+        }
+        ...
+      }

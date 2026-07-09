@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2018-17019-irc-names-parsing-dos
+    message: "Potential DoS vulnerability in IRC names command parsing due to insufficient validation of response parts size (CVE-2018-17019)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              case 353:
+                ...
+                vector<string> parts = SplitWords(params, ' ');
+                ...
+                if ( parts.size() < 2 )
+                ...
+          - pattern: |
+              case 353:
+                ...
+                vector<string> parts = SplitWords(params, ' ');
+                ...
+                if ( parts.size() < 3 )
+                ...
+    fix-regex:
+      regex: 'if \\( parts\\.size\\(\\) < 2 \\)'
+      replacement: 'if ( parts.size() < 3 )'

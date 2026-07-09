@@ -1,0 +1,29 @@
+rules:
+  - id: dv_extract_audio_null_pcm_check_missing
+    message: "Missing null check for pcm pointer before use, which may lead to out-of-bounds read (CVE-2011-3936)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - patterns:
+        - pattern: pcm = ppcm[...];
+        - pattern-inside: |
+            ...
+            pcm = ppcm[...];
+            ...
+            pcm[...]
+        - pattern-not: if (!pcm) break;
+      - patterns:
+        - pattern: pcm = ppcm[...];
+        - pattern-inside: |
+            ...
+            pcm = ppcm[...];
+            ...
+            for (...; ...; ...) {
+                ...
+                pcm[...]
+                ...
+            }
+        - pattern-not: if (!pcm) break;
+    message: "Missing null check for pcm pointer before use, which may lead to out-of-bounds read (CVE-2011-3936)."
+    severity: ERROR
+    languages: [c]

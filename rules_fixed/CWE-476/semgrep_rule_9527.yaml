@@ -1,0 +1,13 @@
+rules:
+  - id: m4v_probe_null_deref_vulnerability
+    message: "Potential NULL pointer dereference due to insufficient startcode validation in mpeg4video_probe. Missing check for non-startcode 00 00 00 sequences."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((temp_buffer & 0xffffff00) != 0x100)
+                  continue;
+          - pattern: |
+              if ((temp_buffer & 0xffffff00) != 0x00000100)
+                  continue;

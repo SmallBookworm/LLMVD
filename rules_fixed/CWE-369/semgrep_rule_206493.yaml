@@ -1,0 +1,19 @@
+rules:
+  - id: cwe-369-divide-by-zero-gst-riff
+    message: "Possible divide-by-zero due to missing validation of 'channels' or 'blockalign' before division. This could lead to a floating point exception (CVE-2017-5837)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $ba * 8 / $ch
+      - pattern: |
+          $strf->blockalign * 8 / $strf->channels
+    metavariable-pattern:
+      metavariable: $ch
+      patterns:
+        - pattern-not: |
+            ($ch != 0)
+    fix-regex:
+      regex: ""
+      replacement: ""
+      enabled: false

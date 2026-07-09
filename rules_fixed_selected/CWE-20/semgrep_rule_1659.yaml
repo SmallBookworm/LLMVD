@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2016-9919-icmp6-send-null-dst
+    message: "Missing null check for dst in icmp6_send may lead to NULL pointer dereference (CVE-2016-9919)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (__ipv6_addr_needs_scope_id(...))
+              ...
+          else
+              iif = l3mdev_master_ifindex(skb_dst(skb)->dev);
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2016-9919"

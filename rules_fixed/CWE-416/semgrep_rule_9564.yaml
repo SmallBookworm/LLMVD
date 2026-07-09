@@ -1,0 +1,21 @@
+rules:
+  - id: use-after-free-ucma-join
+    message: "Potential use-after-free vulnerability in ucma_process_join due to premature publication of 'mc' before copy_to_user completion."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          idr_remove(&multicast_idr, $MC->id);
+          ...
+          kfree($MC);
+      - pattern: |
+          if (copy_to_user(...)) {
+            ...
+            goto err3;
+          }
+          ...
+          err3:
+          ...
+          kfree($MC);
+    metavariable-pattern:
+      $MC: "struct ucma_multicast *"

@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2021-44109-null-pointer-dereference
+    message: "Potential null pointer dereference when accessing n2InfoContent->ngap_ie_type without prior null check."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              switch ($N2INFOCONTENT->ngap_ie_type) {
+                ...
+              }
+          - pattern: |
+              ogs_error("Not implemented ngap_ie_type[%d]", $N2INFOCONTENT->ngap_ie_type);
+    metavariable-pattern:
+      $N2INFOCONTENT:
+        patterns:
+          - pattern-not: |
+              if ($N2INFOCONTENT) {
+                ...
+                switch ($N2INFOCONTENT->ngap_ie_type) {
+                  ...
+                }
+              }

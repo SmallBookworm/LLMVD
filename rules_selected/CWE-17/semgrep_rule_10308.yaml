@@ -1,0 +1,7 @@
+rules:
+  - id: cve-2014-9426-apprentice-load-efree-stack-array
+    message: "Attempt to efree a stack-allocated array 'mfn', which may lead to memory corruption or crash."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      efree(mfn);

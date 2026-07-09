@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2018-14600-signed-char-oob-write
+    message: "Potential out-of-bounds write due to interpreting char as signed instead of unsigned (CVE-2018-14600)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          length = *ch;
+      - pattern: |
+          length = *$PTR;
+    metavariable-pattern:
+      metavariable: $PTR
+      pattern: ch

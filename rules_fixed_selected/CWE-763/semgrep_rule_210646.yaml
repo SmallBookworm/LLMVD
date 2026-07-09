@@ -1,0 +1,23 @@
+rules:
+  - id: openldap_slap_parse_user_invalid_free
+    message: "Potential invalid pointer free in slap_parse_user due to unsafe manipulation of berval pointers. This may lead to denial of service (CVE-2020-36224, CWE-763)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $MECH->bv_val = ber_bvchr($ID, '.');
+          if (!BER_BVISNULL($MECH)) {
+              $MECH->bv_val[0] = '\0';
+              $MECH->bv_val++;
+              ...
+          }
+      - pattern: |
+          if (!BER_BVISNULL($REALM)) {
+              if ($REALM->bv_val < $ID->bv_val + 2)
+                  return LDAP_PROTOCOL_ERROR;
+              AC_MEMCPY($REALM->bv_val - 2, $REALM->bv_val, $REALM->bv_len + 1);
+              $REALM->bv_val -= 2;
+          }
+    metadata:
+      cwe: "CWE-763"
+      cve: "CVE-2020-36224"

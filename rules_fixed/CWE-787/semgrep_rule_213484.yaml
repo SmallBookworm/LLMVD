@@ -1,0 +1,55 @@
+rules:
+  - id: cve-2011-1782-buffer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              case PSP_COMP_RLE:
+                ...
+                $q = ...;
+                $endq = $q + ...;
+                ...
+                while ($q < $endq) {
+                  ...
+                  fread(& $runcount, 1, 1, $f);
+                  ...
+                  if ($bytespp == 1) {
+                    memmove($q, $buf, $runcount);
+                    ...
+                  } else {
+                    ...
+                    for (...; ... < $runcount; ...) {
+                      ...
+                    }
+                  }
+                }
+          - pattern: |
+              case PSP_COMP_RLE:
+                ...
+                $q = ...;
+                $endq = $q + ...;
+                ...
+                while ($q < $endq) {
+                  ...
+                  fread(& $runcount, 1, 1, $f);
+                  ...
+                  if ($runcount > 128) {
+                    $runcount -= 128;
+                    ...
+                  }
+                  ...
+                  if ($bytespp == 1) {
+                    memmove($q, $buf, $runcount);
+                    ...
+                  } else {
+                    ...
+                    for (...; ... < $runcount; ...) {
+                      ...
+                    }
+                  }
+                }
+    message: "Heap-based buffer overflow vulnerability (CVE-2011-1782) due to missing bounds check on runcount in RLE decompression."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-787"
+      confidence: HIGH

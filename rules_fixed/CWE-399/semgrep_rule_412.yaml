@@ -1,0 +1,34 @@
+rules:
+  - id: cve-2016-0798-srp-memory-leak
+    message: "Potential memory leak in SRP_VBASE_get_by_user due to inconsistent memory ownership semantics (CVE-2016-0798)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ((vb->seed_key == NULL) ||
+              (vb->default_g == NULL) || (vb->default_N == NULL))
+              return NULL;
+          ...
+          $USER = sk_SRP_user_pwd_value(...);
+          if (strcmp($USER->id, $USERNAME) == 0)
+              return $USER;
+      - pattern: |
+          for (...; ...; ...) {
+              $USER = sk_SRP_user_pwd_value(...);
+              if (strcmp($USER->id, $USERNAME) == 0)
+                  return $USER;
+          }
+          if ((vb->seed_key != NULL) &&
+              (vb->default_g != NULL) && (vb->default_N != NULL)) {
+              ...
+          }
+    metavariable-names:
+      - name: $USER
+        pattern-either:
+          - pattern: user
+      - name: $USERNAME
+        pattern-either:
+          - pattern: username
+    metadata:
+      cwe: ["CWE-399"]
+      cve: "CVE-2016-0798"

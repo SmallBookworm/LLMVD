@@ -1,0 +1,16 @@
+rules:
+  - id: imagemagick-sgi-heap-buffer-overflow
+    message: "Heap-based buffer overflow in WriteSGIImage due to missing dimension validation before memory allocation."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if ((image->columns > 65535UL) || (image->rows > 65535UL))
+        ThrowWriterException(...);
+      ... 
+      status=OpenBlob(...);
+    pattern-not: |
+      status=OpenBlob(...);
+      ...
+      if ((image->columns > 65535UL) || (image->rows > 65535UL))
+        ThrowWriterException(...);
+    mode: search

@@ -1,0 +1,17 @@
+rules:
+  - id: null_pointer_dereference_assert_fails
+    message: "Potential NULL pointer dereference in assert_fails when tv_get_string_buf_chk returns NULL"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - patterns:
+        - pattern: expected = tv_get_string_buf_chk(...);
+        - pattern: if (!pattern_match(expected, ..., ...))
+      - patterns:
+        - pattern: expected = tv_get_string_buf_chk(...);
+        - pattern: if (actual != NULL)
+        - pattern: expected = tv_get_string_buf_chk(...);
+        - pattern: if (!pattern_match(expected, ..., ...))
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2022-3153"

@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2015-2694-pkinit-bypass
+    message: "PKINIT preauthentication bypass vulnerability (CVE-2015-2694). The function returns success (0) on invalid input (NULL/empty data or unconfigured realm), which may allow attackers to bypass preauthentication."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($DATA == NULL || $DATA->length <= 0 || $DATA->contents == NULL) {
+                  (*$RESPOND)($ARG, 0, NULL, NULL, NULL);
+                  return;
+              }
+          - pattern: |
+              $PLGCTX = pkinit_find_realm_context($CONTEXT, $MODDATA, $SERVER);
+              if ($PLGCTX == NULL) {
+                  (*$RESPOND)($ARG, 0, NULL, NULL, NULL);
+                  return;
+              }
+    metavariable-pattern:
+      $RESPOND: { type: "krb5_kdcpreauth_verify_respond_fn" }

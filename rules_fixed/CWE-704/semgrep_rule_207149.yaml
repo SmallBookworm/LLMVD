@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2018-9568-sk-clone-lock-missing-sk_prot_creator
+    message: "Missing assignment to sk_prot_creator in sk_clone_lock may lead to type confusion and memory corruption (CVE-2018-9568)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          struct sock *sk_clone_lock(const struct sock *sk, const gfp_t priority)
+          {
+              ...
+              sock_copy(newsk, sk);
+              ...
+              newsk->sk_prot_creator = ...;
+              ...
+          }
+    pattern-not: |
+      struct sock *sk_clone_lock(const struct sock *sk, const gfp_t priority)
+      {
+          ...
+          sock_copy(newsk, sk);
+          ...
+          newsk->sk_prot_creator = sk->sk_prot;
+          ...
+      }

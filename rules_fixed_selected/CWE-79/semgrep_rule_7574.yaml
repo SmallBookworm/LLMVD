@@ -1,0 +1,19 @@
+rules:
+  - id: cwe-79-chrome-csp-bypass-vaaapi-initialization
+    message: "Missing Content Security Policy (CSP) enforcement may lead to XSS via malicious extension (CWE-79)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern: |
+          bool $FUNC(...) {
+            ...
+            $WRAPPER = VaapiWrapper::Create(...);
+            if (!$WRAPPER) {
+              ...
+              return false;
+            }
+            return true;
+          }
+    metadata:
+      cwe: ["CWE-79"]
+      cve: "CVE-2018-6070"

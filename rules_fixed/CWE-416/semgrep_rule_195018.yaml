@@ -1,0 +1,14 @@
+rules:
+  - id: use-after-free-readpwpimage
+    message: Use-after-free vulnerability in ReadPWPImage. The image blob is closed after being destroyed, leading to potential use-after-free.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $PWP_IMAGE = DestroyImage($PWP_IMAGE);
+          ...
+          CloseBlob($IMAGE);
+      - pattern: |
+          $PWP_IMAGE = DestroyImage($PWP_IMAGE);
+          ...
+          EOFBlob($IMAGE);

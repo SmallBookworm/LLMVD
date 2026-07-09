@@ -1,0 +1,19 @@
+rules:
+  - id: cwe-362-race-condition-hdrincl
+    message: "Race condition due to multiple reads of inet->hdrincl. Value should be read once into a local variable to prevent inconsistent usage."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (inet->hdrincl)
+                ...
+          - pattern: |
+              flowi4_init_output(..., inet->hdrincl ? ... : ..., ...);
+          - pattern: |
+              if (!inet->hdrincl) {
+                ...
+              }
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: raw_sendmsg

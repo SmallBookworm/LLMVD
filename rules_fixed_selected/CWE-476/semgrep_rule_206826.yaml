@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2020-25692-null-pointer-dereference
+    message: "Potential NULL pointer dereference due to missing NULL check on 'sat_equality' before accessing 'smr_normalize'."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if( desc->ad_type->sat_equality->smr_normalize) {
+                ...
+              }
+          - pattern: |
+              (void) (*desc->ad_type->sat_equality->smr_normalize)(...);
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2020-25692"

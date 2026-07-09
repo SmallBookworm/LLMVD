@@ -1,0 +1,19 @@
+rules:
+  - id: android-region-parcel-read-validation
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $REGION->readFromMemory($DATA, $SIZE);
+          - pattern: |
+              $ACTUAL_SIZE = $REGION->readFromMemory($DATA, $SIZE);
+              if ($SIZE != $ACTUAL_SIZE) { ... }
+    pattern-not: |
+      $ACTUAL_SIZE = $REGION->readFromMemory($DATA, $SIZE);
+      if ($SIZE != $ACTUAL_SIZE) { ... }
+    message: "Missing validation of readFromMemory return value may lead to arbitrary code execution (CVE-2015-3849)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-264"
+      references:
+        - "https://android.googlesource.com/platform/frameworks/base/+/1e72dc7a3074cd0b44d89afbf39bbf5000ef7cc3"

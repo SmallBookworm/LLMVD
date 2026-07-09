@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2016-2464-libvpx-mkv-parsing-integer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (stop >= 0 && pos >= stop)
+                return ...;
+          - pattern: |
+              if (stop >= 0 && pos >= stop)
+                return ...;
+    message: "Potential integer overflow or memory corruption due to improper bounds check (CVE-2016-2464). Use 'pos > stop' instead of 'pos >= stop' after consuming length."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2016-2464"

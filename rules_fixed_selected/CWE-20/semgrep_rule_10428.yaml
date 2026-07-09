@@ -1,0 +1,13 @@
+rules:
+  - id: qemu-ehci-itd-infinite-loop
+    message: "Potential infinite loop in ehci_process_itd due to missing check for active transfers (CVE-2015-8558)"
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      return 0;
+    pattern-not: |
+      return $X ? 0 : -1;
+    metavariable-pattern:
+      metavariable: $X
+      pattern: xfers
+    fix: ""

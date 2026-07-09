@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2016-7101-out-of-bounds-read-sgi
+    message: "Potential out-of-bounds read in SGI image reader due to missing validation of ReadBlob return value. This may lead to denial of service (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              (void) ReadBlob(..., ..., ...);
+          - pattern: |
+              $COUNT = ReadBlob($SIZE, ..., ...);
+              ...
+              /* No check that 'count' equals expected size */
+      - metavariable-pattern:
+          metavariable: count
+          pattern: $COUNT
+      - pattern-not: |
+          $COUNT = ReadBlob($SIZE, ..., ...);
+          ...
+          if ($COUNT != $SIZE)
+            ...

@@ -1,0 +1,35 @@
+rules:
+  - id: mapserver-postgis-timefilter-sqli
+    patterns:
+      - pattern-not: |
+          if( strchr($STR,'\'') || strchr($STR, '\\') ) {
+             msSetError(...);
+             return MS_FALSE;
+          }
+      - pattern-either:
+          - pattern: |
+              int msPostGISLayerSetTimeFilter(layerObj *lp, const char *timestring, const char *timefield)
+              {
+                ...
+                if (!lp || !timestring || !timefield)
+                  return MS_FALSE;
+                ...
+                createPostgresTimeCompareSimple(timefield, timestring, ...);
+                ...
+              }
+          - pattern: |
+              int msPostGISLayerSetTimeFilter(layerObj *lp, const char *timestring, const char *timefield)
+              {
+                ...
+                if (!lp || !timestring || !timefield)
+                  return MS_FALSE;
+                ...
+                atimes = msStringSplit(timestring, ',', ...);
+                ...
+              }
+    message: "SQL injection vulnerability in PostGIS TIME filter. Missing validation for single quotes and backslashes in 'timestring'."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-89"
+      cve: "CVE-2013-7262"

@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2017-0402-eq-param-bounds-check
+    message: "Missing lower bound check on param2 may lead to out-of-bounds access and information disclosure (CVE-2017-0402)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (param2 >= NUM_EQ_BANDS) {
+                ...
+                break;
+              }
+          - pattern: |
+              if (param2 >= ...) {
+                ...
+                break;
+              }
+        pattern-not: |
+          if (param2 < 0 || param2 >= ...)
+    metavariable-regex:
+      metavariable: param2
+      regex: param2

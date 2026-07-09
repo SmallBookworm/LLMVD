@@ -1,0 +1,18 @@
+rules:
+  - id: integer-overflow-get-long-object
+    message: "Potential integer overflow in get_long_object() due to unchecked multiplication of ndigits by 15. This may lead to a heap buffer overflow or DoS."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              size = ndigits * 15;
+          - pattern: |
+              size = $X * 15;
+    metavariable-pattern:
+      metavariable: $X
+      pattern: ndigits
+    fix-regex:
+      regex: 'ndigits\\s*\\*\\s*15'
+      replacement: 'safe_mul(ndigits, 15)'
+      enabled: false

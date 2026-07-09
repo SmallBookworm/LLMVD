@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2014-4049-php-dns-txt-buffer-overflow
+    message: "Heap-based buffer overflow in DNS TXT record parsing may lead to denial of service or arbitrary code execution."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          while (ll < dlen) {
+            n = cp[ll];
+            memcpy(..., cp + ll + 1, n);
+            ...
+            ll = ll + n + 1;
+          }
+      - pattern: |
+          while (ll < dlen) {
+            n = cp[ll];
+            $X = f(... cp + ll + 1, n ...);
+            ...
+            ll = ll + n + 1;
+          }
+    metavariable-pattern:
+      metavariable: n
+      pattern: n = cp[ll]
+    focus-metavariable: n

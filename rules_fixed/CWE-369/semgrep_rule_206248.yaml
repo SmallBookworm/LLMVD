@@ -1,0 +1,6 @@
+rules:
+  - id: imagemagick-divide-by-zero-cve-2020-27763
+    message: Division by zero may occur when `resize_filter->window_support` is zero, leading to undefined behavior.
+    severity: ERROR
+    languages: [c]
+    pattern: $X /= $Y->window_support

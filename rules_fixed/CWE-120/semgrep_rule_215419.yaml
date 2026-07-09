@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2008-3496-uvc-buffer-overflow
+    message: Buffer overflow vulnerability in uvc_parse_format due to insufficient buffer length check for VS_FORMAT_FRAME_BASED format.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (buflen < 27) {
+            ...
+          }
+      - pattern: |
+          if (buflen < 27)
+            ...
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: uvc_parse_format
+    focus-metavariable: $FUNC

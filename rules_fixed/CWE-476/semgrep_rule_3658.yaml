@@ -1,0 +1,27 @@
+rules:
+  - id: xfs_da_shrink_inode_null_bp
+    message: "Calling xfs_da_shrink_inode with a potentially NULL buffer pointer 'bp' may cause a kernel OOPS (CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ($ERROR) {
+            ...
+            xfs_da_shrink_inode($ARGS, $BLKNO, $BP);
+            ...
+          }
+      - pattern: |
+          if ($ERROR) {
+            ...
+            error = xfs_da_shrink_inode($ARGS, $BLKNO, $BP);
+            ...
+          }
+    pattern-not-inside: |
+      if ($BP && ...)
+        ...
+    metavariable-patterns:
+      - metavariable: $BP
+        patterns:
+          - pattern: bp
+    fix-regex:
+      enabled: false

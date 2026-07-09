@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2017-15265-use-after-free
+    message: Use-after-free vulnerability due to missing port reference counting in ALSA sequencer ioctl handler.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $port = snd_seq_create_port(...);
+              ...
+              snd_seq_system_client_ev_port_start($port->addr.client, $port->addr.port);
+          - pattern: |
+              $port = snd_seq_create_port(...);
+              ...
+              if (... && info->kernel) {
+                snd_seq_delete_port($client, $port->addr.port);
+                ...
+              }
+    metavariable-pattern:
+      $port:
+        type: "struct snd_seq_client_port *"

@@ -1,0 +1,32 @@
+rules:
+  - id: cve-2019-19275-out-of-bounds-read
+    message: "Out-of-bounds read in ast_for_arguments due to unsafe CHILD(n, i+2) access without sufficient bounds checking (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (i + 1 < NCH($N) && TYPE(CHILD($N, i + 1)) == EQUAL) {
+              ... ast_for_expr(..., CHILD($N, i + 2)) ...
+          }
+      - pattern: |
+          ch = CHILD($N, i+1);
+          ... ast_for_arg(..., ch) ...
+          i += 3;
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2019-19275"
+    patterns:
+      - pattern-inside: |
+          $N = ...;
+          for (i = 0; i < NCH($N); i++) {
+            ...
+          }
+      - pattern-either:
+        - pattern: |
+            if (i + 1 < NCH($N) && TYPE(CHILD($N, i + 1)) == EQUAL) {
+                ... ast_for_expr(..., CHILD($N, i + 2)) ...
+            }
+        - pattern: |
+            ch = CHILD($N, i+1);
+            ... ast_for_arg(..., ch) ...
+            i += 3;

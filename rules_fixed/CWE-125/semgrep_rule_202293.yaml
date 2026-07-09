@@ -1,0 +1,23 @@
+rules:
+  - id: gssapi_server_read_oob
+    message: "Missing boundary check on gss_unwrap output buffer may lead to read out-of-bounds (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ((((char *) $BUFDESC.value)[0] & $MASK) == 0)
+            { ... }
+      - pattern: |
+          gsasl_property_set_raw(..., (char *) $BUFDESC.value + 4, $BUFDESC.length - 4);
+    metavariable-pattern:
+      $BUFDESC:
+        patterns:
+          - pattern: bufdesc2
+    pattern-not-inside: |
+      if ($BUFDESC.length < 4)
+        { return ...; }
+      ...
+      if ((((char *) $BUFDESC.value)[0] & $MASK) == 0)
+        { ... }
+    fix-regex:
+      enabled: false

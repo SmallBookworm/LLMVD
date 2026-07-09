@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2016-3765-impeg2d-bitstream-oob-read
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($STREAM->u4_offset < $STREAM->u4_max_offset)
+              {
+                  FLUSH_BITS(...);
+              }
+    message: "Potential out-of-bounds read due to insufficient bounds check before FLUSH_BITS. Missing offset adjustment (e.g., +64) may lead to information disclosure or DoS (CVE-2016-3765)."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-200"
+      confidence: MEDIUM

@@ -1,0 +1,29 @@
+rules:
+  - id: use-after-free-xsl-stylesheet-compilation
+    message: "Use-after-free vulnerability due to missing check for prior compilation failure before reusing m_stylesheetDoc."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              xsltStylesheetPtr $FUNC(...) {
+                ...
+                xsltStylesheetPtr $RESULT = xsltParseStylesheetDoc($DOC);
+                if ($RESULT)
+                  ...;
+                return $RESULT;
+              }
+          - pattern: |
+              xsltStylesheetPtr $FUNC(...) {
+                ...
+                if ($COND)
+                  return xsltLoadStylesheetPI(...);
+                ...
+                xsltStylesheetPtr $RESULT = xsltParseStylesheetDoc($DOC);
+                if ($RESULT)
+                  ...;
+                return $RESULT;
+              }
+    metavariable-pattern:
+      $FUNC: "compileStyleSheet"
+    fix: ""

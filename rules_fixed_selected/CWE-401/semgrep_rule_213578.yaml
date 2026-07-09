@@ -1,0 +1,28 @@
+rules:
+  - id: cwe-401-matio-safemuldims-rank-zero
+    patterns:
+      - pattern-either:
+          - pattern: |
+              int SafeMulDims(const matvar_t *matvar, size_t* nelems)
+              {
+                  ...
+                  for ( ... ; ... < matvar->rank; ... ) {
+                      ...
+                  }
+                  ...
+              }
+          - pattern: |
+              int SafeMulDims(const matvar_t *matvar, size_t* nelems)
+              {
+                  ...
+                  for ( ... ; i < matvar->rank; ... ) {
+                      ...
+                  }
+                  ...
+              }
+    message: "Memory leak in SafeMulDims when matvar->rank is 0. The function does not handle the rank==0 case, leading to potential memory leaks (CWE-401, CVE-2019-20052)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-401"
+      cve: "CVE-2019-20052"

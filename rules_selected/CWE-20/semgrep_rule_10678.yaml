@@ -1,0 +1,37 @@
+rules:
+  - id: suricata-teredo-detection-bypass
+    message: "Teredo decoding lacks validation checks for HLIM and NH fields, potentially allowing DNS detection bypass (CVE-2019-1010251)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (IP_GET_RAW_VER($START) == 6) {
+                  ...
+                  if (len == IPV6_HEADER_LEN + IPV6_GET_RAW_PLEN($THDR) + ($START - $PKT)) {
+                      ...
+                  }
+              }
+          - pattern: |
+              if (IP_GET_RAW_VER($START) == 6) {
+                  IPV6Hdr *$THDR = (IPV6Hdr *)$START;
+                  ...
+                  if (len == IPV6_HEADER_LEN + IPV6_GET_RAW_PLEN($THDR) + ($START - $PKT)) {
+                      ...
+                  }
+              }
+    pattern-not: |
+      if (IP_GET_RAW_VER($START) == 6) {
+          IPV6Hdr *$THDR = (IPV6Hdr *)$START;
+          if (IPV6_GET_RAW_HLIM($THDR) == 0)
+              return ...;
+          if (IPV6_GET_RAW_NH($THDR) == 0 && IPV6_GET_RAW_PLEN($THDR) < 8)
+              return ...;
+          ...
+          if (len == IPV6_HEADER_LEN + IPV6_GET_RAW_PLEN($THDR) + ($START - $PKT)) {
+              ...
+          }
+      }
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2019-1010251"

@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2020-10730-null-deref-ldb-lock-callback
+    message: "Potential NULL pointer dereference or use-after-free in ldb_lock_backend_callback due to missing req->context NULL check."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              struct ldb_db_lock_context *lock_context;
+              ...
+              lock_context = talloc_get_type(req->context, struct ldb_db_lock_context);
+          - pattern: |
+              talloc_get_type(req->context, struct ldb_db_lock_context);
+    metavariable-pattern:
+      lock_context:
+        pattern: $LOCK_CONTEXT
+    pattern-not-inside: |
+      if (req->context == NULL) {
+          ...
+          abort();
+      }
+      ...
+      talloc_get_type(req->context, struct ldb_db_lock_context);

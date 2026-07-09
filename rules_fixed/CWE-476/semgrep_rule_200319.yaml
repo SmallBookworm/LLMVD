@@ -1,0 +1,21 @@
+rules:
+  - id: unchecked-kmalloc-null-deref
+    message: "Unchecked kmalloc() return value may lead to NULL pointer dereference (CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      $NEW_RA = on ? kmalloc(...) : NULL;
+      ...
+      if (!$NEW_RA) {
+        ...
+        return -ENOBUFS;
+      }
+    pattern-not: |
+      $NEW_RA = on ? kmalloc(...) : NULL;
+      if (on && !$NEW_RA)
+        return -ENOMEM;
+      ...
+      if (!$NEW_RA) {
+        ...
+        return -ENOBUFS;
+      }

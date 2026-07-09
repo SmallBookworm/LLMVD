@@ -1,0 +1,18 @@
+rules:
+  - id: chromium-omnibox-confusable-characters
+    message: "Missing handling of confusable characters in IDN spoof checker may allow Omnibox spoofing (CVE-2018-6078)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          extra_confusable_mapper_.reset(icu::Transliterator::createFromRules(
+              ...,
+              icu::UnicodeString::fromUTF8("ӏ > l; [кĸκ] > k; п > n; [ƅь] > b; в > b; м > m; н > h; "
+                                           "т > t; [шщ] > w; ട > s;"),
+              ...));
+      - pattern: |
+          icu::UnicodeString::fromUTF8("ӏ > l; [кĸκ] > k; п > n; [ƅь] > b; в > b; м > m; н > h; "
+                                       "т > t; [шщ] > w; ട > s;")
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2018-6078"

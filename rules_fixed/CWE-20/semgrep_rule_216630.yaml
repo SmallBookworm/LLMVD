@@ -1,0 +1,30 @@
+rules:
+  - id: cve-2016-6302-ticket-length-check
+    message: "Missing sanity check on ticket length before HMAC validation. This can lead to denial of service via a malformed ticket (CVE-2016-6302)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              mlen = HMAC_size(&...);
+              ...
+              eticklen -= mlen;
+          - pattern: |
+              mlen = HMAC_size(&...);
+              ...
+              if (HMAC_Update(&..., etick, eticklen) <= 0) {
+                  ...
+              }
+          - pattern: |
+              mlen = HMAC_size(&...);
+              ...
+              if (CRYPTO_memcmp(..., etick + eticklen, mlen))
+    pattern-not-inside: |
+      mlen = HMAC_size(&...);
+      ...
+      if (eticklen <= 16 + EVP_CIPHER_CTX_iv_length(&...) + mlen) {
+          ...
+          return ...;
+      }
+      ...
+      eticklen -= mlen;

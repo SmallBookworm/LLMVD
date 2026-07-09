@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2015-1788-infinite-loop-bn_gf2m_mod_inv
+    message: "Potential infinite loop in BN_GF2m_mod_inv due to missing zero check in binary polynomial inversion (CVE-2015-1788)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (ubits <= BN_BITS2 && udp[0] == 1)
+                  break;
+          - pattern: |
+              if (ubits <= BN_BITS2 && udp[0] == 0x1)
+                  break;

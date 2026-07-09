@@ -1,0 +1,13 @@
+rules:
+  - id: cwe-119-buffer-overflow-parse-identifier
+    message: "Stack-based buffer overflow in parse_identifier due to missing bounds check. Ensure the third argument 'len' is used to prevent overflows."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          parse_identifier(..., $BUF)
+    pattern-not: |
+          parse_identifier(..., $BUF, sizeof($BUF))
+    fix-regex:
+      regex: ''
+      replacement: ''

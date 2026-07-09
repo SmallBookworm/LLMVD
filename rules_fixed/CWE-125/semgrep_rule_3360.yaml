@@ -1,0 +1,13 @@
+rules:
+  - id: imagemagick-rle-out-of-bounds-read-cve-2016-7515
+    message: "Potential out-of-bounds read in RLE image parsing due to incorrect pixel buffer size calculation. This may lead to denial of service (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          pixel_info_length = image->columns * image->rows * MagickMax(number_planes, 4);
+      - pattern: |
+          pixel_info_length = image->columns * image->rows * number_planes;
+    fix-regex:
+      regex: null
+      replacement: null

@@ -1,0 +1,33 @@
+rules:
+  - id: cwe-125-jpeg-size-buffer-overread
+    message: "Potential heap-based buffer over-read in jpeg_size due to missing bounds check before reading data[i] and data[i+1]."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while (... && $I < $DATA_SIZE) {
+                  ...
+                  $I += 2;
+                  $BLOCK_LENGTH = $DATA[$I] * 256 + $DATA[$I + 1];
+                  ...
+              }
+          - pattern: |
+              while ($I < $DATA_SIZE) {
+                  ...
+                  $I += 2;
+                  $BLOCK_LENGTH = $DATA[$I] * 256 + $DATA[$I + 1];
+                  ...
+              }
+    metavariable-pattern:
+      metavariable: $DATA
+      pattern: data
+    metavariable-pattern:
+      metavariable: $DATA_SIZE
+      pattern: data_size
+    metavariable-pattern:
+      metavariable: $I
+      pattern: i
+    metavariable-pattern:
+      metavariable: $BLOCK_LENGTH
+      pattern: block_length

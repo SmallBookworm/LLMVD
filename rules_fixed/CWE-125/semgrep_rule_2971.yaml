@@ -1,0 +1,40 @@
+rules:
+  - id: tnef-type-confusion-cve-2017-6309
+    message: Missing type check before accessing MAPI attribute data may lead to out-of-bounds read/write (CWE-125).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          switch (a->name) {
+            case MAPI_ATTACH_LONG_FILENAME:
+              if (...) { ... }
+              ... = strdup((char*)a->values[0].data.buf);
+              break;
+          }
+      - pattern: |
+          switch (a->name) {
+            case MAPI_ATTACH_DATA_OBJ:
+              file->len = a->values[0].len;
+              ... = CHECKED_XMALLOC(..., file->len);
+              memmove(..., a->values[0].data.buf, file->len);
+              break;
+          }
+      - pattern: |
+          switch (a->name) {
+            case MAPI_ATTACH_MIME_TAG:
+              ... = CHECKED_XMALLOC(..., a->values[0].len);
+              memmove(..., a->values[0].data.buf, a->values[0].len);
+              break;
+          }
+      - pattern: |
+          switch (a->name) {
+            case MAPI_ATTACH_CONTENT_ID:
+              ... = CHECKED_XMALLOC(..., a->values[0].len);
+              memmove(..., a->values[0].data.buf, a->values[0].len);
+              break;
+          }
+    metavariable-pattern:
+      metavariable: a
+      pattern-not: |
+        assert(...);
+        switch (a->name) { ... }

@@ -1,0 +1,19 @@
+rules:
+  - id: unseeded-prng-ntopng
+    pattern: |
+      HTTPserver::HTTPserver(...) {
+        ...
+        srand(...);
+        ...
+      }
+    pattern-not: |
+      HTTPserver::HTTPserver(...) {
+        ...
+        struct timeval tv;
+        gettimeofday(&tv, NULL);
+        srand(tv.tv_sec + tv.tv_usec);
+        ...
+      }
+    message: "PRNG is not properly seeded at program startup, leading to predictable session IDs (CWE-284, CVE-2018-12520)."
+    severity: HIGH
+    languages: [c]

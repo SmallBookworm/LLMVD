@@ -1,0 +1,19 @@
+rules:
+  - id: use-after-free-chrome-ftp-mime
+    message: Potential use-after-free vulnerability due to missing self-reference protection before calling client_->didReceiveResponse.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          scoped_refptr<...> protect(this);
+          $CLIENT->didReceiveResponse(...);
+      - pattern-either:
+          - pattern: |
+              $CLIENT->didReceiveResponse(...);
+          - pattern: |
+              client_->didReceiveResponse(...);
+    metavariable-pattern:
+      metavariable: $CLIENT
+      pattern-either:
+        - pattern: client_
+        - pattern: $CLIENT

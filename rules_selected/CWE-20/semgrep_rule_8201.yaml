@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2016-3757-unbounded-fscanf
+    message: Unbounded fscanf may lead to buffer overflow when reading file names from /proc/pid/maps. Use field width specifiers to prevent overflows.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              fscanf(..., "%s", $BUF)
+          - pattern: |
+              fscanf(..., "%*s %s", ..., $BUF)
+          - pattern: |
+              fscanf(..., "%*x-%*x %*s %zx %s %ld %s\n", ..., $BUF)
+    metavariable-pattern:
+      metavariable: $BUF
+      pattern-not: |
+        fscanf(..., "%*x-%*x %*s %zx %5s %ld %1023s\n", ...)

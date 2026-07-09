@@ -1,0 +1,20 @@
+rules:
+  - id: freetype-unchecked-return-value-CVE-2014-9746
+    message: "Return value of T1_ToFixedArray is not checked, which may lead to uninitialized memory access (CWE-20)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              (void)T1_ToFixedArray(...);
+          - pattern: |
+              T1_ToFixedArray(...);
+              ...
+              $TEMP[...]
+        metavariable-pattern:
+          metavariable: $TEMP
+          pattern: temp
+    fix-regex:
+      regex: ''
+      replacement: ''
+      enabled: false

@@ -1,0 +1,18 @@
+rules:
+  - id: gnutls_ecc_ansi_x963_export_missing_sanity_check
+    message: Missing sanity check on ECC coordinate size before writing to buffer may lead to out-of-bounds write (CVE-2014-8564).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          byte_size = (_gnutls_mpi_get_nbits($X) + 7) / 8;
+          $SIZE = $OUT_SIZE - (1 + ($NUMLEN - byte_size));
+          _gnutls_mpi_print($X, &$OUT_DATA[1 + ($NUMLEN - byte_size)], &$SIZE);
+      - pattern: |
+          byte_size = (_gnutls_mpi_get_nbits($Y) + 7) / 8;
+          $SIZE = $OUT_SIZE - (1 + ($NUMLEN + $NUMLEN - byte_size));
+          _gnutls_mpi_print($Y, &$OUT_DATA[1 + $NUMLEN + $NUMLEN - byte_size], &$SIZE);
+    metavariable-pattern:
+      $NUMLEN: 
+        pattern: numlen
+    focus-metavariable: byte_size

@@ -1,0 +1,16 @@
+rules:
+  - id: imagemagick-locale-lowercase-oob
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($C < 0)
+                return($C);
+          - pattern: |
+              if ($C < 0)
+                return $C;
+    message: "Out-of-bounds read vulnerability due to improper handling of negative input in LocaleLowercase. Use 'if (c == EOF)' instead."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2019-10714"

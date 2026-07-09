@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2016-6198-vfs-rename-self-hardlink-check
+    message: "Missing check for self-hardlink using vfs_select_inode before rename, which may lead to denial of service (CVE-2016-6198)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ($SOURCE == $TARGET)
+            return 0;
+      - pattern: |
+          if ($SOURCE == $TARGET)
+            return 0;
+    metavariable-pattern:
+      $SOURCE: old_dentry->d_inode
+      $TARGET: new_dentry->d_inode
+    fix: ""

@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2012-3291-buffer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              malloc(strlen(...))
+          - pattern: |
+              malloc(strlen($STR))
+    message: "Heap-based buffer overflow due to missing null-terminator space in malloc. Add +1 to strlen(...) to account for null terminator."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2012-3291"

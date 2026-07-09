@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2018-5344-loop-lo_release-use-after-free
+    message: "Use-after-free vulnerability in lo_release due to insufficient serialization. The loop device may be accessed after lo_refcnt reaches zero, leading to potential UAF in __lock_acquire."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              static void lo_release(struct gendisk *disk, fmode_t mode)
+              {
+                  ...
+                  if (atomic_dec_return(&lo->lo_refcnt))
+                      return;
+                  ...
+                  mutex_lock(&lo->lo_ctl_mutex);
+                  ...
+                  mutex_unlock(&lo->lo_ctl_mutex);
+              }
+    metadata:
+      cwe: ["CWE-416"]
+      cve: "CVE-2018-5344"

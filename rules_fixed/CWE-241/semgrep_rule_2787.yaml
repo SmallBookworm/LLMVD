@@ -1,0 +1,54 @@
+rules:
+  - id: cve-2017-9075-sctp-v6-inheritance
+    message: "Missing reset of ipv6_mc_list, ipv6_ac_list, or ipv6_fl_list in SCTP IPv6 accept socket creation may lead to use-after-free or denial of service."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              memcpy($newnp, $np, sizeof(struct ipv6_pinfo));
+              ... 
+              $newnp->ipv6_mc_list != NULL;
+          - pattern: |
+              memcpy($newnp, $np, sizeof(struct ipv6_pinfo));
+              ... 
+              $newnp->ipv6_ac_list != NULL;
+          - pattern: |
+              memcpy($newnp, $np, sizeof(struct ipv6_pinfo));
+              ... 
+              $newnp->ipv6_fl_list != NULL;
+          - pattern: |
+              memcpy($newnp, $np, sizeof(struct ipv6_pinfo));
+              ... 
+              !$newnp->ipv6_mc_list;
+          - pattern: |
+              memcpy($newnp, $np, sizeof(struct ipv6_pinfo));
+              ... 
+              !$newnp->ipv6_ac_list;
+          - pattern: |
+              memcpy($newnp, $np, sizeof(struct ipv6_pinfo));
+              ... 
+              !$newnp->ipv6_fl_list;
+          - pattern: |
+              memcpy($newnp, $np, sizeof(struct ipv6_pinfo));
+              ... 
+              $newnp->ipv6_mc_list = ...;
+          - pattern: |
+              memcpy($newnp, $np, sizeof(struct ipv6_pinfo));
+              ... 
+              $newnp->ipv6_ac_list = ...;
+          - pattern: |
+              memcpy($newnp, $np, sizeof(struct ipv6_pinfo));
+              ... 
+              $newnp->ipv6_fl_list = ...;
+    pattern-not-inside: |
+      memcpy($newnp, $np, sizeof(struct ipv6_pinfo));
+      ...
+      $newnp->ipv6_mc_list = NULL;
+      ...
+      $newnp->ipv6_ac_list = NULL;
+      ...
+      $newnp->ipv6_fl_list = NULL;
+    metadata:
+      cwe: ["CWE-241"]
+      cve: "CVE-2017-9075"

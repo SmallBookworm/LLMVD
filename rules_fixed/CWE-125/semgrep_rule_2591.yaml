@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2017-13005-nfs-buffer-overread
+    message: "Missing bounds check before accessing rp->rm_call.cb_proc or rp->rm_call.cb_vers may lead to buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $xmep->proc = EXTRACT_32BITS(&$rp->rm_call.cb_proc);
+          ...
+          $xmep->vers = EXTRACT_32BITS(&$rp->rm_call.cb_vers);
+      - pattern: |
+          $xmep->proc = EXTRACT_32BITS(&$rp->rm_call.cb_proc);
+      - pattern: |
+          $xmep->vers = EXTRACT_32BITS(&$rp->rm_call.cb_vers);
+    metavariable-pattern:
+      metavariable: $rp
+      pattern: "struct sunrpc_msg *"
+    fix-regex:
+      regex: .*
+      replacement: ""
+      enabled: false

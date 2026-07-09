@@ -1,0 +1,8 @@
+rules:
+  - id: openldap-ava-sort-invalid-dn-syntax-handling
+    message: "Improper handling of duplicate AVA attribute types in RDN may lead to invalid pointer free and DoS (CVE-2020-36224, CWE-763)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (a == 0)
+        return LDAP_INVALID_DN_SYNTAX;

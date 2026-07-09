@@ -1,0 +1,44 @@
+rules:
+  - id: brcmf_cfg80211_mgmt_tx_buffer_overflow
+    message: "Potential buffer overflow in brcmf_cfg80211_mgmt_tx due to missing length validation before memcpy into fixed-size action_frame->data buffer."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (ieee80211_is_action(...)) {
+                  ...
+                  memcpy(action_frame->data, ..., le16_to_cpu(action_frame->len));
+                  ...
+              }
+          - pattern: |
+              else if (ieee80211_is_action(...)) {
+                  ...
+                  memcpy(action_frame->data, ..., le16_to_cpu(action_frame->len));
+                  ...
+              }
+      - metavariable-pattern:
+          metavariable: action_frame
+          pattern: struct brcmf_fil_action_frame_le *
+      - pattern-not-inside: |
+          if (ieee80211_is_action(...)) {
+              ...
+              if (len > BRCMF_FIL_ACTION_FRAME_SIZE + DOT11_MGMT_HDR_LEN) {
+                  ...
+                  goto ...;
+              }
+              ...
+              memcpy(action_frame->data, ..., le16_to_cpu(action_frame->len));
+              ...
+          }
+      - pattern-not-inside: |
+          else if (ieee80211_is_action(...)) {
+              ...
+              if (len > BRCMF_FIL_ACTION_FRAME_SIZE + DOT11_MGMT_HDR_LEN) {
+                  ...
+                  goto ...;
+              }
+              ...
+              memcpy(action_frame->data, ..., le16_to_cpu(action_frame->len));
+              ...
+          }

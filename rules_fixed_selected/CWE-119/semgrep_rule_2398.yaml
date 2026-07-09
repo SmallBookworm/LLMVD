@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2017-16546-wpg-colormap-index-validation
+    message: "Missing validation of colormap index may lead to buffer overflow (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((WPG_Palette.NumOfEntries - WPG_Palette.StartIndex) > ...)
+                ThrowReaderException(...);
+          - pattern: |
+              if ((WPG_Palette.NumOfEntries-WPG_Palette.StartIndex) > ...)
+                ThrowReaderException(...);
+        # Match only the vulnerable pattern that lacks StartIndex <= NumOfEntries check
+      - pattern-not: |
+          if (WPG_Palette.StartIndex > WPG_Palette.NumOfEntries)
+            ThrowReaderException(...);
+    metavariable-pattern:
+      metavariable: ...
+      pattern: (Rec2.RecordLength - 2 - 2) / 3

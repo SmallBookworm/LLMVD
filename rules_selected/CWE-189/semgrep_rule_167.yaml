@@ -1,0 +1,16 @@
+rules:
+  - id: cwe-189-grep-integer-overflow
+    message: "Potential integer overflow due to use of 'int' for context length which may lead to heap-based buffer overflow (CVE-2012-5667)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (! (xstrtoumax ($STR, 0, 10, &$VALUE, "") == LONGINT_OK
+                     && 0 <= (*$OUT = $VALUE)
+                     && *$OUT == $VALUE))
+          - pattern: |
+              static int $VAR; /* Lines of leading/trailing context or max count */
+    metadata:
+      cwe: "CWE-189"
+      cve: "CVE-2012-5667"

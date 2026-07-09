@@ -1,0 +1,21 @@
+rules:
+  - id: imagemagick-vips-memory-leak
+    message: "Memory leak in ReadVIPSImage: allocated 'metadata' is not freed before function return."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (metadata != (char *) NULL)
+            SetImageProperty(image,"vips:metadata",metadata,exception);
+          (void) CloseBlob(image);
+          if (status == MagickFalse)
+            return((Image *) NULL);
+          return(image);
+      - pattern: |
+          if (metadata != (char *) NULL)
+            SetImageProperty(image,"vips:metadata",metadata,exception);
+          (void) CloseBlob(image);
+          return(image);
+    metavariable-regex:
+      metavariable: $...
+      regex: ".*"

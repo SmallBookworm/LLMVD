@@ -1,0 +1,18 @@
+rules:
+  - id: negative_chunk_length_memmove
+    message: "Negative chunk length may be passed to memmove, leading to denial of service (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $CHUNK_LENGTH = (size_t)strtol(...);
+          ...
+          memmove(..., ..., $CHUNK_LENGTH);
+      - pattern: |
+          $CHUNK_LENGTH = strtol(...);
+          ...
+          memmove(..., ..., (size_t)$CHUNK_LENGTH);
+    metavariable-pattern:
+      metavariable: $CHUNK_LENGTH
+      pattern-not: |
+        if ($CHUNK_LENGTH < 0) { ... }

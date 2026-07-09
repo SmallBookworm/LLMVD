@@ -1,0 +1,17 @@
+rules:
+  - id: exiv2-webp-integer-overflow
+    message: "Potential integer overflow in WebPImage::decodeChunks when filesize < io_->tell(), leading to large heap allocation and DoS (CVE-2019-13111)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              enforce($SIZE <= ($FILESIZE - io_->tell()), ...);
+          - pattern: |
+              enforce($SIZE <= ($FILESIZE - $IO->tell()), ...);
+    metavariable-pattern:
+      metavariable: "$FILESIZE"
+      pattern-either:
+        - pattern: uint64_t ...
+        - pattern: uint32_t ...
+    focus-metavariable: "$SIZE"

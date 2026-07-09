@@ -1,0 +1,12 @@
+rules:
+  - id: tensorflow-oob-access-in-specializetype
+    message: "Out-of-bounds read/write due to incorrect loop index used in mutable_args access. This may lead to heap corruption (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      for (int j = 0; j < t->args_size(); j++) {
+        auto* arg = t->mutable_args(j);
+      }
+    metadata:
+      cwe: ["CWE-787"]
+      cve: "CVE-2022-23574"

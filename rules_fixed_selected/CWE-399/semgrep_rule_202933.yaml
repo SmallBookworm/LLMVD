@@ -1,0 +1,23 @@
+rules:
+  - id: qpdf-infinite-recursion-resolve
+    message: "Missing recursion guard in QPDF::resolve may lead to infinite loop and denial of service (CVE-2017-11624)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (! this->obj_cache.count($OG))
+      {
+        ...
+      }
+    pattern-not: |
+      if (this->resolving.count($OG))
+      {
+        ...
+      }
+      ResolveRecorder $RR(this, $OG);
+      if (! this->obj_cache.count($OG))
+      {
+        ...
+      }
+    metavariable-regex:
+      metavariable: $OG
+      regex: og

@@ -1,0 +1,32 @@
+rules:
+  - id: h264_ref_pic_marking_overflow
+    message: "Missing bounds check on ref_pic_marking array access may lead to buffer overflow (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          while (1) {
+            ...
+            READ_UE (NR, MEM_MGMT_CTRL_OP);
+            if (MEM_MGMT_CTRL_OP == 0)
+              break;
+            REFPICMARKING = &dec_ref_pic_m->ref_pic_marking[dec_ref_pic_m->n_ref_pic_marking];
+            ...
+            dec_ref_pic_m->n_ref_pic_marking++;
+          }
+    metavariable-patterns:
+      - metavariable: NR
+        patterns:
+          - pattern-either:
+              - pattern: $_
+      - metavariable: MEM_MGMT_CTRL_OP
+        patterns:
+          - pattern-either:
+              - pattern: $_
+      - metavariable: REFPICMARKING
+        patterns:
+          - pattern-either:
+              - pattern: $_
+    metadata:
+      cwe: ["CWE-787"]
+      cve: "CVE-2021-3185"

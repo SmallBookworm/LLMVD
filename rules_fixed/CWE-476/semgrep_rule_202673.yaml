@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2018-11695-null-deref
+    message: Potential NULL pointer dereference due to unchecked use of `d->value()->perform(&eval)` before null check.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $VALUE = $d->value()->perform(&eval);
+              ...
+              if (!($VALUE || ...)) { ... }
+          - pattern: |
+              Expression_Obj $VALUE = $d->value()->perform(&eval);
+              ...
+              if (!($VALUE || ...)) { ... }
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2018-11695"

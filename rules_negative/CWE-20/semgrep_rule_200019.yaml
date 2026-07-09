@@ -1,0 +1,10 @@
+rules:
+  - id: systemd-zero-length-notify-message
+    message: "Zero-length notification messages may cause assertion failure and PID 1 hang (CVE-2016-7795)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      assert(n > 0);
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2016-7795"

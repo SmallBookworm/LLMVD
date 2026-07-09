@@ -1,0 +1,11 @@
+rules:
+  - id: null_pointer_dereference_wvunpack
+    message: "Potential null pointer dereference when calling filespec_name() without checking its return value before dereferencing."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          *filespec_name($X) = '\0';
+    fix-regex:
+      regex: null
+      replacement: ""

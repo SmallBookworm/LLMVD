@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2015-1232-midi-port-index-oob-write
+    patterns:
+      - pattern-either:
+          - pattern: |
+              DCHECK_LT($PORT_INDEX, $OUTPUT_STREAMS.size());
+              $OUTPUT_STREAMS[$PORT_INDEX]->Send(...);
+          - pattern: |
+              DCHECK($PORT_INDEX < $OUTPUT_STREAMS.size());
+              $OUTPUT_STREAMS[$PORT_INDEX]->Send(...);
+    message: "Missing bounds check on port_index before array access may lead to out-of-bounds write (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2015-1232"

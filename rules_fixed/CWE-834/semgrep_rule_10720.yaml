@@ -1,0 +1,35 @@
+rules:
+  - id: nsv_loop_missing_eof_check
+    message: "Loop reading table entries lacks EOF check, leading to potential DoS (CWE-834)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          for(...;...;...)
+            $VAR[$I] = avio_rl32($PB) + ...;
+      - pattern: |
+          for(...;...;...) {
+            ...
+            $VAR[$I] = avio_rl32($PB) + ...;
+            ...
+          }
+    metavariable-pattern:
+      metavariable: $PB
+      pattern: pb
+    patterns:
+      - pattern-not-inside: |
+          for(...;...;...) {
+            ...
+            if (avio_feof(...)) ...
+            ...
+            $VAR[$I] = avio_rl32($PB) + ...;
+            ...
+          }
+      - pattern-not-inside: |
+          for(...;...;...) {
+            ...
+            if (avio_feof(...)) return ...;
+            ...
+            $VAR[$I] = avio_rl32($PB) + ...;
+            ...
+          }

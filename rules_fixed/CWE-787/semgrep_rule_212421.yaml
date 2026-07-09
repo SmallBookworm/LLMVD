@@ -1,0 +1,18 @@
+rules:
+  - id: libvncserver-unaligned-access-hybiReadAndDecode
+    message: "Unaligned memory access via direct uint32_t pointer cast may cause crashes on architectures that do not support unaligned access. Use memcpy to safely handle potentially unaligned data."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              uint32_t *data32 = (uint32_t *)$DATA;
+              ...
+              data32[$IDX] ^= $VAL;
+          - pattern: |
+              $PTR = (uint32_t *)$DATA;
+              ...
+              $PTR[$IDX] ^= $VAL;
+    metavariable-regex:
+      metavariable: $PTR
+      regex: "data32"

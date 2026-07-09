@@ -1,0 +1,18 @@
+rules:
+  - id: imagemagick-bmp-oob-write-cve-2018-12599
+    message: "Potential out-of-bounds write in BMP image parsing due to insufficient bounds checking. This could lead to memory corruption (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          pixel_info=AcquireVirtualMemory((size_t) image->rows,
+            MagickMax(bytes_per_line,image->columns+256UL)*sizeof(*pixels));
+      - pattern: |
+          pixel_info=AcquireVirtualMemory(image->rows,
+            MagickMax(bytes_per_line,image->columns+256UL)*sizeof(*pixels));
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2018-12599"
+      references:
+        - https://github.com/ImageMagick/ImageMagick/issues/1177
+        - https://github.com/ImageMagick/ImageMagick/commit/ae04fa4be910255e5d363edebd77adeee99a525d

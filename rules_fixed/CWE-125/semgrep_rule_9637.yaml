@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2018-14466-buffer-overread
+    message: "Buffer over-read vulnerability due to reading 32 bits from a 16-bit field 'serviceId' in rx_header structure. Use EXTRACT_16BITS instead of EXTRACT_32BITS."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $$rxent->serviceId = EXTRACT_32BITS(&$$rxh->serviceId);
+          - pattern: |
+              EXTRACT_32BITS(&$$rxh->serviceId)
+    metadata:
+      cwe: ["CWE-125"]
+      cve: "CVE-2018-14466"

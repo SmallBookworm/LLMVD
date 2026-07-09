@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2013-1418-null-deref
+    message: "NULL pointer dereference in setup_server_realm when sprinc is not checked before use. This can lead to a denial of service (CVE-2013-1418)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (kdc_numrealms > 1) {
+            ... find_realm_data($SPRINC->realm.data, ...) ...
+          }
+      - pattern: |
+          find_realm_data($SPRINC->realm.data, ...)
+    metavariable-comparison:
+      metavariable: $SPRINC
+      comparison:
+        operator: not_contains
+        value: NULL
+    fix: "Add a NULL check for sprinc before dereferencing it."
+    comment: "Ensure sprinc is checked against NULL before accessing its members."

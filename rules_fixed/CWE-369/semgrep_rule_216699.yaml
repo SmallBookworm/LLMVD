@@ -1,0 +1,15 @@
+rules:
+  - id: cwe-369-division-by-zero-box-blur
+    message: Division by zero may occur if 'coverage' is zero in box_blur_line. Ensure box_width > 0 to prevent SIGFPE.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          dest[...] = (ac[...] + (...)) / coverage;
+      - pattern-inside: |
+          ... / ${coverage};
+    metavariable-pattern:
+      metavariable: coverage
+      pattern: |
+        (lead < len ? lead : len - 1) - (trail >= 0 ? trail : -1)
+    focus-metavariable: coverage

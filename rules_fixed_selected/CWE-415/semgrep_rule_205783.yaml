@@ -1,0 +1,18 @@
+rules:
+  - id: cwe-415-libplist-invalid-key-type
+    message: "Potential double-free or invalid free due to non-string key node being cast to PLIST_KEY. This can lead to denial of service (CVE-2017-5836)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          plist_get_data($KEY)->type = PLIST_KEY;
+          ...
+          if (!plist_get_data($KEY)->strval) { ... }
+      - pattern: |
+          $DATA = plist_get_data($KEY);
+          $DATA->type = PLIST_KEY;
+          ...
+          if (!$DATA->strval) { ... }
+    metavariable-regex:
+      metavariable: $KEY
+      regex: "key"

@@ -1,0 +1,12 @@
+rules:
+  - id: vfio_integer_overflow_kzalloc
+    message: "Potential integer overflow in kzalloc leading to memory corruption. Use kcalloc instead to prevent overflow."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: $PTR = kzalloc($N * sizeof(...), ...)
+    metadata:
+      cwe: ["CWE-190"]
+      references:
+        - https://github.com/torvalds/linux/commit/05692d7005a364add85c6e25a6c4447ce08f913a
+        - CVE-2016-9083

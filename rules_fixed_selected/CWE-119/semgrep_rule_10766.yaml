@@ -1,0 +1,32 @@
+rules:
+  - id: qemu-net-checksum-buffer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              void net_checksum_calculate(uint8_t *data, int length)
+              {
+                  ...
+                  if ((data[14] & 0xf0) != 0x40)
+                      return;
+                  ...
+                  plen = (data[16] << 8 | data[17]) - hlen;
+                  ...
+                  if (plen < csum_offset+2)
+                      return;
+                  ...
+              }
+          - pattern: |
+              void net_checksum_calculate(uint8_t *data, int length)
+              {
+                  ...
+                  plen = (data[16] << 8 | data[17]) - hlen;
+                  ...
+                  data[14+hlen+csum_offset] = ...;
+                  ...
+              }
+    message: "Missing validation of 'length' against minimum header size before accessing packet data, leading to potential out-of-bounds read (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2016-2857"

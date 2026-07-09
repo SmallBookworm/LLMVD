@@ -1,0 +1,16 @@
+rules:
+  - id: alsa_compress_integer_overflow_check
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($... || $fragments > SIZE_MAX / $fragment_size)
+                $...
+          - pattern: |
+              if ($... || $fragments > (size_t)SIZE_MAX / $fragment_size)
+                $...
+    message: "Integer overflow check uses SIZE_MAX instead of INT_MAX, which may lead to insufficient buffer allocation. Use INT_MAX to match the allocation type."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: ["CWE-703"]
+      cve: "CVE-2014-9904"

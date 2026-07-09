@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2019-11472-divide-by-zero-xwd
+    message: "Missing validation for bitmap_bit_order may lead to divide-by-zero in XWD image parsing (CVE-2019-11472, CWE-369)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if ((header.bitmap_bit_order != MSBFirst) &&
+          (header.bitmap_bit_order != LSBFirst))
+        ThrowReaderException(...);
+    pattern-not-inside: |
+      if ((header.bitmap_bit_order != MSBFirst) &&
+          (header.bitmap_bit_order != LSBFirst))
+        ThrowReaderException(CorruptImageError, ...);

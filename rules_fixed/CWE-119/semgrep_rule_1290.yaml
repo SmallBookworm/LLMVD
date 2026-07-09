@@ -1,0 +1,14 @@
+rules:
+  - id: hid-off-by-one-rsize-check
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (*$R >= 17 && ...)
+          - pattern: |
+              if ($R >= 17 && ...)
+    message: "Potential off-by-one vulnerability in HID report descriptor size check. Size should be at least 18 to safely access rdesc[17]."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2014-3184"

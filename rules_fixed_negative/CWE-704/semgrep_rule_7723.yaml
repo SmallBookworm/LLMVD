@@ -1,0 +1,11 @@
+rules:
+  - id: cwe-704-svg-parent-type-assumption
+    message: "Incorrect object type assumption in SVG parent traversal may lead to object corruption (CWE-704)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          ParentOrShadowHostElement() && ParentOrShadowHostElement()->IsSVGElement()
+    metadata:
+      cwe: ["CWE-704"]
+      cve: "CVE-2019-5757"

@@ -1,0 +1,30 @@
+rules:
+  - id: flashsv_diff_bounds_check_missing
+    message: Missing validation of diff_start and diff_height may lead to out-of-bounds access (CVE-2013-7015)
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (has_diff) {
+              ...
+              $DIFF_START = get_bits(..., 8);
+              $DIFF_HEIGHT = get_bits(..., 8);
+              ...
+              if ($DIFF_START + $DIFF_HEIGHT > $CUR_BLK_HEIGHT) {
+                  ...
+              }
+          }
+    pattern-not: |
+      if (has_diff) {
+          ...
+          $DIFF_START = get_bits(..., 8);
+          $DIFF_HEIGHT = get_bits(..., 8);
+          if ($DIFF_START + $DIFF_HEIGHT > $CUR_BLK_HEIGHT) {
+              ...
+              return ...;
+          }
+          ...
+      }
+    metavariable-pattern:
+      metavariable: "$CUR_BLK_HEIGHT"
+      pattern: "cur_blk_height"

@@ -1,0 +1,22 @@
+rules:
+  - id: integer_underflow_esds_parse
+    message: "Potential integer underflow in ESDS::parseESDescriptor due to missing size checks before subtraction."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($FLAG) {
+                  ...
+                  $size -= 2;
+              }
+          - pattern: |
+              if ($URL_Flag) {
+                  ...
+                  unsigned $URLlength = ...;
+                  ...
+                  $size -= $URLlength + 1;
+              }
+    metavariable-regex:
+      - metavariable: $FLAG
+        regex: (streamDependenceFlag|OCRstreamFlag)

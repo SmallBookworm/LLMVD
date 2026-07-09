@@ -1,0 +1,29 @@
+rules:
+  - id: cve-2018-10902-double-free-in-rawmidi
+    message: |
+      Double-free vulnerability due to unsafe buffer reallocation without proper locking.
+      The code uses krealloc() to resize the buffer without protecting against concurrent access,
+      which can lead to a double free (CWE-415). Fixed version uses kmalloc + kfree with spinlock.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ($SIZE != runtime->buffer_size) {
+            tmp = krealloc(runtime->buffer, $SIZE, $FLAGS);
+            if (tmp != NULL) {
+              runtime->buffer = tmp;
+              runtime->buffer_size = $SIZE;
+            }
+          }
+      - pattern: |
+          if ($SIZE != runtime->buffer_size) {
+            tmp = krealloc(runtime->buffer, $SIZE);
+            if (tmp != NULL) {
+              runtime->buffer = tmp;
+              runtime->buffer_size = $SIZE;
+            }
+          }
+    metavariable-comparison:
+      left: $SIZE
+      operator: ==
+      right: params->buffer_size

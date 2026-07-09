@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2016-0798-srp-memory-leak
+    message: "Memory leak in SRP_VBASE_get_by_user when handling invalid usernames with seed_key configured. Use SRP_VBASE_get1_by_user instead."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      SRP_user_pwd *SRP_VBASE_get_by_user(SRP_VBASE *vb, char *username)
+      {
+          ...
+          if ((vb->seed_key == NULL) ||
+              (vb->default_g == NULL) || (vb->default_N == NULL))
+              return NULL;
+          ...
+          if ((user = SRP_user_pwd_new()) == NULL)
+              return NULL;
+          ...
+          return user;
+          ...
+      }

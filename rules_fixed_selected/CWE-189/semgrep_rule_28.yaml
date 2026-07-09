@@ -1,0 +1,22 @@
+rules:
+  - id: poppler-integer-overflow-gmalloc
+    message: "Potential integer overflow in memory allocation using gmalloc. Use gmallocn or gmallocn3 instead to avoid multiplication overflows."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: gmalloc($W * $H * $S)
+      - pattern: gmalloc($A * $B)
+    metavariable-pattern:
+      $W: 
+        pattern-regex: "width|height|[0-9]+"
+      $H: 
+        pattern-regex: "width|height|[0-9]+"
+      $S: 
+        pattern-regex: "[1-9][0-9]*"
+      $A: 
+        pattern-regex: ".*"
+      $B: 
+        pattern-regex: ".*"
+    fix-regex:
+      regex: "gmalloc\\((.*)\\)"
+      replacement: "gmallocn(\\1)"

@@ -1,0 +1,24 @@
+rules:
+  - id: fuse_notify_inval_entry_buffer_overflow
+    message: "Missing size validation for FUSE_NOTIFY_INVAL_ENTRY message may lead to buffer overflow (CVE-2011-3353)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (size < sizeof($OUTARG))
+            goto $LABEL;
+          ...
+          if ($OUTARG.namelen > FUSE_NAME_MAX)
+            goto $LABEL;
+          ...
+          fuse_copy_one($CS, $BUF, $OUTARG.namelen + 1);
+      - pattern: |
+          if (size < sizeof($OUTARG))
+            goto $LABEL;
+          ...
+          if ($OUTARG->namelen > FUSE_NAME_MAX)
+            goto $LABEL;
+          ...
+          fuse_copy_one($CS, $BUF, $OUTARG->namelen + 1);
+    metavariable-pattern:
+      $OUTARG: { type: "struct fuse_notify_inval_entry_out" }

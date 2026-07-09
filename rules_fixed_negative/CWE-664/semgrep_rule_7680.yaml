@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2019-5816-process-lifetime
+    message: "Use of Java_ChildProcessLauncherHelperImpl_getTerminationInfo without stopping the process may lead to process persistence vulnerability (CVE-2019-5816)."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      Java_ChildProcessLauncherHelperImpl_getTerminationInfo(
+        ...,
+        java_peer_,
+        ...
+      )
+    metadata:
+      cwe: ["CWE-664"]
+      references:
+        - https://github.com/chromium/chromium/commit/37a0e90a956194a066dd31edd5b5ac5045701d31
+        - https://nvd.nist.gov/vuln/detail/CVE-2019-5816

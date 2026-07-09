@@ -1,0 +1,9 @@
+rules:
+  - id: tensorflow-quantizedconv2d-div-by-zero
+    message: "Division by zero possible in QuantizedConv2D due to missing validation of filter_value_count. This can lead to a crash (CWE-369)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      const int filter_value_count = ...;
+      const int64 patches_per_chunk =
+          kMaxChunkSize / (filter_value_count * sizeof(...));

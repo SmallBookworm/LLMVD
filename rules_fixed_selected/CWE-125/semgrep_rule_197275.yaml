@@ -1,0 +1,15 @@
+rules:
+  - id: unchecked-init_vlc-return-value
+    message: "Return value of 'init_vlc' is not checked, which may lead to out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              init_vlc(...);
+          - pattern: |
+              init_vlc($ARG1, $ARG2, $ARG3, $ARG4, $ARG5, $ARG6, $ARG7, $ARG8, $ARG9, $ARG10);
+    metavariable-pattern:
+      metavariable: $ARG1
+      pattern-not: |
+        if (...) init_vlc(...)

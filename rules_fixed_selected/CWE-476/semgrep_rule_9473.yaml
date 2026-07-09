@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2017-6415-null-pointer-dereference
+    message: "Potential NULL pointer dereference due to missing check on 'p4' before dereferencing. This may lead to denial of service via crafted DEX file (CVE-2017-6415)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $P4 = r_buf_get_at(...);
+          ...
+          ut8 opcode = *($P4++) & 0xff;
+      - pattern: |
+          $P4 = r_buf_get_at(...);
+          ...
+          ut8 opcode = *(++$P4) & 0xff;
+    metavariable-pattern:
+      $P4: 
+        pattern-regex: "p4"

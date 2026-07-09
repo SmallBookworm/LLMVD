@@ -1,0 +1,12 @@
+rules:
+  - id: cwe-61-symlink-following-tmp
+    message: "Use of fixed /tmp path with QStandardPaths::TempLocation may allow symlink attacks. Use QStandardPaths::RuntimeLocation instead."
+    severity: WARNING
+    languages: [c]
+    pattern: 'QStandardPaths::standardLocations(QStandardPaths::TempLocation)'
+    metadata:
+      cwe: ["CWE-61"]
+      references:
+        - "https://github.com/linuxdeepin/deepin-clone/issues/16"
+        - "https://bugzilla.opensuse.org/show_bug.cgi?id=1130388"
+        - "https://github.com/linuxdeepin/deepin-clone/commit/e079f3e2712b4f8c28e3e63e71ba1a1f90fce1ab"

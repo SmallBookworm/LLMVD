@@ -1,0 +1,7 @@
+rules:
+  - id: cve-2018-20217-reachable-assertion
+    message: "Reachable assertion in return_enc_padata() may lead to KDC crash (CVE-2018-20217, CWE-617)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      assert($X->enc_padata == NULL);

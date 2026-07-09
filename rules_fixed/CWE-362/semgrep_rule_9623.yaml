@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2019-6974-kvm-ioctl-create-device-race
+    message: "Potential use-after-free due to incorrect reference counting order in kvm_ioctl_create_device. kvm_get_kvm() must be called before anon_inode_getfd() to prevent race condition."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              anon_inode_getfd(..., $DEV, ...);
+              ...
+              kvm_get_kvm($KVM);
+          - pattern: |
+              $ret = anon_inode_getfd(..., $DEV, ...);
+              if ($ret < 0) { ... }
+              ...
+              kvm_get_kvm($KVM);
+    metadata:
+      cwe: "CWE-362"
+      cve: "CVE-2019-6974"

@@ -1,0 +1,23 @@
+rules:
+  - id: integer-overflow-in-allocation-size
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: $lg = ROUNDED_UP_GRANULES($lb);
+              - pattern: $lb_rounded = GRANULES_TO_BYTES($lg);
+              - pattern-inside: |
+                  {
+                    ...
+                  }
+              - pattern: $n_blocks = OBJ_SZ_TO_BLOCKS($lb_rounded);
+          - patterns:
+              - pattern: $lg = ROUNDED_UP_GRANULES($lb);
+              - pattern: $lb_rounded = GRANULES_TO_BYTES($lg);
+              - pattern-inside: |
+                  {
+                    ...
+                  }
+              - pattern: GC_bytes_allocd += $lb_rounded;
+    message: "Missing check for integer overflow after rounding allocation size. This may lead to allocating less memory than requested, causing buffer overflows (CWE-189)."
+    severity: ERROR
+    languages: [c]

@@ -1,0 +1,50 @@
+rules:
+  - id: cwe-189-pcf-encodings-signedness-check
+    message: Missing sanity checks on signed integer values 'firstCol', 'lastCol', 'firstRow', and 'lastRow' may lead to integer overflow or NULL pointer dereference.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ( !PCF_FORMAT_MATCH($FMT, PCF_DEFAULT_FORMAT) )
+                return ...;
+              ...
+              for ( $I = $FIRSTROW; $I <= $LASTROW; $I++ )
+              {
+                for ( $J = $FIRSTCOL; $J <= $LASTCOL; $J++ )
+                {
+                  ...
+                }
+              }
+          - pattern: |
+              if ( !PCF_FORMAT_MATCH($FMT, PCF_DEFAULT_FORMAT) )
+                return ...;
+              ...
+              k = 0;
+              for ( $I = $FIRSTROW; $I <= $LASTROW; $I++ )
+              {
+                for ( $J = $FIRSTCOL; $J <= $LASTCOL; $J++ )
+                {
+                  ...
+                }
+              }
+      - metavariable-pattern:
+          metavariable: $FIRSTCOL
+          pattern: "firstCol"
+      - metavariable-pattern:
+          metavariable: $LASTCOL
+          pattern: "lastCol"
+      - metavariable-pattern:
+          metavariable: $FIRSTROW
+          pattern: "firstRow"
+      - metavariable-pattern:
+          metavariable: $LASTROW
+          pattern: "lastRow"
+      - pattern-not: |
+          if ( firstCol < 0       ||
+               firstCol > lastCol ||
+               lastCol  > 0xFF    ||
+               firstRow < 0       ||
+               firstRow > lastRow ||
+               lastRow  > 0xFF    )
+            return ...;

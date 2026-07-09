@@ -1,0 +1,24 @@
+rules:
+  - id: imagemagick-dot-memory-leak
+    message: "Memory leak in ReadDOTImage: image not destroyed before early return"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ($STATUS == MagickFalse)
+            {
+              $IMAGE = DestroyImageList($IMAGE);
+              return((Image *) NULL);
+            }
+      - pattern: |
+          if ($GRAPH == (graph_t *) NULL)
+            {
+              (void) RelinquishUniqueFileResource($FILENAME);
+              return ((Image *) NULL);
+            }
+    metavariable-pattern:
+      metavariable: $IMAGE
+      patterns:
+        - pattern: image
+    fix-regex:
+      enabled: false

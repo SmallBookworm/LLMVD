@@ -1,0 +1,22 @@
+rules:
+  - id: wanxl_ioctl_uninitialized_struct
+    message: "Uninitialized struct 'sync_serial_settings' may leak kernel memory via ioctl"
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              sync_serial_settings $VAR;
+              ...
+              $VAR.$MEMBER = ...;
+              ...
+              copy_to_user(..., &$VAR, ...);
+          - pattern: |
+              struct sync_serial_settings $VAR;
+              ...
+              $VAR.$MEMBER = ...;
+              ...
+              copy_to_user(..., &$VAR, ...);
+    metavariable-regex:
+      metavariable: $MEMBER
+      regex: ^(clock_type|clock_rate|loopback)$

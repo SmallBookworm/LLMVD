@@ -1,0 +1,19 @@
+rules:
+  - id: mariadb-unreleased-lock-cve-2022-31621
+    message: "Potential deadlock due to missing mutex unlock when stream_ctxt->dest_file is NULL in xbstream_open"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              pthread_mutex_lock(&$MUTEX);
+              if ($STREAM_CTXT->dest_file == NULL) {
+                  $STREAM_CTXT->dest_file = ...;
+                  if ($STREAM_CTXT->dest_file == NULL) {
+                      return NULL;
+                  }
+              }
+              pthread_mutex_unlock(&$MUTEX);
+    metadata:
+      cwe: ["CWE-703"]
+      cve: "CVE-2022-31621"

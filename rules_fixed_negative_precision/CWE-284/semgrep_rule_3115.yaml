@@ -1,0 +1,12 @@
+rules:
+  - id: cwe-284-libgit2-cert-validation
+    message: "Potential certificate validation bypass due to incorrect 'is_valid' assignment after error variable clobbering (CWE-284, CVE-2016-10130)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          is_valid = error != GIT_ECERTIFICATE;
+      - pattern: |
+          int is_valid;
+          ...
+          is_valid = error != GIT_ECERTIFICATE;

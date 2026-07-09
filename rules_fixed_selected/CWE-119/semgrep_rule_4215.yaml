@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2007-6762-off-by-one-array-bounds
+    message: "Off-by-one array bounds check may lead to buffer overflow in doi_def->tags[] (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($ITER > CIPSO_V4_TAG_MAXCNT)
+                return -EINVAL;
+          - pattern: |
+              if ($ITER > $MAX)
+                return -EINVAL;
+    metavariable-pattern:
+      $MAX: 
+        pattern: CIPSO_V4_TAG_MAXCNT

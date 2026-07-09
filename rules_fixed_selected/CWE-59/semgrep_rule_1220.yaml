@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2014-5045-mntget-misuse
+    message: "Improper reference counting in mountpoint_last may lead to use-after-free or memory leak (CVE-2014-5045, CWE-59)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          path->mnt = mntget(nd->path.mnt);
+          ...
+          follow_mount(path);
+      - pattern: |
+          path->mnt = mntget(...);
+          ...
+          follow_mount(...);
+    metavariable-regex:
+      metavariable: $path
+      regex: "path"

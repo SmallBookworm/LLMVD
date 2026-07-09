@@ -1,0 +1,14 @@
+rules:
+  - id: pacemaker-acl-node-evaluation-bypass
+    message: "ACL bypass vulnerability: node with only 'id' attribute in ACLs section is incorrectly allowed without proper evaluation"
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (strcmp(prop_name, XML_ATTR_ID) == 0) {
+                  continue;
+              }
+    metadata:
+      cwe: ["CWE-264"]
+      cve: "CVE-2015-1867"

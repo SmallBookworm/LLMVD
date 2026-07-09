@@ -1,0 +1,23 @@
+rules:
+  - id: ntp_crypto_nak_auth_bypass
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!AUTH(sys_authenticate | (restrict_mask & (RES_NOPEER | RES_DONTTRUST)), is_authentic)) {
+                  if (AUTH(restrict_mask & RES_DONTTRUST, is_authentic)) {
+                      fast_xmit(..., MODE_PASSIVE, skeyid, ...);
+                      return;
+                  }
+                  if (is_authentic == AUTH_ERROR) {
+                      fast_xmit(..., MODE_ACTIVE, 0, ...);
+                      ...
+                      return;
+                  }
+                  ...
+              }
+    message: "Crypto-NAK packets can bypass authentication in NTP symmetric associations (CVE-2015-7871)."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-287"
+      vulnerability: "Authentication Bypass"

@@ -1,0 +1,21 @@
+rules:
+  - id: imagemagick-writebmpimage-memory-leak-cve-2019-7398
+    message: "Memory leak in WriteBMPImage due to missing RelinquishVirtualMemory call when AcquireQuantumMemory fails."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              bmp_colormap=(unsigned char *) AcquireQuantumMemory(...);
+              if (bmp_colormap == (unsigned char *) NULL)
+                ThrowWriterException(...);
+          - pattern: |
+              bmp_colormap=(unsigned char *) AcquireQuantumMemory(...);
+              if (bmp_colormap == (unsigned char *) NULL)
+                return ...;
+    metadata:
+      cwe: "CWE-401: Memory Leak"
+      cve: "CVE-2019-7398"
+      references:
+        - https://github.com/ImageMagick/ImageMagick/issues/1453
+        - https://github.com/ImageMagick/ImageMagick6/commit/dfa1e752bce7b6994765897fb6606d6069345442

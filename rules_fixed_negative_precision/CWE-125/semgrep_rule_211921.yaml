@@ -1,0 +1,34 @@
+rules:
+  - id: curl-buffer-overread-voutf
+    message: "Potential heap-based buffer over-read due to unsafe length handling in voutf-like function (CWE-125, CVE-2018-16842)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          while($LEN > 0) {
+            ...
+            if($LEN > (int)WARN_TEXTWIDTH) {
+              int cut = WARN_TEXTWIDTH-1;
+              while(!ISSPACE($PTR[cut]) && cut) {
+                cut--;
+              }
+              ...
+              $PTR += cut+1;
+              $LEN -= cut;
+            }
+            ...
+          }
+      - pattern: |
+          while(len > 0) {
+            ...
+            if(len > (int)WARN_TEXTWIDTH) {
+              int cut = WARN_TEXTWIDTH-1;
+              while(!ISSPACE(ptr[cut]) && cut) {
+                cut--;
+              }
+              ...
+              ptr += cut+1;
+              len -= cut;
+            }
+            ...
+          }

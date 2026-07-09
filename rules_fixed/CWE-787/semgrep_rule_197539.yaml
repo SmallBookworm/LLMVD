@@ -1,0 +1,13 @@
+rules:
+  - id: cwe-787-vla-user-controlled
+    message: "Stack allocation with attacker-controlled size may lead to buffer overflow (CWE-787). Use heap allocation with validation instead."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      char $VAR[$SIZE + 1];
+    pattern-not: |
+      char $VAR[...];
+    metavariable-pattern:
+      $SIZE:
+        pattern-regex: \w+
+    focus-metavariable: $VAR

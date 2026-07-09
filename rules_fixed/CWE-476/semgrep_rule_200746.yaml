@@ -1,0 +1,17 @@
+rules:
+  - id: qemu-esp-cmdfifo-overflow
+    message: "Potential buffer overflow in cmdfifo due to missing bounds check on fifo8_push_all. This can lead to a NULL pointer dereference (CWE-476) and denial of service (CVE-2020-35504)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          fifo8_push_all(&s->cmdfifo, buf, dmalen);
+      - pattern: |
+          fifo8_push_all(&s->cmdfifo, buf, n);
+    metavariable-pattern:
+      metavariable: s
+      pattern: ESPState *
+    pattern-not-inside: |
+      $X = MIN(fifo8_num_free(&s->cmdfifo), $Y);
+      ...
+      fifo8_push_all(&s->cmdfifo, buf, $Z);

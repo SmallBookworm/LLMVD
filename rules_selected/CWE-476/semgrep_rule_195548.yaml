@@ -1,0 +1,7 @@
+rules:
+  - id: cve-2017-14640-null-pointer-dereference
+    message: "Potential NULL pointer dereference in GetSample due to missing null check on m_SttsAtom before use."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      m_SttsAtom->GetDts(...)

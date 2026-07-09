@@ -1,0 +1,16 @@
+rules:
+  - id: sshd_long_password_dos
+    message: "Missing password length check may lead to DoS via CPU consumption (CVE-2016-6515)"
+    severity: ERROR
+    languages: [c]
+    pattern-inside: |
+      auth_password(Authctxt *$..., const char *$PASSWORD)
+      {
+        ...
+      }
+    pattern-not: |
+      if (strlen($PASSWORD) > MAX_PASSWORD_LEN)
+        return 0;
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2016-6515"

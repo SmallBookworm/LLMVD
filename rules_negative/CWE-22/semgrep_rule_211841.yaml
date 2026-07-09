@@ -1,0 +1,14 @@
+rules:
+  - id: sigil-directory-traversal-epub-extraction
+    message: "Detected insecure handling of ZIP archive entry paths that may allow directory traversal via '../'."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $QFILE_NAME = $QFILE_NAME.replace("../", "");
+          - pattern: |
+              $CP437_FILE_NAME = $CP437_FILE_NAME.replace("../", "");
+    metadata:
+      cwe: "CWE-22"
+      cve: "CVE-2019-14452"

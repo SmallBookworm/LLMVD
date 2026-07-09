@@ -1,0 +1,21 @@
+rules:
+  - id: ecryptfs_tag3_missing_key_size_check
+    message: "Missing check for encrypted key size against ECRYPTFS_MAX_ENCRYPTED_KEY_BYTES in parse_tag_3_packet, which may lead to heap-based buffer overflow (CVE-2009-2407)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $auth_tok->session_key.encrypted_key_size = ($body_size - (ECRYPTFS_SALT_SIZE + 5));
+          ...
+          memcpy($auth_tok->session_key.encrypted_key, ..., $auth_tok->session_key.encrypted_key_size);
+      - pattern: |
+          (*$new_auth_tok)->session_key.encrypted_key_size = ($body_size - (ECRYPTFS_SALT_SIZE + 5));
+          ...
+          memcpy((*$new_auth_tok)->session_key.encrypted_key, ..., (*$new_auth_tok)->session_key.encrypted_key_size)
+    metavariable-patterns:
+      - metavariable: $auth_tok
+        pattern-not: |
+          if ($auth_tok->session_key.encrypted_key_size > ECRYPTFS_MAX_ENCRYPTED_KEY_BYTES) { ... }
+      - metavariable: $new_auth_tok
+        pattern-not: |
+          if ((*$new_auth_tok)->session_key.encrypted_key_size > ECRYPTFS_MAX_ENCRYPTED_KEY_BYTES) { ... }

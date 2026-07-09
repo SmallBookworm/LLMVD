@@ -1,0 +1,14 @@
+rules:
+  - id: cwe-125-mb_split-negative-size
+    message: "Potential out-of-bounds read due to negative size parameter in mb_split. The subtraction `(OnigUChar *)(string + string_len) - chunk_pos` may underflow if `chunk_pos` is beyond the string end."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          n = ((OnigUChar *)(string + string_len) - chunk_pos);
+          if (n > 0) {
+            add_next_index_stringl(..., ..., n);
+          }
+    metadata:
+      cwe: ["CWE-125"]
+      cve: "CVE-2019-9025"

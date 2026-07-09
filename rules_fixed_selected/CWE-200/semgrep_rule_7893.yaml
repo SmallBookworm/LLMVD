@@ -1,0 +1,17 @@
+rules:
+  - id: cwe-200-uninitialized-data-webrtc
+    message: "Potential use of uninitialized data leading to information disclosure (CWE-200)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $DESCRIPTION_TEXT->SetTextLayoutMode(TextLayoutMode::kSingleLineFixedWidth);
+          ...
+          content_text->SetTextLayoutMode(...);
+      - pattern: |
+          content_text->SetTextLayoutMode(...);
+          ...
+          $DESCRIPTION_TEXT->SetTextLayoutMode(TextLayoutMode::kSingleLineFixedWidth);
+    metadata:
+      cwe: ["CWE-200"]
+      cve: "CVE-2018-6132"

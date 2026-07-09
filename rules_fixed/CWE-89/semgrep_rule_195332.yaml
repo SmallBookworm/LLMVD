@@ -1,0 +1,46 @@
+rules:
+  - id: cve-2021-23214-mitm-sql-injection
+    message: "Missing check for extraneous data after SSL/GSS encryption handshake may allow man-in-the-middle attackers to inject SQL queries (CVE-2021-23214)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (proto == NEGOTIATE_SSL_CODE && !ssl_done)
+          {
+            ...
+            if (SSLok == 'S' && secure_open_server(port) == -1)
+              return STATUS_ERROR;
+            ...
+            return ProcessStartupPacket(port, true, SSLok == 'S');
+          }
+      - pattern: |
+          if (proto == NEGOTIATE_GSS_CODE && !gss_done)
+          {
+            ...
+            if (GSSok == 'G' && secure_open_gssapi(port) == -1)
+              return STATUS_ERROR;
+            ...
+            return ProcessStartupPacket(port, GSSok == 'G', true);
+          }
+    patterns:
+      - pattern-not-inside: |
+          if (proto == NEGOTIATE_SSL_CODE && !ssl_done)
+          {
+            ...
+            if (pq_buffer_has_data())
+              ereport(FATAL, ...);
+            ...
+            return ProcessStartupPacket(...);
+          }
+      - pattern-not-inside: |
+          if (proto == NEGOTIATE_GSS_CODE && !gss_done)
+          {
+            ...
+            if (pq_buffer_has_data())
+              ereport(FATAL, ...);
+            ...
+            return ProcessStartupPacket(...);
+          }
+    metadata:
+      cwe: ["CWE-89"]
+      cve: "CVE-2021-23214"

@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2015-8608-out-of-bounds-read
+    message: "Potential out-of-bounds read due to missing length check before accessing pInName[1] or pInName[2]."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (pInName[1] == ':') { ... }
+          - pattern: |
+              if (IsPathSep(pInName[1]) && IsPathSep(pInName[0])) { ... }
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2015-8608"

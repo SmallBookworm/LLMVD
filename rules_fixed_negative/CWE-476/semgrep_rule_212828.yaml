@@ -1,0 +1,18 @@
+rules:
+  - id: cwe-476-onigmo-null-deref-onig_error_code_to_str
+    message: "Potential NULL pointer dereference due to missing initialization of einfo->enc in onig_compile. This may lead to a crash in onig_error_code_to_str."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (IS_NOT_NULL(einfo)) einfo->par = (UChar* )NULL;
+      - pattern: |
+          if (IS_NOT_NULL(einfo)) {
+            einfo->par = (UChar* )NULL;
+          }
+    metavariable-pattern:
+      metavariable: einfo
+      pattern: $EINFO
+    fix-regex:
+      regex: ''
+      replacement: ''

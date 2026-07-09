@@ -1,0 +1,19 @@
+rules:
+  - id: cwe-125-aacparse-buffer-underread
+    message: "Buffer underread vulnerability due to missing size check before accessing codec_data buffer. This may lead to out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          gst_buffer_map($BUF, &$MAP, GST_MAP_READ);
+          ... 
+          $MAP.data[1];
+      - pattern: |
+          gst_buffer_map($BUF, &$MAP, GST_MAP_READ);
+          ... 
+          ($MAP.data[0] && $MAP.data[1]);
+    metavariable-pattern:
+      metavariable: $BUF
+      patterns:
+        - pattern-not: |
+            gst_buffer_get_size($BUF) >= 2

@@ -1,0 +1,9 @@
+rules:
+  - id: cwe-415-double-free-pinctrl-unregister
+    message: "Use of pinctrl_unregister() after pinctrl_register() may lead to double-free (CWE-415). Use devm_pinctrl_register() instead."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      pinctrl_register(...);
+      $STMTS
+      pinctrl_unregister(...)

@@ -1,0 +1,18 @@
+rules:
+  - id: imagemagick-pop-hex-pixel-buffer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              q=PopHexPixel(hex_digits,0xff,q);
+              q=PopHexPixel(hex_digits,0xff,q);
+              q=PopHexPixel(hex_digits,0xff,q);
+          - pattern: |
+              q=PopHexPixel(hex_digits,ScaleQuantumToChar(...),q);
+              q=PopHexPixel(hex_digits,ScaleQuantumToChar(...),q);
+              q=PopHexPixel(hex_digits,ScaleQuantumToChar(...),q);
+    message: "Potential stack-based buffer overflow in PopHexPixel usage. Ensure destination buffer 'pixels' is sufficiently sized to handle repeated writes."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2019-9956"

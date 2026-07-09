@@ -1,0 +1,9 @@
+rules:
+  - id: cve-2010-3696-infinite-loop-dhcp
+    message: "Infinite loop in DHCP option parsing due to incorrect tail traversal. This can lead to denial of service (CWE-399)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          *tail = $VP;
+          while (*tail) tail = &$VP->next;

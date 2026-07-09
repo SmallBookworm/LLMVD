@@ -1,0 +1,29 @@
+rules:
+  - id: znc-config-injection
+    message: "Unsanitized user input written to config file may allow privilege escalation (CVE-2018-14055)"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              File.Write($INDENT + $KEY + " = " + $VALUE + "\n")
+          - pattern: |
+              File.Write($INDENT + "<" + $TAG + " " + $ATTR + ">\n")
+          - pattern: |
+              File.Write($INDENT + "</" + $TAG + ">\n")
+    metavariable-patterns:
+      - metavariable: $VALUE
+        pattern-not: |
+          SingleLine(...)
+      - metavariable: $KEY
+        pattern-not: |
+          SingleLine(...)
+      - metavariable: $TAG
+        pattern-not: |
+          SingleLine(...)
+      - metavariable: $ATTR
+        pattern-not: |
+          SingleLine(...)
+      - metavariable: $INDENT
+        pattern-not: |
+          SingleLine(...)

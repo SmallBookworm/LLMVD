@@ -1,0 +1,17 @@
+rules:
+  - id: command-injection-dvipdfm-filename
+    patterns:
+      - pattern-either:
+          - pattern: |
+              g_strdup_printf("dvipdfm %s -o %s \"%s\"",
+                              ...,
+                              ...,
+                              $FILENAME)
+          - pattern: |
+              g_strdup_printf("dvipdfm %s -o %s %s",
+                              ...,
+                              ...,
+                              $FILENAME)
+    message: "Unquoted filename passed to g_strdup_printf in command construction may lead to command injection (CWE-78). Use g_shell_quote to sanitize."
+    severity: ERROR
+    languages: [c]

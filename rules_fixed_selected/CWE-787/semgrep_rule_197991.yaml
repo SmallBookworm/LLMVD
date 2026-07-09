@@ -1,0 +1,9 @@
+rules:
+  - id: cwe-787-stack-buffer-overflow-aes-gcm-decrypt
+    message: "Potential stack-based buffer overflow in AES_GCM_DecryptContext::Decrypt due to missing output buffer size check before decryption."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      crypto_aead_aes256gcm_decrypt_afternm(..., &..., ..., ..., cbEncryptedDataAndTag, ..., ...);
+      ...
+      *pcbPlaintextData = ...;

@@ -1,0 +1,7 @@
+rules:
+  - id: znc-dcc-resume-crash
+    message: "Dereference of m_pClient instead of m_pUser in DCC RESUME handling may cause denial of service (CVE-2012-0033)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      m_pUser->PutUser(":" + ... + " PRIVMSG " + m_pClient->GetNick() + " :\\001DCC RESUME ...")

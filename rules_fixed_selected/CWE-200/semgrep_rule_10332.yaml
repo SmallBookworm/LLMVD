@@ -1,0 +1,15 @@
+rules:
+  - id: vmxnet3_uninitialized_tx_descriptor
+    message: "Uninitialized struct 'Vmxnet3_TxCompDesc' may leak sensitive host memory to guest (CVE-2016-6836, CWE-200)."
+    severity: HIGH
+    languages: [c]
+    pattern: |
+      struct Vmxnet3_TxCompDesc $TXCQ_DESCR;
+      ...
+      $TXCQ_DESCR.$FIELD = ...;
+    pattern-not: |
+      struct Vmxnet3_TxCompDesc $TXCQ_DESCR;
+      ...
+      memset(&$TXCQ_DESCR, ..., sizeof($TXCQ_DESCR));
+      ...
+      $TXCQ_DESCR.$FIELD = ...;

@@ -1,0 +1,16 @@
+rules:
+  - id: integer-overflow-malloc-debug-leak
+    message: "Integer overflow in allocation size may lead to buffer overflow. Missing overflow check before memory allocation."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              size_t size = (alignment - MALLOC_ALIGNMENT) + bytes;
+              void* base = leak_malloc(size);
+          - pattern: |
+              size_t size = (alignment - MALLOC_ALIGNMENT) + bytes;
+              void* base = chk_malloc(size);
+          - pattern: |
+              size_t size = (alignment - MALLOC_ALIGNMENT) + bytes;
+              void* base = malloc(size)

@@ -1,0 +1,26 @@
+rules:
+  - id: pcnet_buffer_overflow_cve_2015_7512
+    message: "Buffer overflow vulnerability in pcnet_receive: large packet size may exceed buffer capacity. Truncation check is missing."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!s->looptest) {
+                  memcpy(s->buffer, ..., size);
+                  ...
+                  size += 4;
+              }
+          - pattern: |
+              if (!s->looptest) {
+                  memcpy(src, buf, size);
+                  ...
+                  size += 4;
+              }
+    metavariable-pattern:
+      metavariable: size
+      pattern-not: |
+          if (size > 4092) {
+              ...
+              size = 4092;
+          }

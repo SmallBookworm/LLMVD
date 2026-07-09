@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2016-2089
+    message: "Missing validation of matrix dimensions before accessing matrix data may lead to invalid read (CWE-20)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          for ($X = $MATRIX->numrows; $X < $COND; $INC) {
+            ...
+            for ($Y = $MATRIX->numcols; $Y < $COND2; $YINC) {
+              ...
+            }
+          }
+      - pattern: |
+          for ($X = $MATRIX->numrows; $X < $COND; $INC)
+            for ($Y = $MATRIX->numcols; $Y < $COND2; $YINC)
+              ...
+    metavariable-pattern:
+      metavariable: $MATRIX
+      pattern: jas_matrix_t *
+    pattern-not-inside: |
+      if (jas_matrix_numrows(...) > 0 && jas_matrix_numcols(...) > 0) {
+        ...
+      }

@@ -1,0 +1,31 @@
+rules:
+  - id: haproxy-h2-priority-oob-read
+    message: Missing frame length check before accessing PRIORITY flag data in HTTP/2 HEADERS frame. This can lead to an out-of-bounds read (CWE-125) and crash (CVE-2018-20615).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (h2c->dff & H2_F_HEADERS_PRIORITY) {
+              ...
+              hdrs += 5;
+              flen -= 5;
+          }
+      - pattern: |
+          if (h2c->dff & H2_F_HEADERS_PRIORITY) {
+              ...
+              if (read_n32(...)) {
+                  ...
+              }
+              hdrs += 5;
+              flen -= 5;
+          }
+    pattern-not: |
+      if (h2c->dff & H2_F_HEADERS_PRIORITY) {
+          ...
+          if (flen < 5) {
+              ...
+          }
+          ...
+          hdrs += 5;
+          flen -= 5;
+      }

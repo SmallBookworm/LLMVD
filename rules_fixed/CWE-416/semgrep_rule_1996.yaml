@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2016-4805-use-after-free-ppp
+    message: "Use-after-free vulnerability due to missing reference on network namespace in ppp_register_net_channel. Network namespace 'net' must be held with get_net() to prevent premature deallocation."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              pch->chan_net = $net;
+          - pattern: |
+              ... pch->chan_net = $net; ...
+    metavariable-pattern:
+      $net:
+        pattern-not: get_net(...)
+    fix: ""

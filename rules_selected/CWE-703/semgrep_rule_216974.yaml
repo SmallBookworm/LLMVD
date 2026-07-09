@@ -1,0 +1,45 @@
+rules:
+  - id: mariadb-unreleased-mutex-on-error
+    message: "Mutex ctrl_mutex is not released on error path, leading to potential deadlock (CVE-2022-31623)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          err:
+          my_free(...);
+          return NULL;
+      - pattern: |
+          err:
+          ...
+          my_free(...);
+          return NULL;
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern: |
+        create_worker_threads(...)
+        {
+          ...
+          for (...; ...; ...) {
+            ...
+            pthread_mutex_lock(&thd->ctrl_mutex);
+            ...
+            if (...pthread_create(...)) {
+              ...
+              pthread_mutex_unlock(&thd->ctrl_mutex);
+              goto err;
+            }
+          }
+          ...
+          err:
+          my_free(threads);
+          return NULL;
+        }
+    pattern-not-inside: |
+      err:
+      while (... > 0) {
+        ...
+        pthread_mutex_unlock(&thd->ctrl_mutex);
+        ...
+      }
+      my_free(threads);
+      return NULL;

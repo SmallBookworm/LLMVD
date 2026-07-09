@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2019-9923-null-ptr-deref
+    message: "Potential NULL pointer dereference due to missing check after find_next_block(). This may lead to a crash when parsing malformed archives (CVE-2019-9923, CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $blk = find_next_block ();
+          ...
+          $p = $blk->$field;
+      - pattern: |
+          $b = find_next_block ();
+          ...
+          $src = $b->$field;
+    metavariable-pattern:
+      metavariable: $blk
+      pattern-not: |
+        if (!$blk)
+          ...

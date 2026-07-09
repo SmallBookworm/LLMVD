@@ -1,0 +1,32 @@
+rules:
+  - id: imagemagick-cve-2017-17681-infinite-loop
+    message: "Infinite loop vulnerability in ReadPSDChannelZip due to improper handling of inflate() return values. This may lead to CPU exhaustion (CWE-835)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          while (stream.avail_out > 0)
+          {
+            ...
+            ret=inflate(...,...);
+            if (ret < 0)
+            {
+              ...
+            }
+            if (ret == Z_STREAM_END)
+              break;
+            ...
+          }
+      - pattern: |
+          while (stream.avail_out > 0)
+          {
+            ...
+            ret=inflate(...,...);
+            if (ret <= 0)
+            {
+              ...
+            }
+            if (ret == Z_STREAM_END)
+              break;
+            ...
+          }

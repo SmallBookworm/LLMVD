@@ -1,0 +1,25 @@
+rules:
+  - id: cve-2021-36222-null-deref
+    message: "Potential NULL pointer dereference due to missing error check before k5memdup0() call. This may lead to a crash in KDC when processing PA-ENCRYPTED-CHALLENGE without FAST."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (armor_key == NULL) {
+              ...
+              retval = ...;
+              ...
+          }
+          ...
+          realmstr = k5memdup0(..., ..., &retval);
+      - pattern: |
+          if (armor_key == NULL) {
+              ...
+              retval = ...;
+              ...
+          }
+          ...
+          $VAR = k5memdup0(..., ..., &retval);
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2021-36222"

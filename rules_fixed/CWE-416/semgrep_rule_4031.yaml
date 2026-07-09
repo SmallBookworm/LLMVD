@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2019-12819-use-after-free-mdiobus
+    message: "Use-after-free vulnerability in __mdiobus_register due to calling put_device() on device_register() failure. This may lead to a denial of service."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              err = device_register(...);
+              if (err) {
+                ...
+                put_device(&$$bus->dev);
+                ...
+              }
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2019-12819"

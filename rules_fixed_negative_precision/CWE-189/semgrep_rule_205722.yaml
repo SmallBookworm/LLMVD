@@ -1,0 +1,41 @@
+rules:
+  - id: integer-overflow-gdimagecrop
+    message: "Potential integer overflow in gdImageCrop leading to heap-based buffer overflow (CVE-2013-7226). Missing validation of crop dimensions before allocation or use."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              gdImagePtr gdImageCrop(..., const gdRectPtr crop) {
+                ...
+                if (src->trueColor) {
+                  dst = gdImageCreateTrueColor(crop->width, crop->height);
+                  ...
+                } else {
+                  dst = gdImageCreate(crop->width, crop->height);
+                  ...
+                }
+                ...
+                if (dst == NULL) { ... }
+                else { ... }
+              }
+          - pattern: |
+              gdImagePtr gdImageCrop(..., const gdRectPtr crop) {
+                ...
+                gdImageCreateTrueColor(crop->width, crop->height);
+                ...
+              }
+          - pattern: |
+              gdImagePtr gdImageCrop(..., const gdRectPtr crop) {
+                ...
+                gdImageCreate(crop->width, crop->height);
+                ...
+              }
+      - pattern-not-inside: |
+          gdImagePtr gdImageCrop(..., const gdRectPtr crop) {
+            ...
+            if (crop->width <= 0 || crop->height <= 0) {
+              return NULL;
+            }
+            ...
+          }

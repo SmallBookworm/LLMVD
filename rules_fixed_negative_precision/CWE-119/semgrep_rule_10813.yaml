@@ -1,0 +1,26 @@
+rules:
+  - id: varnish-cache-vbf-stp-error-buffer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while ($LL > 0) {
+                $L = $LL;
+                if (VFP_GetStorage($VFC, &$L, &$PTR) != VFP_OK)
+                  break;
+                memcpy($PTR, $SRC + $O, $L);
+                ...
+              }
+          - pattern: |
+              while ($LL > 0) {
+                $L = $LL;
+                if (VFP_GetStorage($VFC, &$L, &$PTR) != VFP_OK)
+                  break;
+                memcpy($PTR, $SRC, $L);
+                ...
+              }
+    message: "Missing check for buffer over-read when using VFP_GetStorage. The returned buffer may be larger than requested, leading to out-of-bounds read in memcpy."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2017-8807"

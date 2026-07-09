@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2019-19227-null-deref-appletalk
+    message: "Potential NULL pointer dereference due to missing error handling after register_snap_client. If register_snap_client returns NULL, subsequent use of the returned pointer (e.g., in unregister_snap_client) may cause a crash."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $X = register_snap_client(...);
+          if (!$X)
+            ...;
+          ...
+          unregister_snap_client($X);
+      - pattern: |
+          $X = register_snap_client(...);
+          if (!$X)
+            ...;
+          ...
+          ...($X, ...);
+    metavariable-regex:
+      metavariable: $X
+      regex: '^[a-zA-Z_][a-zA-Z0-9_]*$'

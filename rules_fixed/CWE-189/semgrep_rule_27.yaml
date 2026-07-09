@@ -1,0 +1,26 @@
+rules:
+  - id: poppler-integer-overflow-gmallocn
+    message: "Integer overflow vulnerability due to incorrect size argument in gmallocn leading to potential buffer overflow (CVE-2009-3605)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              imgData.lookup = (SplashColorPtr)gmallocn(n, 3);
+              ...
+              imgData.lookup[4*$$i] = ...;
+          - pattern: |
+              imgData.lookup = (SplashColorPtr)gmallocn(n, 3);
+              ...
+              imgData.lookup[4*$$i+1] = ...;
+          - pattern: |
+              imgData.lookup = (SplashColorPtr)gmallocn(n, 3);
+              ...
+              imgData.lookup[4*$$i+2] = ...;
+          - pattern: |
+              imgData.lookup = (SplashColorPtr)gmallocn(n, 3);
+              ...
+              imgData.lookup[4*$$i+3] = ...;
+    metadata:
+      cwe: "CWE-189"
+      cve: "CVE-2009-3605"

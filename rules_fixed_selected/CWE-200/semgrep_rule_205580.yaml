@@ -1,0 +1,17 @@
+rules:
+  - id: libgcrypt-cve-2016-6313
+    message: "Vulnerable mixing function in Libgcrypt random number generator (CVE-2016-6313). The loop incorrectly copies only DIGESTLEN bytes into hashbuf before hashing, leading to predictable output."
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          memcpy(hashbuf, p, DIGESTLEN);
+          ...
+          rmd160_mixblock(&md, hashbuf);
+      - pattern: |
+          memcpy(hashbuf, p, DIGESTLEN);
+          ...
+          rmd160_mixblock( &md, hashbuf);
+    metavariable-regex:
+      metavariable: $md
+      regex: md

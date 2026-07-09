@@ -1,0 +1,18 @@
+rules:
+  - id: android_mediahttpconnection_buffer_overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              int32_t len = ...;
+              ...
+              memcpy($BUF, $SRC, len);
+          - pattern: |
+              int32_t $LEN = ...;
+              ...
+              memcpy($BUF, $SRC, $LEN);
+    message: "Potential buffer overflow in readAt: 'len' is read as int32_t and used in memcpy without validation against buffer size."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2015-3831"

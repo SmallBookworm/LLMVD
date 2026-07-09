@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2019-14495-out-of-bounds-write
+    message: Detected potential out-of-bounds write vulnerability in admin interface (CVE-2019-14495). The 'contentlen' variable is parsed with atoi() without validation, which may lead to buffer overflows during subsequent reads.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              atoi(...)
+          - pattern: |
+              contentlen = atoi(...)
+      - metavariable-pattern:
+          metavariable: contentlen
+          pattern: |
+            int contentlen = ...

@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2013-1767-use-after-free-shmem-remount
+    message: "Use-after-free vulnerability in shmem_remount_fs due to unconditional mpol_put() and assignment of potentially unreferenced mempolicy."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          mpol_put($SBINFO->mpol);
+          $SBINFO->mpol = $CONFIG.mpol;
+      - pattern: |
+          mpol_put(...);
+          ...->mpol = ...->mpol;
+    metavariable-patterns:
+      - metavariable: $SBINFO
+        pattern: "struct shmem_sb_info *"
+      - metavariable: $CONFIG
+        pattern: "struct shmem_sb_info"

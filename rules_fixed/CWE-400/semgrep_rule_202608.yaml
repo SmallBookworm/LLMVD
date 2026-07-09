@@ -1,0 +1,24 @@
+rules:
+  - id: lldp_memory_leak_cve-2020-27827
+    message: "Potential memory leak in LLDP decoding when handling duplicate TLVs (CVE-2020-27827). Missing free() before reassignment can lead to denial of service."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((b = (char *)calloc(...)) == NULL) { ... }
+              ...
+              port->p_descr = b;
+          - pattern: |
+              if ((b = (char *)calloc(...)) == NULL) { ... }
+              ...
+              chassis->c_name = b;
+          - pattern: |
+              if ((b = (char *)calloc(...)) == NULL) { ... }
+              ...
+              chassis->c_descr = b;
+    metavariable-pattern:
+      metavariable: b
+      pattern-not: |
+          free($FIELD);
+          $FIELD = b;

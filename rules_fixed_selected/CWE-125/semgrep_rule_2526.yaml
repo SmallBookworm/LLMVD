@@ -1,0 +1,29 @@
+rules:
+  - id: cve-2017-13045-vqp-buffer-overread
+    message: "Buffer over-read vulnerability in VQP parser due to missing bounds checks before accessing packet data."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while (... && tlen > 0) {
+                  ...;
+                  vqp_obj_tlv = (const struct vqp_obj_tlv_t *)tptr;
+                  vqp_obj_type = EXTRACT_32BITS(vqp_obj_tlv->obj_type);
+                  vqp_obj_len = EXTRACT_16BITS(vqp_obj_tlv->obj_length);
+                  ...
+                  ND_TCHECK2(*tptr, vqp_obj_len);
+                  ...
+              }
+          - pattern: |
+              vqp_common_header = (const struct vqp_common_header_t *)pptr;
+              ND_TCHECK(*vqp_common_header);
+              ...
+              tptr += sizeof(const struct vqp_common_header_t);
+              tlen -= sizeof(const struct vqp_common_header_t);
+              while (... && tlen > 0) {
+                  ...
+              }
+    metavariable-pattern:
+      metavariable: tlen
+      pattern: tlen

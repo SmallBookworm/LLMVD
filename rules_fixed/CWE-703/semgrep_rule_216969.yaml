@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2022-1343-ocsp-verify-signer-error-handling
+    message: "OCSP signer verification returns incorrect error code on certificate verification failure, leading to potential trust of invalid OCSP responses when OCSP_NOCHECKS is used."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (ret <= 0) {
+          ret = X509_STORE_CTX_get_error(ctx);
+          ...
+          goto end;
+      }

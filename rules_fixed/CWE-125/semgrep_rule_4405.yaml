@@ -1,0 +1,36 @@
+rules:
+  - id: cve-2016-6906-tga-oob-read
+    message: "Potential out-of-bounds read in TGA RLE decompression due to missing buffer bounds check before accessing decompression_buffer."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while( bitmap_caret < image_block_size ) {
+                if ((decompression_buffer[buffer_caret] & TGA_RLE_FLAG) == TGA_RLE_FLAG) {
+                  ...
+                } else {
+                  ...
+                }
+              }
+          - pattern: |
+              while( bitmap_caret < image_block_size ) {
+                if ((decompression_buffer[buffer_caret] & TGA_RLE_FLAG) == TGA_RLE_FLAG) {
+                  ...
+                }
+                ...
+              }
+    pattern-not: |
+      while( bitmap_caret < image_block_size ) {
+        if (buffer_caret + pixel_block_size > rle_size) {
+          ...
+          return -1;
+        }
+        ...
+      }
+    metadata:
+      cwe: CWE-125
+    fix-regex:
+      regex: ""
+      replacement: ""
+      enabled: false

@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2017-2862-jpeg-output-components-check
+    message: "Missing validation of cinfo->output_components may lead to heap overflow (CVE-2017-2862). Only 3 or 4 color components are supported."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          gdk_pixbuf_new(..., cinfo->output_components == 4 ? ... : ..., ...)
+      - pattern: |
+          gdk_pixbuf_new(..., (cinfo->output_components == 4) ? ... : ..., ...)

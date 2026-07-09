@@ -1,0 +1,11 @@
+rules:
+  - id: domoticz-sql-injection-floorplan
+    patterns:
+      - pattern: |
+          m_sql.safe_queryBlob("SELECT Image FROM Floorplans WHERE ID=%s", $IDX.c_str())
+    message: "SQL injection vulnerability via user-controlled 'idx' parameter. Use integer formatting (%d) with atol() instead of string formatting (%s)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-89"
+      cve: "CVE-2019-10664"

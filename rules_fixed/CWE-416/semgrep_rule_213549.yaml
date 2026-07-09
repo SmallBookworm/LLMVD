@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2021-3962-use-after-free
+    message: "Use-after-free vulnerability detected. Memory is freed but may still be accessed in error handling paths."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - patterns:
+        - pattern: |
+            if ((status == MagickFalse) && (exception->severity < ErrorException))
+              ThrowDCMException(...)
+      - patterns:
+        - pattern: |
+            if ((status == MagickFalse) && (exception->severity < ErrorException))
+              return(DestroyImageList(image));
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2021-3962"
+      references:
+        - https://github.com/ImageMagick/ImageMagick/commit/82775af03bbb10a0a1d0e15c0156c75673b4525e

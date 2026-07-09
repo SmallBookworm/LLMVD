@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2014-0244-sys-recvfrom-infinite-loop
+    message: "sys_recvfrom may enter an infinite loop on non-blocking UDP sockets due to spurious wakeups. Ensure EAGAIN and EWOULDBLOCK are not retried in recvfrom loops."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          do {
+            $RET = recvfrom($S, $BUF, $LEN, $FLAGS, $FROM, $FROMLEN);
+          } while ($RET == -1 && (errno == EINTR || errno == EAGAIN));
+      - pattern: |
+          do {
+            $RET = recvfrom($S, $BUF, $LEN, $FLAGS, $FROM, $FROMLEN);
+          } while ($RET == -1 && (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK));
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2014-0244"

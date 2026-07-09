@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2017-9608-null-deref-dnxhd
+    message: "Potential NULL pointer dereference due to returning invalid negative frame size. This may lead to denial of service (CVE-2017-9608)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (dctx->remaining <= 0)
+                  return dctx->remaining;
+          - pattern: |
+              if ($REMAINING <= 0)
+                  return $REMAINING;
+    metavariable-pattern:
+      $REMAINING: 
+        pattern-either:
+          - pattern: dctx->remaining

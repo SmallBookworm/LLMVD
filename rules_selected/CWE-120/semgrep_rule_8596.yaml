@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2017-0594-buffer-overflow-check-missing
+    message: Missing buffer overflow check before memcpy may lead to heap-based buffer overflow (CWE-120).
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          memcpy($OUT, $SRC, $SIZE);
+      - pattern: |
+          ... 
+          $HEADER->nFilledLen = $SIZE;
+          ...
+          memcpy($PTR, $SRC, $SIZE);
+    metavariable-pattern:
+      metavariable: $SIZE
+      pattern: encInfo.confSize
+    focus-metavariable: $SIZE
+    pattern-not-inside: |
+      if ($PTR + encInfo.confSize > $ALLOC_LEN) {
+        ...
+        return;
+      }
+      ...
+      memcpy($PTR, $SRC, encInfo.confSize);

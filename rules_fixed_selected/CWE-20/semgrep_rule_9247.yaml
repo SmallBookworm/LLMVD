@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2013-1763-sock-diag-oob
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (nlmsg_len($NLH) < sizeof(*$REQ))
+                  return -EINVAL;
+              ...
+              $HNDL = sock_diag_lock_handler($REQ->sdiag_family);
+          - pattern: |
+              if (nlmsg_len($NLH) < sizeof(*$REQ))
+                  return -EINVAL;
+              $HNDL = sock_diag_lock_handler($REQ->sdiag_family);
+    message: "Missing bounds check on sdiag_family before array access in sock_diag. This may lead to out-of-bounds access (CVE-2013-1763)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2013-1763"

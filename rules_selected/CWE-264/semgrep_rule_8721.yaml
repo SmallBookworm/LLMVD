@@ -1,0 +1,11 @@
+rules:
+  - id: android_softmp3_memset_buffer_overflow
+    message: "Potential buffer overflow in SoftMP3::memsetSafe due to unchecked buffer size before calling memset."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if ($LEN > $OUT_HEADER->nAllocLen) {
+        ...
+        return NULL;
+      }
+      return memset($OUT_HEADER->pBuffer, $C, $LEN);

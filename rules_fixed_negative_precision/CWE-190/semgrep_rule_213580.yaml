@@ -1,0 +1,10 @@
+rules:
+  - id: imagemagick-left-right-shift-overflow
+    message: "Potential integer overflow due to unsafe left/right shift of ssize_t. Use loop-based multiplication/division instead."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          (ssize_t) $PIXEL << (ssize_t) ($VALUE + 0.5)
+      - pattern: |
+          (ssize_t) $PIXEL >> (ssize_t) ($VALUE + 0.5)

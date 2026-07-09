@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2013-2878-out-of-bounds-read
+    message: "Potential out-of-bounds read due to insufficient bounds checking. Use RELEASE_ASSERT instead of ASSERT to prevent denial of service in release builds."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              ASSERT($CHARS + $LEN <= $END);
+          - pattern: |
+              ASSERT(... && $CHARS + $LEN <= $END);
+    metavariable-pattern:
+      $CHARS: 
+        pattern-regex: .*text\.characters\(\).*
+      $END:
+        pattern-regex: .*text\.characters\(\) \+ static_cast<int>\(text\.length\(\)\).*

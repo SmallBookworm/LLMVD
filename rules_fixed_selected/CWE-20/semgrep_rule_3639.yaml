@@ -1,0 +1,47 @@
+rules:
+  - id: cve-2018-14351-imap-literal-check
+    message: "Missing validation that literal length (litlen) does not exceed the actual buffer size, which may lead to out-of-bounds access (CWE-20)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (imap_get_literal_count(..., &litlen) == 0)
+          {
+            ...
+            mailbox = idata->buf;
+            s = mailbox + litlen;
+            ...
+          }
+      - pattern: |
+          if (imap_get_literal_count(..., &litlen) == 0)
+          {
+            ...
+            if (imap_cmd_step(...) != IMAP_CMD_CONTINUE)
+            {
+              ...
+              return;
+            }
+            mailbox = idata->buf;
+            s = mailbox + litlen;
+            ...
+          }
+    pattern-not-inside: |
+      if (imap_get_literal_count(..., &litlen) == 0)
+      {
+        ...
+        if (imap_cmd_step(...) != IMAP_CMD_CONTINUE)
+        {
+          ...
+          return;
+        }
+
+        if (strlen(idata->buf) < litlen)
+        {
+          ...
+          return;
+        }
+        ...
+        mailbox = idata->buf;
+        s = mailbox + litlen;
+        ...
+      }

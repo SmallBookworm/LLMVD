@@ -1,0 +1,17 @@
+rules:
+  - id: fmtlib-prepare_int_buffer-memory-corruption
+    message: "Potential memory corruption in fmt::print() due to unsafe pointer arithmetic in prepare_int_buffer (CVE-2018-1000052, CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          CharPtr result = prepare_int_buffer(...);
+          ...
+          return result;
+      - pattern: |
+          return prepare_int_buffer(...);
+    metavariable-pattern:
+      metavariable: result
+      pattern: |
+        CharPtr $PTR = prepare_int_buffer($...);
+    focus-metavariable: result

@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2014-0077-vhost-net-packet-length-validation
+    message: "Missing overrun check for datalen in get_rx_bufs may lead to memory corruption (CVE-2014-0077)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          heads[headcount - 1].len += datalen;
+          ...
+          return headcount;
+      - pattern: |
+          heads[headcount - 1].len += datalen;
+          ...
+          if (unlikely(log))
+            ...
+          return headcount;
+    metavariable-pattern:
+      metavariable: headcount
+      pattern: headcount > 0
+    fix-regex:
+      regex: ""
+      replacement: ""

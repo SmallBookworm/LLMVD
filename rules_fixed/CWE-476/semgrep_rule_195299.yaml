@@ -1,0 +1,16 @@
+rules:
+  - id: tensorflow-quantizedmaxpool-nullptr-dereference
+    message: "Potential null pointer dereference in QuantizedMaxPool when accessing input tensors without checking NumElements()."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              const float min_input = context->input(...).flat<float>()(0);
+          - pattern: |
+              const float max_input = context->input(...).flat<float>()(0);
+    metavariable-regex:
+      metavariable: $...
+      regex: "1|2"
+    fixes:
+      - regex: false

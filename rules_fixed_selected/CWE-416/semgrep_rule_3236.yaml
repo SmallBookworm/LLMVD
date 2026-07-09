@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2016-9936-use-after-free-unserialize
+    message: "Use-after-free vulnerability in unserialize due to missing temporary variable for return value (CVE-2016-9936, CWE-416)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!php_var_unserialize_ex(return_value, ...)) {
+            ...
+            zval_ptr_dtor(return_value);
+            ...
+          }
+      - pattern: |
+          php_var_unserialize_ex(return_value, ...)

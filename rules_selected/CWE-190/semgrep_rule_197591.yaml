@@ -1,0 +1,19 @@
+rules:
+  - id: integer-overflow-lsr-translate-coords
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (val >> (nb_bits - 1)) {
+                ...
+              }
+          - pattern: |
+              if (val >> (nb_bits-1)) {
+                ...
+              }
+    message: "Potential integer overflow due to missing check for zero nb_bits before bit shift. See CVE-2022-2454."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-190"
+      references:
+        - "https://github.com/gpac/gpac/commit/faa75edde3dfeba1e2cf6ffa48e45a50f1042096"

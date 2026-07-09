@@ -1,0 +1,29 @@
+rules:
+  - id: lzw_buffer_overflow_cwe787
+    message: "Potential heap-based buffer overflow in LZW decompressor due to missing stack bounds checks (CVE-2011-2896)"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          *sp++ = ...
+      - pattern: |
+          while ($COND && sp < $LIMIT)
+            {
+              *sp++ = ...;
+            }
+    pattern-not-inside: |
+      #define STACK_SIZE ...
+      ...
+      static gint stack[STACK_SIZE], *sp;
+      ...
+      if (sp < &(stack[STACK_SIZE]))
+        *sp++ = ...
+    pattern-inside: |
+      static gint stack[...], *sp;
+      ...
+      while ((code = GetCode(...)) >= 0)
+        {
+          ...
+          *sp++ = ...
+          ...
+        }

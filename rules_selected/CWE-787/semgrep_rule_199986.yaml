@@ -1,0 +1,21 @@
+rules:
+  - id: unbound-rdata-copy-oob-write
+    message: "Potential out-of-bounds write in rdata_copy due to missing length validation before memmove"
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if(len) {
+                  memmove(to, sldns_buffer_current(pkt), len);
+                  ...
+              }
+          - pattern: |
+              if(len) {
+                  ...
+                  memmove(to, sldns_buffer_current(pkt), len);
+                  ...
+              }
+    metavariable-pattern:
+      metavariable: len
+      pattern-not: log_assert(len <= pkt_len);

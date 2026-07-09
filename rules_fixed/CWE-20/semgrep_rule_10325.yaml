@@ -1,0 +1,11 @@
+rules:
+  - id: mptsas_config_missing_class_id
+    patterns:
+      - pattern-either:
+          - pattern: |
+              MPTSAS_CONFIG_PACK(..., "*l*lwwb*b*b*blww", ..., ..., ..., $$subsystem_vendor_id, ...)
+          - pattern: |
+              MPTSAS_CONFIG_PACK(..., "*l*lwwb*b*b*blww", ..., ..., ..., ..., $$subsystem_id)
+    message: "Missing 'class_id' field in MPTSAS_CONFIG_PACK call may lead to buffer overread or crash (CVE-2016-7157)."
+    severity: ERROR
+    languages: [c]

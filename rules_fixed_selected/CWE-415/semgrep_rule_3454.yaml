@@ -1,0 +1,22 @@
+rules:
+  - id: warc_unconsumed_data_loop
+    message: "Missing consumption of previously read data in WARC parser may lead to infinite loop (CWE-20, CVE-2018-1000880)"
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (w->cntoff >= w->cntlen) { ... }
+          ...
+          rab = __archive_read_ahead(...);
+      - pattern: |
+          if (w->cntoff >= w->cntlen) { ... }
+          ...
+          const char *rab = __archive_read_ahead(...);
+    pattern-not: |
+      if (w->unconsumed) {
+          __archive_read_consume(..., w->unconsumed);
+          w->unconsumed = 0U;
+      }
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: _warc_read

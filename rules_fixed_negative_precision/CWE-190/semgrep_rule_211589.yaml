@@ -1,0 +1,23 @@
+rules:
+  - id: qmp_guest_file_read_integer_overflow
+    message: "Integer overflow in qmp_guest_file_read may lead to buffer allocation issues. Missing upper bound check on 'count' before g_malloc0(count+1)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!has_count) {
+              ...
+          } else if (count < 0) {
+              ...
+          }
+          ...
+          g_malloc0(count+1);
+      - pattern: |
+          if (!has_count) {
+              ...
+          } else if (count < 0) {
+              ...
+          }
+          ...
+          g_malloc0(count + 1);
+    metadata: {}

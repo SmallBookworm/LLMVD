@@ -1,0 +1,19 @@
+rules:
+  - id: cwe-200-atm-info_leak
+    message: "Uninitialized struct sockaddr_atmpvc may leak kernel stack memory. Missing memset(0) before use."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              struct sockaddr_atmpvc * $ADDR = (struct sockaddr_atmpvc *) $SOCKADDR;
+              ...
+              $ADDR->sap_family = ...;
+          - pattern: |
+              $ADDR = (struct sockaddr_atmpvc *) $SOCKADDR;
+              ...
+              $ADDR->sap_family = ...;
+    metavariable-pattern:
+      $ADDR:
+        pattern-not: |
+          memset($ADDR, 0, sizeof(*$ADDR))

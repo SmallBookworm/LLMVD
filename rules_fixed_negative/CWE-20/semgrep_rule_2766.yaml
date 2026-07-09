@@ -1,0 +1,25 @@
+rules:
+  - id: cve-2017-9242-ip6-append-data-out-of-bounds-write
+    message: "Potential out-of-bounds write in __ip6_append_data due to late validation of copy length before skb allocation. This may lead to skb_shared_info overwrite and denial of service."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          copy = datalen - transhdrlen - fraggap;
+          ...
+          if (copy < 0) {
+            ...
+            kfree_skb(skb);
+            goto error;
+          }
+      - pattern: |
+          if (copy < 0) {
+            err = -EINVAL;
+            kfree_skb(skb);
+            goto error;
+          }
+    metavariable-pattern:
+      metavariable: copy
+      patterns:
+        - pattern: $COPY = datalen - transhdrlen - fraggap
+        - focus-metavariable: copy

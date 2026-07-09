@@ -1,0 +1,17 @@
+rules:
+  - id: imagemagick-heap-buffer-overflow-cve-2019-13307
+    message: "Heap-based buffer overflow due to incorrect allocation size based on ThreadResource instead of actual image list length."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $NUMBER_THREADS = (size_t) GetMagickResourceLimit(ThreadResource);
+          $PIXELS = (MagickPixelPacket **) AcquireQuantumMemory($NUMBER_THREADS, sizeof(*$PIXELS));
+          ...
+          for ($I = 0; $I < (ssize_t) $NUMBER_THREADS; $I++)
+          {
+            ...
+          }
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2019-13307"

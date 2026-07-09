@@ -1,0 +1,12 @@
+rules:
+  - id: cwe-476-null-ptr-deref-empty-pkt
+    message: "Empty packet line may result in NULL pointer dereference (CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (pkt == NULL)
+              continue;
+    metadata:
+      cwe: ["CWE-476"]
+      cve: "CVE-2016-10129"

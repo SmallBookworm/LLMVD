@@ -1,0 +1,15 @@
+rules:
+  - id: imagemagick-psd-layer-name-buffer-overflow
+    patterns:
+      - pattern: |
+          length=(MagickSizeType) ReadBlobByte(image);
+          combined_length+=length+1;
+          if (length > 0)
+            (void) ReadBlob(image,(size_t) length++,layer_info[i].name);
+          layer_info[i].name[length]='\0';
+    message: "Potential heap-based buffer overflow due to improper cast of ReadBlobByte return value. The 'length' variable should be cast to unsigned char before assignment to avoid sign extension issues."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2017-5511"

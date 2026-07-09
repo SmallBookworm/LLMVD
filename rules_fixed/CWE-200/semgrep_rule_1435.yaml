@@ -1,0 +1,28 @@
+rules:
+  - id: cwe-200-vivid-fb-ioctl-uninit-struct
+    message: "Uninitialized struct fb_vblank may leak kernel memory via FBIOGET_VBLANK ioctl"
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              struct fb_vblank $V;
+              ...
+              $V.flags = ...;
+              $V.count = ...;
+              $V.vcount = ...;
+              $V.hcount = ...;
+              ...
+              copy_to_user(..., &$V, sizeof($V))
+          - pattern: |
+              struct fb_vblank $V;
+              ...
+              $V.flags = ...;
+              $V.count = ...;
+              $V.vcount = ...;
+              $V.hcount = ...;
+              ...
+              copy_to_user(..., &$V, sizeof(struct fb_vblank))
+    metavariable-pattern:
+      $V:
+        pattern-not: memset(&$V, 0, ...)

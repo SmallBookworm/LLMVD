@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2018-10124-kill-something-info-int-min
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (pid != -1) {
+                ... find_vpid(-$PID) ...
+              }
+          - pattern: |
+              find_vpid(-$PID)
+    message: "Negation of pid may cause undefined behavior when pid is INT_MIN (CWE-119)."
+    severity: ERROR
+    languages: [c]

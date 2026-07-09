@@ -1,0 +1,11 @@
+rules:
+  - id: wangle-accept-routing-handler-unsafe-cast
+    message: "Unsafe cast to folly::AsyncSocket may cause denial of service. Use folly::AsyncTransportWrapper instead."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          std::dynamic_pointer_cast<folly::AsyncSocket>(...);
+    metadata:
+      cwe: ["CWE-241"]
+      cve: "CVE-2019-3554"

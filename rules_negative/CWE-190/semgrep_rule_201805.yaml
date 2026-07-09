@@ -1,0 +1,38 @@
+rules:
+  - id: qemu-ati-2d-integer-overflow
+    message: "Potential integer overflow in ati_2d_blt due to missing zero checks on bpp or pitch values before arithmetic operations."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              int bpp = ...;
+              ...
+              int dst_stride = ...;
+              ...
+              dst_stride *= bpp;
+          - pattern: |
+              int bpp = ...;
+              ...
+              int src_stride = ...;
+              ...
+              src_stride *= bpp;
+      - pattern-not: |
+          int bpp = ...;
+          if (!bpp) { ... return; }
+          ...
+          int dst_stride = ...;
+          if (!dst_stride) { ... return; }
+          ...
+          dst_stride *= bpp;
+      - pattern-not: |
+          int bpp = ...;
+          if (!bpp) { ... return; }
+          ...
+          int src_stride = ...;
+          if (!src_stride) { ... return; }
+          ...
+          src_stride *= bpp;
+    metavariable-regex:
+      metavariable: bpp
+      regex: bpp

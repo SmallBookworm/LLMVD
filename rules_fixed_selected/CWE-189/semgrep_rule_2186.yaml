@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2016-2070-divide-by-zero-tcp-cwnd-reduction
+    message: "Potential divide-by-zero in tcp_cwnd_reduction due to missing check for zero prior_cwnd or non-positive newly_acked_sacked."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (delta < 0) {
+                ...;
+                sndcnt = div_u64(..., tp->prior_cwnd) ...;
+              }
+          - pattern: |
+              tp->snd_cwnd = tcp_packets_in_flight(...) + sndcnt;
+    pattern-not-inside: |
+      if (newly_acked_sacked <= 0 || WARN_ON_ONCE(!tp->prior_cwnd))
+        return;
+      ...
+    metavariable-regex:
+      metavariable: $...
+      regex: ".*"

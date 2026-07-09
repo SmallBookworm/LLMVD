@@ -1,0 +1,41 @@
+rules:
+  - id: imlib2-gif-null-rows-check-missing
+    patterns:
+      - pattern-not: |
+          if (!rows) {
+            goto quit2;
+          }
+      - pattern-either:
+          - pattern: |
+              im->format = strdup("gif");
+              ...
+              if (im->loader || immediate_load || progress) {
+                ...
+                for (i = 0; i < h; i++) {
+                  for (j = 0; j < w; j++) {
+                    $STMTS
+                  }
+                }
+              }
+            metavariable-regex:
+              variable: $STMTS
+              regex: '.*rows\\s*\\[\\s*i\\s*\\]\\s*\\[\\s*j\\s*\\].*'
+          - pattern: |
+              im->format = strdup("gif");
+              ...
+              if (im->loader || immediate_load || progress) {
+                ...
+                ptr = im->data;
+                ...
+                for (i = 0; i < h; i++) {
+                  for (j = 0; j < w; j++) {
+                    $STMTS
+                  }
+                }
+              }
+            metavariable-regex:
+              variable: $STMTS
+              regex: '.*rows\\s*\\[\\s*i\\s*\\]\\s*\\[\\s*j\\s*\\].*'
+    message: "Missing null check for 'rows' before dereference may lead to NULL pointer dereference (CVE-2014-9764)."
+    severity: ERROR
+    languages: [c]

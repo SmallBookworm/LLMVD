@@ -1,0 +1,24 @@
+rules:
+  - id: imagemagick-screenshot-memory-leak
+    message: "Potential memory leak in ReadSCREENSHOTImage due to early return without cleanup (CWE-401)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (status == MagickFalse)
+            return(DestroyImageList(image));
+          if (image == (Image *) NULL)
+            image=screen;
+          else
+            AppendImageToList(&image,screen);
+      - pattern: |
+          if (image == (Image *) NULL)
+            image=screen;
+          else
+            AppendImageToList(&image,screen);
+          status=SetImageExtent(...);
+          if (status == MagickFalse)
+            return(DestroyImageList(image));
+    metavariable-regex:
+      metavariable: $status
+      regex: status

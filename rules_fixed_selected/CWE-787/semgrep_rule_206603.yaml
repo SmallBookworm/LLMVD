@@ -1,0 +1,25 @@
+rules:
+  - id: cve-2014-9050-heap-buffer-overflow
+    message: "Heap-based buffer overflow in cli_scanpe function due to missing bounds check on section headers. This can lead to denial of service via crafted PE files."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2014-9050"
+    pattern-either:
+      - pattern: |
+          for(...; ...; ...) {
+            ...
+            if (exe_sections[i].rsz && fsize>exe_sections[i].raw && !CLI_ISCONTAINED(0, (uint32_t) fsize, exe_sections[i].raw, exe_sections[i].rsz))
+                exe_sections[i].rsz = fsize - exe_sections[i].raw;
+            ...
+          }
+      - pattern: |
+          for(...; ...; ...) {
+            ...
+            if (exe_sections[i].rsz && !CLI_ISCONTAINED(0, fsize, exe_sections[i].uraw, exe_sections[i].ursz)
+                || exe_sections[i].raw >= fsize) {
+              ...
+            }
+            ...
+          }

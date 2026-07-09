@@ -1,0 +1,29 @@
+rules:
+  - id: tensorflow-sparsetensor-csr-validation-missing
+    message: Missing validation for dense_shape and indices tensor ranks in SparseTensorToCSRSparseMatrix, which can lead to denial of service via CHECK failure.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              const Tensor& dense_shape = ...;
+              const Tensor& indices = ...;
+              ...
+              const int rank = dense_shape.NumElements();
+              OP_REQUIRES(ctx, rank == 2 || rank == 3, ...);
+              ...
+              auto dense_shape_vec = dense_shape.vec<...>();
+          - pattern: |
+              const Tensor& indices = ...;
+              const Tensor& dense_shape = ...;
+              ...
+              const int rank = dense_shape.NumElements();
+              OP_REQUIRES(ctx, rank == 2 || rank == 3, ...);
+              ...
+              auto dense_shape_vec = dense_shape.vec<...>();
+    metavariable-pattern:
+      metavariable: dense_shape
+      pattern: dense_shape
+    metavariable-pattern:
+      metavariable: indices
+      pattern: indices

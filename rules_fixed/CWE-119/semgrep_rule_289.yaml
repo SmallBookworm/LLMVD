@@ -1,0 +1,17 @@
+rules:
+  - id: imlib2-gif-oob-read-cve-2016-3994
+    message: "Potential out-of-bounds read in GIF loader due to missing colormap bounds check (CVE-2016-3994, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $$cmap->Colors[$$index].Red
+      - pattern: |
+          $$cmap->Colors[$$index].Green
+      - pattern: |
+          $$cmap->Colors[$$index].Blue
+    metavariable-pattern:
+      metavariable: $$index
+      patterns:
+        - pattern-not: |
+            ($$i >= 0 && $$i < $$cmap->ColorCount) || ($$i < 256)

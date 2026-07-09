@@ -1,0 +1,16 @@
+rules:
+  - id: kvm_cr3_validation_missing
+    message: Missing validation of cr3 value in kvm_arch_vcpu_ioctl_set_sregs may lead to NULL pointer dereference (CVE-2009-2287, CWE-476).
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      vcpu->arch.cr3 = sregs->cr3;
+    pattern-not-inside: |
+      down_read(&vcpu->kvm->slots_lock);
+      if (gfn_to_memslot(..., sregs->cr3 >> PAGE_SHIFT))
+        vcpu->arch.cr3 = sregs->cr3;
+      else
+        set_bit(KVM_REQ_TRIPLE_FAULT, &vcpu->requests);
+      up_read(&vcpu->kvm->slots_lock);
+    metadata:
+      cwe: "CWE-476"

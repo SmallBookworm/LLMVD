@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2016-3924-missing-set-param-validation
+    message: Missing validation for EFFECT_CMD_SET_PARAM and EFFECT_CMD_SET_PARAM_DEFERRED commands may lead to information disclosure.
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (cmdCode == EFFECT_CMD_GET_PARAM && ...)
+            ...
+      - pattern: |
+          status_t status = (*mEffectInterface)->command(...);
+    pattern-not-inside: |
+      if ((cmdCode == EFFECT_CMD_SET_PARAM
+              || cmdCode == EFFECT_CMD_SET_PARAM_DEFERRED) && 
+          (...)) {
+          ...
+          return -EINVAL;
+      }
+    metadata:
+      cwe: CWE-200
+    fix-regex:
+      regex: ""
+      replacement: ""
+      enabled: false

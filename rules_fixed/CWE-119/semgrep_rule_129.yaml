@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2017-10971-xorg-extension-event-validation
+    message: "Only the first event is validated for type range; all events should be checked to prevent stack overflow (CVE-2017-10971)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!((EXTENSION_EVENT_BASE <= $FIRST->u.u.type) &&
+                ($FIRST->u.u.type < lastEvent))) {
+              ...
+              return BadValue;
+          }
+      - pattern: |
+          if (!((EXTENSION_EVENT_BASE <= $FIRST[$N].u.u.type) &&
+                ($FIRST[$N].u.u.type < lastEvent))) {
+              ...
+              return BadValue;
+          }
+    metavariable-pattern:
+      metavariable: $N
+      pattern-not: i
+    mode: regex

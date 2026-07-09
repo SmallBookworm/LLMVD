@@ -1,0 +1,8 @@
+rules:
+  - id: rpmsg_eptdev_write_iter_memory_leak
+    message: Memory leak in rpmsg_eptdev_write_iter when copy_from_iter_full fails. Allocated buffer is not freed.
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (!copy_from_iter_full(...)) 
+        return -EFAULT;

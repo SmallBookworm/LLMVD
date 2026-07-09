@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2017-8818-curl-ssl-allocation
+    message: "Insufficient memory allocation for ssl_backend_data in 32-bit builds may lead to out-of-bounds access (CVE-2017-8818, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          #define SSL_EXTRA + 4 * Curl_ssl->sizeof_ssl_backend_data - sizeof(long long)
+      - pattern: |
+          calloc(1, sizeof(struct connectdata) + SSL_EXTRA)
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2017-8818"

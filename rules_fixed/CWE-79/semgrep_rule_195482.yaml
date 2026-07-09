@@ -1,0 +1,13 @@
+rules:
+  - id: hhvm-wddx-xss
+    message: "Unescaped string used in WDDX serialization may lead to XSS (CWE-79). Strings should be HTML-encoded using StringUtil::HtmlEncode."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              std::string varValue = $VAR.toString().data();
+          - pattern: |
+              std::string varValue = ...;
+              ...
+              varValue = $VAR.toString().data()

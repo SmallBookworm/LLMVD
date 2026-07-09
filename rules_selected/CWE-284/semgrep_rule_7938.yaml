@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2016-1672-sop-bypass
+    message: "Use of non-private property access in module system may allow bindings-interception attacks and SOP bypass."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!GetProperty($CONTEXT, $MODULES, $MODULE_NAME, &$EXPORTS) || !$EXPORTS->IsUndefined())
+                return ...;
+          - pattern: |
+              SetProperty($CONTEXT, $MODULES, $MODULE_NAME, $EXPORTS);
+    metadata:
+      cwe: "CWE-284"
+      cve: "CVE-2016-1672"

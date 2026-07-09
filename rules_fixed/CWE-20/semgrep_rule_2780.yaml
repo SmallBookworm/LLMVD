@@ -1,0 +1,29 @@
+rules:
+  - id: imagemagick-rle-eof-handling
+    message: "Missing EOF check after ReadBlobByte or ReadBlobLSBSignedShort may lead to crash on crafted RLE image (CVE-2017-9144)"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $op = ReadBlobByte($img);
+          ...
+          switch ($opcode & 0x3f) {
+          case ...:
+            $operand = ReadBlobByte($img);
+            ...
+            if ($opcode & 0x40)
+              $operand = ReadBlobLSBSignedShort($img);
+            ...
+          }
+      - pattern: |
+          $op = ReadBlobByte($img);
+          ...
+          switch ($opcode & 0x3f) {
+          case ...:
+            $operand = ReadBlobByte($img);
+            ...
+            if ($opcode & 0x40) {
+              $operand = ReadBlobLSBSignedShort($img);
+            }
+            ...
+          }

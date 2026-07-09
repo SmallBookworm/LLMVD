@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2021-3712-asn1-string-not-null-terminated
+    message: "ASN1_STRING data may not be NUL-terminated. Using it as a C string without checking or using length-aware functions can lead to buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern-inside: |
+              $EMAIL->data;
+          - pattern: |
+              OPENSSL_strdup((char *)$EMAIL->data)
+          - pattern: |
+              sk_OPENSSL_STRING_find($SK, (char *)$EMAIL->data)
+    metadata:
+      cwe: ["CWE-125"]
+      cve: "CVE-2021-3712"
+      references:
+        - https://github.com/openssl/openssl/commit/bb4d2ed4091408404e18b3326e3df67848ef63d0

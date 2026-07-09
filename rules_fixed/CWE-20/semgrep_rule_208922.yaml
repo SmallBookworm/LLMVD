@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2016-10397-url-parser-host-bypass
+    message: "URL parser may incorrectly handle URI components, allowing hostname bypass via inputs like 'evil.com:80#@good.com/'."
+    severity: HIGH
+    languages: [c]
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2016-10397"
+    pattern: |
+      e = ue;
+      if (!(p = memchr(s, '/', (ue - s)))) {
+        p = ue;

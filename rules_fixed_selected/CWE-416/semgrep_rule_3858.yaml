@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2017-18017-use-after-free-tcpmss
+    message: "Missing sanity check on tcph->doff may lead to use-after-free (CWE-416). Ensure tcp_hdrlen >= sizeof(struct tcphdr) before use."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $TCPH = (struct tcphdr *)(...);
+          $TCP_HDRLEN = $TCPH->doff * 4;
+          if ($LEN < $TCP_HDRLEN)
+            return ...;
+      - pattern: |
+          $TCPH = (struct tcphdr *)(...);
+          $TCP_HDRLEN = $TCPH->doff * 4;
+          if ($LEN < $TCP_HDRLEN || ...)
+            return ...;
+    metavariable-pattern:
+      $TCPH: "struct tcphdr *"
+    pattern-not-inside: |
+      $TCPH = (struct tcphdr *)(...);
+      $TCP_HDRLEN = $TCPH->doff * 4;
+      if ($LEN < $TCP_HDRLEN || $TCP_HDRLEN < sizeof(struct tcphdr))
+        return ...;

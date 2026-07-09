@@ -1,0 +1,15 @@
+rules:
+  - id: claws_mail_uri_security_check_cwe_601
+    message: "Insufficient URI validation in textview_uri_security_check may allow phishing via misleading URLs (CWE-601, CVE-2021-37746)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (is_uri_string($URI) == FALSE)
+              return TRUE;
+      - pattern: |
+          if (is_uri_string($URI) == FALSE)
+              return true;
+    metavariable-pattern:
+      metavariable: $URI
+      pattern: uri->uri

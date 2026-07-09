@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2017-5549-klsi-105-uninitialized-log
+    message: "Uninitialized heap memory may be logged if usb_control_msg returns a short transfer. This can leak sensitive information (CWE-532, CVE-2017-5549)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ($RC < 0)
+            $LOG_ERROR(...);
+          else {
+            ...
+            dev_info(..., ..., $BUF[0], $BUF[1]);
+            ...
+          }
+      - pattern: |
+          if ($RC < 0)
+            $LOG_ERROR(...);
+          else
+            dev_info(..., ..., $BUF[0], $BUF[1]);
+    metavariable-pattern:
+      metavariable: $RC
+      pattern: usb_control_msg(...)
+    focus-metavariable: $BUF

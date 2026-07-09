@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2021-20277-ldb-handler-fold-oob-write
+    message: "Out-of-bounds write vulnerability in ldb_handler_fold due to missing length adjustment when skipping leading spaces. This can lead to a crash (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (*s == ' ') {
+        for (t = s; *s == ' '; s++) ;
+        memmove(t, s, l);
+      }

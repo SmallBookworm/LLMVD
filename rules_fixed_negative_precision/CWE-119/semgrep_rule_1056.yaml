@@ -1,0 +1,12 @@
+rules:
+  - id: tg3_vpd_buffer_overflow
+    message: "Potential heap-based buffer overflow in tg3_read_vpd due to missing length check before memcpy into tp->fw_ver"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          memcpy($TP->fw_ver, $SRC, $LEN);
+          strncat($TP->fw_ver, ...);
+    metadata:
+      cwe: ["CWE-119"]
+      cve: ["CVE-2013-1929"]

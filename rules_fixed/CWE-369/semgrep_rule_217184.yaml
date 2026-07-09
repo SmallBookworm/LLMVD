@@ -1,0 +1,17 @@
+rules:
+  - id: cwe-369-div-zero-jfif-samp-fact
+    message: Division by zero vulnerability in JFIF sampling factor calculation. Ensure divisor is non-zero before division.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $max / $horz
+      - pattern: |
+          $max / $vert
+    metavariable-pattern:
+      - metavariable: $horz
+        pattern-either:
+          - pattern: m_anSofHorzSampFact_Hi[...]
+          - pattern: anSofSampFact[...]
+      - metavariable: $vert
+        pattern: m_anSofVertSampFact_Vi[...]

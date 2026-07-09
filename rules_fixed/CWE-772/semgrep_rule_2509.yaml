@@ -1,0 +1,11 @@
+rules:
+  - id: imagemagick-mat-memory-leak-cve-2017-13146
+    message: "Memory leak in ReadMATImage due to missing null check before DestroyQuantumInfo. This may lead to resource exhaustion (CWE-772)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      RelinquishMagickMemory(BImgBuff);
+      quantum_info=DestroyQuantumInfo(quantum_info);
+    fix-regex:
+      regex: 'quantum_info=DestroyQuantumInfo\\(quantum_info\\);'
+      replacement: 'if (quantum_info != (QuantumInfo *) NULL)\n    quantum_info=DestroyQuantumInfo(quantum_info);'

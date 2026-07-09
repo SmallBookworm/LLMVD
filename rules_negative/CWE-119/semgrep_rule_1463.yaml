@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2015-5283-sctp-init-race
+    message: "SCTP protocol initialization race condition may lead to memory corruption or panic (CVE-2015-5283). The pernet subsystem must be initialized before protocol registration to prevent premature socket creation."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              status = sctp_v4_protosw_init();
+              ...
+              status = sctp_v6_protosw_init();
+              ...
+              status = register_pernet_subsys(&sctp_net_ops);
+          - pattern: |
+              sctp_v4_protosw_init();
+              ...
+              sctp_v6_protosw_init();
+              ...
+              register_pernet_subsys(&sctp_net_ops);
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2015-5283"
+      references:
+        - https://github.com/torvalds/linux/commit/8e2d61e0aed2b7c4ecb35844fe07e0b2b762dee4

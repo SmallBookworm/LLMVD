@@ -1,0 +1,17 @@
+rules:
+  - id: tee_mmu_check_access_rights_missing_last_page_check
+    message: "tee_mmu_check_access_rights() may skip checking the last page of a memory range due to unaligned address and length, leading to potential memory corruption (CWE-20, CVE-2019-1010293)."
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          for ($A = $UADDR; $A < ($UADDR + $LEN); $A += $ADDR_INCR) {
+              ...
+          }
+      - pattern: |
+          for ($A = $UADDR; $A < $UADDR + $LEN; $A += $ADDR_INCR) {
+              ...
+          }
+    metavariable-pattern:
+      metavariable: $ADDR_INCR
+      pattern-not: ROUNDDOWN(...)

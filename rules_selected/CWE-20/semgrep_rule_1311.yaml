@@ -1,0 +1,25 @@
+rules:
+  - id: cve-2014-2673-missing-tm-flush
+    message: "Missing TM state flush before duplicating task structure may lead to denial of service (CVE-2014-2673)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          *dst = *src;
+      - pattern: |
+          arch_dup_task_struct(..., struct task_struct *src)
+          {
+              ...
+              *dst = *src;
+              ...
+          }
+    pattern-not-inside: |
+        arch_dup_task_struct(..., struct task_struct *src)
+        {
+            ...
+            __switch_to_tm(src);
+            tm_recheckpoint_new_task(src);
+            ...
+            *dst = *src;
+            ...
+        }

@@ -1,0 +1,7 @@
+rules:
+  - id: cve-2016-2117-atl2-sg-enabled
+    message: "atl2 driver incorrectly enables scatter/gather I/O (NETIF_F_SG) without support, potentially leaking kernel memory (CVE-2016-2117)."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      $NETDEV->hw_features = $_ | ... NETIF_F_SG ...

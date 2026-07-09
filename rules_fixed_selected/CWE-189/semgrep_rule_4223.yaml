@@ -1,0 +1,20 @@
+rules:
+  - id: xfs_acl_integer_overflow
+    message: "Integer overflow vulnerability in xfs_acl_from_disk due to signed 'count' variable. Use unsigned int to prevent negative values bypassing validation."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              int count;
+              ...
+              count = be32_to_cpu($X);
+              if (count > XFS_ACL_MAX_ENTRIES) ...
+          - pattern: |
+              int count, $REST;
+              ...
+              count = be32_to_cpu($X);
+              if (count > XFS_ACL_MAX_ENTRIES) ...
+    metadata:
+      cwe: "CWE-189"
+      cve: "CVE-2012-0038"

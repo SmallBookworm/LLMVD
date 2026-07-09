@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2013-2921-double-free-pattern
+    message: Potential double free vulnerability due to incorrect handling of CopyOutputRequest area and size parameters.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: const gfx::Size& dst_size_in_pixel = ...;
+              - pattern: $X = cc::CopyOutputRequest::CreateRequest(..., dst_size_in_pixel, ...);
+              - pattern: gfx::Rect src_subrect_in_pixel = ...;
+              - pattern: $X->set_area(src_subrect_in_pixel);
+          - patterns:
+              - pattern: $Y = cc::CopyOutputRequest::CreateRequest(..., dst_size, ...);
+              - pattern: $Z = ConvertRectToPixel(..., src_subrect);
+              - pattern: $Y->set_area(...);
+    metadata:
+      cwe: "CWE-399"
+      cve: "CVE-2013-2921"

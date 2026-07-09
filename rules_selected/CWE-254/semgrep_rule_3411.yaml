@@ -1,0 +1,19 @@
+rules:
+  - id: missing_secure_boot_propagation
+    message: "Missing propagation of secure_boot flag in setup_efi_state may bypass UEFI Secure Boot restrictions."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (efi_enabled(EFI_OLD_MEMMAP))
+          	return 0;
+          $EI->efi_loader_signature = ...;
+      - pattern: |
+          if (efi_enabled(EFI_OLD_MEMMAP))
+          	return 0;
+          $EI->efi_systab = ...;
+    metavariable-pattern:
+      metavariable: $EI
+      pattern: "&$PARAMS->efi_info"
+    pattern-not: |
+      $PARAMS->secure_boot = boot_params.secure_boot;

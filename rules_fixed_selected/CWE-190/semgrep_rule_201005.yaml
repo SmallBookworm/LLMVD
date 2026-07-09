@@ -1,0 +1,12 @@
+rules:
+  - id: imagemagick-integer-overflow-exportindexquantum
+    message: "Potential integer overflow in ExportIndexQuantum when casting GetPixelIndex() result directly to unsigned char. This may lead to undefined behavior or crash (CVE-2021-20224, CWE-190)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: (unsigned char) GetPixelIndex(...)
+      - pattern: (unsigned short) GetPixelIndex(...)
+      - pattern: (unsigned int) GetPixelIndex(...)
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: GetPixelIndex

@@ -1,0 +1,53 @@
+rules:
+  - id: use-after-free-in-updateDevice
+    message: "Use-after-free vulnerability in updateDevice due to missing list unlink before free on realloc failure."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if(!tmp)
+          {
+            syslog(...);
+            free(p);
+            return ...;
+          }
+      - pattern: |
+          if(!tmp)
+          {
+            syslog(...);
+            free(p);
+            return ...;
+          }
+    metavariable-pattern:
+      metavariable: tmp
+      pattern: realloc(...)
+    inside:
+      pattern: |
+        struct device ** pp = ...;
+        struct device * p = *pp;
+        ...
+        while(p)
+        {
+          ...
+          if(...)
+          {
+            ...
+            tmp = realloc(p, ...);
+            if(!tmp)
+            {
+              syslog(...);
+              free(p);
+              return ...;
+            }
+            ...
+          }
+          ...
+        }
+    pattern-not-inside: |
+      if(!tmp)
+      {
+        syslog(...);
+        *pp = p->next;
+        free(p);
+        return ...;
+      }

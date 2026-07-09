@@ -1,0 +1,21 @@
+rules:
+  - id: bnxt_re_create_srq_memory_leak
+    message: "Memory leak in bnxt_re_create_srq(): ib_copy_to_udata() failure does not release allocated memory. Use 'goto fail' instead of 'goto exit' to ensure cleanup."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (rc) {
+              ...
+              goto exit;
+          }
+      - pattern: |
+          if (rc) {
+              ...
+              bnxt_qplib_destroy_srq(...);
+              goto exit;
+          }
+    metavariable-regex:
+      metavariable: rc
+      regex: "rc"
+    focus-metavariable: rc

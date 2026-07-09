@@ -1,0 +1,24 @@
+rules:
+  - id: vim_spell_suggest_stack_overflow
+    message: "Stack-based buffer overflow in spell suggestion due to unchecked depth increase. Upgrade to Vim 8.2.4247 or later."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (byts[arridx] == 0 || n == (int)STATE_NOPREFIX)
+              {
+              ...
+              go_deeper(stack, depth, 0);
+              ++depth;
+              ...
+              }
+          - pattern: |
+              if (depth < MAXWLEN
+                  && (byts[arridx] == 0 || n == (int)STATE_NOPREFIX))
+              {
+              ...
+              go_deeper(stack, depth, 0);
+              ++depth;
+              ...
+              }

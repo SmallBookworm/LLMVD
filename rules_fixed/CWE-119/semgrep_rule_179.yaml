@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2014-9672-out-of-bounds-read
+    message: "Potential out-of-bounds read due to missing bounds check on string_count before using it as an array index. This could lead to denial of service or information disclosure (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          for ($I = 0; $I < $STRING_COUNT && $I < 64; $I++) {
+            $NAMES[$I] = ...;
+            ...
+          }
+          ...
+          if ($STYLE->indexes[$FACE_INDEX] <= FT_MIN($STRING_COUNT, 64))
+      - pattern: |
+          for ($I = 0; $I < $STRING_COUNT && $I < 64; $I++) {
+            $NAMES[$I] = ...;
+            ...
+          }
+          ...
+          if (... $STYLE->indexes[$FACE_INDEX] <= FT_MIN($STRING_COUNT, 64) ...)
+    metavariable-pattern:
+      metavariable: $NAMES
+      pattern: names

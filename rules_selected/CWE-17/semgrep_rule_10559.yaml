@@ -1,0 +1,8 @@
+rules:
+  - id: redis_lua_bytecode_loading
+    patterns:
+      - pattern: |
+          ((c == LUA_SIGNATURE[0]) ? luaU_undump : luaY_parser)(...)
+    message: "Detected conditional execution that allows loading of Lua bytecode via luaU_undump, which can lead to arbitrary code execution (CVE-2015-4335)."
+    severity: ERROR
+    languages: [c]

@@ -1,0 +1,20 @@
+rules:
+  - id: imagemagick-ycbcr-memory-leak
+    message: Memory leak in ReadYCBCRImage due to missing cleanup of canvas_image and quantum_info on SetImageExtent failure.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (status == MagickFalse)
+            return(DestroyImageList(image));
+      - pattern: |
+          if (status == MagickFalse)
+          {
+            quantum_info=DestroyQuantumInfo(quantum_info);
+            return(DestroyImageList(image));
+          }
+    metavariable-comparison:
+      metavariable: $status
+      comparison: '=='
+      expression: 'MagickFalse'
+    mode: regex

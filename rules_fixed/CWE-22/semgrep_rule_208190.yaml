@@ -1,0 +1,19 @@
+rules:
+  - id: zip-slip-directory-traversal
+    message: "Potential Zip Slip vulnerability: archive entry filename is used without sanitizing '../' or backslashes, which may lead to directory traversal during extraction."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              QString file_path = $DEST + "/" + $QFILE_NAME;
+          - pattern: |
+              QString cp437_file_path = $DEST + "/" + $CP437_FILE_NAME;
+    metavariable-pattern:
+      metavariable: $QFILE_NAME
+      pattern-not: |
+        $QFILE_NAME.replace(...)
+    metavariable-pattern:
+      metavariable: $CP437_FILE_NAME
+      pattern-not: |
+        $CP437_FILE_NAME.replace(...)

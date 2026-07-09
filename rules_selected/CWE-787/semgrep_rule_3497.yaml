@@ -1,0 +1,16 @@
+rules:
+  - id: uriparser-composequery-oob-write
+    message: "Out-of-bounds write vulnerability in uriComposeQuery* due to missing ampersandLen initialization for first item."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (firstItem == URI_TRUE) {
+              firstItem = URI_FALSE;
+          } else {
+              write[0] = _UT('&');
+              write++;
+          }
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2018-19198"

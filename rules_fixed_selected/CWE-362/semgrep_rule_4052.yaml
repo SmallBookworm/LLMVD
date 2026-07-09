@@ -1,0 +1,11 @@
+rules:
+  - id: rds_tcp_kill_sock_race_condition
+    message: "Race condition leading to use-after-free in rds_tcp_kill_sock due to unnecessary '|| !tc->t_sock' check. This may prevent proper cleanup during net namespace destruction."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if ($NET != $C_NET || !$TC->t_sock)
+        continue;
+    metadata:
+      cwe: "CWE-362"
+      cve: "CVE-2019-11815"

@@ -1,0 +1,14 @@
+rules:
+  - id: sctp-use-after-free-init-collision
+    message: "Use-after-free vulnerability in sctp_assoc_update due to double free of asoc_shared_key. The call to sctp_auth_key_put(asoc->asoc_shared_key) before sctp_auth_asoc_init_active_key may lead to a double free when AUTH is enabled and an INIT collision occurs."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          sctp_auth_key_put($ASOC->asoc_shared_key);
+          sctp_auth_asoc_init_active_key($ASOC, ...);
+    metadata:
+      cwe: ["CWE-703"]
+      cve: "CVE-2015-1421"
+      references:
+        - https://github.com/torvalds/linux/commit/600ddd6825543962fb807884169e57b580dba208

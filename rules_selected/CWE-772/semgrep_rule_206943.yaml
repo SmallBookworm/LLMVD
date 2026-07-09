@@ -1,0 +1,12 @@
+rules:
+  - id: imagemagick-miff-memory-leak-cve-2018-14436
+    message: "Memory leak in ReadMIFFImage due to missing break statement in colormap depth handling, leading to improper resource cleanup (CWE-772, CVE-2018-14436)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      switch (image->depth)
+      {
+        default:
+          $COLORMAP=(unsigned char *) RelinquishMagickMemory($COLORMAP);
+          ThrowMIFFException(...);
+      }

@@ -1,0 +1,18 @@
+rules:
+  - id: use-after-free-in-blk-cleanup-queue
+    message: "Use-after-free vulnerability in blk_cleanup_queue due to missing blk_mq_sched_free_requests before percpu_ref_exit. This may lead to arbitrary code execution (CVE-2019-25044, CWE-416)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (queue_is_mq($Q))
+              blk_mq_exit_queue($Q);
+          percpu_ref_exit(&$Q->q_usage_counter);
+      - pattern: |
+          if (queue_is_mq($Q))
+              blk_mq_exit_queue($Q);
+          ...
+          percpu_ref_exit(&$Q->q_usage_counter);
+    metavariable-pattern:
+      metavariable: $Q
+      pattern: $Q

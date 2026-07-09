@@ -1,0 +1,18 @@
+rules:
+  - id: cwe-476-pointer-wraparound-check
+    message: "Pointer wraparound vulnerability due to insufficient bounds check before pointer arithmetic."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($PTR + $OFFSET < $PTR) {
+                ...
+              }
+          - pattern: |
+              if ($OFFSET < 1 || $PTR + $OFFSET < $PTR) {
+                ...
+              }
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2017-16359"

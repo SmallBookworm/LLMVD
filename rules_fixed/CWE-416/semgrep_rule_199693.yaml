@@ -1,0 +1,28 @@
+rules:
+  - id: cve-2015-6831-use-after-free-spl_dllist_unserialize
+    message: "Potential use-after-free vulnerability in SplDoublyLinkedList::unserialize due to improper handling of unserialized elements. This may lead to arbitrary code execution."
+    severity: ERROR
+    languages: [c]
+    cwe: ["CWE-416"]
+    pattern-either:
+      - pattern: |
+          spl_ptr_llist_push($INTERN->llist, $ELEM TSRMLS_CC);
+      - pattern: |
+          spl_ptr_llist_push($INTERN->$FIELD, $ELEM TSRMLS_CC);
+    metavariable-regex:
+      - metavariable: $INTERN
+        regex: '.*'
+      - metavariable: $ELEM
+        regex: '.*'
+    patterns:
+      - pattern-inside: |
+          typedef struct spl_dllist_object {
+              zend_object std;
+              void *llist;
+              zend_long flags;
+          } spl_dllist_object;
+      - pattern-either:
+          - pattern: |
+              spl_ptr_llist_push($INTERN->llist, $ELEM TSRMLS_CC);
+          - pattern: |
+              spl_ptr_llist_push($INTERN->$FIELD, $ELEM TSRMLS_CC);

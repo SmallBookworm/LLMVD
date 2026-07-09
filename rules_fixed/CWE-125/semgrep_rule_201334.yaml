@@ -1,0 +1,14 @@
+rules:
+  - id: leptonica-heap-buffer-overread-rasterop
+    message: "Heap-based buffer over-read in pixFillMapHoles due to unsafe rasterop usage with temporary PIX copy (CVE-2020-36279, CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $pixt = pixCopy(NULL, $pix);
+          ...
+          pixRasterop($pix, $j, 0, 1, $h, PIX_SRC, $pixt, $j_plus_1, 0);
+          pixRasterop($pixt, $j, 0, 1, $h, PIX_SRC, $pix, $j, 0);
+      - pattern: |
+          pixRasterop($pix, $j, 0, 1, $h, PIX_SRC, $pixt, $j_minus_1, 0);
+          pixRasterop($pixt, $j, 0, 1, $h, PIX_SRC, $pix, $j, 0);

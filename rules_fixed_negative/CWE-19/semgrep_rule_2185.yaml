@@ -1,0 +1,9 @@
+rules:
+  - id: cve-2016-2085-memcmp-timing-attack
+    message: Use of memcmp() for MAC comparison is vulnerable to timing side-channel attacks. Use crypto_memneq() instead.
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern: |
+          memcmp($BUF1, $BUF2, $SIZE)
+    fix: ""

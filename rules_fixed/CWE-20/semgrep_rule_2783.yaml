@@ -1,0 +1,9 @@
+rules:
+  - id: cve-2017-9141-missing-num-images-check
+    message: Missing validation of num_images before loop may lead to assertion failure or undefined behavior.
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (volume)
+        num_images = dds_info.depth;
+      for (n = 0; n < num_images; n++)

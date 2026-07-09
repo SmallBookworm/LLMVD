@@ -1,0 +1,25 @@
+rules:
+  - id: sctp_memory_consumption_vulnerability
+    message: "Potential denial of service due to excessive memory consumption in SCTP chunk processing. Missing pdiscard handling for malformed trailing chunks may prevent output queue flush."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (chunk->chunk_end < skb_tail_pointer(chunk->skb)) {
+                  chunk->singleton = 0;
+              } else if (chunk->chunk_end > skb_tail_pointer(chunk->skb)) {
+                  sctp_chunk_free(chunk);
+                  chunk = queue->in_progress = NULL;
+                  return NULL;
+              }
+          - pattern: |
+              if (skb_headlen(chunk->skb) < sizeof(sctp_chunkhdr_t)) {
+                  sctp_chunk_free(chunk);
+                  chunk = queue->in_progress = NULL;
+              }
+    metadata:
+      cwe: "CWE-399"
+      cve: "CVE-2014-3688"
+      references:
+        - https://github.com/torvalds/linux/commit/26b87c7881006311828bb0ab271a551a62dcceb4

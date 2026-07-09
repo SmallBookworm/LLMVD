@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2016-2543-null-deref
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (client->type == USER_CLIENT)
+                  snd_seq_fifo_clear(client->data.user.fifo);
+    message: "Missing NULL check before calling snd_seq_fifo_clear may lead to NULL pointer dereference (CVE-2016-2543)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-703"
+      confidence: HIGH

@@ -1,0 +1,17 @@
+rules:
+  - id: integer-overflow-malloc-size
+    message: Multiplication used to calculate buffer size for malloc may overflow, leading to integer overflow vulnerability.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          malloc($X * $Y)
+      - pattern: |
+          malloc($X * $Y * $Z)
+    metavariable-patterns:
+      - metavariable: $X
+        pattern-regex: .*
+      - metavariable: $Y
+        pattern-regex: .*
+      - metavariable: $Z
+        pattern-regex: .*

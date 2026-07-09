@@ -1,0 +1,10 @@
+rules:
+  - id: redis_sds_integer_overflow_cve_2021_41099
+    message: "Potential integer overflow in _sdsMakeRoomFor due to missing overflow check when adding header size (CVE-2021-41099)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          assert(hdrlen + newlen + 1 > len);
+      - pattern: |
+          assert(... + newlen + 1 > len);

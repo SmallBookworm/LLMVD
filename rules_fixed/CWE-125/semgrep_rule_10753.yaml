@@ -1,0 +1,20 @@
+rules:
+  - id: cwe-125-heap-out-of-bounds-read-java_switch_op
+    message: Heap out of bounds read vulnerability in java_switch_op due to insufficient bounds check before reading switch table data.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (pos + 8 > len) {
+                return op->size;
+              }
+          - pattern: |
+              if (pos + 8 >= len) {
+                return op->size;
+              }
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: java_switch_op
+    paths:
+      regex: .*\.c$

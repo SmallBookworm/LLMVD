@@ -1,0 +1,16 @@
+rules:
+  - id: cwe-190-integer-overflow-get_refcount
+    message: "Potential integer overflow in get_refcount due to use of signed integer for refcount_table_index or block_index. This may lead to out-of-bounds access or memory corruption."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              int $VAR = $CLUSTER_INDEX >> (...);
+          - pattern: |
+              int $VAR = $CLUSTER_INDEX & (...);
+    metavariable-pattern:
+      $VAR:
+        pattern-either:
+          - pattern: refcount_table_index
+          - pattern: block_index

@@ -1,0 +1,54 @@
+rules:
+  - id: mlx4_register_mac_vlan_oob_access
+    message: "Potential out-of-bounds array access due to missing check for 'free < 0' before using 'free' as an index."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              int $FUNC(struct mlx4_dev *dev, ..., int *index)
+              {
+                ...
+                int free = -1;
+                ...
+                for (...; ...; ...) {
+                  if (free < 0 && ...) {
+                    free = ...;
+                    continue;
+                  }
+                  ...
+                }
+                ...
+                if (table->total == table->max) {
+                  ...
+                  goto out;
+                }
+                ...
+                table->refs[free] = ...;
+                ...
+              }
+          - pattern: |
+              int $FUNC(struct mlx4_dev *dev, ..., int *index)
+              {
+                ...
+                int free = -1;
+                ...
+                for (...; ...; ...) {
+                  if (free < 0 && ...) {
+                    free = ...;
+                    continue;
+                  }
+                  ...
+                }
+                ...
+                if (table->total == table->max) {
+                  ...
+                  goto out;
+                }
+                ...
+                table->entries[free] = ...;
+                ...
+              }
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: "mlx4_register_(mac|vlan)"

@@ -1,0 +1,19 @@
+rules:
+  - id: uninitialized_struct_memory_leak
+    patterns:
+      - pattern-either:
+          - pattern: |
+              struct $TYPE *$VAR = (struct $TYPE *)$PTR;
+              ...
+              $VAR->$FIELD = ...;
+          - pattern: |
+              struct $TYPE *$VAR = (struct $TYPE *)$PTR;
+              ...
+              for (...; ...; ...)
+                $VAR->$ARRAY[...] = ...;
+    message: "Structure passed to user space is not fully initialized, potentially leaking kernel memory (CWE-200)."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2009-3001"

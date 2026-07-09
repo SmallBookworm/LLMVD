@@ -1,0 +1,15 @@
+rules:
+  - id: tensorflow_raggedtensor_to_variant_null_dereference
+    message: "Potential null pointer dereference in RaggedTensorToVariant due to missing validation of empty ragged tensor input."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - patterns:
+        - pattern: batched_ragged_input.append_splits(...)
+        - pattern-inside: |
+            ...
+        - pattern: batched_ragged_input.splits(0)
+      - pattern: batched_ragged.splits(0)
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2021-29516"

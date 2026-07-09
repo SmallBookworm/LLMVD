@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2022-29205-null-ptr-dereference
+    message: "Potential null pointer dereference in ParseDimensionValue due to missing nullptr check before use. This can lead to segfault (CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (inner_py_value.get() == Py_None) {
+            ...
+          } else if (!ParseDimensionValue($X, inner_py_value.get(), $Y, $Z)) {
+            ...
+          }
+      - pattern: |
+          if (inner_py_value.get() == Py_None) {
+            ...
+          } else if (!ParseDimensionValue(...)) {
+            ...
+          }

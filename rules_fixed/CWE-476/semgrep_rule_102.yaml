@@ -1,0 +1,26 @@
+rules:
+  - id: cve-2019-12382-unchecked-kstrdup
+    message: "Unchecked return value from kstrdup may lead to NULL pointer dereference (CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $FWSTR = kstrdup(...);
+          ...;
+          strsep(&$FWSTR, ...);
+      - pattern: |
+          $FWSTR = kstrdup(...);
+          ...;
+          while (($TEMP = strsep(&$FWSTR, ...)) != NULL) { ... }
+    metavariable-pattern:
+      patterns:
+        - pattern-either:
+            - pattern: $FWSTR
+          metavariable: $FWSTR
+          constraint:
+            type: identifier
+        - pattern-either:
+            - pattern: $TEMP
+          metavariable: $TEMP
+          constraint:
+            type: identifier

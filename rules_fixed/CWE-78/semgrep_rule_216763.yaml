@@ -1,0 +1,40 @@
+rules:
+  - id: libssh-scp-path-length-check-missing
+    message: Missing length check on SCP location path may lead to command injection (CVE-2019-14889, CWE-78).
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      ssh_scp_new(..., const char *location)
+      {
+        ...
+        if (strlen(location) > 32 * 1024) {
+          ...
+        }
+        ...
+        scp->location = strdup(location);
+        ...
+      }
+    pattern-not: |
+      ssh_scp_new(..., const char *location)
+      {
+        ...
+        if (strlen(location) > 32 * 1024) {
+          ...
+        }
+        ...
+        scp->location = strdup(location);
+        ...
+      }
+    pattern-either:
+      - pattern: |
+          ssh_scp_new(..., const char *location)
+          {
+            ...
+            scp->location = strdup(location);
+            ...
+          }
+    metadata:
+      cwe: "CWE-78"
+      cve: "CVE-2019-14889"
+      references:
+        - https://git.libssh.org/projects/libssh.git/commit/?h=stable-0.8&id=391c78de9d0f7baec3a44d86a76f4e1324eb9529

@@ -1,0 +1,30 @@
+rules:
+  - id: ghostscript-lock-safety-bypass
+    message: "Missing LockSafetyParams preservation may allow bypass of -dSAFER protection (CVE-2018-16863)."
+    severity: HIGH
+    languages: [c]
+    cwe: ["CWE-78"]
+    pattern-either:
+      - pattern: |
+          if (pgs->device == 0 || !gx_device_is_null(pgs->device)) {
+              ...
+              rc_init(...);
+              ...
+              if ((code = gs_setdevice_no_erase(pgs, ndev)) < 0)
+                  ...
+          }
+      - pattern: |
+          if (pgs->device == NULL || !gx_device_is_null(pgs->device)) {
+              ...
+              rc_init(...);
+              ...
+              if ((code = gs_setdevice_no_erase(pgs, ndev)) < 0)
+                  ...
+          }
+    pattern-not: |
+        bool saveLockSafety = ...;
+        ...
+        if (gs_currentdevice_inline(pgs) != NULL)
+            saveLockSafety = gs_currentdevice_inline(pgs)->LockSafetyParams;
+        ...
+        gs_currentdevice_inline(pgs)->LockSafetyParams = saveLockSafety;

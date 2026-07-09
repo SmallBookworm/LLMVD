@@ -1,0 +1,19 @@
+rules:
+  - id: lighttpd-signed-integer-overflow-burl_normalize
+    message: "Potential signed integer overflow in burl_normalize_2F_to_slash_fix leading to abort (CVE-2019-11072)"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              memmove(..., ..., $blen - $qs);
+          - pattern: |
+              ... = $blen - $qs;
+              memmove(..., ..., ...);
+    metavariable-patterns:
+      - metavariable: $blen
+        pattern: (int)buffer_string_length(...)
+      - metavariable: $qs
+        pattern: $qs >= 0
+    fix-regex:
+      enabled: false

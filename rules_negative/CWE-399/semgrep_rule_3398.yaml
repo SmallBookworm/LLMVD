@@ -1,0 +1,18 @@
+rules:
+  - id: imagemagick-dds-skip-mipmaps-no-seek-check
+    message: "Missing check for SeekBlob return value may lead to denial of service (CVE-2015-8959)"
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (...; ...; ...)
+              {
+                ...
+                offset = ...;
+                (void) SeekBlob(..., offset, SEEK_CUR);
+                ...
+              }
+    metadata:
+      cwe: ["CWE-399"]
+      cve: "CVE-2015-8959"

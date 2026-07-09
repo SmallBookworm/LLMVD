@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2021-26675-buffer-overflow
+    message: "Missing buffer length check before strncpy or memcpy may lead to stack-based buffer overflow (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              strncpy($UPTR, $NAME, $UNCOMP_LEN - ($UPTR - $UNCOMPRESSED));
+              ...
+              $UPTR += $ULEN;
+              *$UPTR++ = '\0';
+          - pattern: |
+              memcpy($UPTR, $PTR, NS_RRFIXEDSZ);
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2021-26675"

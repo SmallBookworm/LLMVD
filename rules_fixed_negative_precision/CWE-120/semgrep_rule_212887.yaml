@@ -1,0 +1,25 @@
+rules:
+  - id: cwe-120-buffer-overflow-epsc-print-page
+    message: "Buffer overflow vulnerability in epsc_print_page due to missing x_dpi range check before array indexing. This could lead to out-of-bounds read and denial of service (CVE-2020-16294)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              char start_graphics = (char)
+                  ((y_24pin ? graphics_modes_24 : graphics_modes_9)[x_dpi / 60]);
+          - pattern: |
+              char start_graphics = (char)((y_24pin ? $ARR1 : $ARR2)[x_dpi / 60]);
+      - metavariable-pattern:
+          metavariable: $ARR1
+          pattern: "graphics_modes_24"
+      - metavariable-pattern:
+          metavariable: $ARR2
+          pattern: "graphics_modes_9"
+      - pattern-not-inside: |
+          int max_dpi = ...;
+          if (x_dpi > max_dpi) {
+              return_error(...);
+          }
+          ...
+          char start_graphics = (char)((y_24pin ? graphics_modes_24 : graphics_modes_9)[x_dpi / 60]);

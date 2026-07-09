@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2014-9423-uninitialized-handle
+    message: "Uninitialized handle field may leak sensitive heap memory (CVE-2014-9423)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              memcpy(gr->gr_ctx.value, ..., sizeof(gss_union_ctx_id_desc));
+          - pattern: |
+              memcpy(gr->gr_ctx.value, ..., sizeof(...));
+    metavariable-regex:
+      metavariable: $...
+      regex: "gss_union_ctx_id_desc"

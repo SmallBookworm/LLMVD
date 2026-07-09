@@ -1,0 +1,26 @@
+rules:
+  - id: missing_invept_exit_handler
+    message: "Missing INVEPT exit handler in nested VMX exit handling may lead to denial of service (CVE-2014-3645)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          switch ($EXIT_REASON) {
+            ...
+            case EXIT_REASON_VMON:
+              ...
+              $S1
+            case EXIT_REASON_CR_ACCESS:
+              ...
+          }
+      - pattern: |
+          switch ($EXIT_REASON) {
+            ...
+            case EXIT_REASON_VMON:
+              ...
+              $S1
+            default:
+              ...
+          }
+    metavariable-pattern:
+      $S1: { pattern-not: "case EXIT_REASON_INVEPT:" }

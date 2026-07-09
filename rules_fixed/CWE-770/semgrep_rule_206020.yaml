@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2017-5835-zero-offset-size
+    message: "Missing check for zero offset_size may lead to large memory allocation and denial of service (CVE-2017-5835)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (num_objects == 0)
+          return;
+      ...
+      if (offset_size == 0)
+          return;
+    pattern-not: |
+      if (num_objects == 0)
+          return;
+      ...
+      if (offset_size == 0)
+          return;

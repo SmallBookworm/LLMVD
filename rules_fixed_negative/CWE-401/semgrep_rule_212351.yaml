@@ -1,0 +1,13 @@
+rules:
+  - id: rtl8xxxu_memory_leak
+    message: "Memory leak in rtl8xxxu_submit_int_urb: allocated urb is not freed on usb_submit_urb failure."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (ret) {
+        usb_unanchor_urb($URB);
+        goto $LABEL;
+      }
+    metadata:
+      cwe: "CWE-401"
+      cve: "CVE-2019-19068"

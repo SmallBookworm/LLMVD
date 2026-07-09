@@ -1,0 +1,29 @@
+rules:
+  - id: cve-2011-2860-use-after-free
+    message: "Missing validation after collectChildrenAndRemoveFromOldParent() may lead to use-after-free (CVE-2011-2860)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          collectChildrenAndRemoveFromOldParent(..., ..., $EC);
+          if ($EC)
+              return ...;
+          ...
+          checkReplaceChild(..., ..., $EC);
+      - pattern: |
+          collectChildrenAndRemoveFromOldParent(..., ..., $EC);
+          if ($EC)
+              return ...;
+          InspectorInstrumentation::willInsertDOMNode(...);
+    metavariable-pattern:
+      - metavariable: $EC
+        pattern:
+          regex: "^[a-zA-Z_][a-zA-Z0-9_]*$"
+    patterns:
+      - pattern-inside: |
+          $T1& $EC;
+          ...
+      - metavariable-comparison:
+          metavariable: $EC
+          operator: ends-with
+          value: "&"

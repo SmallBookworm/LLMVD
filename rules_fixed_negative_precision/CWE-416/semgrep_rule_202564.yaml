@@ -1,0 +1,26 @@
+rules:
+  - id: ucma_migrate_id-use-after-free
+    message: "Potential use-after-free in ucma_migrate_id due to unsafe ctx->file update without revalidating context under xa_lock. This may lead to a race condition with ucma_close and ucma_destroy_id."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              xa_lock(&ctx_table);
+              ...
+              list_move_tail(&ctx->list, &new_file->ctx_list);
+              ...
+              ctx->file = new_file;
+              ...
+              xa_unlock(&ctx_table);
+          - pattern: |
+              xa_lock(&ctx_table);
+              ...
+              ctx->file = new_file;
+              ...
+              list_move_tail(&ctx->list, &new_file->ctx_list);
+              ...
+              xa_unlock(&ctx_table);
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2020-36385"

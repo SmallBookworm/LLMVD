@@ -1,0 +1,10 @@
+rules:
+  - id: modsecurity-null-pointer-dereference-cve-2013-2765
+    message: "Missing check for REQUEST_BODY_FORCEBUF_ON may lead to NULL pointer dereference when handling large POST requests with crafted Content-Type header."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          if ((...->msc_reqbody_spilltodisk)
+              && (...->msc_reqbody_length + ... > ...)
+          )

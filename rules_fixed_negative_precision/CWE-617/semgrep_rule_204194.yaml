@@ -1,0 +1,12 @@
+rules:
+  - id: bind9-assertion-failure-rcode-noerror
+    message: "Potential assertion failure due to rcode_override allowing NOERROR in ns_client_error() when RRL is enabled."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (client->view != NULL && client->view->rrl != NULL) {
+        ...
+        INSIST(rcode != dns_rcode_noerror &&
+               rcode != dns_rcode_nxdomain);
+        ...
+      }

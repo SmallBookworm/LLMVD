@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2015-5330-strupper-talloc-n-handle-loop-condition
+    message: "Loop condition may lead to out-of-bounds read due to incorrect decrement of 'n'. This can leak heap memory via crafted packets (CVE-2015-5330, CWE-200)."
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          while (n-- && *src) {
+            ...
+            src += c_size;
+            ...
+          }
+      - pattern: |
+          while (n-- && $SRC) {
+            ...
+            $SRC += $C_SIZE;
+            ...
+          }
+    metadata:
+      cwe: ["CWE-200"]
+      cve: "CVE-2015-5330"

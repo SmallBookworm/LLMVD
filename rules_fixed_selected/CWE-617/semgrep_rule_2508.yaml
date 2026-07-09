@@ -1,0 +1,10 @@
+rules:
+  - id: imagemagick-missing-null-check-cve-2017-13658
+    message: "Missing NULL check for clone_info before calling DestroyImageInfo may lead to denial of service (CWE-617)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      clone_info=DestroyImageInfo(clone_info);
+    pattern-not: |
+      if (clone_info != (ImageInfo *) NULL)
+        clone_info=DestroyImageInfo(clone_info);

@@ -1,0 +1,14 @@
+rules:
+  - id: weechat-irc-color-buffer-overflow
+    message: "Potential heap-based buffer overflow in IRC color decoding due to unsafe strcat usage. This may lead to denial of service or arbitrary code execution (CVE-2012-5854)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              strcat((char *)$OUT, weechat_color(...));
+          - pattern: |
+              strcat((char *)$OUT, $STR);
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2012-5854"

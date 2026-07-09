@@ -1,0 +1,27 @@
+rules:
+  - id: double-free-tga-colormap
+    message: "Potential double free vulnerability due to missing colormap size validation before AcquireImageColormap."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (tga_info.colormap_type != 0)
+            {
+              ...
+              if (AcquireImageColormap(image, image->colors, exception) == MagickFalse)
+                ...
+            }
+      - pattern: |
+          if (tga_info.colormap_type != 0)
+            {
+              ...
+              if (AcquireImageColormap(image,image->colors,exception) == MagickFalse)
+                ...
+            }
+    metavariable-comparison:
+      metavariable: image->colors
+      comparison: "< tga_info.colormap_index"
+    fix-regex:
+      regex: .*
+      replacement: ""
+      enabled: false

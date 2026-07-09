@@ -1,0 +1,28 @@
+rules:
+  - id: imagemagick-sgi-memory-leak-cve-2018-17965
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((... == (ssize_t *) NULL) ||
+                  (... == (size_t *) NULL) ||
+                  (... == (MemoryInfo *) NULL))
+                {
+                  if (... != (ssize_t *) NULL)
+                    ... = (ssize_t *) RelinquishMagickMemory(...);
+                  if (... != (size_t *) NULL)
+                    ... = (size_t *) RelinquishMagickMemory(...);
+                  if (... != (MemoryInfo *) NULL)
+                    ... = (MemoryInfo *) RelinquishVirtualMemory(...);
+                  ThrowWriterException(...);
+                }
+          - pattern: |
+              if ((... == (ssize_t *) NULL) ||
+                  (... == (size_t *) NULL) ||
+                  (... == (MemoryInfo *) NULL))
+                {
+                  ...
+                  ThrowWriterException(...);
+                }
+    message: "Missing call to RelinquishVirtualMemory for 'pixel_info' before ThrowWriterException may cause memory leak (CVE-2018-17965, CWE-772)."
+    severity: ERROR
+    languages: [c]

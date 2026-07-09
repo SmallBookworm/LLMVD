@@ -1,0 +1,11 @@
+rules:
+  - id: radvd-unicastonly-mdelay
+    message: "Use of mdelay() in UnicastOnly mode may lead to denial of service via excessive ND_ROUTER_SOLICIT requests (CVE-2011-3605)."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      if (iface->UnicastOnly) {
+          ...
+          mdelay(...);
+          ...
+      }

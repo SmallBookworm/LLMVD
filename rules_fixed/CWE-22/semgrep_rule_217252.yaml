@@ -1,0 +1,14 @@
+rules:
+  - id: platinum-upnp-directory-traversal
+    patterns:
+      - pattern: |
+          if ((file_path.Find("/..") >= 0) || (file_path.Find("\\..") >= 0) ||
+              NPT_FAILED(NPT_File::GetInfo(file_path, file_info))) {
+              return NPT_ERROR_NO_SUCH_ITEM;
+          }
+    message: "Insecure path validation may allow directory traversal. Use '../' and '..\\' instead of '/..' and '\\..' to properly block parent directory access."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-22"
+      cve: "CVE-2020-19858"

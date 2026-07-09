@@ -1,0 +1,15 @@
+rules:
+  - id: cwe-415-double-free-blkcg_init_queue
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (IS_ERR($BLKG)) {
+                  blkg_free($NEW_BLKG);
+                  return PTR_ERR($BLKG);
+              }
+    message: "Double free vulnerability: 'blkg_create' already frees 'new_blkg' on failure, so calling 'blkg_free' again leads to a double free (CWE-415)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-415"
+      cve: "CVE-2018-7480"

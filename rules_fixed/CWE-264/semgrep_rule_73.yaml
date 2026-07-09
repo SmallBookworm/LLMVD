@@ -1,0 +1,31 @@
+rules:
+  - id: openssh-x11-forwarding-missing-refusal-deadline-check
+    message: Missing check for X11 refusal deadline may allow bypass of access restrictions.
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              x11_open_helper(...) {
+                ...
+                if (buffer_len($X) < 12) {
+                  ...
+                }
+                ...
+              }
+          - pattern: |
+              x11_open_helper(...) {
+                ...
+                debug2(...);
+                return -1;
+                ...
+              }
+    pattern-not: |
+      x11_open_helper(...) {
+        ...
+        if (x11_refuse_time != 0 && (u_int)monotime() >= x11_refuse_time) {
+          ...
+          return -1;
+        }
+        ...
+      }

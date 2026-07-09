@@ -1,0 +1,13 @@
+rules:
+  - id: cwe-347-shibboleth-missing-metadata-provider-init
+    message: "DynamicMetadataProvider constructor missing explicit MetadataProvider(e) initialization, which may bypass critical security checks like signature validation (CWE-347, CVE-2017-16852)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      DynamicMetadataProvider::DynamicMetadataProvider(...) : saml2md::DynamicMetadataProvider(___), m_trust(___) {
+        ...
+      }
+    pattern-not: |
+      DynamicMetadataProvider::DynamicMetadataProvider(...) : saml2md::DynamicMetadataProvider(___), MetadataProvider(___), m_trust(___) {
+        ...
+      }

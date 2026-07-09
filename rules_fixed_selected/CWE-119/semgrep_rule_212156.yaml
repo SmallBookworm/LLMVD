@@ -1,0 +1,26 @@
+rules:
+  - id: pam_env_buffer_overflow_no_abort
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((strlen(tmp) + 1) < MAX_ENV) {
+                ...
+              } else {
+                ...
+                pam_syslog(...);
+                // missing return PAM_BUF_ERR;
+              }
+          - pattern: |
+              if ((strlen(tmp) + strlen(tmpptr)) < MAX_ENV) {
+                ...
+              } else {
+                ...
+                pam_syslog(...);
+                // missing return PAM_BUF_ERR;
+              }
+    message: "Missing return after buffer overflow detection in _expand_arg may lead to denial of service (CVE-2011-3149)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2011-3149"

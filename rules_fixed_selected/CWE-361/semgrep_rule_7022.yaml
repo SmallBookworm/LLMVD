@@ -1,0 +1,19 @@
+rules:
+  - id: cwe-361-image-input-type-fallback-content
+    message: "Potential type confusion due to improper handling of fallback content state in ImageInputType"
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!m_useFallbackContent)
+                  return;
+              m_useFallbackContent = false;
+          - pattern: |
+              if (!m_useFallbackContent)
+                  return;
+              ... 
+              m_useFallbackContent = false;
+    metadata:
+      cwe: ["CWE-361"]
+      cve: "CVE-2016-1643"

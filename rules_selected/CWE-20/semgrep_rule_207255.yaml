@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2018-1140-missing-ldb-dn-get-casefold-check
+    message: Missing null check after calling ldb_dn_get_casefold(), which may lead to denial of service (CVE-2018-1140).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          const char *cdn = ldb_dn_get_casefold(...);
+          ...
+          lsqlite3_tprintf(..., cdn);
+      - pattern: |
+          const char *cdn = ldb_dn_get_casefold(...);
+          ...
+          return lsqlite3_tprintf(..., cdn);
+    metavariable-pattern:
+      metavariable: cdn
+      pattern: ldb_dn_get_casefold(...)
+    pattern-not-inside: |
+      const char *cdn = ldb_dn_get_casefold(...);
+      if (cdn == NULL) { ... }
+      ...

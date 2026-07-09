@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2013-6376-x2apic-cid-mask
+    message: "Insecure cid_mask assignment in x2APIC mode may lead to out-of-bounds access (CVE-2013-6376, CWE-189)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (apic_x2apic_mode()) {
+            ... 
+            new->cid_mask = 0xffff;
+            ...
+          }
+      - pattern: |
+          if (apic_x2apic_mode()) {
+            ... 
+            new->cid_mask = new->lid_mask = 0xffff;
+            ...
+          }

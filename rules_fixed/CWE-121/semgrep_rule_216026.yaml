@@ -1,0 +1,41 @@
+rules:
+  - id: cwe-121-stack-buffer-overflow-json-escape
+    message: "Stack-based buffer overflow vulnerability in JSON parser's in_escape state. Missing bounds check before writing to valbuf may lead to arbitrary code execution."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          case in_escape:
+            ...
+            if (pval == NULL)
+              ...
+            switch (*cp) {
+              ...
+            }
+            state = in_val_string;
+      - pattern: |
+          case in_escape:
+            ...
+            if (pval == NULL)
+              ...
+            else if (pval > valbuf + JSON_VAL_MAX - 1
+                     || pval > valbuf + maxlen) {
+              ...
+            }
+            switch (*cp) {
+              ...
+            }
+            state = in_val_string;
+    metavariable-comparison:
+      metavariable: $STATE
+      comparison: $STATE == "in_escape"
+    pattern-not: |
+      case in_escape:
+        ...
+        if (pval == NULL)
+          ...
+        else if (pval > valbuf + JSON_VAL_MAX - 1
+                 || pval > valbuf + maxlen) {
+          ...
+        }
+        ...

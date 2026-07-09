@@ -1,0 +1,23 @@
+rules:
+  - id: cwe-125-xcf-buffer-overread
+    message: "Potential stack-based buffer over-read in XCF parser when version string lacks null terminator before calling atoi()."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (... && $ID[9] == 'v')
+              {
+                ... = atoi($ID + 10);
+              }
+          - pattern: |
+              else if ($ID[9] == 'v')
+              {
+                ... = atoi($ID + 10);
+              }
+    metavariable-pattern:
+      metavariable: $ID
+      pattern: id
+    fix-regex:
+      regex: ''
+      replacement: ''

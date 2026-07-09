@@ -1,0 +1,24 @@
+rules:
+  - id: missing_break_in_switch_case_cwe119
+    message: "Missing 'break' statement in switch case may lead to unintended fallthrough and heap corruption (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          switch ($X) {
+            case $C1:
+              ...
+            case $C2:
+              ...
+          }
+      - pattern: |
+          switch ($X) {
+            case $C1:
+              ...
+            default:
+              ...
+          }
+    metavariable-pattern:
+      metavariable: $C1
+      pattern-not: |
+        ... break;

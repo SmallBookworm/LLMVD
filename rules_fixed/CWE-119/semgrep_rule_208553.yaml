@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2016-7414-phar-signature-uncompressed-size-check
+    message: "Missing check for minimum uncompressed_filesize when reading PHAR signature may lead to out-of-bounds memory access (CVE-2016-7414)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (read != entry.uncompressed_filesize) {
+                ...
+                PHAR_ZIP_FAIL(...);
+              }
+          - pattern: |
+              if (read != entry.uncompressed_filesize) {
+                ...
+                return FAILURE;
+              }
+    metavariable-pattern:
+      metavariable: read
+      pattern: php_stream_read(...)
+    fix-regex:
+      regex: ""
+      replacement: ""

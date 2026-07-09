@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2016-10218-null-dereference
+    message: "Potential NULL pointer dereference in pdf14_pop_transparency_group due to missing early check for 'nos == NULL' before use."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      pdf14_buf *tos = ctx->stack;
+      pdf14_buf *nos = tos->saved;
+      ...
+      $X = nos->parent_color_info_procs->num_components - nos->num_spots;
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2016-10218"

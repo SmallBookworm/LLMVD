@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2018-14469-buffer-overread
+    message: "Missing bounds check before reading 32-bit value from buffer in ikev1_n_print() may cause buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              case IPSECDOI_NTYPE_REPLAY_STATUS:
+                ...
+                EXTRACT_32BITS($CP);
+          - pattern: |
+              case IPSECDOI_NTYPE_REPLAY_STATUS:
+                ...
+                ND_PRINT(_, EXTRACT_32BITS($CP) ? _ : _);
+    metavariable-regex:
+      metavariable: $CP
+      regex: "cp"

@@ -1,0 +1,6 @@
+rules:
+  - id: cwe-61-symlink-follow-tmp-log
+    message: "Use of fixed path in /tmp for log file may allow symlink attacks (CWE-61)."
+    severity: WARNING
+    languages: [c]
+    pattern: 'process.start(QString("%1 -s %2 -c -q -C -L /tmp/partclone.log"))'

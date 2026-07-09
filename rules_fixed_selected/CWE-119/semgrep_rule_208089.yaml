@@ -1,0 +1,15 @@
+rules:
+  - id: flac_heap_overflow_cve_2014_9028
+    message: "Heap-based buffer overflow vulnerability in FLAC stream decoder. Inadequate validation when partition_order > 0 may lead to heap overflow via crafted .flac file."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (partition_samples < predictor_order) {
+                  ...
+                  return true;
+              }
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2014-9028"

@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2018-15857-invalid-free
+    patterns:
+      - pattern: FreeStmt((ParseCommon *) &...)
+    message: "Invalid free of address-of local variable or parameter may lead to use-after-free (CWE-416)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: ["CWE-416"]
+      cve: "CVE-2018-15857"

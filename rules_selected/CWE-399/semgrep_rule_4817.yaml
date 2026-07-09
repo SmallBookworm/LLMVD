@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2011-2853-use-after-free
+    message: "Potential use-after-free vulnerability due to missing null check before object creation. This may lead to denial of service or unspecified impact."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (views::Widget::IsPureViews())
+                  return new $CLASS(...);
+    metadata:
+      cwe: ["CWE-399"]
+      cve: "CVE-2011-2853"

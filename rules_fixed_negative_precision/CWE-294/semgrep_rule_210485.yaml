@@ -1,0 +1,10 @@
+rules:
+  - id: cephx_missing_authorizer_challenge
+    message: "Missing authorizer challenge in Cephx authentication may lead to replay attacks (CVE-2020-25660, CWE-294)."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      if (!HAVE_FEATURE(con->get_features(), CEPHX_V2)) {
+        ...
+        ac = nullptr;
+      }

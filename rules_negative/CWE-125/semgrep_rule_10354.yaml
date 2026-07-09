@@ -1,0 +1,14 @@
+rules:
+  - id: cwe-125-buffer-overread-exempi
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $DATALEN = ...;
+              $DATATOTAL = (($DATALEN + 1) & 0xFFFFFFFEUL);
+              if (!XIO::CheckFileSpace($FILEREF, $DATATOTAL)) break;
+          - pattern: |
+              $DATATOTAL = (($DATALEN + 1) & 0xFFFFFFFEUL);
+              if (!XIO::CheckFileSpace($FILEREF, $DATATOTAL)) break;
+    message: "Missing overflow check before using dataTotal may lead to heap-based buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]

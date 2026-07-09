@@ -1,0 +1,23 @@
+rules:
+  - id: openexr-heap-buffer-overflow-cve-2021-45942
+    message: |
+      Heap-based buffer overflow vulnerability in OpenEXR due to insufficient validation of packedDataSize and unpackedDataSize before casting to int.
+      This may lead to out-of-bounds memory access when reading or decompressing data.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (sampleCountTableDataSize > uint64_t(compressorMaxDataSize))
+          {
+            ...
+          }
+          streamData->is->read(..., static_cast<int>(sampleCountTableDataSize));
+      - pattern: |
+          int compressorMaxDataSize = std::numeric_limits<int>::max();
+          if (sampleCountTableDataSize > uint64_t(compressorMaxDataSize))
+          {
+            ...
+          }
+    metadata:
+      cwe: ["CWE-787"]
+      cve: "CVE-2021-45942"

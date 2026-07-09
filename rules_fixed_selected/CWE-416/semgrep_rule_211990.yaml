@@ -1,0 +1,41 @@
+rules:
+  - id: cve-2018-6307-use-after-free
+    message: "Missing 'return' after rfbCloseClient() may lead to use-after-free when 'reason' is accessed after client closure."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (... <= 0) {
+                ...
+                rfbCloseClient($CL);
+                ...
+                free($PTR);
+                return;
+              }
+          - pattern: |
+              if (... <= 0) {
+                ...
+                rfbCloseClient($CL);
+                ...
+                return;
+              }
+      - pattern-not: |
+          if (... <= 0) {
+            ...
+            rfbCloseClient($CL);
+            free($PTR);
+            return;
+          }
+    pattern-inside: |
+      HandleFileDownloadCancelRequest(...) {
+        ...
+        if ((... = rfbReadExact(..., $PTR, ...)) <= 0) {
+          ...
+          rfbCloseClient($CL);
+          ...
+        }
+        ...
+        free($PTR);
+        ...
+      }

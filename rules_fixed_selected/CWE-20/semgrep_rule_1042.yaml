@@ -1,0 +1,20 @@
+rules:
+  - id: xen-blkback-discard-permission-check-missing
+    message: "Missing permission check before issuing DISCARD operation. This may allow guest OS users to cause data loss on read-only disks (CVE-2013-2140)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          blkdev_issue_discard($BDEV, $SECTOR, $NR_SECTORS, $GFP, $SECURE);
+      - pattern: |
+          err = blkdev_issue_discard($BDEV, $SECTOR, $NR_SECTORS, $GFP, $SECURE);
+    metavariable-pattern:
+      $BDEV: 
+        pattern: $BLKIF->vbd.bdev
+    pattern-not-inside: |
+      if (xen_vbd_translate(..., $BLKIF, WRITE)) {
+        ...
+        goto ...;
+      }
+      ...
+      blkdev_issue_discard(...);

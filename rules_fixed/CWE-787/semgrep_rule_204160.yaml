@@ -1,0 +1,8 @@
+rules:
+  - id: oniguruma_octal_overflow
+    message: "Octal value in regular expression may exceed 255, leading to heap out-of-bounds write (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      num = scan_unsigned_octal_number(...);
+      if (num < 0) return ...;

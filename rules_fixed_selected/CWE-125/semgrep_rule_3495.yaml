@@ -1,0 +1,19 @@
+rules:
+  - id: cwe-125-hfs-keylen-check
+    message: "Insufficient bounds check on key length may lead to out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          keylen = 2 + tsk_getu16(..., key->key_len);
+          if ((keylen) > nodesize) {
+            ...
+          }
+      - pattern: |
+          int keylen = 2 + tsk_getu16(..., key->key_len);
+          if ((keylen) > nodesize) {
+            ...
+          }
+    metadata:
+      cwe: ["CWE-125"]
+      cve: "CVE-2018-19497"

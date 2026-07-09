@@ -1,0 +1,15 @@
+rules:
+  - id: cwe-119-phar-tar-linkname-buffer-overflow
+    message: |
+      Buffer overflow vulnerability in phar_tar_writeheaders_int due to unsafe use of strncpy on header.linkname.
+      This could lead to memory corruption if entry->link is longer than header.linkname buffer.
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern: |
+          if (entry->link) {
+              strncpy(header.linkname, entry->link, strlen(entry->link));
+          }
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2019-9675"

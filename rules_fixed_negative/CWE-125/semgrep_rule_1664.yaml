@@ -1,0 +1,13 @@
+rules:
+  - id: kvm-out-of-bounds-rtc-eoi-map
+    message: "Use of KVM_MAX_VCPUS instead of KVM_MAX_VCPU_ID may lead to out-of-bounds access (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      bitmap_zero(..., KVM_MAX_VCPUS)
+    fix-regex:
+      regex: KVM_MAX_VCPUS
+      replacement: KVM_MAX_VCPU_ID
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2016-9777"

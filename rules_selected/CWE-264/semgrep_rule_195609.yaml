@@ -1,0 +1,25 @@
+rules:
+  - id: missing-initgroups-call
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($PW->pw_gid) {
+                setgid($PW->pw_gid);
+                ...
+              }
+          - pattern: |
+              if ($PW->pw_gid) {
+                ...
+                setgid($PW->pw_gid);
+              }
+    pattern-not: |
+      if ($PW->pw_gid) {
+        ...
+        initgroups(..., $PW->pw_gid);
+        ...
+        setgid($PW->pw_gid);
+        ...
+      }
+    message: "Supplementary groups are not dropped when changing user. Use initgroups() to reset group memberships."
+    severity: WARNING
+    languages: [c]

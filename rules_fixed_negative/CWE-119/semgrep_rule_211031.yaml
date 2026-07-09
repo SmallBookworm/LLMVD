@@ -1,0 +1,7 @@
+rules:
+  - id: unsafe_sprintf_with_variable_input
+    message: Use of unsafe sprintf with variable-length input may lead to buffer overflow (CWE-119).
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      sprintf(err_msg, "Binding non-numeric field %d, value %s as a numeric!", ...);

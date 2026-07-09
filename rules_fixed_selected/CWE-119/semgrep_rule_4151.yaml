@@ -1,0 +1,38 @@
+rules:
+  - id: cve-2018-8799-out-of-bounds-read
+    message: "Out-of-bounds read vulnerability in cssp_read_tsrequest due to missing bounds check before in_uint8s or out_uint8p. This can lead to denial of service (CVE-2018-8799)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          in_uint8s($S, $LENGTH);
+          ...
+          if ($TOKEN)
+          {
+            ...
+            out_uint8p($TOKEN, $S->p, $LENGTH);
+          }
+      - pattern: |
+          if ($TOKEN)
+          {
+            ...
+            out_uint8p($TOKEN, $S->p, $LENGTH);
+          }
+    metavariable-pattern:
+      $LENGTH: 
+        pattern-regex: \w+
+      $S:
+        pattern-regex: \w+
+      $TOKEN:
+        pattern-regex: \w+
+    pattern-not-inside: |
+      if (!s_check_rem($S, $LENGTH))
+      {
+        ...
+        rdp_protocol_error(..., &$PACKET);
+      }
+      ...
+      $STMTS
+      in_uint8s($S, $LENGTH);
+      ...
+      out_uint8p($TOKEN, $S->p, $LENGTH);

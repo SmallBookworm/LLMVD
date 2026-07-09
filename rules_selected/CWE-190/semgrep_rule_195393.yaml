@@ -1,0 +1,18 @@
+rules:
+  - id: tensorflow_embedding_lookup_sparse_integer_overflow
+    message: "Potential integer overflow in embedding lookup leading to heap OOB access. Ensure bounds checks are performed before array indexing."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          for (int k = 0; k < embedding_size; k++) {
+            output_ptr[current_output_offset + k] += value_ptr[example_embedding_offset + k] * w;
+          }
+      - pattern: |
+          for (int k = 0; k < embedding_size; k++) {
+            ... output_ptr[...] += value_ptr[...] * ...;
+          }
+    metavariable-pattern:
+      metavariable: embedding_size
+      pattern: "embedding_size"
+    focus-metavariable: embedding_size

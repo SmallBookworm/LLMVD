@@ -1,0 +1,24 @@
+rules:
+  - id: bnep_missing_l2cap_socket_check
+    message: "Missing validation that socket is an l2cap socket before use. This can lead to privilege escalation."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      bnep_add_connection(..., struct socket *sock)
+      {
+        ...
+        baswap(..., &l2cap_pi(sock->sk)->chan->...);
+        ...
+      }
+    pattern-not: |
+      bnep_add_connection(..., struct socket *sock)
+      {
+        ...
+        if (!l2cap_is_socket(sock))
+          ...
+        baswap(..., &l2cap_pi(sock->sk)->chan->...);
+        ...
+      }
+    fix-regex:
+      regex: ""
+      replacement: ""

@@ -1,0 +1,33 @@
+rules:
+  - id: cwe-362-su-child-pid-not-cleared
+    message: "Potential race condition due to not clearing child PID after waitpid(), which may lead to killing an unintended process."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (pid != (pid_t)-1)
+                {
+                  ... 
+                  status = WEXITSTATUS (status);
+                }
+              ...
+              if (caught_signal)
+                {
+                  ...
+                  kill (child, SIGTERM);
+                }
+          - pattern: |
+              if (caught_signal)
+                {
+                  ...
+                  kill (child, SIGKILL);
+                  ...
+                }
+    metavariable-pattern:
+      metavariable: child
+      pattern-not: |
+        child = (pid_t) -1;
+    fix-regex:
+      regex: ""
+      replacement: ""

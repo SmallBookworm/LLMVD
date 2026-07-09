@@ -1,0 +1,27 @@
+rules:
+  - id: cve-2019-17595-buffer-overread
+    message: "Heap-based buffer over-read in fmt_entry due to missing null check after backslash escape"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while ((*d = *s++) != 0) {
+                  ...
+                  if (*d == '\\') {
+                      *++d = *s++;
+                  }
+                  ...
+              }
+          - pattern: |
+              while ((*d = *s++) != '\0') {
+                  ...
+                  if (*d == '\\') {
+                      *++d = *s++;
+                  }
+                  ...
+              }
+    metavariable-regex:
+      metavariable: s
+      regex: "srccap"
+    focus-metavariable: s

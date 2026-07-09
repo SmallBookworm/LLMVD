@@ -1,0 +1,10 @@
+rules:
+  - id: libyaml-assert-simple-key
+    message: "Assert statement may cause denial of service via line-wrapped input (CVE-2014-9130)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      assert(parser->simple_key_allowed || !required);
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2014-9130"

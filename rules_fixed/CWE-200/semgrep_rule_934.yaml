@@ -1,0 +1,22 @@
+rules:
+  - id: uninitialized_struct_info_leak
+    pattern-either:
+      - pattern: |
+          struct serial_icounter_struct $ICOUNT;
+          ...
+          copy_to_user(..., &$ICOUNT, ...);
+      - pattern: |
+          struct serial_icounter_struct $ICOUNT = { ... };
+          ...
+          copy_to_user(..., &$ICOUNT, ...);
+        metavariable-pattern:
+          metavariable: $ICOUNT
+          patterns:
+            - pattern-not: |
+                struct serial_icounter_struct $ICOUNT = {};
+    message: "Uninitialized struct 'serial_icounter_struct' may leak kernel stack memory via copy_to_user."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2013-4516"

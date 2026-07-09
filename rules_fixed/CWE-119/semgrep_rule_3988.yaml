@@ -1,0 +1,13 @@
+rules:
+  - id: imagemagick-enhance-buffer-overflow
+    message: "Heap-based buffer overflow in EnhanceImage due to incorrect image reference in SetPixelViaPixelInfo"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          SetPixelViaPixelInfo(image, ..., ...)
+    fix-regex:
+      regex: ""
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2019-13298"

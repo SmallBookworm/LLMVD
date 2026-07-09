@@ -1,0 +1,28 @@
+rules:
+  - id: cve-2017-9077-ipv6-mc-list-inheritance
+    message: "IPv6 multicast list inheritance not cleared, leading to potential use-after-free or double-free (CVE-2017-9077)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          memcpy($NEWNP, $NP, sizeof(struct ipv6_pinfo));
+          ...
+          $NEWNP->pktoptions = NULL;
+          $NEWNP->opt = NULL;
+          ...
+          $NEWNP->mcast_oif = ...;
+      - pattern: |
+          memcpy($NEWNP, $NP, sizeof(struct ipv6_pinfo));
+          ...
+          $NEWNP->pktoptions = NULL;
+          $NEWNP->opt = NULL;
+    metavariable-regex:
+      metavariable: $NEWNP
+      regex: 'newnp'
+    patterns:
+      - pattern-not: |
+          $NEWNP->ipv6_mc_list = NULL;
+      - pattern-not: |
+          $NEWNP->ipv6_ac_list = NULL;
+      - pattern-not: |
+          $NEWNP->ipv6_fl_list = NULL;

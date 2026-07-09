@@ -1,0 +1,19 @@
+rules:
+  - id: spice-vdagent-unlimited-connections
+    message: "Unlimited agent connections allowed, leading to potential denial of service (CVE-2020-25652)."
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (g_list_length($SERVER->connections) >= $MAX) {
+              ...
+          }
+      - pattern: |
+          g_list_length($SERVER->connections) >= $MAX
+    pattern-not-inside: |
+      if (g_list_length($SERVER->connections) >= $MAX) {
+          ...
+          return ...;
+      }
+    metadata:
+      cwe: "CWE-770"

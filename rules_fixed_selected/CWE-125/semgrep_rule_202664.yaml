@@ -1,0 +1,27 @@
+rules:
+  - id: cve-2019-9023-buffer-overread
+    message: "Heap-based buffer over-read in mbstring regex functions due to missing bounds check in enclen usage."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (; $PTR < $END; ) {
+                $LEN = enclen($ENC, $PTR);
+                if ($LEN == $PREV_LEN) {
+                  ...
+                } else {
+                  ...
+                }
+                $PTR += $LEN;
+              }
+          - pattern: |
+              for (; $PTR < $END; ) {
+                $LEN = enclen($ENC, $PTR);
+                ... 
+                $PTR += $LEN;
+              }
+    metavariable-pattern:
+      metavariable: $LEN
+      pattern-not: |
+        if ($PTR + $LEN > $END) $LEN = $END - $PTR;

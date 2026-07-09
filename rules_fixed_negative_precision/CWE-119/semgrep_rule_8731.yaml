@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2016-2508-buffer-validation-check
+    message: "Use of unchecked mIsWidevine flag may lead to memory corruption via crafted media file (CVE-2016-2508)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          if (mIsWidevine && $_ && $_ != NULL) {
+              ...
+          }
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2016-2508"

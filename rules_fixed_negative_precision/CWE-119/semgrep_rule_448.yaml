@@ -1,0 +1,10 @@
+rules:
+  - id: bdfread_buffer_overflow
+    patterns:
+      - pattern: sscanf((char *) $LINE, "STARTCHAR %s", $CHARNAME)
+    message: "Potential stack-based buffer overflow due to unbounded string read in sscanf. Use '%99s' to limit input length."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2013-6462"

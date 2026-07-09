@@ -1,0 +1,8 @@
+rules:
+  - id: cwe-362-vfs-rename-race-condition
+    message: "Detected use of fsnotify_oldname_init/fsnotify_oldname_free which is vulnerable to race condition (CWE-362). Use take_dentry_name_snapshot and release_dentry_name_snapshot instead."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: fsnotify_oldname_init(...)
+      - pattern: fsnotify_oldname_free(...)

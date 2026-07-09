@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2015-2716-signed-overflow
+    message: Potential signed integer overflow leading to buffer overflow in XML_GetBuffer (CVE-2015-2716)
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          int neededSize = len + (int)(bufferEnd - bufferPtr);
+      - pattern: |
+          bufferSize *= 2;
+    metadata:
+      cwe: ["CWE-119"]
+      references:
+        - https://github.com/libexpat/libexpat/commit/f0bec73b018caa07d3e75ec8dd967f3785d71bde
+        - https://nvd.nist.gov/vuln/detail/CVE-2015-2716

@@ -1,0 +1,30 @@
+rules:
+  - id: cve-2018-6196-negative-indent
+    message: "Missing check for negative 'tbl->indent' value may lead to infinite recursion (CWE-835)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (tbl->indent > 0) {
+                ...
+              }
+          - pattern: |
+              offset = tbl->indent;
+              ...
+              if (cmd == HTML_DT) {
+                ...
+              }
+      - metavariable-pattern:
+          metavariable: tbl
+          pattern: $X
+      - pattern-not-inside: |
+          ...
+          if (tbl->indent < 0)
+            tbl->indent = 0;
+          ...
+      - pattern-not-inside: |
+          ...
+          if (offset < 0)
+            offset = 0;
+          ...

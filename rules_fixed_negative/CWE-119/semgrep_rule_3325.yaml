@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2016-8687-buffer-overflow
+    message: "Potential stack-based buffer overflow in safe_fprintf due to insufficient output buffer margin (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (i > (sizeof(outbuff) - 20)) {
+        outbuff[i] = '\0';
+        fprintf(f, "%s", outbuff);
+        i = 0;
+      }

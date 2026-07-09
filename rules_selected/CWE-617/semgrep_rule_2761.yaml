@@ -1,0 +1,16 @@
+rules:
+  - id: imagemagick-number-meta-channels-assertion-failure
+    message: "Missing validation for number_meta_channels may lead to assertion failure in SetPixelChannelAttributes (CVE-2017-9499)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          image->number_meta_channels = StringToUnsignedLong(...);
+      - pattern: |
+          image->number_meta_channels=StringToUnsignedLong(...);
+    metavariable-pattern:
+      metavariable: $IMAGE
+      pattern: $IMAGE->number_meta_channels
+    pattern-not-inside: |
+      if ($IMAGE->number_meta_channels > MaxPixelChannels)
+        ThrowReaderException(...);

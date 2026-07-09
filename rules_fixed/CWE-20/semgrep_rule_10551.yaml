@@ -1,0 +1,26 @@
+rules:
+  - id: cve-2013-7294-missing-ke-payload-check
+    message: "Missing check for KE payload in IKEv2 I1 notification packet may lead to denial of service (CVE-2013-7294)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!md->chain[ISAKMP_NEXT_v2KE]) {
+                  ...
+                  return STF_FAIL + v2N_INVALID_KE_PAYLOAD;
+              }
+          - pattern: |
+              if (md->chain[ISAKMP_NEXT_v2KE] == NULL) {
+                  ...
+                  return STF_FAIL + v2N_INVALID_KE_PAYLOAD;
+              }
+    pattern-not-inside: |
+      if (!md->chain[ISAKMP_NEXT_v2KE]) {
+          ...
+          if (md->chain[ISAKMP_NEXT_v2N]) {
+              ...
+          }
+          ...
+          return STF_FAIL + v2N_INVALID_KE_PAYLOAD;
+      }

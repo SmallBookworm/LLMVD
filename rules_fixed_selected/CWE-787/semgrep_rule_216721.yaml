@@ -1,0 +1,13 @@
+rules:
+  - id: audiofile-heap-buffer-overflow-cve-2018-17095
+    patterns:
+      - pattern-either:
+          - pattern: |
+              pull(...);
+              run(*$IN_CHUNK, *$OUT_CHUNK);
+    message: "Heap-based buffer overflow vulnerability (CVE-2018-17095) due to missing update of output chunk frame count after pull."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2018-17095"

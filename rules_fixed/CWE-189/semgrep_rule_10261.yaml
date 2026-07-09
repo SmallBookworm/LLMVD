@@ -1,0 +1,10 @@
+rules:
+  - id: cwe-189-phar-off-by-one
+    patterns:
+      - pattern: |
+          if (FAILURE == zend_hash_add_empty_element(..., $$filename, $$filename_len)) {
+              ...
+          }
+    message: "Missing check for zero-length filename before calling zend_hash_add_empty_element may lead to off-by-one error (CWE-189)."
+    severity: ERROR
+    languages: [c]

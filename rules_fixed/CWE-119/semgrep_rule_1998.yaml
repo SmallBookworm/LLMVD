@@ -1,0 +1,24 @@
+rules:
+  - id: dosfstools-fat-size-overflow
+    message: "Potential heap-based buffer overflow due to unchecked FAT size. Ensure fat_length is validated before use."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: unsigned int fat_length;
+              - pattern: |
+                  fat_length = ...;
+              - pattern-inside: |
+                ...
+                $X * fat_length
+          - patterns:
+              - pattern: unsigned int fat_length;
+              - pattern: |
+                  fat_length = ...;
+              - pattern-inside: |
+                ...
+                fat_length * $X
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2016-4804"

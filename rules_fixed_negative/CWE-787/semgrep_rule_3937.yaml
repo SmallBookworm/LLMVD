@@ -1,0 +1,10 @@
+rules:
+  - id: cwe-787-isvalidsize-signed-comparison
+    patterns:
+      - pattern: |
+          int32_t $NESTSIZE = (int32_t)$EXPR;
+          ...
+          if ($SIZE + 2 <= $NESTSIZE) ...
+    message: "Use of signed integer for size comparison may lead to out-of-bounds write (CWE-787)."
+    severity: ERROR
+    languages: [c]

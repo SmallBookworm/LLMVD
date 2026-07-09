@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2014-9420-rock-continue-infinite-loop
+    message: "Missing loop counter in rock_continue may lead to infinite loop when processing Rock Ridge continuation entries (CVE-2014-9420)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (rs->cont_extent) {
+            ...
+            bh = sb_bread(...);
+            ...
+          }
+      - pattern: |
+          if (rs->cont_extent) {
+            ...
+            rs->buffer = kmalloc(...);
+            ...
+            bh = sb_bread(...);
+            ...
+          }
+    pattern-not: |
+      if (++rs->cont_loops >= RR_MAX_CE_ENTRIES)
+        goto out;

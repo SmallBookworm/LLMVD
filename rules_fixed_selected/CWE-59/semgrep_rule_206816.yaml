@@ -1,0 +1,30 @@
+rules:
+  - id: dbus_cookie_sha1_symlink_vulnerability
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!_dbus_credentials_add_from_user (auth->desired_identity, data))
+                {
+                  ...
+                  return send_rejected (auth);
+                }
+              ...
+              if (auth->keyring == NULL)
+                {
+                  auth->keyring = _dbus_keyring_new_for_credentials (auth->desired_identity, ...);
+                  ...
+                }
+          - pattern: |
+              if (!_dbus_credentials_add_from_user (auth->desired_identity, data))
+                {
+                  ...
+                  return send_rejected (auth);
+                }
+              ...
+              auth->keyring = _dbus_keyring_new_for_credentials (auth->desired_identity, ...);
+    message: "DBUS_COOKIE_SHA1 authentication is used without verifying that the client's desired identity matches the server's UID, leading to potential symlink-based authentication bypass (CVE-2019-12749)."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-59"
+      cve: "CVE-2019-12749"

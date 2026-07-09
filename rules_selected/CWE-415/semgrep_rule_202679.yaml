@@ -1,0 +1,20 @@
+rules:
+  - id: double-free-check_file_actlst
+    patterns:
+      - pattern-either:
+          - pattern: |
+              free($BUF);
+              ...
+              free($BUF);
+          - pattern: |
+              free($BUF);
+              ...
+              if ($BUF) {
+                free($BUF);
+              }
+    message: "Double free vulnerability detected. The buffer is freed more than once without being set to NULL in between."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-415"
+      cve: "CVE-2019-19725"

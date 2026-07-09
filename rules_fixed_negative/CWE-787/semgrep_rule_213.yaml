@@ -1,0 +1,14 @@
+rules:
+  - id: freetype-tt_size_reset-oob-write
+    message: "Potential out-of-bounds write in tt_size_reset due to missing CFF2 check (CVE-2017-7864, CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      size->ttmetrics.valid = FALSE;
+      ...
+      face = (TT_Face)size->root.face;
+    pattern-not: |
+      face = (TT_Face)size->root.face;
+      ...
+      if ( face->isCFF2 )
+        return FT_Err_Ok;

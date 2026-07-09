@@ -1,0 +1,22 @@
+rules:
+  - id: gd2_integer_overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (gd2_compressed(...)) {
+                  ...
+                  nc = (*ncx) * (*ncy);
+                  ...
+              }
+          - pattern: |
+              if (gd2_compressed(...)) {
+                  ...
+                  $X = (*ncx) * (*ncy);
+                  ...
+              }
+    message: "Potential integer overflow when multiplying chunk counts (*ncx * *ncy) without prior validation. This can lead to buffer overflows or memory corruption."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-190"
+      cve: "CVE-2016-10168"

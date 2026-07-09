@@ -1,0 +1,21 @@
+rules:
+  - id: cwe-125-out-of-bounds-read-windows-icon-typefind
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((data = gst_type_find_peek (find, 0, 6)) == NULL)
+                return;
+          - pattern: |
+              if ((data = gst_type_find_peek(find, 0, 6)) == NULL)
+                return;
+    pattern-not: |
+      if (datalen < 18)
+        return;
+      if ((data = gst_type_find_peek (find, 0, 6)) == NULL)
+        return;
+    message: "Missing bounds check before accessing data in windows_icon_typefind may lead to out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: ["CWE-125"]
+      cve: "CVE-2016-9811"

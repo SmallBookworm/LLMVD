@@ -1,0 +1,8 @@
+rules:
+  - id: apparmor_setprocattr_null_profile
+    message: "Passing NULL as profile to aa_audit may cause a NULL pointer dereference. Use __aa_current_profile() instead."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          aa_audit(AUDIT_APPARMOR_DENIED, NULL, ...)

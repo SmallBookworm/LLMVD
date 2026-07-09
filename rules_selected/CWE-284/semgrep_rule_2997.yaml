@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2017-5551-simple-set-acl-sgid
+    message: "Missing SGID bit clearing when setting POSIX ACLs in tmpfs. This may allow local privilege escalation via setgid programs."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (type == ACL_TYPE_ACCESS) {
+                  ... 
+                  posix_acl_equiv_mode(..., &inode->i_mode);
+                  ...
+              }
+    metadata:
+      cwe: ["CWE-284"]
+      cve: "CVE-2017-5551"

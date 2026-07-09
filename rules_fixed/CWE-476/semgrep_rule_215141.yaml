@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2019-20806-null-deref-tw5864
+    message: "NULL pointer dereference vulnerability in tw5864_handle_frame. 'vb' is dereferenced before being checked for NULL."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $VB = $input->vb;
+              ...
+              to_vb2_v4l2_buffer(&$VB->$FIELD);
+              ...
+              if (!$VB) { ... }
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2019-20806"

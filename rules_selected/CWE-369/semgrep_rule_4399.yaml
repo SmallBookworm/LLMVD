@@ -1,0 +1,11 @@
+rules:
+  - id: imagemagick-divide-by-zero-cve-2016-7530
+    message: "Potential divide-by-zero or out-of-bounds write in ImageMagick appendImages due to unsafe quantum handling (CVE-2016-7530)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: 'appendImages(..., true)'
+      - pattern: 'appendImages(..., false)'
+    metadata:
+      cwe: "CWE-369"
+      cve: "CVE-2016-7530"

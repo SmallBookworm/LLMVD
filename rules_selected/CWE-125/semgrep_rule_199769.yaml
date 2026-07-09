@@ -1,0 +1,27 @@
+rules:
+  - id: cwe-125-quassel-blowfish-ecb-oob-read
+    message: "Potential out-of-bounds read in blowfishECB due to missing input length validation before base64 decoding. This may lead to denial of service (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (direction)
+          {
+              ...
+          }
+          else
+          {
+              temp = b64ToByte(temp);
+              ...
+          }
+      - pattern: |
+          if (direction) {
+              ...
+              temp2 = byteToB64(temp2);
+          }
+    metavariable-regex:
+      metavariable: $...
+      regex: ".*"
+    # The rule flags the absence of a length check modulo 12 before b64ToByte in the else branch,
+    # and absence of length check modulo 8 before byteToB64 in the if (direction) branch.
+    # Since Semgrep doesn't support negative patterns well, we approximate by matching the vulnerable structure.

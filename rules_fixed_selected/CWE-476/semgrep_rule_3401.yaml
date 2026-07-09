@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2015-8898-null-dereference
+    message: "Potential NULL pointer dereference in WriteImages due to unsafe GetNextImageInList usage (CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          for ( ; GetNextImageInList($P) != (Image *) NULL; $P=GetNextImageInList($P))
+            if ($P->scene >= GetNextImageInList($P)->scene)
+              { ... }
+    metadata:
+      cwe: ["CWE-476"]
+      cve: "CVE-2015-8898"

@@ -1,0 +1,16 @@
+rules:
+  - id: unchecked-setuid
+    message: "Return value of setuid() is not checked. This can lead to privilege escalation if the call fails."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          if ((setuid(...) == -1) && (errno == EAGAIN)) {
+            ...
+          }
+      - pattern-either:
+          - pattern: setuid(...)
+          - pattern: setuid( getuid() )
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: ^setuid$

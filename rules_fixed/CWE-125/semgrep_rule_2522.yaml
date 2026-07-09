@@ -1,0 +1,20 @@
+rules:
+  - id: cwe-125-buffer-overread-ubik_print
+    message: Missing bounds check before EXTRACT_32BITS may cause buffer over-read (CWE-125).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          case 20002:
+              ...
+              temp = EXTRACT_32BITS(bp);
+      - pattern: |
+          case 20002:
+              ...
+              EXTRACT_32BITS(bp)
+    metavariable-pattern:
+      metavariable: bp
+      pattern-not: ND_TCHECK_32BITS(...)
+    fix-regex:
+      regex: ""
+      replacement: ""

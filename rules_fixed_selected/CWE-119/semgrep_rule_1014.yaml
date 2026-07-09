@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2013-2850-buffer-overflow
+    message: Heap-based buffer overflow due to unsafe strncpy usage. Use strlcpy with destination buffer size instead.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: strncpy($DST, $SRC, strlen($SRC) + 1)
+          - pattern: strncpy($DST, $SRC, (strlen($SRC) + 1))
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2013-2850"

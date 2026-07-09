@@ -1,0 +1,13 @@
+rules:
+  - id: cx24116-diseqc-buffer-overflow
+    message: Buffer overflow vulnerability in cx24116_send_diseqc_msg due to insufficient validation of d->msg_len against buffer size.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (d->msg_len > (CX24116_ARGLEN - CX24116_DISEQC_MSGOFS))
+                  return -EINVAL;
+          - pattern: |
+              if (d->msg_len > ($X - $Y))
+                  return -EINVAL;

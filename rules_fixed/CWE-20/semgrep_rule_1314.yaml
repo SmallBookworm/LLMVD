@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2014-2523-dccp-skb-header-pointer
+    message: "Incorrect usage of skb_header_pointer may lead to stack memory corruption. The fourth argument should be a buffer (e.g., &_dh), not a pointer variable (&dh)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $type $tmp;
+              *$ptr;
+              ...
+              $ptr = skb_header_pointer($skb, $dataoff, sizeof($tmp), &$ptr);
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2014-2523"

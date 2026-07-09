@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2017-13031-frag6-print-buffer-overread
+    message: "Buffer over-read vulnerability in IPv6 fragmentation header parsing due to insufficient bounds check (CVE-2017-13031, CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          ND_TCHECK($DP->ip6f_offlg);
+      - pattern: |
+          ND_TCHECK($DP->ip6f_ident);
+    metavariable-pattern:
+      metavariable: $DP
+      pattern: (const struct ip6_frag *)
+    fix: ""

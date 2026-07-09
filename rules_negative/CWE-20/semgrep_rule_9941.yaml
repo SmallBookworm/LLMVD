@@ -1,0 +1,8 @@
+rules:
+  - id: cve-2015-6782-omnibox-spoofing
+    message: "Missing page dismissal event check may lead to Omnibox spoofing vulnerability (CVE-2015-6782)."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      if (m_loadEventProgress != LoadEventInProgress && m_loadEventProgress != UnloadEventInProgress)
+          m_loadEventProgress = LoadEventNotRun;

@@ -1,0 +1,13 @@
+rules:
+  - id: cwe-476-null-pointer-dereference-missing-check
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $PARENT = mainwindow_create($RIGHT);
+              $PARENT->$FIELD = ...;
+          - pattern: |
+              $PARENT = mainwindow_create($RIGHT);
+              gui_window_reparent(..., $PARENT);
+    message: "Missing NULL check after mainwindow_create() may lead to NULL pointer dereference (CWE-476)."
+    severity: ERROR
+    languages: [c]

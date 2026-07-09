@@ -1,0 +1,24 @@
+rules:
+  - id: cwe-476-null-pointer-dereference-unregister-handler
+    message: "Potential NULL pointer dereference in on_unregister_handler when accessing handler->opaque for internal handlers. Missing check for external handler before use."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          struct tcmur_handler *handler = find_handler_by_subtype(...);
+          struct dbus_info *info = handler ? handler->opaque : NULL;
+          ...
+          g_bus_unwatch_name(info->watcher_id);
+      - pattern: |
+          struct tcmur_handler *handler = find_handler_by_subtype(...);
+          ...
+          struct dbus_info *info = handler->opaque;
+          ...
+          g_bus_unwatch_name(info->watcher_id);
+    metavariable-pattern:
+      metavariable: handler
+      pattern-not: |
+        if (handler->_is_dbus_handler != 1) {
+          ...
+          return ...;
+        }

@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2014-3597-buffer-overflow-dn_expand
+    message: "Potential buffer overflow in dn_expand due to missing bounds check on answer buffer. Fixed by passing 'end' instead of hardcoded size."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              dn_expand($ANSWER->qb2, $ANSWER->qb2 + 65536, ..., ..., ...)
+          - pattern: |
+              dn_expand($ANSWER->qb2, $ANSWER->qb2 + $CONST, ..., ..., ...)
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2014-3597"

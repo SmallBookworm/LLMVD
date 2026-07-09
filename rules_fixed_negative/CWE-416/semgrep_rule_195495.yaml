@@ -1,0 +1,7 @@
+rules:
+  - id: cwe-416-page-refcount-overflow
+    message: "Potential page reference count overflow leading to use-after-free (CWE-416). The check 'page_ref_count(page) <= 0' is insufficient to prevent overflow; use 'page_ref_zero_or_close_to_overflow' instead."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      VM_BUG_ON_PAGE(page_ref_count($PAGE) <= 0, $PAGE)

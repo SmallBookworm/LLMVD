@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2019-19244-distinct-window-orderby
+    message: "Potential crash in sqlite3Select when a sub-select uses both DISTINCT and window functions with certain ORDER BY usage."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if ((p->selFlags & (SF_Distinct|SF_Aggregate)) == SF_Distinct 
+       && sqlite3ExprListCompare(sSort.pOrderBy, pEList, -1) == 0) {
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2019-19244"

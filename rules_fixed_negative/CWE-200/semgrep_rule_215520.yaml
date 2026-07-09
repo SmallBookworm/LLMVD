@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2009-3612-uninitialized-pad2
+    message: "Uninitialized tcm__pad2 field may leak kernel memory (CVE-2009-3612)"
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $TMC->tcm__pad1 = 0;
+              $TMC->tcm__pad1 = 0;
+          - pattern: |
+              $TMC->tcm__pad1 = 0;
+              $TMC->tcm__pad2 = 0;
+              ...
+              $TMC->tcm__pad1 = 0;
+    metavariable-regex:
+      metavariable: $TMC
+      regex: "tcm"

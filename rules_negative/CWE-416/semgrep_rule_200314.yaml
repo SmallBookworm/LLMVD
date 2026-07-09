@@ -1,0 +1,15 @@
+rules:
+  - id: adutux-use-after-free
+    message: "Use-after-free vulnerability due to premature clearing of udev pointer before deregistering device. This can lead to race conditions in release() or open()."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          dev->udev = NULL;
+          usb_deregister_dev(...);
+      - pattern: |
+          $DEV->udev = NULL;
+          usb_deregister_dev(...);
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2019-19523"

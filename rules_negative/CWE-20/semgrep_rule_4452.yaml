@@ -1,0 +1,28 @@
+rules:
+  - id: suricata-dcerpc-dns-misdetected
+    message: "Missing workaround for DNS misdetected as DCERPC over UDP, leading to potential detection bypass (CVE-2019-1010251)."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          if (pm_matches > 0) {
+              alproto = pm_results[0];
+              if (!(ipproto == IPPROTO_UDP && alproto == ALPROTO_DCERPC))
+                  goto end;
+              ...
+          }
+      - pattern-either:
+          - pattern: |
+              if (pm_matches > 0) {
+                  alproto = pm_results[0];
+                  goto end;
+              }
+          - pattern: |
+              if (pm_matches > 0) {
+                  alproto = pm_results[0];
+                  ...;
+                  goto end;
+              }
+    metavariable-regex:
+      metavariable: $...
+      regex: "(?s).*"

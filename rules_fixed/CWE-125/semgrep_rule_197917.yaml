@@ -1,0 +1,9 @@
+rules:
+  - id: oracle-buffer-overread
+    message: "Heap-based buffer over-read in Oracle protocol dissector due to missing bounds check before accessing packet payload."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      (packet->payload[0] == 0x07) && (packet->payload[1] == 0xff) && (packet->payload[2] == 0x00)
+    metadata:
+      cwe: "CWE-125"

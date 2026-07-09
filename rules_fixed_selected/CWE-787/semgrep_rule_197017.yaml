@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2016-10066-buffer-overflow
+    message: Buffer overflow vulnerability due to insufficient overflow check before memory allocation. Use HeapOverflowSanityCheck instead of CheckMemoryOverflow to prevent denial of service.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (CheckMemoryOverflow(..., ...) != MagickFalse)
+                ThrowReaderException(ResourceLimitError, "MemoryAllocationFailed");
+          - pattern: |
+              if (CheckMemoryOverflow(...) != MagickFalse)
+                ThrowReaderException(ResourceLimitError, "MemoryAllocationFailed");
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2016-10066"

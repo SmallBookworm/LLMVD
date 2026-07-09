@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2018-20856-use-after-free
+    message: "Use-after-free vulnerability in blk_init_allocated_queue due to missing q->fq = NULL after blk_free_flush_queue. This may lead to undefined behavior when __blk_drain_queue accesses freed memory."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              blk_free_flush_queue(q->fq);
+              return ...;
+          - pattern: |
+              blk_free_flush_queue($Q->fq);
+              return ...;
+    metavariable-pattern:
+      $Q: { type: "struct request_queue *" }
+    fix: ""

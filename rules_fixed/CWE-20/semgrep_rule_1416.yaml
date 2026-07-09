@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2012-6647-futex-wait-requeue-pi-uaddr-equals-uaddr2
+    message: "futex_wait_requeue_pi does not check that uaddr != uaddr2, which can lead to NULL pointer dereference (CVE-2012-6647)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      futex_wait_requeue_pi(..., u32 *uaddr, ..., u32 *uaddr2) {
+        ...
+        if (!bitset)
+          return -EINVAL;
+        ...
+      }
+    pattern-not: |
+      futex_wait_requeue_pi(..., u32 *uaddr, ..., u32 *uaddr2) {
+        ...
+        if (uaddr == uaddr2)
+          return -EINVAL;
+        ...
+      }

@@ -1,0 +1,39 @@
+rules:
+  - id: cve-2020-27827-lldp-memory-leak
+    message: "Potential memory leak in LLDP TLV handling. Repeated TLVs of type LLDP_TLV_PORT_DESCR, LLDP_TLV_SYSTEM_NAME, or LLDP_TLV_SYSTEM_DESCR may overwrite previously allocated pointers without freeing them, leading to denial of service (CWE-400)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (tlv_type == LLDP_TLV_PORT_DESCR) {
+              ...
+              port->p_descr = b;
+          }
+        pattern-not-inside: |
+          if (tlv_type == LLDP_TLV_PORT_DESCR) {
+              ...
+              free(port->p_descr);
+              port->p_descr = b;
+          }
+      - pattern: |
+          if (tlv_type == LLDP_TLV_SYSTEM_NAME) {
+              ...
+              chassis->c_name = b;
+          }
+        pattern-not-inside: |
+          if (tlv_type == LLDP_TLV_SYSTEM_NAME) {
+              ...
+              free(chassis->c_name);
+              chassis->c_name = b;
+          }
+      - pattern: |
+          if (tlv_type == LLDP_TLV_SYSTEM_DESCR) {
+              ...
+              chassis->c_descr = b;
+          }
+        pattern-not-inside: |
+          if (tlv_type == LLDP_TLV_SYSTEM_DESCR) {
+              ...
+              free(chassis->c_descr);
+              chassis->c_descr = b;
+          }

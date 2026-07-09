@@ -1,0 +1,18 @@
+rules:
+  - id: drown-ssl2-enabled
+    message: "SSLv2 is enabled by default, which is vulnerable to the DROWN attack (CVE-2016-0800). Ensure SSL_OP_NO_SSLv2 is set."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $CTX->options |= SSL_OP_LEGACY_SERVER_CONNECT;
+          ...
+          return ($CTX);
+      - pattern: |
+          $CTX->options |= SSL_OP_LEGACY_SERVER_CONNECT;
+    metavariable-pattern:
+      metavariable: $CTX
+      pattern: SSL_CTX
+    fix-regex:
+      regex: ""
+      replacement: ""

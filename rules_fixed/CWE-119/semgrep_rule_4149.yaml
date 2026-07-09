@@ -1,0 +1,25 @@
+rules:
+  - id: cve-2018-8799-out-of-bounds-read
+    message: "Out-of-bounds read vulnerability in process_plane due to missing bounds check in while loops (CVE-2018-8799)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while (collen > 0)
+              {
+                ...
+                indexw++;
+                collen--;
+              }
+          - pattern: |
+              while (replen > 0)
+              {
+                ...
+                indexw++;
+                replen--;
+              }
+    metavariable-pattern:
+      metavariable: $LOOP_VAR
+      pattern: collen|replen
+    focus-metavariable: $LOOP_VAR

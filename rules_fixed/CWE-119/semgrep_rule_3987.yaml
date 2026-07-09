@@ -1,0 +1,25 @@
+rules:
+  - id: imagemagick-heap-buffer-overflow-cve-2019-13300
+    message: "Heap-based buffer overflow due to unsafe use of image->columns without considering maximum columns across image list."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: |
+                  for ($X; $Y; $Z)
+                  {
+                    $A = AcquireQuantumMemory(image->columns, $B);
+                    ...
+                    for ($J = 0; $J < (ssize_t) image->columns; $K)
+                      ...;
+                  }
+          - patterns:
+              - pattern: |
+                  $A = AcquireQuantumMemory(image->columns, $B);
+                  ...
+                  for ($J = 0; $J < (ssize_t) image->columns; $K)
+                    ...;
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2019-13300"

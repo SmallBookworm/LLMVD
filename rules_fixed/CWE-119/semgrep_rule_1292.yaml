@@ -1,0 +1,21 @@
+rules:
+  - id: hid-off-by-one-rsize-check
+    message: "Potential out-of-bounds write due to insufficient report descriptor size check before accessing rdesc array elements."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($COND1 && *$RSIZE >= 90 && $COND2)
+          - pattern: |
+              if ($COND1 && *$RSIZE >= 50 && $COND2)
+    metavariable-patterns:
+      - metavariable: $RSIZE
+        patterns:
+          - pattern-either:
+              - pattern: $RSIZE
+            constraints:
+              is_identifier: true
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2014-3184"

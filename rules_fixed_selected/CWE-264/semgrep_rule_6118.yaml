@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2012-5155-mac-sandbox-bypass
+    message: "Insecure sandboxing on macOS due to incorrect OS guard macro; may allow path traversal bypass. Use OS_MACOSX instead of OS_MAC."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              #if defined(OS_MAC)
+              ...
+              #endif
+    metadata:
+      cwe: ["CWE-264"]
+      cve: "CVE-2012-5155"

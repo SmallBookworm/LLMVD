@@ -1,0 +1,33 @@
+rules:
+  - id: cve-2018-8799-out-of-bounds-read
+    message: "Missing stream validation before use may lead to out-of-bounds read (CVE-2018-8799)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $FUNC(STREAM *$s)
+              {
+                ...
+                unsigned int pkglen = $s->end - $s->p;
+                ...
+              }
+          - pattern: |
+              $FUNC(STREAM *$s)
+              {
+                ...
+                $type pkglen = $s->end - $s->p;
+                ...
+              }
+      - pattern-not: |
+          $FUNC(STREAM *$s)
+          {
+            ...
+            if (!s_check($s)) { ... }
+            ...
+            $s->end - $s->p
+            ...
+          }
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: seamless_process

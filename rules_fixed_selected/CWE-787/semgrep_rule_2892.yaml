@@ -1,0 +1,25 @@
+rules:
+  - id: ffmpeg-pngdec-trns-oob-write
+    message: "Potential out-of-bounds write in PNG decoder due to insufficient validation of bit_depth before processing tRNS chunk. This may lead to heap-based buffer overflow (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (s->has_trns && s->color_type != PNG_COLOR_TYPE_PALETTE) {
+        ...
+        for (...; ...; ...) {
+          ...
+          memmove(...);
+          ...
+        }
+      }
+    pattern-not: |
+      if (s->has_trns && s->color_type != PNG_COLOR_TYPE_PALETTE) {
+        ...
+        av_assert0(s->bit_depth > 1);
+        ...
+        for (...; ...; ...) {
+          ...
+          memmove(...);
+          ...
+        }
+      }

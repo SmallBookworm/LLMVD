@@ -1,0 +1,15 @@
+rules:
+  - id: libass_calc_coeff_buffer_overflow
+    message: "Buffer overflow vulnerability in calc_coeff due to insufficient array size (mat_freq[13] instead of mat_freq[14])."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern: |
+          double mat_freq[13];
+          ...
+          memset(mat_freq + 4, 0, sizeof(mat_freq) - sizeof(kernel));
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2016-7970"
+      references:
+        - https://github.com/libass/libass/commit/08e754612019ed84d1db0d1fc4f5798248decd75

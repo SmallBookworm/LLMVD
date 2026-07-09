@@ -1,0 +1,17 @@
+rules:
+  - id: glib_file_copy_missing_private_flag
+    message: "File copy operation does not use G_FILE_CREATE_PRIVATE, which may expose the file with overly permissive permissions during the copy."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          g_file_create($DEST, 0, $CANCELLABLE, $ERROR)
+      - pattern: |
+          g_file_replace($DEST, $ETAG, $BACKUP, G_FILE_CREATE_REPLACE_DESTINATION, $CANCELLABLE, $ERROR)
+      - pattern: |
+          _g_local_file_output_stream_create($FILENAME, $REPLACE, 0, $INFO, $CANCELLABLE, $ERROR)
+      - pattern: |
+          _g_local_file_output_stream_replace($FILENAME, $REPLACE, $ETAG, $BACKUP, G_FILE_CREATE_REPLACE_DESTINATION, $INFO, $CANCELLABLE, $ERROR)
+    metadata:
+      cwe: "CWE-362"
+      cve: "CVE-2019-12450"

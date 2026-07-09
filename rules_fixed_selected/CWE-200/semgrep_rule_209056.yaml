@@ -1,0 +1,32 @@
+rules:
+  - id: rndis_msg_set_size_check_missing
+    message: Missing validation of RNDIS_MSG_SET command size may lead to out-of-bounds access and information disclosure.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          static int rndis_set_response(..., rndis_set_msg_type *buf)
+          {
+              ...
+              u32 BufLength = le32_to_cpu(buf->InformationBufferLength);
+              u32 BufOffset = le32_to_cpu(buf->InformationBufferOffset);
+              ...
+              if (gen_ndis_set_resp(..., ((u8 *)buf) + 8 + BufOffset, BufLength, ...))
+              ...
+          }
+      - pattern: |
+          static int rndis_set_response(..., rndis_set_msg_type *buf)
+          {
+              ...
+              u32 BufLength, BufOffset;
+              ...
+              BufLength = le32_to_cpu(buf->InformationBufferLength);
+              BufOffset = le32_to_cpu(buf->InformationBufferOffset);
+              ...
+              if (gen_ndis_set_resp(..., ((u8 *)buf) + 8 + BufOffset, BufLength, ...))
+              ...
+          }
+    pattern-not: |
+        if ((BufLength > RNDIS_MAX_TOTAL_SIZE) ||
+            (BufOffset + 8 >= RNDIS_MAX_TOTAL_SIZE))
+                return -EINVAL;

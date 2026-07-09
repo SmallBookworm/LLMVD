@@ -1,0 +1,13 @@
+rules:
+  - id: cwe-120-buffer-overflow-get_next_file
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (ptr[strlen(ptr) - 1] == '\n')
+                  ptr[strlen(ptr) - 1] = '\0';
+    message: "Buffer underflow due to missing check on strlen() return value. If ptr is empty, strlen(ptr) - 1 underflows."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-120"
+      cve: "CVE-2018-14879"

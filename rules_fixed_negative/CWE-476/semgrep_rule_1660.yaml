@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2016-9888-null-deref-tar
+    message: "Potential null pointer dereference due to missing type check before casting 'subdir' to GSF_INFILE_TAR. This can lead to a crash when processing crafted TAR files."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (subdir) {
+              g_object_unref (subdir);
+              dir = GSF_INFILE_TAR (subdir);
+          }
+      - pattern: |
+          if (subdir) {
+              dir = GSF_INFILE_TAR (subdir);
+              g_object_unref (subdir);
+          }
+    metadata:
+      cwe: ["CWE-476"]
+      cve: "CVE-2016-9888"

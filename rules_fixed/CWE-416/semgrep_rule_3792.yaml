@@ -1,0 +1,21 @@
+rules:
+  - id: use-after-free-nsfs-dcache-rcuaccess-missing
+    message: "Missing DCACHE_RCUACCESS flag on dentry may lead to use-after-free under RCU read-side critical section (CWE-416)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          dentry = d_alloc_pseudo(...);
+          ...
+          d_instantiate(dentry, ...);
+          dentry->d_fsdata = ...;
+      - pattern: |
+          d_instantiate(dentry, ...);
+          ...
+          dentry->d_fsdata = ...;
+    metavariable-pattern:
+      metavariable: dentry
+      pattern: $X
+    patterns:
+      - pattern-not: |
+          dentry->d_flags |= DCACHE_RCUACCESS;

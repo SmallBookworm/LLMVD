@@ -1,0 +1,10 @@
+rules:
+  - id: jas_stream_printf-buffer-overflow
+    patterns:
+      - pattern: vsprintf($BUF, $FMT, $AP)
+    message: "Use of vsprintf without size limit may lead to buffer overflow. Use vsnprintf instead."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2008-3522"

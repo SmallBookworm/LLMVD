@@ -1,0 +1,12 @@
+rules:
+  - id: imagemagick-jng-memory-leak-cve-2017-12641
+    message: "Missing cleanup of color_image and color_image_info before throwing CorruptImageError may cause memory leak (CVE-2017-12641, CWE-772)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (length > PNG_UINT_31_MAX || count == 0)
+            ThrowReaderException(CorruptImageError,"CorruptImage");
+    metadata:
+      cwe: ["CWE-772"]
+      cve: "CVE-2017-12641"

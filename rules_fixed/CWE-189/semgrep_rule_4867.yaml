@@ -1,0 +1,20 @@
+rules:
+  - id: cwe-189-missing-switch-default
+    message: "Missing 'default' case in switch statement may lead to integer overflow or undefined behavior (CWE-189)."
+    severity: WARNING
+    languages: [c]
+    pattern-not: |
+      switch ($X) {
+        ...
+        default:
+          ...
+      }
+    patterns:
+      - pattern: |
+          switch ($X) {
+            case ...:
+              ...
+          }
+      - metavariable-pattern:
+          metavariable: $X
+          pattern: gfx::GetGLImplementation()

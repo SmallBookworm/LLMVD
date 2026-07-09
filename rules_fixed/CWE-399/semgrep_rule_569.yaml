@@ -1,0 +1,24 @@
+rules:
+  - id: ape_no_frames_check_missing
+    message: "Missing check for zero totalframes in APE header parsing may lead to denial of service (CVE-2011-2161)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (ape->totalframes > UINT_MAX / sizeof(APEFrame)) {
+              ...
+              return ...;
+          }
+          ape->frames = av_malloc(ape->totalframes * sizeof(APEFrame));
+      - pattern: |
+          if(ape->totalframes > UINT_MAX / sizeof(APEFrame)){
+              ...
+              return ...;
+          }
+          ape->frames       = av_malloc(ape->totalframes * sizeof(APEFrame));
+    metavariable-pattern:
+      metavariable: ape
+      pattern: $X
+    fix-regex:
+      regex: ""
+      replacement: ""

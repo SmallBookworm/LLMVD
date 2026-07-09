@@ -1,0 +1,22 @@
+rules:
+  - id: imagemagick-divide-by-zero-parsemetageometry
+    message: "Potential divide-by-zero vulnerability in ParseMetaGeometry due to unsafe division without using PerceptibleReciprocal."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              (double) (... * ... / ...);
+          - pattern: |
+              (double) (... / ... * ...);
+      - pattern-not-inside: |
+          PerceptibleReciprocal(...)
+      - metavariable-pattern:
+          metavariable: $EXPR
+          pattern-either:
+            - pattern: former_height
+            - pattern: former_width
+            - pattern: geometry_ratio
+            - pattern: image_ratio
+    fix-regex:
+      enabled: false

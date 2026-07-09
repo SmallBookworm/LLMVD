@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2018-14467-bgp-capcode-mp-buffer-overread
+    message: "Missing bounds check before accessing opt[i+5] in BGP_CAPCODE_MP case may lead to buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          case BGP_CAPCODE_MP:
+              ...
+              tok2str(_, _, opt[i+5])
+      - pattern: |
+          case BGP_CAPCODE_MP:
+              ...
+              opt[i+5]
+    metavariable-pattern:
+      metavariable: i
+      language: c
+      pattern: $I
+    pattern-not-inside: |
+      case BGP_CAPCODE_MP:
+          ...
+          ND_TCHECK_8BITS(opt + i + 5);
+          ...

@@ -1,0 +1,7 @@
+rules:
+  - id: cve-2019-9433-use-after-free-vp8-postproc
+    message: "Use of cm->show_frame_mi may lead to use-after-free in VP8 post-processing. Use cm->mi instead."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      cm->show_frame_mi

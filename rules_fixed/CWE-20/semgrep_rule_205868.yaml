@@ -1,0 +1,22 @@
+rules:
+  - id: php-gd-null-byte-injection
+    message: "Potential null byte injection in GD image output function. File paths must be checked for null bytes to prevent arbitrary file overwrite."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (Z_TYPE_P(to_zval) == IS_STRING) {
+                  stream = php_stream_open_wrapper(Z_STRVAL_P(to_zval), ...);
+              }
+          - pattern: |
+              else if (Z_TYPE_P(to_zval) == IS_STRING) {
+                  stream = php_stream_open_wrapper(Z_STRVAL_P(to_zval), ...);
+              }
+    pattern-not: |
+      if (Z_TYPE_P(to_zval) == IS_STRING) {
+          if (CHECK_ZVAL_NULL_PATH(to_zval)) {
+              ...
+          }
+          ...
+      }

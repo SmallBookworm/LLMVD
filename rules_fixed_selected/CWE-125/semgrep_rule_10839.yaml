@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2018-13300-avpriv-request-sample-avcodecparameters
+    message: "Passing AVCodecParameters to avpriv_request_sample may cause out-of-bounds read (CWE-125). Use AVFormatContext instead."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      avpriv_request_sample($PAR, ...)
+    pattern-not: |
+      avpriv_request_sample($FC, ...)
+    metavariable-pattern:
+      $PAR:
+        pattern-either:
+          - pattern: track->par
+          - pattern: $OBJ->par
+          - pattern: $PAR
+        pattern-regex: .*par$
+    fix-regex:
+      regex: .*
+      replacement: ""
+      count: 1

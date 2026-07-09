@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2016-7412-mysqlnd-bit-field-overflow
+    message: "Missing bounds check for BIT field length may lead to heap-based buffer overflow (CVE-2016-7412, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (fields_metadata[...].type == MYSQL_TYPE_BIT) {
+            ...
+            ps_fetch_from_1_to_8_bytes(..., &p, len ...);
+            ...
+          }
+      - pattern: |
+          if (len != MYSQLND_NULL_LENGTH && ((p + len) > packet_end)) {
+            ...
+          }
+    pattern-not-inside: |
+      const zend_uchar * const packet_end = ...;
+      ...
+      if (len != MYSQLND_NULL_LENGTH && ((p + len) > packet_end)) {
+        ...
+      }

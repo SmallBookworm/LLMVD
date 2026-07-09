@@ -1,0 +1,16 @@
+rules:
+  - id: unnecessary-null-check-before-kfree
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($X)
+                kfree($X);
+          - pattern: |
+              if ($X != NULL)
+                kfree($X);
+          - pattern: |
+              if (NULL != $X)
+                kfree($X);
+    message: "Unnecessary NULL check before kfree. kfree(NULL) is safe and the check may mask use-after-free vulnerabilities like CVE-2017-16648 (CWE-416)."
+    severity: WARNING
+    languages: [c]

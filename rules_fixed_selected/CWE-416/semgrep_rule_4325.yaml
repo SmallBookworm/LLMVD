@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2017-16525-use-after-free
+    message: "Potential use-after-free due to missing NULL check before accessing serial->port[0]."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (serial->port[0] == usbcons_info.port) {
+        ...
+      }
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2017-16525"

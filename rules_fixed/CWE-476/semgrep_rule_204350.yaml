@@ -1,0 +1,22 @@
+rules:
+  - id: kvm_ioapic_use_before_init
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (irqchip_split(kvm))
+                  ...
+              else {
+                  ...
+                  kvm_ioapic_scan_entry(vcpu, ...);
+              }
+          - pattern: |
+              if (irqchip_split(kvm))
+                  ...
+              else
+                  kvm_ioapic_scan_entry(vcpu, ...);
+    message: "Potential NULL pointer dereference due to use of ioapic before initialization. Ensure ioapic_in_kernel(kvm) is checked before calling kvm_ioapic_scan_entry."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2018-19407"

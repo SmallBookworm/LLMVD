@@ -1,0 +1,16 @@
+rules:
+  - id: cwe-362-race-condition-timer-setup
+    patterns:
+      - pattern-either:
+          - pattern: |
+              snd_seq_timer_stop($TIMER);
+              snd_seq_timer_close($TIMER);
+          - pattern: |
+              snd_seq_timer_stop($Q->timer);
+              snd_seq_timer_close($Q);
+    message: "Race condition detected: timer operations are not protected by timer_mutex, which may lead to use-after-free (CWE-362)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-362"
+      cve: "CVE-2016-2544"

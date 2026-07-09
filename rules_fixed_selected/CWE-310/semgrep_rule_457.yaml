@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2000-1254-bitwise-shift-vulnerability
+    message: "Bitwise shift operation uses '1 << i' which may overflow on 64-bit platforms when 'unsigned long' is wider than 'int'. Use '1UL << i' instead."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      (1 << $I)
+    fix-regex:
+      regex: '\b1\s*<<'
+      replacement: '1UL <<'
+    metadata:
+      cwe: "CWE-310"
+      cve: "CVE-2000-1254"

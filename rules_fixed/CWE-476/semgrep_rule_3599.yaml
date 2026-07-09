@@ -1,0 +1,20 @@
+rules:
+  - id: unchecked-null-pointer-dereference-xkbcommon
+    message: "Potential NULL pointer dereference when copying key aliases without checking num_key_aliases > 0"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $KEY_ALIASES = NULL;
+          if ($NUM_KEY_ALIASES > 0) {
+            ...
+          }
+          ...
+          darray_foreach($ITER, $INFO->aliases) {
+            if ($ITER != XKB_ATOM_NONE) {
+              $KEY_ALIASES[$INDEX] = $VALUE;
+            }
+          }
+    metadata:
+      cwe: ["CWE-476"]
+      cve: "CVE-2018-15858"

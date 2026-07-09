@@ -1,0 +1,22 @@
+rules:
+  - id: cwe-125-atol8-empty-string
+    patterns:
+      - pattern-either:
+          - pattern: |
+              atol8(const char *p, size_t char_cnt)
+              {
+                ...
+                while (char_cnt-- > 0) {
+                  ...
+                }
+                ...
+              }
+          - pattern: |
+              int64_t l;
+              ...
+              while (char_cnt-- > 0) {
+                ...
+              }
+    message: "Missing check for empty input string in atol8 may lead to heap-based buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]

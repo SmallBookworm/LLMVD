@@ -1,0 +1,58 @@
+rules:
+  - id: cve-2009-0031-missing-kfree
+    message: "Missing kfree() call on 'name' may cause a memory leak (CVE-2009-0031, CWE-399)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $FUNC(...) {
+            ...
+            char *name;
+            ...
+            if ($COND) {
+              name = strndup_user(...);
+              if (IS_ERR(name)) {
+                ...;
+                goto error;
+              }
+            }
+            ... = join_session_keyring(name);
+            ...
+            error:
+            return ...;
+          }
+      - pattern: |
+          $FUNC(...) {
+            ...
+            char *name = NULL;
+            ...
+            if ($COND) {
+              name = strndup_user(...);
+              if (IS_ERR(name)) {
+                ...;
+                goto error;
+              }
+            }
+            ... = join_session_keyring(name);
+            ...
+            error:
+            return ...;
+          }
+    pattern-not: |
+      $FUNC(...) {
+        ...
+        char *name;
+        ...
+        if ($COND) {
+          name = strndup_user(...);
+          if (IS_ERR(name)) {
+            ...;
+            goto error;
+          }
+        }
+        ... = join_session_keyring(name);
+        kfree(name);
+        ...
+        error:
+        return ...;
+      }

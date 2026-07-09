@@ -1,0 +1,8 @@
+rules:
+  - id: cve-2013-2920-out-of-bounds-read
+    message: "Potential out-of-bounds read in DoResolveRelativeHost due to incorrect length passed to ParseAfterScheme (CWE-119, CVE-2013-2920)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      url_parse::ParseAfterScheme(&relative_url[relative_component.begin],
+                                  relative_component.len, ...)

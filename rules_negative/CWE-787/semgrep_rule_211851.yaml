@@ -1,0 +1,16 @@
+rules:
+  - id: mutt_imap_buffer_overflow
+    message: "Potential stack-based buffer overflow in msg_parse_fetch due to missing bounds check when copying INTERNALDATE or RFC822.SIZE fields into a fixed-size buffer."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while (*s && *s != '\"')
+                *ptmp++ = *s++;
+          - pattern: |
+              while (isdigit ((unsigned char) *s))
+                *ptmp++ = *s++;
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2018-14350"

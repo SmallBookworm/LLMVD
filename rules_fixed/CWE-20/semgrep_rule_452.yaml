@@ -1,0 +1,39 @@
+rules:
+  - id: imlib2_missing_colormap_check
+    message: "Missing colormap check may lead to segmentation fault when processing GIF images without a colormap (CVE-2014-9762)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - patterns:
+        - pattern: |
+            $cmap = ($GIF->Image.ColorMap ? $GIF->Image.ColorMap : $GIF->SColorMap);
+        - pattern-inside: |
+            typedef struct { ... } GifFileType;
+            ...
+        - pattern: $cmap->Colors[...]
+        - metavariable-comparison:
+            left: $GIF
+            operator: ==
+            right: $gif
+      - patterns:
+        - pattern: |
+            $cmap = ($GIF->Image.ColorMap ? $GIF->Image.ColorMap : $GIF->SColorMap);
+        - pattern-inside: |
+            typedef struct { ... } GifFileType;
+            ...
+        - pattern: |
+            if (!im->data)
+               ...
+            ptr = im->data;
+        - pattern: $cmap->Colors[...]
+        - metavariable-comparison:
+            left: $GIF
+            operator: ==
+            right: $gif
+    metavariable-pattern:
+      metavariable: $gif
+      patterns:
+        - pattern-either:
+            - pattern-inside: |
+                typedef struct { ... } GifFileType;
+            - pattern: GifFileType $gif;

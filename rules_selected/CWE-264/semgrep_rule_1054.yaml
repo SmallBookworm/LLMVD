@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2013-1956-userns-chroot-check-missing
+    patterns:
+      - pattern-not: |
+          if (current_chrooted())
+              return -EPERM;
+      - pattern-either:
+          - pattern: |
+              int create_user_ns(struct cred *new)
+              {
+                  ...
+                  if (!kuid_has_mapping(..., ...) ||
+                      !kgid_has_mapping(..., ...))
+                      return -EPERM;
+                  ...
+              }
+    message: "Missing check for chrooted processes before creating a user namespace. This may allow bypassing filesystem restrictions (CVE-2013-1956)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-264"
+      cve: "CVE-2013-1956"

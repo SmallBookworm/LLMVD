@@ -1,0 +1,21 @@
+rules:
+  - id: virtio-gpu-resource-attach-backing-memory-leak
+    message: "Memory leak in virgl_resource_attach_backing: 'res_iovs' is not freed if virgl_renderer_resource_attach_iov fails."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          virgl_renderer_resource_attach_iov(...);
+      - pattern: |
+          $FUNC(...);
+    pattern-not-inside: |
+      int $RET = virgl_renderer_resource_attach_iov($...);
+      ...
+      if ($RET != 0)
+        virtio_gpu_cleanup_mapping_iov($..., $...);
+    metavariable-pattern:
+      metavariable: $FUNC
+      patterns:
+        - pattern: virgl_renderer_resource_attach_iov
+    fix-regex:
+      enabled: false

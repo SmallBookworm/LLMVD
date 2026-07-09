@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2010-4254-missing-generic-method-validation
+    message: Missing validation of generic method instantiation may allow bypassing generic constraints.
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      mono_class_inflate_generic_method(...);
+      $STMTS;
+      mono_method_get_object(...)
+    pattern-not: |
+      mono_class_inflate_generic_method(...);
+      $STMTS;
+      mono_verifier_is_method_valid_generic_instantiation(...);
+      $STMTS;
+      mono_method_get_object(...)

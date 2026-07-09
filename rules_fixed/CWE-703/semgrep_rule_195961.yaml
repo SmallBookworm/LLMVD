@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2017-12476-null-ptr-deref
+    message: "Potential NULL pointer dereference due to incorrect loop bound using m_SequenceParameters.ItemCount() for m_PictureParameters access."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (...; ... < $SEQ.ItemCount(); ...) {
+                ... $PIC[...].GetData() ...;
+              }
+      - metavariable-pattern:
+          metavariable: $SEQ
+          pattern: m_SequenceParameters
+      - metavariable-pattern:
+          metavariable: $PIC
+          pattern: m_PictureParameters

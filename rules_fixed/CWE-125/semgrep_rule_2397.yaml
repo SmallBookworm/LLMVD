@@ -1,0 +1,48 @@
+rules:
+  - id: gtco-out-of-bounds-read
+    message: "Potential out-of-bounds read in HID report descriptor parsing due to missing bounds check before multi-byte access."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while ($I < $LENGTH) {
+                ...
+                $PREFIX = $REPORT[$I++];
+                $SIZE = PREF_SIZE($PREFIX);
+                ...
+                switch ($SIZE) {
+                  case 2:
+                    ... get_unaligned_le16(&$REPORT[$I]) ...;
+                    break;
+                  case 3:
+                    ... get_unaligned_le32(&$REPORT[$I]) ...;
+                    break;
+                  ...
+                }
+                $I += $SIZE;
+                ...
+              }
+          - pattern: |
+              while ($I < $LENGTH) {
+                ...
+                $PREFIX = $REPORT[$I];
+                $I++;
+                $SIZE = PREF_SIZE($PREFIX);
+                ...
+                switch ($SIZE) {
+                  case 2:
+                    ... get_unaligned_le16(&$REPORT[$I]) ...;
+                    break;
+                  case 3:
+                    ... get_unaligned_le32(&$REPORT[$I]) ...;
+                    break;
+                  ...
+                }
+                $I += $SIZE;
+                ...
+              }
+    metavariable-regex:
+      metavariable: $SIZE
+      regex: "size"
+    fix-regex: null

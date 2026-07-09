@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2015-0856-kde-crash-handler
+    message: "KDE crash handler not disabled in greeter environment; may allow privilege escalation via crash (CVE-2015-0856)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+          ...
+          env.insert(...);
+          ...
+          m_process->setProcessEnvironment(env);
+      - pattern: |
+          QProcessEnvironment env;
+          QProcessEnvironment sysenv = QProcessEnvironment::systemEnvironment();
+          ...
+          env.insert(...);
+          ...
+          m_auth->insertEnvironment(env);
+    pattern-not: |
+        env.insert(QStringLiteral("KDE_DEBUG"), QStringLiteral("1"));

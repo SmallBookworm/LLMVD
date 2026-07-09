@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2016-6823-bmp-integer-overflow
+    message: "Potential integer overflow in BMP coder leading to buffer overflow. Missing width/height validation before casting to signed int."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          bmp_info.width = (ssize_t) $IMAGE->columns;
+          bmp_info.height = (ssize_t) $IMAGE->rows;
+      - pattern: |
+          $WIDTH = (ssize_t) $IMAGE->columns;
+          $HEIGHT = (ssize_t) $IMAGE->rows;
+    metavariable-pattern:
+      metavariable: $IMAGE
+      pattern: image

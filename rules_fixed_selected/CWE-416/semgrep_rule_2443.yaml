@@ -1,0 +1,31 @@
+rules:
+  - id: alsa_seq_use_after_free_race_condition
+    message: "Potential use-after-free due to missing reference count increment in snd_seq_create_port. This may lead to a race condition when the port is deleted by another thread before being fully initialized."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              struct snd_seq_client_port *snd_seq_create_port(...) {
+                ...
+                new_port = kzalloc(...);
+                ...
+                sprintf(new_port->name, ...);
+                snd_use_lock_init(&new_port->use_lock);
+                ...
+                return new_port;
+              }
+          - pattern: |
+              struct snd_seq_client_port *snd_seq_create_port(...) {
+                ...
+                new_port = kzalloc(...);
+                ...
+                snd_use_lock_init(&new_port->use_lock);
+                ...
+                sprintf(new_port->name, ...);
+                ...
+                return new_port;
+              }
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: snd_seq_create_port

@@ -1,0 +1,22 @@
+rules:
+  - id: proftpd-allowchrootsymlinks-bypass
+    message: "Incomplete symlink check in DefaultRoot handling allows bypass of AllowChrootSymlinks control (CVE-2017-7418, CWE-59). Only the final path component is checked with lstat(), enabling symlink traversal via intermediate components."
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (allow_symlinks == FALSE) {
+            ...
+            res = pr_fsio_lstat(path, &st);
+            ...
+            if (S_ISLNK(st.st_mode)) {
+              ...
+            }
+          }
+      - pattern: |
+          if (allow_symlinks == FALSE) {
+            ...
+            pr_fsio_lstat(..., ...);
+            ...
+            S_ISLNK(...);
+          }

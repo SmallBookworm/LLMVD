@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2015-3193-montgomery-squaring-bug
+    message: "Detected potential use of vulnerable Montgomery squaring implementation susceptible to carry propagation bug (CVE-2015-3193)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: BN_mod_exp($$d, $$a, $$b, $$c, $$ctx)
+      - pattern: BN_mod_exp_mont_consttime($$d, $$a, $$b, $$c, $$ctx, NULL)
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2015-3193"
+      references:
+        - https://git.openssl.org/?p=openssl.git;a=commit;h=d73cc256c8e256c32ed959456101b73ba9842f72

@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2019-19064-memory-leak
+    message: "Memory leak in fsl_lpspi_probe: pm_runtime_get_sync failure does not release allocated SPI controller."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          ret = pm_runtime_get_sync(...);
+          if (ret < 0) {
+            ...
+            return ret;
+          }
+      - pattern: |
+          if ((ret = pm_runtime_get_sync(...)) < 0) {
+            ...
+            return ret;
+          }
+    metavariable-regex:
+      metavariable: $...
+      regex: "fsl_lpspi->dev"

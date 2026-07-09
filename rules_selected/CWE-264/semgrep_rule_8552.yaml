@@ -1,0 +1,22 @@
+rules:
+  - id: use-after-free-wifi-cleanup
+    patterns:
+      - pattern-either:
+          - pattern: |
+              cmd->cancel();
+              ...
+              pthread_mutex_lock(...);
+              ...
+              cmd->releaseRef();
+          - pattern: |
+              $CMD->cancel();
+              ...
+              pthread_mutex_lock($MUTEX);
+              ...
+              $CMD->releaseRef();
+    message: "Potential use-after-free vulnerability due to releasing reference after re-acquiring lock without validation."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-264"
+      cve: "CVE-2016-0809"

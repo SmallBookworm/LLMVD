@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2011-3359-b43-dma-rx-buffer-check
+    message: "Potential buffer overflow in dma_rx due to insufficient receive buffer size check. The condition should account for frame offset when comparing against rx_buffersize."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (unlikely(len > ring->rx_buffersize)) {
+                ...
+              }
+    fix: ""

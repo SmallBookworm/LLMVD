@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2015-5296-samba-encryption-signing-mismatch
+    message: "Encryption is enabled without requiring signing, allowing encrypted-to-unencrypted downgrade attacks (CVE-2015-5296)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          cli_connect_nb(..., SMB_SIGNING_DEFAULT, ..., &c);
+      - pattern: |
+          cli_connect_nb(..., SMB_SIGNING_OFF, ..., &c);
+    metavariable-patterns:
+      - metavariable: c
+        pattern: struct cli_state *

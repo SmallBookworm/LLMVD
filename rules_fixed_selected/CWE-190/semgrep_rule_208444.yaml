@@ -1,0 +1,17 @@
+rules:
+  - id: pillow-integer-overflow-map-buffer
+    message: "Potential integer overflow in buffer size calculation (CWE-190). Missing overflow check before multiplication or addition."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          size = (Py_ssize_t) $YSIZE * $STRIDE;
+          ...
+          if (offset + size > $VIEW_LEN) { ... }
+      - pattern: |
+          $SIZE = $YSIZE * $STRIDE;
+          ...
+          if (offset + $SIZE > $VIEW_LEN) { ... }
+    metavariable-pattern:
+      $YSIZE: "int"
+      $STRIDE: "int"

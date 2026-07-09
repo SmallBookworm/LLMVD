@@ -1,0 +1,17 @@
+rules:
+  - id: cwe-189-asn1-bit-len-check-missing
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: "*bit_len = ...;"
+              - pattern: "if (str_size >= ...) {...}"
+            condition: and
+          - pattern: |
+              *bit_len = ...;
+              memcpy(...);
+    message: "Missing validation of bit length may lead to out-of-bounds access (CWE-189)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-189"
+      cve: "CVE-2014-3468"

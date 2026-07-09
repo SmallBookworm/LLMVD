@@ -1,0 +1,33 @@
+rules:
+  - id: cve-2016-2505-missing-sectionlength-validation
+    message: Missing validation of sectionLength against mSkipBytes may lead to buffer overread or memory corruption (CWE-119).
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              unsigned sectionLength = ...;
+              ...
+              sectionLength -= mSkipBytes;
+              ...
+              for(unsigned i = 0; i < sectionLength + 4; i++) {
+                  ...
+              }
+          - pattern: |
+              unsigned sectionLength = ...;
+              ...
+              sectionLength -= mSkipBytes;
+              ...
+              for (unsigned i = 0; i < sectionLength + 4; i++) {
+                  ...
+              }
+      - metavariable-pattern:
+          metavariable: sectionLength
+          pattern: U16_AT(...) & 0xfff
+      - pattern-not: |
+          if (sectionLength < mSkipBytes) {
+              ...
+              return false;
+          }
+          ...
+          sectionLength -= mSkipBytes;

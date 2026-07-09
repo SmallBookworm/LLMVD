@@ -1,0 +1,11 @@
+rules:
+  - id: null_pointer_dereference_crypt
+    message: "crypt() can return NULL; dereferencing it without a check may cause a NULL pointer dereference (CWE-476)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              strcmp(..., (char *) crypt(...)) != 0
+          - pattern: |
+              strcmp(..., crypt(...)) != 0

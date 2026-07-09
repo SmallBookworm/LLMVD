@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2018-16300-unlimited-recursion-bgp_attr_print
+    message: "Unlimited recursion in bgp_attr_print() can lead to stack exhaustion (CVE-2018-16300, CWE-674)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!bgp_attr_print($NDATA, $ATYPE, $TPTR, $ALEN))
+              return 0;
+      - pattern: |
+          if (!bgp_attr_print($NDATA, $ATYPE, $PPTR, $PLEN))
+              return 0;
+    metadata:
+      cwe: "CWE-674"
+      cve: "CVE-2018-16300"
+      references:
+        - https://github.com/the-tcpdump-group/tcpdump/commit/af2cf04a9394c1a56227c2289ae8da262828294a

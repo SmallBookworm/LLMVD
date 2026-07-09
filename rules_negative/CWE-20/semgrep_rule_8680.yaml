@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2017-13194-libvpx-odd-frame-width
+    message: "Potential improper handling of odd frame width in libvpx leading to memory corruption (CVE-2017-13194, CWE-20)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          align = (1 << $XCS) - 1;
+          w = (d_w + align) & ~align;
+          align = (1 << $YCS) - 1;
+          h = (d_h + align) & ~align;
+          ...
+          if (!img_data) { ... }
+      - pattern: |
+          $W = (d_w + ((1 << $XCS) - 1)) & ~((1 << $XCS) - 1);
+          $H = (d_h + ((1 << $YCS) - 1)) & ~((1 << $YCS) - 1);
+          ...
+          if (!img_data) { ... }
+    metavariable-pattern:
+      $XCS: "xcs"
+      $YCS: "ycs"

@@ -1,0 +1,17 @@
+rules:
+  - id: mongodb-role-name-parser-uninitialized-memory
+    message: "Incorrect validation of user input in RoleName::parseFromBSON may lead to use of uninitialized memory (CVE-2020-7925). The dbField type check incorrectly validates nameField instead of dbField."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          uassert(...,
+                  ...,
+                  nameField.type() == String);
+          ...
+          uassert(...,
+                  ...,
+                  nameField.type() == String);
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2020-7925"

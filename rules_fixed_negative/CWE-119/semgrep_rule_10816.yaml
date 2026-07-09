@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2013-4264-kempf-decode-tile-bounds-check
+    message: Missing bounds check on src pointer before dereference in kempf_decode_tile may lead to out-of-bounds heap write (CWE-119).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!bits) {
+              bitbuf = *src++;
+              ...
+          }
+      - pattern: |
+          if (src_end - src < zsize)
+              return AVERROR_INVALIDDATA;

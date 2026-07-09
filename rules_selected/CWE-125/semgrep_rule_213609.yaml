@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2020-11521-out-of-bounds-write
+    message: "Potential out-of-bounds write due to unsafe pointer arithmetic (CVE-2020-11521)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (pRLE >= pEnd)
+                return -1;
+              ...
+              controlByte = *pRLE++;
+          - pattern: |
+              pRLE += cRawBytes;
+              ...
+              if (pRLE > pEnd)
+                return -1;
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2020-11521"

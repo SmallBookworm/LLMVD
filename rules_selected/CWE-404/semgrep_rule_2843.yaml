@@ -1,0 +1,11 @@
+rules:
+  - id: omninet_open_tty_reference_leak
+    patterns:
+      - pattern-either:
+          - pattern: |
+              tty_port_tty_set(&($SERIAL->port[1])->port, $TTY)
+          - pattern: |
+              tty_port_tty_set(&$WPORT->port, $TTY)
+    message: "Detected unnecessary tty reference in omninet_open which may cause tty exhaustion (CVE-2017-8925, CWE-404)."
+    severity: ERROR
+    languages: [c]

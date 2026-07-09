@@ -1,0 +1,27 @@
+rules:
+  - id: cwe-787-sdp-copy-raw-data-oob-write
+    message: "Potential out-of-bounds write in sdp_copy_raw_data due to insufficient bounds checking before memcpy. This could lead to remote code execution over Bluetooth."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (offset) {
+                type = *p++;
+                p = sdpu_get_len_from_type(p, type, &list_len);
+              }
+              ...
+              memcpy(..., p, cpy_len);
+          - pattern: |
+              if (offset) {
+                type = *p++;
+                p = sdpu_get_len_from_type(p, type, &list_len);
+              }
+              if (list_len < cpy_len) {
+                cpy_len = list_len;
+              }
+              ...
+              memcpy(..., p, cpy_len);
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2018-9504"

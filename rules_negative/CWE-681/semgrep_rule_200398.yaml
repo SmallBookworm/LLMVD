@@ -1,0 +1,7 @@
+rules:
+  - id: cve-2020-28588
+    message: "Potential information disclosure due to improper casting of syscall arguments on 32-bit platforms. Directly casting info->data.args (u64 array) to unsigned long* in syscall_get_arguments() may leak uninitialized memory."
+    severity: HIGH
+    languages: [c]
+    pattern: |
+      syscall_get_arguments(..., (unsigned long *)&info->data.args[...])

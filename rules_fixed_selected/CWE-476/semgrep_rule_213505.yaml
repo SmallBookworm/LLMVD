@@ -1,0 +1,16 @@
+rules:
+  - id: null_pointer_dereference-ReadVIDImage-InterpretImageProperties
+    message: "Potential NULL pointer dereference. The return value of InterpretImageProperties is used without a NULL check before being passed to SetImageProperty."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $LABEL = InterpretImageProperties(...);
+          (void) SetImageProperty(..., $LABEL, ...);
+      - pattern: |
+          $LABEL = InterpretImageProperties(...);
+          ...;
+          (void) SetImageProperty(..., $LABEL, ...);
+    metavariable-pattern:
+      metavariable: $LABEL
+      pattern: "char *"

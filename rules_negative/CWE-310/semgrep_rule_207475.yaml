@@ -1,0 +1,29 @@
+rules:
+  - id: libgcrypt_rsa_side_channel_vulnerability
+    message: "Detected vulnerable pattern in _gcry_mpi_powm susceptible to cache side-channel attack (CVE-2017-7526, CWE-310). The code lacks constant-time computation for square and multiply operations."
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          base_u_size = 0;
+          for (...; ...; ...)
+            {
+              ...
+              mpi_set_cond (...);
+              base_u_size |= (...);
+            }
+
+          for (j += ...; j >= 0; j--)
+            {
+              mul_mod (..., j == 0 ? base_u : rp, j == 0 ? base_u_size : rsize, ...);
+              ...
+            }
+      - pattern: |
+          for (j += ...; j >= 0; j--)
+            {
+              ...
+              mul_mod (xp, &xsize, rp, rsize,
+                       j == 0 ? base_u : rp, j == 0 ? base_u_size : rsize,
+                       mp, msize, &karactx);
+              ...
+            }

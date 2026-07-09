@@ -1,0 +1,37 @@
+rules:
+  - id: suricata-tcp-syn-sent-timestamp-validation-missing
+    message: Missing timestamp validation in TCP SYN_SENT state may allow RST/FIN injection to bypass detection (CVE-2019-18625).
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          if (StateSynSentValidateTimestamp($SSN, $P) == false)
+              return -1;
+      - pattern-either:
+          - pattern: |
+              static int StreamTcpPacketStateSynSent(..., TcpSession *$SSN, ...)
+              {
+                ...
+                if ($SSN == NULL)
+                    return -1;
+                ...
+                /* RST */
+                if ($P->tcph->th_flags & TH_RST) { ... }
+                ...
+              }
+          - pattern: |
+              static int StreamTcpPacketStateSynSent(..., TcpSession *$SSN, ...)
+              {
+                ...
+                if ($SSN == NULL)
+                    return -1;
+                ...
+                /* FIN */
+                else if ($P->tcph->th_flags & TH_FIN) { ... }
+                ...
+              }
+    metavariable-regex:
+      - metavariable: SSN
+        regex: ssn
+      - metavariable: P
+        regex: p

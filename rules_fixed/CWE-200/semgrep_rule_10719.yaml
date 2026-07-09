@@ -1,0 +1,18 @@
+rules:
+  - id: megasas-bios-version-not-null-terminated
+    message: "BIOS version buffer is not null-terminated, which may lead to out-of-bounds read (CWE-200)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              memcpy($BUF, $PTR + 0x41, 31);
+              ...
+              memcpy($DST, $BUF, strlen((const char *)$BUF));
+          - pattern: |
+              memcpy($BUF, $PTR + 0x41, 31);
+              ...
+              strlen((const char *)$BUF);
+    metavariable-pattern:
+      $BUF:
+        pattern-regex: \bbiosver\b

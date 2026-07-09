@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2018-10360-out-of-bounds-read
+    message: Potential out-of-bounds read in do_core_note due to missing buffer boundary check in string traversal.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (cp = cname; *cp && isprint(*cp); cp++)
+                  continue;
+          - pattern: |
+              for (cp = cname; *cp && ...; cp++)
+                  ...;
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2018-10360"

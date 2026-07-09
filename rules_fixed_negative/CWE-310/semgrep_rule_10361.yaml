@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2012-2143-crypt-des-null-byte-handling
+    message: "DES-based crypt function may truncate password at 0x80 byte, leading to authentication bypass (CVE-2012-2143)."
+    severity: HIGH
+    languages: [c]
+    cwe: ["CWE-310"]
+    pattern: |
+      while (q - (uint8 *) keybuf - 8)
+      {
+         if ((*q++ = *key << 1))
+              key++;
+      }

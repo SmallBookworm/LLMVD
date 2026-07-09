@@ -1,0 +1,34 @@
+rules:
+  - id: msr_open_missing_capability_check
+    patterns:
+      - pattern-either:
+          - pattern: |
+              static int msr_open(struct inode *inode, struct file *file)
+              {
+                ...
+                if (!cpu_has(...))
+                  return ...;
+                return 0;
+              }
+          - pattern: |
+              static int msr_open(struct inode *inode, struct file *file)
+              {
+                ...
+                unsigned int cpu = ...;
+                ...
+                if (cpu >= nr_cpu_ids || !cpu_online(cpu))
+                  return ...;
+                ...
+                if (!cpu_has(...))
+                  return ...;
+                return 0;
+              }
+      - pattern-not: |
+          if (!capable(CAP_SYS_RAWIO))
+            return -EPERM;
+    message: "Missing CAP_SYS_RAWIO capability check in msr_open allows privilege escalation. See CVE-2013-0268."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-264"
+      confidence: HIGH

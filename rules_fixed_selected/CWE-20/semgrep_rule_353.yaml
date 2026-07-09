@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2014-3567-memory-leak
+    message: "Missing EVP_CIPHER_CTX_cleanup call on HMAC verification failure may cause memory leak (CVE-2014-3567)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (CRYPTO_memcmp(...))
+                  return 2;
+          - pattern: |
+              if (CRYPTO_memcmp(...))
+                  { ... }
+    metavariable-pattern:
+      metavariable: $BODY
+      patterns:
+        - pattern-not: |
+            if (CRYPTO_memcmp(...))
+                {
+                EVP_CIPHER_CTX_cleanup(...);
+                ...
+                return 2;
+                }

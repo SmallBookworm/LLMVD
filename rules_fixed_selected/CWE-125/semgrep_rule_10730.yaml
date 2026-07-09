@@ -1,0 +1,19 @@
+rules:
+  - id: cwe-125-yara-buffer-overread
+    message: "Potential buffer over-read due to missing bounds check before accessing match_data. This could lead to denial of service or information disclosure (CVE-2017-9465)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          match_length += $FORWARD_MATCHES;
+          ...
+          yr_arena_write_data(..., $MATCH_DATA, ..., ...);
+      - pattern: |
+          match_length += $FORWARD_MATCHES;
+          ...
+          yr_arena_allocate_memory(..., sizeof(YR_MATCH), ...);
+          ...
+          yr_arena_write_data(..., $MATCH_DATA, ..., ...);
+    metavariable-pattern:
+      $MATCH_DATA: match_data
+    focus-metavariable: $MATCH_DATA

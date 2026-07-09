@@ -1,0 +1,17 @@
+rules:
+  - id: openssl-cms-decrypt-padding-oracle
+    message: "CMS_decrypt may be vulnerable to a Bleichenbacher padding oracle attack when used without a certificate (cert == NULL). Ensure OpenSSL is updated or cert is provided."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      if (!cert)
+        cms->d.envelopedData->encryptedContentInfo->havenocert = 1;
+    pattern-not-inside: |
+      if (!cert) {
+        cms->d.envelopedData->encryptedContentInfo->havenocert = 1;
+      } else {
+        cms->d.envelopedData->encryptedContentInfo->havenocert = 0;
+      }
+    metadata:
+      cwe: "CWE-311"
+      cve: "CVE-2019-1563"

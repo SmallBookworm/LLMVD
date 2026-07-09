@@ -1,0 +1,17 @@
+rules:
+  - id: gpgme-heap-buffer-overflow-cve-2014-3564
+    message: "Heap-based buffer overflow vulnerability in status_handler due to incorrect linesize update. This may lead to memory corruption, denial of service, or arbitrary code execution."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($COND)
+                {
+                  ...
+                  $$struct->colon.attic.linesize += $linelen + 1;
+                  ...
+                }
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2014-3564"

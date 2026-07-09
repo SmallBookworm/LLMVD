@@ -1,0 +1,20 @@
+rules:
+  - id: cwe-125-out-of-bounds-read-tga-rle
+    message: "Potential out-of-bounds read in TGA RLE decompression due to insufficient bounds check before buffer access."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!((buffer_caret + (encoded_pixels * pixel_block_size)) < image_block_size)) {
+                ...
+                return -1;
+              }
+          - pattern: |
+              if (!((buffer_caret + (encoded_pixels * pixel_block_size)) < ...)) {
+                ...
+                return -1;
+              }
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2016-6905"

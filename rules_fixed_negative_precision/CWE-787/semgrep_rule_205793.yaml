@@ -1,0 +1,16 @@
+rules:
+  - id: gstreamer-rtsp-sessionid-buffer-overflow
+    message: "Heap-based buffer overflow in RTSP session ID parsing due to missing bounds check before ';'."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      for ($I = 0; session_id[$I] != '\0'; $I++) {
+        if (session_id[$I] == ';') {
+          $MAXLEN = $I;
+          ...
+          break;
+        }
+      }
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2019-9928"

@@ -1,0 +1,20 @@
+rules:
+  - id: exiv2-out-of-bounds-read-jp2header
+    message: "Missing bounds check before accessing memory in Jp2Image::encodeJp2Header may lead to out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          while ( count < length || !bWroteColor ) {
+              Jp2BoxHeader* pSubBox = (Jp2BoxHeader*) (p+count) ;
+              ...
+          }
+      - pattern: |
+          while ( count < length || !bWroteColor ) {
+              ...
+              Jp2BoxHeader* pSubBox = (Jp2BoxHeader*) (p+count) ;
+              ...
+          }
+    metavariable-regex:
+      metavariable: $...
+      regex: "^(?!.*enforce\\(sizeof\\(Jp2BoxHeader\\) <= length - count).*$"

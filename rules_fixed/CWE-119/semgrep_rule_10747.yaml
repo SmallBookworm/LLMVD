@@ -1,0 +1,15 @@
+rules:
+  - id: spice-ticket-buffer-overflow
+    message: "Stack-based buffer overflow in reds_handle_ticket due to undersized password buffer passed to RSA_private_decrypt. The buffer must be at least RSA_size(rsa) bytes."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      char password[$SIZE];
+      ...
+      RSA_private_decrypt(..., (unsigned char *)password, ...)
+    metavariable-pattern:
+      $SIZE <: "SPICE_MAX_PASSWORD_LENGTH"
+    fix-regex:
+      regex: ""
+      replacement: ""
+      enabled: false

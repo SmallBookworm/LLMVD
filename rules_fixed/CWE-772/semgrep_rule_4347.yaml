@@ -1,0 +1,27 @@
+rules:
+  - id: cve-2017-12190-unbalanced-refcounting
+    message: "Unbalanced refcounting in bio_map_user_iov may cause memory leak (CVE-2017-12190, CWE-772). Missing put_page calls for pages already added to bio in error path."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          out_unmap:
+          for ($j = 0; $j < $nr_pages; $j++) {
+            if (!$pages[$j])
+              break;
+            put_page($pages[$j]);
+          }
+      - pattern: |
+          out_unmap:
+          for ($j = $cur_page; $j < $page_limit; $j++) {
+            if (!$pages[$j])
+              break;
+            put_page($pages[$j]);
+          }
+    metavariable-regex:
+      metavariable: $nr_pages
+      regex: nr_pages
+    fix-regex:
+      regex: .*
+      replacement: ${0}
+      enabled: false

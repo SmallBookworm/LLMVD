@@ -1,0 +1,17 @@
+rules:
+  - id: cwe-787-integer-overflow-buffer-alloc
+    message: |
+      Potential integer overflow leading to heap-based buffer overflow in malloc size calculation.
+      Multiplication of 'pitch' and '*height' may overflow before being passed to malloc.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          $PITCH = ...;
+          ... malloc($PITCH * (*$HEIGHT)) ...
+      - metavariable-pattern:
+          metavariable: $PITCH
+          pattern: int
+      - metavariable-pattern:
+          metavariable: $HEIGHT
+          pattern: int

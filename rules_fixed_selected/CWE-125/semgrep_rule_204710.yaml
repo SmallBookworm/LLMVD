@@ -1,0 +1,38 @@
+rules:
+  - id: imagemagick-getnexttoken-buffer-overread
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (p++; *p != '\0'; p++)
+              {
+                ...
+                if (i < (ssize_t) (extent-1))
+                  token[i++]=(*p);
+                ...
+              }
+          - pattern: |
+              for ( ; (p < q) && (*p != ','); p++)
+                if (i < (ssize_t) (extent-1))
+                  token[i++]=(*p);
+          - pattern: |
+              for ( ; *p != '\0'; p++)
+              {
+                ...
+                if (i < (ssize_t) (extent-1))
+                  token[i++]=(*p);
+                ...
+                if (*p == '(')
+                  for (p++; *p != '\0'; p++)
+                  {
+                    if (i < (ssize_t) (extent-1))
+                      token[i++]=(*p);
+                    ...
+                  }
+                ...
+              }
+    message: "Potential heap-based buffer over-read in GetNextToken due to missing bounds check against input length (CWE-125)."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2017-10928"

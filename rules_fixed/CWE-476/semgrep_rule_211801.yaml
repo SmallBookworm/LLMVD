@@ -1,0 +1,16 @@
+rules:
+  - id: openexr-dwa-null-pointer-dereference
+    message: "Potential NULL pointer dereference in DWA decompression due to missing null check on _packedAcBuffer before use."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          if ($AC_COMPRESSED_SIZE > 0)
+          {
+              if ($TOTAL_AC_UNCOMPRESSED_COUNT * sizeof(unsigned short) > $PACKED_AC_BUFFER_SIZE)
+              {
+                  throw ...;
+              }
+              ...
+              ($FUNC)($COMPRESSED_AC_BUF, ..., (unsigned short *)_packedAcBuffer, ...);
+          }

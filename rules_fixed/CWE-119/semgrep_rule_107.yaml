@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2013-2236-buffer-overflow
+    message: "Potential stack-based buffer overflow due to missing bounds check before using 'len' which may exceed buffer size."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              u_char $buf[...];
+              ...
+              $len = sizeof(...) + $filter->num_areas * sizeof(...);
+              ...
+              msg_new(..., $len);
+          - pattern: |
+              u_char $buf[...];
+              ...
+              $len = sizeof(...) + $filter->num_areas * sizeof(...);
+              ...
+              return msg_new(..., $len);
+    metavariable-pattern:
+      metavariable: $buf
+      pattern: u_char [...]
+    focus-metavariable: $len

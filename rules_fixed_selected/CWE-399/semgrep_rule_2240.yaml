@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2015-8785-fuse-infinite-loop
+    message: "Potential infinite loop in fuse_fill_write_pages due to missing iov_iter_advance() before 'goto again', which can be triggered by a zero-length iov segment (CVE-2015-8785, CWE-399)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!tmp) {
+            ...
+            goto again;
+          }
+      - pattern: |
+          if (!tmp) {
+            ...
+            $X;
+            goto again;
+          }
+    metavariable-pattern:
+      metavariable: $X
+      pattern-not: iov_iter_advance(...)

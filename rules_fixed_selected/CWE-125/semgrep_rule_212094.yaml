@@ -1,0 +1,21 @@
+rules:
+  - id: exiv2-psd-resources-length-check-missing
+    message: Missing check that resourcesLength is less than file size, which may lead to heap-based buffer over-read (CWE-125).
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      uint32_t resourcesLength = getULong(...);
+      while (resourcesLength > 0)
+      {
+      ...
+      }
+    pattern-not: |
+      uint32_t resourcesLength = getULong(...);
+      enforce(resourcesLength < io_->size(), ...);
+      while (resourcesLength > 0)
+      {
+      ...
+      }
+    fix-regex:
+      regex: ''
+      replacement: ''

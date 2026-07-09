@@ -1,0 +1,13 @@
+rules:
+  - id: sscanf_unsigned_int_vulnerability
+    message: "Use of sscanf with %u for packet length may allow negative values to be interpreted as large unsigned integers, leading to buffer overflows or crashes. Use signed integer with %d and validate for negativity instead."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              sscanf(..., "%<...>u", ..., &pkt_len, ...);
+    metavariable-pattern:
+      metavariable: pkt_len
+      pattern: 
+        type: "guint"

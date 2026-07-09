@@ -1,0 +1,23 @@
+rules:
+  - id: hivex-ri-record-recursion-stack-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (_get_children (...,$$offset,...,$flags) == -1)
+                return -1;
+          - pattern: |
+              if (_get_children (...,$$offset,...,$flags, ...) == -1)
+                return -1;
+    pattern-not: |
+      if ($depth >= 32) {
+        ...
+        return -1;
+      }
+      if (_get_children (...,$$offset,...,$flags, $depth+1) == -1)
+        return -1;
+    message: "Unbounded recursion in _get_children when processing ri-records may lead to stack overflow (CVE-2021-3622)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-400"
+      cve: "CVE-2021-3622"

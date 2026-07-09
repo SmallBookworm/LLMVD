@@ -1,0 +1,12 @@
+rules:
+  - id: null_pointer_dereference_writefile
+    message: "Potential NULL pointer dereference in writefile. The 'struct string *s' should be checked for NULL before accessing its members."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      fwrite(s->s, 1, s->n, ...)
+    pattern-not: |
+      if (s && fwrite(s->s, 1, s->n, ...))
+    fix-regex:
+      regex: ""
+      replacement: ""

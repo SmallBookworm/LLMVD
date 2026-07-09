@@ -1,0 +1,21 @@
+rules:
+  - id: hid_report_fixup_out_of_bounds
+    message: "Potential out-of-bounds write due to insufficient report descriptor size check before accessing rdesc[61]."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (*$RSIZE >= 60 && ... && $RDESC[61] == ...)
+          - pattern: |
+              if (*$RSIZE > 60 && ... && $RDESC[61] == ...)
+    metavariables:
+      - metavariable: $RSIZE
+        pattern-either:
+          - pattern: rsize
+      - metavariable: $RDESC
+        pattern-either:
+          - pattern: rdesc
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2014-3184"

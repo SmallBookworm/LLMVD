@@ -1,0 +1,22 @@
+rules:
+  - id: dovecot-imap-bodystructure-missing-dummy
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((part->flags & MESSAGE_PART_FLAG_MESSAGE_RFC822) != 0) {
+                ...
+                str_append(str, " (");
+                imap_envelope_write(...);
+                str_append(str, ") ");
+                ...
+              } else if (...) { ... }
+          - pattern: |
+              if ((part->flags & MESSAGE_PART_FLAG_MESSAGE_RFC822) != 0) {
+                ...
+              } else if (...) { ... }
+    message: "Missing handling for truncated message/rfc822 MIME parts may lead to invalid BODYSTRUCTURE and crash (CVE-2020-25275)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2020-25275"

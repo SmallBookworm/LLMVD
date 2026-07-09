@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2016-0758-asn1-integer-overflow
+    message: "Potential integer overflow in ASN.1 length parsing leading to buffer overread (CVE-2016-0758, CWE-787). Missing validation of 'len' against remaining data before use."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (len <= 0x7f) {
+              dp += len;
+              ...
+          }
+      - pattern: |
+          for (len = 0; n > 0; n--) {
+              len <<= 8;
+              len |= data[dp++];
+          }
+          dp += len

@@ -1,0 +1,13 @@
+rules:
+  - id: nfsd-direct-set_acl-call
+    message: Direct call to inode->i_op->set_acl bypasses permission checks and inode locking. Use set_posix_acl instead.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $inode->i_op->set_acl($...)
+    metadata:
+      cwe: ["CWE-284"]
+      references:
+        - https://github.com/torvalds/linux/commit/999653786df6954a31044528ac3f7a5dadca08f4
+        - CVE-2016-1237

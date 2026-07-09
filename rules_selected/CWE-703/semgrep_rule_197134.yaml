@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2018-5813-infinite-loop-parse_minolta
+    message: "Missing validation of 'len' in parse_minolta() may lead to an infinite loop (CVE-2018-5813, CWE-703)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          len = get4();
+          switch (...)
+          {
+          ...
+          }
+          fseek(..., save + len + 8, ...);
+      - pattern: |
+          len = get4();
+          ...
+          fseek(..., save + len + 8, ...);
+    metavariable-pattern:
+      metavariable: len
+      pattern-not: |
+        if (len < 0)
+          return;

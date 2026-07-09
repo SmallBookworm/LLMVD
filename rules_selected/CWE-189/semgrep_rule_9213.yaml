@@ -1,0 +1,32 @@
+rules:
+  - id: pmcraid_negative_request_size
+    patterns:
+      - pattern-either:
+          - pattern: |
+              request_size = buffer->ioarcb.data_transfer_length;
+              ...
+              if (request_size > 0) { ... }
+              else if (request_size < 0) {
+                ...
+                goto out_free_buffer;
+              }
+              ...
+              if (request_size) {
+                ...pmcraid_build_passthrough_ioadls(..., request_size, ...);
+              }
+          - pattern: |
+              request_size = buffer->ioarcb.data_transfer_length;
+              ...
+              if (request_size > 0) { ... }
+              else if (request_size < 0) {
+                ...
+                goto out_free_buffer;
+              }
+              ...
+              if (direction == DMA_TO_DEVICE && request_size > 0) { ... }
+    message: "Negative request_size from user-controlled data_transfer_length may lead to integer signedness error (CWE-189). Ensure negative sizes are rejected before use in allocation or memory operations."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-189"
+      cve: "CVE-2011-2906"

@@ -1,0 +1,12 @@
+rules:
+  - id: git-credential-newline-injection
+    message: "Credential value containing a newline can lead to protocol injection (CVE-2020-5260)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      fprintf($FP, $KEY "=...%s\\n", ..., $VALUE);
+    pattern-not: |
+      if (strchr($VALUE, '\\n')) {
+        die(...);
+      }
+      fprintf($FP, $KEY "=...%s\\n", ..., $VALUE);

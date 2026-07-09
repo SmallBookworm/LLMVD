@@ -1,0 +1,25 @@
+rules:
+  - id: imagemagick-cals-memory-leak-cve-2017-12669
+    message: "Memory leak in WriteCALSImage due to missing DestroyImageInfo call on error path."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $WRITE_INFO = CloneImageInfo(...);
+          ...
+          if ($GROUP4_IMAGE == (Image *) NULL)
+            {
+              (void) CloseBlob(...);
+              return(MagickFalse);
+            }
+      - pattern: |
+          $WRITE_INFO = CloneImageInfo(...);
+          ...
+          if ($GROUP4 == (unsigned char *) NULL)
+            {
+              (void) CloseBlob(...);
+              return(MagickFalse);
+            }
+    metavariable-pattern:
+      metavariable: $WRITE_INFO
+      pattern: ImageInfo *

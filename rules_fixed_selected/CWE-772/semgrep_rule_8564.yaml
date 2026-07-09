@@ -1,0 +1,43 @@
+rules:
+  - id: cve-2017-0818-missing-buffer-release
+    message: "Potential resource leak due to missing MediaBuffer::release() before break in loop (CVE-2017-0818, CWE-772)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (err == ERROR_END_OF_STREAM || ...)
+          {
+              ...
+              break;
+          }
+      - pattern: |
+          if (err == ERROR_END_OF_STREAM || ...)
+          {
+              break;
+          }
+    metavariable-pattern:
+      metavariable: $ERR_COND
+      pattern: err == ERROR_END_OF_STREAM || ...
+    pattern-not-inside: |
+        if ($ERR_COND) {
+            ...
+            if ($BUF != NULL) {
+                $BUF->release();
+                $BUF = NULL;
+            }
+            break;
+        }
+    pattern-inside: |
+        while (true) {
+            ...
+            status_t err = ...;
+            ...
+            if ($ERR_COND) {
+                ...
+                break;
+            }
+            ...
+            $BUF->release();
+            $BUF = NULL;
+            ...
+        }

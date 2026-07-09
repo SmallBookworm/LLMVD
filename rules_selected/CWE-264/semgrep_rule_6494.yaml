@@ -1,0 +1,14 @@
+rules:
+  - id: csp_star_wildcard_bypass
+    message: "CSP '*' pattern allows blob:, data:, or filesystem: URLs, leading to policy bypass (CVE-2015-6786)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($ALLOW_STAR) {
+                  return true;
+              }
+    metavariable-pattern:
+      metavariable: $ALLOW_STAR
+      pattern: m_allowStar

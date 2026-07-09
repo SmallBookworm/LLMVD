@@ -1,0 +1,30 @@
+rules:
+  - id: cve-2015-3142-abrt-core-ownership-check
+    message: "Potential information disclosure due to missing ownership validation before writing core dump. UID/GID changes are not reverted before file validation, allowing local users to obtain sensitive information via crafted core dump files."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              xsetegid(...);
+              xseteuid(...);
+              ...;
+              int $FD = openat(...);
+              ...;
+              xsetegid(0);
+              xseteuid(0);
+              ...;
+              if (... || fstat($FD, ...) != 0 || ... || $SB.st_uid != $FSUID) { ... }
+          - pattern: |
+              xsetegid(...);
+              xseteuid(...);
+              ...;
+              int $FD = openat(...);
+              ...;
+              xsetegid(0);
+              xseteuid(0);
+              ...;
+              if ($FD < 0 || fstat($FD, ...) != 0 || ... || $SB.st_uid != $FSUID) { ... }
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2015-3142"

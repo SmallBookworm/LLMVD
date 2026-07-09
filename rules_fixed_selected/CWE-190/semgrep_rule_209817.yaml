@@ -1,0 +1,13 @@
+rules:
+  - id: imagemagick-integer-overflow-pixel-offset
+    message: Unconstrained pixel offset calculation may lead to integer overflow (CWE-190). Use ConstrainPixelOffset() to sanitize input before casting to integer.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: (ssize_t) floor($X)
+      - pattern: (ssize_t) (floor($X + 0.5) - 1)
+      - pattern: (ssize_t) floor($X + 0.5)
+    metavariable-pattern:
+      metavariable: $X
+      pattern-not: ConstrainPixelOffset(...)
+    fix: ""

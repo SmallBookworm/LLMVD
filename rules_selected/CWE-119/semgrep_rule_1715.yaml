@@ -1,0 +1,28 @@
+rules:
+  - id: brcmf_cfg80211_start_ap_ssid_overflow
+    message: "Potential stack-based buffer overflow due to missing SSID length validation in brcmf_cfg80211_start_ap. User-controlled SSID IE length may exceed IEEE80211_MAX_SSID_LEN, leading to memory corruption."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!ssid_ie)
+                return -EINVAL;
+            # Missing length check after parsing SSID IE
+          - pattern: |
+              if (!ssid_ie || ssid_ie->len > IEEE80211_MAX_SSID_LEN)
+                return -EINVAL;
+            # This is the fixed version; we want to match only the vulnerable one
+    pattern-not: |
+      if (!ssid_ie || ssid_ie->len > IEEE80211_MAX_SSID_LEN)
+        return -EINVAL;
+    pattern-inside: |
+      struct cfg80211_ap_settings *settings;
+      ...
+      if (settings->ssid == NULL || settings->ssid_len == 0) {
+        ...
+        ssid_ie = brcmf_parse_tlvs(..., WLAN_EID_SSID);
+        ...
+        memcpy(..., ssid_ie->data, ssid_ie->len);
+        ...
+      }

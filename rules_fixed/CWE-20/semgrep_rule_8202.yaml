@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2016-3756-unvalidated-partition-index
+    message: "Unvalidated partition index may lead to out-of-bounds access (CWE-20). Partition index should be checked against info->partitions before use."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (info->stagemasks[(int)partword[...][...]] & (1 << s))
+      - pattern: |
+          if (info->stagemasks[(int)partword[...]] & (1 << s))
+    metadata: {}

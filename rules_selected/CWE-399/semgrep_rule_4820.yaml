@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2011-2834-double-free
+    message: "Potential double free vulnerability in XPath handling. In error conditions, an object may be freed twice via xmlXPathFreeObject and xmlXPathReleaseObject."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (ctxt->error) {
+                xmlXPathFreeObject($OBJ);
+                return(0);
+              }
+              ...
+              xmlXPathReleaseObject($CTX, $OBJ);
+          - pattern: |
+              if (ctxt->error != XPATH_EXPRESSION_OK) {
+                xmlXPathFreeObject($OBJ);
+                return(0);
+              }
+              ...
+              xmlXPathReleaseObject($CTX, $OBJ);
+    metadata:
+      cwe: "CWE-399"
+      cve: "CVE-2011-2834"

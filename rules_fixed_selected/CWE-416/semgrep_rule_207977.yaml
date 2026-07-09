@@ -1,0 +1,15 @@
+rules:
+  - id: use_after_free_skb_zerocopy_no_error_handling
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (skb_zerocopy(...))
+                  ...
+          - pattern: |
+              skb_zerocopy(...)
+    message: "Use-after-free vulnerability due to missing error handling and orphaning in skb_zerocopy. This may lead to information disclosure (CWE-416)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2014-2568"

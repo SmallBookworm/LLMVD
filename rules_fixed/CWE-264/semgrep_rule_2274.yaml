@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2015-8539-user-key-update-negative-instantiation
+    message: "Potential use-after-free or kernel BUG due to missing check for negatively instantiated user key before accessing payload.data[0]."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (ret == 0) {
+          ...
+          $X = key->payload.data[0];
+          ...
+      }
+    metavariable-pattern:
+      metavariable: $X
+      patterns:
+        - pattern-equals: zap

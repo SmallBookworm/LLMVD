@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2015-3331-buffer-overflow
+    message: "Buffer overflow vulnerability in RFC4106 GCM decryption due to incorrect buffer size calculation (CVE-2015-3331, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          assoc = (src + req->cryptlen + auth_tag_len);
+      - pattern: |
+          scatterwalk_map_and_copy(dst, req->dst, 0, req->cryptlen, 1);

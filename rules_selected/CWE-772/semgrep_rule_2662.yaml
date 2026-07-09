@@ -1,0 +1,26 @@
+rules:
+  - id: imagemagick-msl-memory-leak-cve-2017-12427
+    message: "Missing cleanup of allocated MSLInfo fields may cause memory leak (CVE-2017-12427, CWE-772)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          xmlFreeParserCtxt($MSL_INFO.parser);
+          ...
+          $MSL_INFO.group_info = (MSLGroupInfo *) RelinquishMagickMemory($MSL_INFO.group_info);
+          ...
+          if ($IMAGE == (Image *) NULL)
+            $IMAGE = (*$MSL_INFO.image);
+          ...
+          if ($MSL_INFO.exception->severity != UndefinedException)
+            return(MagickFalse);
+      - pattern: |
+          xmlFreeParserCtxt($MSL_INFO.parser);
+          ...
+          $MSL_INFO.group_info = (MSLGroupInfo *) RelinquishMagickMemory($MSL_INFO.group_info);
+          ...
+          if ($MSL_INFO.exception->severity != UndefinedException)
+            return(MagickFalse);
+    metavariable-pattern:
+      metavariable: $MSL_INFO
+      pattern: msl_info

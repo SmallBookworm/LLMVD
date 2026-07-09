@@ -1,0 +1,25 @@
+rules:
+  - id: flv_empty_audio_packet_assertion_failure
+    message: "Empty audio packet may cause assertion failure in flv_write_packet. Check for empty audio packets before processing."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (par->codec_type == AVMEDIA_TYPE_AUDIO && !pkt->size) {
+                  ...
+              }
+          - pattern: |
+              switch (par->codec_type) {
+              case AVMEDIA_TYPE_AUDIO:
+                  ...
+                  av_assert0(size);
+                  ...
+              }
+    metavariable-pattern:
+      metavariable: size
+      pattern: pkt->size
+    pattern-not-inside: |
+      if (par->codec_type == AVMEDIA_TYPE_AUDIO && !pkt->size) {
+          ...
+      }

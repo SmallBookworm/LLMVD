@@ -1,0 +1,34 @@
+rules:
+  - id: libmspack-chmd-read-headers-buffer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (memcmp(&name[2], &content_name[2], 31L) == 0) {
+                if (memcmp(&name[33], &content_name[33], 8L) == 0) {
+                  ...
+                }
+              }
+          - pattern: |
+              if (memcmp(&name[2], &control_name[2], 31L) == 0) {
+                if (memcmp(&name[33], &control_name[33], 11L) == 0) {
+                  ...
+                }
+              }
+          - pattern: |
+              if (memcmp(&name[2], &spaninfo_name[2], 31L) == 0) {
+                if (memcmp(&name[33], &spaninfo_name[33], 8L) == 0) {
+                  ...
+                }
+              }
+          - pattern: |
+              if (memcmp(&name[2], &rtable_name[2], 31L) == 0) {
+                if (memcmp(&name[33], &rtable_name[33], 72L) == 0) {
+                  ...
+                }
+              }
+    message: "Detected unsafe memcmp usage without prior name_len validation, which may lead to buffer overread (CWE-119). Fixed version validates name_len before memcmp."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2019-1010305"

@@ -1,0 +1,24 @@
+rules:
+  - id: empathy-adium-xss-cve-2011-4170
+    message: "Unescaped user-controlled input 'name' used in HTML output within action messages may lead to XSS (CVE-2011-4170)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (action) {
+                ...
+                str = g_strdup_printf("<span class='actionMessageUserName'>%s</span>...", name, ...);
+                ...
+              }
+          - pattern: |
+              if (action) {
+                ...
+                str = g_strdup_printf("<span class='actionMessageUserName'>%s</span>...", $NAME, ...);
+                ...
+              }
+    metavariable-pattern:
+      - metavariable: $NAME
+        patterns:
+          - pattern-not:
+              pattern: g_markup_escape_text(...)

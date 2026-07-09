@@ -1,0 +1,17 @@
+rules:
+  - id: smb_fdata-recursion-stack-exhaustion
+    message: "Unbounded recursion in smb_fdata() can lead to stack exhaustion (CVE-2018-16452, CWE-674)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          depth++;
+          buf2 = smb_fdata(...);
+          depth--;
+      - pattern: |
+          ++depth;
+          buf2 = smb_fdata(...);
+          --depth;
+    metavariable-pattern:
+      metavariable: buf2
+      pattern: $BUF2 = smb_fdata(...)

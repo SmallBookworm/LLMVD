@@ -1,0 +1,6 @@
+rules:
+  - id: insecure_unix_socket_in_tmp
+    message: "Unix domain socket created in /tmp is vulnerable to symlink attacks and DoS (CWE-284). Use g_get_user_runtime_dir() instead."
+    severity: WARNING
+    languages: [c]
+    pattern: 'g_strdup_printf("/tmp/.lxterminal-socket%s-%s", ...)'

@@ -1,0 +1,14 @@
+rules:
+  - id: cwe-190-integer-overflow-iso-parser
+    message: "Potential integer overflow in ISO parser due to missing cast to int64_t before multiplication. This can lead to denial of service via crafted ISO file (CVE-2016-5844)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $$skipsize = LOGICAL_BLOCK_SIZE * $$vd->location;
+          - pattern: |
+              $$skipsize = $$block_size * $$vd->location;
+    metavariable-pattern:
+      metavariable: $$block_size
+      pattern: LOGICAL_BLOCK_SIZE

@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2018-18347-invalid-url-navigation
+    message: "Missing validation of URL validity before preserving pending navigation entry, which may lead to execution of JavaScript in an arbitrary origin."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              bool should_preserve_entry = controller_->IsUnmodifiedBlankTab() ||
+                                           delegate_->ShouldPreserveAbortedURLs();
+          - pattern: |
+              bool should_preserve_entry = ...;
+              ...
+              if (pending_entry != controller_->GetVisibleEntry() ||
+                  !should_preserve_entry) {
+                ...
+              }
+    metavariable-pattern:
+      metavariable: should_preserve_entry
+      pattern-not: |
+        pending_entry->GetURL().is_valid() && ...

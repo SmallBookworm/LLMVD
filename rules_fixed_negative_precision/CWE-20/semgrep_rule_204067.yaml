@@ -1,0 +1,20 @@
+rules:
+  - id: libvpx-improper-input-validation-cve-2019-9371
+    message: "Improper input validation may lead to resource exhaustion (CVE-2019-9371). Raw pointer 'colour' is used without RAII, risking memory leaks or use-after-free."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          Colour* colour = NULL;
+          ...
+          if (!Colour::Parse(..., &colour))
+            ...
+          ...
+          pTrack->m_colour = colour;
+      - pattern: |
+          Colour* colour;
+          ...
+          if (!Colour::Parse(..., &colour))
+            ...
+          ...
+          pTrack->m_colour = colour;

@@ -1,0 +1,36 @@
+rules:
+  - id: miniupnp-out-of-bounds-read-cve-2014-3985
+    message: "Potential out-of-bounds read in header parsing due to missing bounds check in while loop condition (CVE-2014-3985)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while((... < ((int)$BUF_USED - 1)) && (...))
+              {
+                ...
+                if($BUF[...] == '\n')
+                {
+                  ...;
+                  if($BUF[...] == '\n')
+                  {
+                    ...;
+                  }
+                }
+                ...;
+              }
+          - pattern: |
+              for(...; ... < $ENDOFHEADERS - 1; ...)
+              {
+                ...
+                else if($BUF[...] == '\r' || $BUF[...] == '\n')
+                {
+                  ...
+                  while($BUF[...] == '\r' || $BUF[...] == '\n')
+                    ...;
+                  ...
+                }
+              }
+    metavariable-patterns:
+      - metavariable: $BUF
+        pattern: header_buf

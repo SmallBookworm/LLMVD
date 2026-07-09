@@ -1,0 +1,28 @@
+rules:
+  - id: type_confusion_merge_param
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (Z_TYPE_PP(test_ptr) == IS_ARRAY) {
+                ...
+              }
+          - pattern: |
+              while (... && Z_TYPE_PP(zdata_ptr) == IS_ARRAY && ...) {
+                ...
+                if (Z_TYPE_PP(test_ptr) == IS_ARRAY) {
+                  ...
+                } else {
+                  ...
+                }
+                ...
+              }
+    pattern-not: |
+      if (Z_TYPE_PP(test_ptr) == IS_ARRAY && Z_TYPE_PP(ptr) == IS_ARRAY) {
+        ...
+      }
+    message: "Potential type confusion vulnerability in merge_param due to missing IS_ARRAY check on 'ptr'."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-704"
+      cve: "CVE-2016-7398"

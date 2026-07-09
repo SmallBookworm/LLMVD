@@ -1,0 +1,14 @@
+rules:
+  - id: nettle-ecc-mod-mul-out-of-range
+    message: "Use of ecc_mod_mul instead of ecc_mod_mul_canonical may lead to out-of-range scalars in ECC point multiplication, potentially causing incorrect signature validation (CVE-2021-20305)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          ecc_mod_mul($P, $T0, $X1, $Z2, $T0);
+          if (mpn_cmp($T0, $P->m, $P->size) >= 0)
+            mpn_sub_n($T0, $T0, $P->m, $P->size);
+      - pattern: |
+          ecc_mod_mul($P, $T1, $X2, $Z1, $T1);
+          if (mpn_cmp($T1, $P->m, $P->size) >= 0)
+            mpn_sub_n($T1, $T1, $P->m, $P->size);

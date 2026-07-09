@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2014-0182-virtio-load-buffer-overflow
+    message: |
+      Heap-based buffer overflow in virtio_load due to missing validation of config_len
+      against vdev->config_len before calling qemu_get_buffer. This may allow remote
+      attackers to execute arbitrary code via a crafted savevm image.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $CONFIG_LEN = qemu_get_be32($F);
+              qemu_get_buffer($F, $VDEV->config, $CONFIG_LEN);
+          - pattern: |
+              $VDEV->config_len = qemu_get_be32($F);
+              qemu_get_buffer($F, $VDEV->config, $VDEV->config_len)
+    fix: ""

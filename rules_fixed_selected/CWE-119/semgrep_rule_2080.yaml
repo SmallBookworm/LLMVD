@@ -1,0 +1,34 @@
+rules:
+  - id: cve-2016-3955-out-of-bounds-write
+    message: "Potential out-of-bounds write in usbip_recv_xbuff due to missing validation of 'size' against 'urb->transfer_buffer_length'."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (ud->side == USBIP_STUB) {
+                  ...
+                  size = urb->transfer_buffer_length;
+              } else {
+                  ...
+                  size = urb->actual_length;
+              }
+              ...
+              if (!(size > 0))
+                  return ...;
+              ...
+              usbip_recv(..., urb->transfer_buffer, size);
+          - pattern: |
+              size = urb->actual_length;
+              ...
+              if (!(size > 0))
+                  return ...;
+              ...
+              usbip_recv(..., urb->transfer_buffer, size);
+    metavariable-pattern:
+      metavariable: size
+      pattern-not: |
+        if (size > urb->transfer_buffer_length) {
+            ...
+            return ...;
+        }

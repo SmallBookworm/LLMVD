@@ -1,0 +1,11 @@
+rules:
+  - id: nfsd-direct-set_acl-call
+    message: Direct call to inode->i_op->set_acl without permission checks or inode locking. Use set_posix_acl instead.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: $inode->i_op->set_acl($inode, $acl, $type)
+          - pattern: $INODE->i_op->set_acl($INODE, $ACL, $TYPE)
+    fix-regex:
+      regex: false

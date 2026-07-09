@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2011-2482-sctp-sock-migrate-null-deref
+    message: "Missing receive buffer accounting for fragmented data in sctp_sock_migrate may lead to NULL pointer dereference (CVE-2011-2482, CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          sctp_sock_rfree($skb);
+          ...
+          sctp_skb_set_owner_r($skb, $newsk);
+      - pattern: |
+          sctp_sock_rfree($skb);
+          ...
+          sctp_skb_set_owner_r($skb, $newsk);
+    metavariable-regex:
+      metavariable: $skb
+      regex: "skb"

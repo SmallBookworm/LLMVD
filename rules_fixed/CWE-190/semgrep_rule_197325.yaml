@@ -1,0 +1,27 @@
+rules:
+  - id: exiv2-webp-integer-overflow
+    message: |
+      Integer overflow vulnerability in WebPImage::getHeaderOffset due to missing check
+      for data_size < header_size, which can lead to buffer overflow.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (...; $I < $DATA_SIZE - $HEADER_SIZE; ...) {
+                ...
+                memcmp(..., &$DATA[$I], $HEADER_SIZE) == 0
+                ...
+              }
+          - pattern: |
+              for (...; $I < $DATA_SIZE - $HEADER_SIZE; ...) {
+                ...
+                memcmp(..., &$DATA[$I], $HEADER_SIZE)
+                ...
+              }
+    metavariable-pattern:
+      $DATA_SIZE: 
+        pattern-regex: data_size
+      $HEADER_SIZE: 
+        pattern-regex: header_size
+    focus-metavariable: $I

@@ -1,0 +1,25 @@
+rules:
+  - id: rsync-archaic-checksum-auth-bypass
+    patterns:
+      - pattern-not: |
+          if (protocol_version < 21) {
+              rprintf(FERROR, "ERROR: protocol version is too old!\n");
+              exit_cleanup(RERR_PROTOCOL);
+          }
+      - pattern-inside: |
+          char *auth_server(int f_in, int f_out, int module, const char *host,
+                            const char *addr, const char *leader)
+          {
+              ...
+              if (!users || !*users)
+                  return "";
+              ...
+              gen_challenge(...);
+              ...
+          }
+    message: "Missing protocol version check before authentication allows use of weak checksums, leading to potential auth bypass (CVE-2017-15994)."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-354"
+      cve: "CVE-2017-15994"

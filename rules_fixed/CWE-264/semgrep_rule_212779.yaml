@@ -1,0 +1,25 @@
+rules:
+  - id: unchecked-setuid
+    patterns:
+      - pattern: setuid(...)
+      - pattern-not-inside: if (... setuid(...) ...)
+      - pattern-not-inside: if (setuid(...) ...)
+      - pattern-not-inside: if (setuid(...) == ...)
+      - pattern-not-inside: if (setuid(...) != ...)
+      - pattern-not-inside: if (... == setuid(...))
+      - pattern-not-inside: if (... != setuid(...))
+      - pattern-not-inside: if ((setuid(...)) ...)
+      - pattern-not: |
+          $RET = setuid(...);
+          ...
+          if ($RET ...)
+      - pattern-not: |
+          $RET = setuid(...);
+          ...
+          if (... $RET ...)
+    message: "The return value of setuid() is not checked. This could lead to privilege escalation if the call fails (e.g., due to process limits)."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-264"
+      cve: "CVE-2013-6825"

@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2009-0935-inotify-double-unlock
+    message: "Potential double unlock of mutex in inotify_read leading to denial of service (CVE-2009-0935)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              mutex_unlock(&dev->ev_mutex);
+              ...
+              mutex_unlock(&dev->ev_mutex);
+          - patterns:
+            - pattern: if (... copy_to_user(...)) { ... break; }
+            - pattern-inside: $F(...)
+            - pattern: mutex_unlock(&dev->ev_mutex);

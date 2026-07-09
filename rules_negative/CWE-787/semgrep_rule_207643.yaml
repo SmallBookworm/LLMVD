@@ -1,0 +1,14 @@
+rules:
+  - id: librelp-buffer-overflow-cve-2018-1000140
+    message: "Potential buffer overflow in certificate name handling. Use relpTcpAddToCertNamesBuffer to safely append to allNames buffer."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              iAllNames += snprintf(allNames + iAllNames, sizeof(allNames) - iAllNames, ...);
+          - pattern: |
+              iAllNames += snprintf(allNames+iAllNames, sizeof(allNames)-iAllNames, ...);
+    metadata:
+      cwe: ["CWE-787"]
+      cve: "CVE-2018-1000140"

@@ -1,0 +1,7 @@
+rules:
+  - id: cve-2008-3247-ldt-size
+    message: "Incorrect LDT entry size calculation may lead to buffer overflow (CWE-119). Use LDT_ENTRY_SIZE instead of sizeof(ldt)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      set_tssldt_descriptor(..., DESC_LDT, entries * sizeof($VAR) - 1)

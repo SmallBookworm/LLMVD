@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2016-3879-null-ptr-deref
+    message: "Potential NULL pointer dereference in DLSParser due to missing null check before calling Convert_art. This may lead to denial of service via crafted media file (CVE-2016-3879, CWE-284)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      Convert_art(&dls, &defaultArt, 0);
+      dls.artCount = 1;
+    pattern-not: |
+      if (dls.pDLS) {
+          Convert_art(&dls, &defaultArt, 0);
+          dls.artCount = 1;
+      }

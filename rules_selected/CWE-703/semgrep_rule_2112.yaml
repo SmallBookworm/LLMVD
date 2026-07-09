@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2016-3138-null-deref-acm-probe
+    message: "Missing NULL check for control_interface or data_interface in acm_probe may lead to NULL pointer dereference (CVE-2016-3138)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (quirks == NO_UNION_NORMAL) {
+              data_interface = usb_ifnum_to_if(...);
+              control_interface = usb_ifnum_to_if(...);
+              goto skip_normal_probe;
+          }
+      - pattern: |
+          if (quirks == NO_UNION_NORMAL) {
+              data_interface = usb_ifnum_to_if(...);
+              control_interface = usb_ifnum_to_if(...);
+              ...
+              goto skip_normal_probe;
+          }
+    metavariable-pattern:
+      metavariable: $...
+      pattern: '...'

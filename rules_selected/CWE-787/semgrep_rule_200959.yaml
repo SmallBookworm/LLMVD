@@ -1,0 +1,22 @@
+rules:
+  - id: libmysofa-heap-buffer-overflow-cve-2021-3756
+    message: "Potential heap-based buffer overflow due to missing data->data reallocation check in layout class 1 handling."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (validAddress(..., ...)) {
+                ...
+                if (!data->data) {
+                  if (data_size > 0x10000000)
+                    return ...;
+                  data->data_len = data_size;
+                  data->data = calloc(1, data_size);
+                  ...
+                }
+                ...
+              }
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2021-3756"

@@ -1,0 +1,12 @@
+rules:
+  - id: curl-use-after-free-CVE-2018-16840
+    message: "Potential use-after-free vulnerability in Curl_close(). The 'data->multi_easy' pointer is not nulled after cleanup, which may lead to a use-after-free condition (CVE-2018-16840)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (data->multi_easy)
+            curl_multi_cleanup(data->multi_easy);
+      - pattern: |
+          if(data->multi_easy)
+            curl_multi_cleanup(data->multi_easy);

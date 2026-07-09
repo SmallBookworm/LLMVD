@@ -1,0 +1,18 @@
+rules:
+  - id: sctp_getsockopt_assoc_stats_unvalidated_copy_from_user
+    message: "Missing validation of 'len' before copy_from_user in sctp_getsockopt_assoc_stats may lead to buffer overflow (CVE-2013-1828, CWE-20)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (copy_from_user($_, $optval, $len))
+            ...
+          ...
+          $len = min_t(size_t, $len, sizeof(...));
+      - pattern: |
+          copy_from_user($_, $optval, $len);
+          ...
+          $len = min_t(size_t, $len, sizeof(...));
+    metavariable-pattern:
+      metavariable: $len
+      pattern: len

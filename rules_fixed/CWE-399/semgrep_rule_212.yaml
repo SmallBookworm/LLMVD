@@ -1,0 +1,18 @@
+rules:
+  - id: dbus_nested_variants_stack_consumption
+    message: "Detected missing depth check in D-Bus variant/array/struct validation, which may lead to stack exhaustion (CVE-2010-4352)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          validate_body_helper (..., const unsigned char *p, const unsigned char *end, ...)
+      - pattern: |
+          validate_body_helper (..., $P, $END, ...)
+    metavariable-pattern:
+      metavariable: $P
+      patterns:
+        - pattern-not:
+            metavariable: total_depth
+    fix-regex:
+      regex: ""
+      replacement: ""

@@ -1,0 +1,8 @@
+rules:
+  - id: cve-2020-8265-use-after-free-tls
+    message: "Detected vulnerable DoWrite function signature using raw WriteWrap pointer, which may lead to use-after-free (CWE-416)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          int $CLASS::DoWrite(WriteWrap* $WRAP, ...)

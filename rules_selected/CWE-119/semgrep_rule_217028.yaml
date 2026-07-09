@@ -1,0 +1,14 @@
+rules:
+  - id: squidclamav-unescaped-url-command-injection
+    patterns:
+      - pattern-either:
+          - pattern: |
+              fprintf(sgfpw, "%s %s %s %s\n", httpinf.url, clientip, username, httpinf.method);
+          - pattern: |
+              fprintf(sgfpw, "%s %s %s %s\n", $URL, $CLIENTIP, $USERNAME, $METHOD);
+    message: "Unescaped URL passed to system command may lead to command injection or denial of service (CWE-119, CVE-2012-3501)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2012-3501"

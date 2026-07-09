@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2016-7052-null-deref-crl
+    message: "Potential NULL pointer dereference in CRL handling due to missing sanity check (CVE-2016-7052, CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (crl_score == best_score) {
+            ...
+            ASN1_TIME_diff(..., X509_CRL_get_lastUpdate(best_crl), ...);
+            ...
+          }
+      - pattern: |
+          if (crl_score < best_score)
+            continue;
+    fix-regex:
+      regex: ""

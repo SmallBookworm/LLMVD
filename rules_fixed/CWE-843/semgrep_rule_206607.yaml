@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2019-13118-uninitialized-read-grouping-char
+    message: "Potential uninitialized read due to narrow character type when handling UTF-8 grouping characters in xsltNumberFormatDecimal."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      xsltNumberFormatDecimal(..., $grouping_char, $len);
+    pattern-not: |
+      int $gchar = xsltGetUTF8Char(...);
+      xsltNumberFormatDecimal(..., $gchar, $len);
+    metadata:
+      fix-regex:
+        enabled: false

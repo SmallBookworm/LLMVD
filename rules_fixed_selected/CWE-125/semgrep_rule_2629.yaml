@@ -1,0 +1,19 @@
+rules:
+  - id: cwe-125-buffer-overread-isoclns-print
+    message: "Buffer over-read vulnerability due to insufficient bounds checking. Use ND_TTEST() for safe access."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($CAPLEN <= 1) {
+                ...
+                return;
+              }
+          - pattern: |
+              if ($CAPLEN > 1)
+                print_unknown_data(..., $CAPLEN);
+    metavariable-pattern:
+      metavariable: "$CAPLEN"
+      pattern:
+        regex: "caplen"

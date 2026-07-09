@@ -1,0 +1,32 @@
+rules:
+  - id: lz4_integer_overflow_check_missing
+    message: Missing integer overflow check in LZ4 decompression may lead to memory corruption (CVE-2014-4611).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (length == RUN_MASK) {
+              ...
+              for (; len == 255; length += 255)
+                  len = *ip++;
+              length += len;
+          }
+      - pattern: |
+          if (length == RUN_MASK) {
+              ...
+              for (; *ip == 255; length += 255)
+                  ip++;
+              length += *ip++;
+          }
+    metavariable-pattern:
+      metavariable: length
+      pattern: size_t
+    pattern-not: |
+      if (length == RUN_MASK) {
+          ...
+          for (; ...; length += 255)
+              ...;
+          if (unlikely(length > (size_t)(length + ...)))
+              goto _output_error;
+          length += ...;
+      }

@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2015-3864-integer-underflow
+    message: "Integer underflow vulnerability in MPEG4Extractor::parseChunk may lead to arbitrary code execution via crafted MPEG-4 data."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((chunk_size > SIZE_MAX) || (SIZE_MAX - chunk_size <= $SIZE)) {
+                  return ERROR_MALFORMED;
+              }
+          - pattern: |
+              if (SIZE_MAX - chunk_size <= $SIZE) {
+                  return ERROR_MALFORMED;
+              }
+    metavariable-pattern:
+      metavariable: $SIZE
+      pattern: size
+    fix-regex:
+      regex: ""
+      replacement: ""

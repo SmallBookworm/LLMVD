@@ -1,0 +1,15 @@
+rules:
+  - id: freetype_psh_glyph_find_strong_points_heap_corruption
+    message: "Missing bounds check on mask->end_point against glyph->num_points may lead to heap corruption (CVE-2010-2498)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          first = mask->end_point;
+      - pattern: |
+          next = mask->end_point;
+    metavariable-pattern:
+      metavariable: mask
+      pattern: mask
+    pattern-not-inside: |
+      $BOUND = mask->end_point > glyph->num_points ? glyph->num_points : mask->end_point;

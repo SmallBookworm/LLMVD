@@ -1,0 +1,29 @@
+rules:
+  - id: cve-2013-4470-ufo-uninitialized-gso
+    message: "Missing GSO initialization for peeked non-UFO skb may lead to memory corruption or privilege escalation (CVE-2013-4470)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((skb = skb_peek_tail($QUEUE)) == NULL) {
+                ...
+                skb->ip_summed = CHECKSUM_PARTIAL;
+                skb->csum = 0;
+                skb_shinfo(skb)->gso_size = ...;
+                skb_shinfo(skb)->gso_type = SKB_GSO_UDP;
+                __skb_queue_tail($QUEUE, skb);
+              }
+              return skb_append_datato_frags(...);
+          - pattern: |
+              if ((skb = skb_peek_tail($QUEUE)) == NULL) {
+                ...
+                skb_shinfo(skb)->gso_size = ...;
+                skb_shinfo(skb)->gso_type = SKB_GSO_UDP;
+                skb->ip_summed = CHECKSUM_PARTIAL;
+                skb->csum = 0;
+                __skb_queue_tail($QUEUE, skb);
+              }
+              return skb_append_datato_frags(...);
+    metavariable-pattern:
+      $QUEUE: "struct sk_buff_head *"

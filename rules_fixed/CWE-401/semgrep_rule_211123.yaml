@@ -1,0 +1,21 @@
+rules:
+  - id: imagemagick-dpx-memory-leak-cve-2019-12975
+    message: "Memory leak in WriteDPXImage due to missing length check before WriteBlob call. This may lead to improper resource shutdown (CWE-401)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $length = ExportQuantumPixels(..., $pixels, ...);
+              $count = WriteBlob($image, $extent, $pixels);
+              if ($count != (ssize_t) $length) ...
+          - pattern: |
+              $length = ExportQuantumPixels(..., $pixels, ...);
+              $count = WriteBlob($image, $extent, $pixels);
+              if ($count != (ssize_t) length) ...
+    metadata:
+      cwe: "CWE-401"
+      cve: "CVE-2019-12975"
+      references:
+        - https://github.com/ImageMagick/ImageMagick/issues/1517
+        - https://github.com/ImageMagick/ImageMagick6/commit/b9c3aa197020ca091a21145cf46855afd4ddcb07

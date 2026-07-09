@@ -1,0 +1,9 @@
+rules:
+  - id: cwe-125-out-of-bounds-read-lcms2
+    message: "Missing overflow check before bounds validation may lead to out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if ((Offset + Len) > SizeOfTag + 8) goto Error;
+    pattern-not: |
+      if (((Offset + Len) < Len) || ((Offset + Len) > SizeOfTag + 8)) goto Error;

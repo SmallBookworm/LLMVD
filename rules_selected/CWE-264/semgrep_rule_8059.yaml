@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2016-3890-jdwp-socket-close
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (... || (...)) {
+                local_socket_close($S);
+                goto restart;
+              }
+    message: "Use of 'local_socket_close' may lead to use-after-free or privilege escalation (CVE-2016-3890). Should use 's->close(s)' instead."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-264"
+      confidence: MEDIUM

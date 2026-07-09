@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2017-5008-private-script-controller-check
+    message: "Missing ownership check on 'privateScriptController' property may lead to UXSS via attacker-controlled JavaScript (CVE-2017-5008)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          v8::Local<v8::Value> privateScriptController =
+              global->Get(..., v8String(..., "privateScriptController"))
+                  .ToLocalChecked();
+          RELEASE_ASSERT(privateScriptController->IsUndefined() ||
+                         privateScriptController->IsObject());
+      - pattern: |
+          v8::Local<v8::Value> privateScriptController =
+              global->Get(..., ...).ToLocalChecked();
+          RELEASE_ASSERT(privateScriptController->IsUndefined() ||
+                         privateScriptController->IsObject());
+    metadata:
+      cwe: "CWE-79"
+      cve: "CVE-2017-5008"

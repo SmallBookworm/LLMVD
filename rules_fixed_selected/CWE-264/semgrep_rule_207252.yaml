@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2014-3684-missing-root-check
+    patterns:
+      - pattern-either:
+          - pattern: |
+              fail_unless(FALSE == ispidowner(1));
+          - pattern: |
+              fail_unless(ispidowner(1) == FALSE);
+    message: "Missing root user check before calling ispidowner(1); may allow privilege escalation (CVE-2014-3684)."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-264"
+      cve: "CVE-2014-3684"

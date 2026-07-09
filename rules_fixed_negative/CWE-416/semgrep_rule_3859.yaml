@@ -1,0 +1,13 @@
+rules:
+  - id: use-after-free-get_net_ns_by_id
+    message: "Use-after-free vulnerability in get_net_ns_by_id(): missing check on net::count after idr_find(). Use maybe_get_net() instead of get_net() to avoid referencing a freed network namespace."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (peer)
+                  get_net(peer);
+    metavariable-regex:
+      metavariable: peer
+      regex: 'peer'

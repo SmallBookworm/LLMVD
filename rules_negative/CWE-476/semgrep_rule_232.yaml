@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2016-7424-null-ptr-deref
+    message: "Potential NULL pointer dereference due to missing edge emulation when unrestricted_mv is disabled. This may lead to denial of service via crafted media files."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (s->unrestricted_mv) {
+                  if ((unsigned)src_x > FFMAX(..., ...) ||
+                      (unsigned)src_y > FFMAX(..., ...)) {
+                      ...
+                  }
+              }
+              pix_op[...](...);
+    metadata:
+      cwe: ["CWE-476"]
+      cve: "CVE-2016-7424"

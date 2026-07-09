@@ -1,0 +1,27 @@
+rules:
+  - id: imagemagick-xwd-out-of-bounds-read-cve-2019-15139
+    message: "Missing overflow check before allocating memory for colormap in XWD image parsing may lead to out-of-bounds read (CVE-2019-15139, CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (header.ncolors != 0)
+            {
+              ...
+              colors=(XColor *) AcquireQuantumMemory((size_t) header.ncolors,
+                sizeof(*colors));
+              ...
+            }
+      - pattern: |
+          if (header.ncolors != 0)
+            {
+              ...
+              length=(size_t) header.ncolors;
+              colors=(XColor *) AcquireQuantumMemory(length,sizeof(*colors));
+              ...
+            }
+    metavariable-comparison:
+      metavariable: header.ncolors
+      comparison: "<= (~0UL)/sizeof(*colors)"
+    fix-regex:
+      enabled: false

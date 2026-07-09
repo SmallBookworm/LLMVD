@@ -1,0 +1,8 @@
+rules:
+  - id: imagemagick-dib-out-of-bounds-write
+    message: "Potential out-of-bounds write in DIB image reader due to unsafe memory allocation. Upgrade to patched version."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      AcquireVirtualMemory((size_t) image->rows, MagickMax(
+        bytes_per_line, image->columns + 256UL) * sizeof(*pixels))

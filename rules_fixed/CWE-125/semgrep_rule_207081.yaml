@@ -1,0 +1,25 @@
+rules:
+  - id: cve-2017-5838-out-of-bounds-read
+    message: "Potential out-of-bounds heap read in gst_date_time_new_from_iso8601_string due to missing length check before parsing timezone info."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (pos) {
+                ... sscanf(pos, ...);
+              }
+          - pattern: |
+              if (pos && ...) {
+                ... sscanf(pos, ...);
+              }
+      - pattern-not: |
+          if (pos && strlen(pos) >= 3) {
+            ... sscanf(pos, ...);
+          }
+    mode: taint
+    pattern-sources:
+      - pattern: pos
+    pattern-sinks:
+      - patterns:
+          - pattern: sscanf(pos, ...)

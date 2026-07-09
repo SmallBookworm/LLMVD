@@ -1,0 +1,14 @@
+rules:
+  - id: incomplete_tiocsti_seccomp_filter
+    message: "Incomplete seccomp filter for TIOCSTI ioctl may allow sandbox bypass (CVE-2019-10063). The filter only blocks exact matches of TIOCSTI, but the kernel accepts ioctl requests where the lower 32 bits match TIOCSTI, allowing bypass on 64-bit systems."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          {SCMP_SYS (ioctl), &SCMP_A1(SCMP_CMP_EQ, (int)TIOCSTI)}
+      - pattern: |
+          {SCMP_SYS (ioctl), &SCMP_A1(SCMP_CMP_EQ, TIOCSTI)}
+    fix-regex:
+      # Not providing autofix as per guidelines
+      regex: ""
+      replacement: ""

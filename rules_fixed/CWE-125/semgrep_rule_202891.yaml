@@ -1,0 +1,16 @@
+rules:
+  - id: imagemagick-psd-buffer-overread
+    message: "Heap-based buffer over-read in ParseImageResourceBlocks due to missing underflow check before pointer arithmetic."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((p + count) > (blocks + length))
+                break;
+          - pattern: |
+              if ((p + count) > (blocks + length))
+                break;
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2018-16412"

@@ -1,0 +1,18 @@
+rules:
+  - id: libraw-thumbnail-size-check-missing
+    message: "Missing thumbnail size validation before memory allocation may lead to out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          malloc(..., T.tlength)
+      - pattern: |
+          calloc(..., T.tlength)
+      - pattern: |
+          malloc(T.tlength)
+      - pattern: |
+          calloc(T.tlength, ...)
+    metavariable-pattern:
+      metavariable: T.tlength
+      pattern-not: |
+        THUMB_SIZE_CHECK...

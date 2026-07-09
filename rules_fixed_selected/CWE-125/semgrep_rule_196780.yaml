@@ -1,0 +1,15 @@
+rules:
+  - id: cwe-125-gf_m2ts_process_pmt-out-of-bounds-read
+    patterns:
+      - pattern: |
+          an_es = (GF_M2TS_PES *)gf_list_get(pmt->program->streams, es->depends_on_pid);
+          if (an_es) {
+            es->depends_on_pid = an_es->pid;
+          }
+    message: "Potential out-of-bounds read due to unchecked array access in gf_m2ts_process_pmt. The index 'es->depends_on_pid' may exceed the bounds of 'pmt->program->streams'."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2020-19481"
+      confidence: HIGH

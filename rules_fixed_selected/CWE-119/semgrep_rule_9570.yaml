@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2018-11506-sr-do-ioctl-buffer-overflow
+    message: |
+      Potential stack-based buffer overflow in sr_do_ioctl due to passing
+      a smaller CDROM-layer sense buffer (64 bytes) to scsi_execute,
+      which expects a larger SCSI sense buffer (96 bytes).
+      This can lead to memory corruption or denial of service.
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      scsi_execute(..., (unsigned char *)cgc->sense, ...)

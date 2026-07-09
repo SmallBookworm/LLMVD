@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2018-16074-site-isolation-bypass
+    message: "Insufficient policy enforcement in site isolation may allow bypass via crafted blob URLs. Missing handling for blob scheme can lead to process sharing between different sites."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!origin.unique()) {
+            ...
+            return GURL(origin.scheme() + ":");
+          } else if ($URL.has_scheme()) {
+            ...
+            return GURL($URL.scheme() + ":");
+          }
+      - pattern: |
+          else if ($URL.has_scheme()) {
+            ...
+            return GURL($URL.scheme() + ":");
+          }
+    metavariable-pattern:
+      metavariable: $URL
+      pattern: url
+    focus-metavariable: $URL

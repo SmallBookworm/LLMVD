@@ -1,0 +1,18 @@
+rules:
+  - id: mongodb-negative-uncompressed-size-check-missing
+    message: "Missing check for negative uncompressedSize may lead to integer overflow or invalid memory allocation"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          if (compressionHeader.uncompressedSize < 0) {
+              ...
+          }
+      - pattern-either:
+          - pattern: |
+              size_t bufferSize = compressionHeader.uncompressedSize + MsgData::MsgDataHeaderSize;
+          - pattern: |
+              auto bufferSize = compressionHeader.uncompressedSize + MsgData::MsgDataHeaderSize;
+    metadata:
+      cwe: ["CWE-697"]
+      cve: "CVE-2019-20925"

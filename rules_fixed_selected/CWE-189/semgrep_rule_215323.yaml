@@ -1,0 +1,23 @@
+rules:
+  - id: hrtimer_forward_integer_overflow
+    message: "Potential integer overflow in hrtimer_forward leading to infinite loop (CVE-2007-6712)"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              timer->expires = ktime_add_ns(..., ...);
+              ...
+              timer->expires = ktime_add(timer->expires, interval);
+              return ...;
+          - pattern: |
+              timer->expires = ktime_add(timer->expires, interval);
+              return ...;
+    pattern-not: |
+      timer->expires = ktime_add(timer->expires, interval);
+      if (timer->expires.tv64 < 0)
+          timer->expires = ktime_set(KTIME_SEC_MAX, 0);
+      return ...;
+    fix-regex:
+      regex: ""
+      replacement: ""

@@ -1,0 +1,17 @@
+rules:
+  - id: imagemagick-tiff-memory-exhaustion
+    message: "Potential memory exhaustion in TIFF image parsing due to missing overflow check before memory allocation."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $number_pixels = (MagickSizeType) ($width * $height);
+          ...
+          $pixels = (uint32 *) AcquireQuantumMemory($width, $height * sizeof(*$pixels));
+      - pattern: |
+          $number_pixels = (MagickSizeType) ($columns * $rows);
+          ...
+          $tile_pixels = (uint32 *) AcquireQuantumMemory($columns, $rows * sizeof(*$tile_pixels));
+    metavariable-regex:
+      metavariable: $number_pixels
+      regex: '^[a-zA-Z_][a-zA-Z0-9_]*$'

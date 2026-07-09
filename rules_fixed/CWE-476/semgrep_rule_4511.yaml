@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2018-7191-tun-dev-get-valid-name-check
+    message: "Improper error check of dev_get_valid_name() return value may lead to NULL pointer dereference (CVE-2018-7191, CWE-476). Only negative return values should be treated as errors."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if ($ERR)
+        goto $LABEL;
+    pattern-inside: |
+      int $FUNC(...) {
+        ...
+        err = dev_get_valid_name(...);
+        ...
+      }
+    metavariable-pattern:
+      patterns:
+        - pattern: $ERR
+        - regex: err

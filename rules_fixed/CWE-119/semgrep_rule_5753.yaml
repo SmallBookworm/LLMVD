@@ -1,0 +1,62 @@
+rules:
+  - id: cwe-119-out-of-bounds-read-v8
+    message: Potential out-of-bounds read due to missing bounds check when accessing array elements.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          $VEC[$INDEX]
+      - pattern-not-inside: |
+          if ($COND) {
+            ...
+            $VEC[$INDEX]
+            ...
+          }
+      - pattern-not-inside: |
+          for (...; ... < $VEC.size(); ...) {
+            ...
+            $VEC[$INDEX]
+            ...
+          }
+      - pattern-not-inside: |
+          for (...; ... < $VEC.length(); ...) {
+            ...
+            $VEC[$INDEX]
+            ...
+          }
+      - pattern-not-inside: |
+          for (...; ... < (int)$VEC.size(); ...) {
+            ...
+            $VEC[$INDEX]
+            ...
+          }
+      - pattern-not-inside: |
+          for (...; ... < (int)$VEC.length(); ...) {
+            ...
+            $VEC[$INDEX]
+            ...
+          }
+      - pattern-not-inside: |
+          if (... < $VEC.size()) {
+            ...
+            $VEC[$INDEX]
+            ...
+          }
+      - pattern-not-inside: |
+          if (... < $VEC.length()) {
+            ...
+            $VEC[$INDEX]
+            ...
+          }
+      - pattern-not-inside: |
+          if ((unsigned)... < $VEC.size()) {
+            ...
+            $VEC[$INDEX]
+            ...
+          }
+      - pattern-not-inside: |
+          if ((size_t)... < $VEC.size()) {
+            ...
+            $VEC[$INDEX]
+            ...
+          }

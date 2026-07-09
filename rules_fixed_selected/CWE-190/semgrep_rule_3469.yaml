@@ -1,0 +1,11 @@
+rules:
+  - id: memcached-integer-overflow-refcount
+    message: "Potential integer overflow in item refcount due to use of item_get instead of limited_get, which may lead to data corruption or deadlocks (CVE-2018-1000127)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          it = item_get(...);
+    metadata:
+      cwe: "CWE-190"
+      cve: "CVE-2018-1000127"

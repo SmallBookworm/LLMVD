@@ -1,0 +1,14 @@
+rules:
+  - id: exif_makernote_strlen_oob_read
+    message: "Out-of-bounds read vulnerability in exif_iif_add_value when handling MakerNote tags due to use of strlen on non-null-terminated data. Use php_strnlen instead."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (tag == TAG_MAKER_NOTE) {
+              length = MIN(length, strlen(value));
+          }
+      - pattern: |
+          if (tag == TAG_MAKER_NOTE) {
+              length = strlen(value);
+          }

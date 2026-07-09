@@ -1,0 +1,18 @@
+rules:
+  - id: git_diff_buffer_overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              char concatpath[PATH_MAX];
+              ...
+              sprintf(concatpath, "%s%s", $BASE, $PATH);
+          - pattern: |
+              char concatpath[PATH_MAX];
+              ...
+              sprintf(concatpath, "%s%s", $BASE, "");
+    message: "Stack-based buffer overflow possible due to use of fixed-size PATH_MAX buffer with sprintf. Use of PATH_MAX may be insufficient if actual path length exceeds system PATH_MAX."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2008-3546"

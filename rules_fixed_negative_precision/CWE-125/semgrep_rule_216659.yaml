@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2017-3731-rc4-md5-oob-read
+    message: "Missing length check before subtracting MD5_DIGEST_LENGTH may cause out-of-bounds read (CVE-2017-3731, CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (!EVP_CIPHER_CTX_encrypting(...)) {
+          len -= MD5_DIGEST_LENGTH;
+          ...
+      }
+    pattern-not: |
+      if (!EVP_CIPHER_CTX_encrypting(...)) {
+          if (len < MD5_DIGEST_LENGTH)
+              return -1;
+          len -= MD5_DIGEST_LENGTH;
+          ...
+      }

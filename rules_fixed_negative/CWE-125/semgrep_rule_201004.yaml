@@ -1,0 +1,19 @@
+rules:
+  - id: exiv2-ciffdirectory-integer-overflow
+    message: "Potential integer overflow leading to out-of-bounds read in CiffDirectory::readDirectory (CWE-125, CVE-2019-13110)"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ( $O + 2 > $SIZE )
+            ...
+      - pattern: |
+          if ( ( $O + ( $COUNT * 10 ) ) > $SIZE )
+            ...
+    metavariable-patterns:
+      - metavariable: $O
+        pattern: "o"
+      - metavariable: $SIZE
+        pattern: "size"
+      - metavariable: $COUNT
+        pattern: "count"

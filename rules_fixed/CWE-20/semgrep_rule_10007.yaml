@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2017-5110-omnibox-spoofing
+    message: "Potential Omnibox spoofing vulnerability due to missing capability restrictions in service manifest (CVE-2017-5110)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern-inside: |
+          $OBJ.RequireCapability("chromeos::crostini_upgrader::mojom::PageHandlerFactory", ...)
+      - pattern: |
+          chromeos::crostini_upgrader::mojom::PageHandlerFactory

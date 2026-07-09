@@ -1,0 +1,16 @@
+rules:
+  - id: ext4_rec_len_validation_missing
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $fde = &root->dotdot;
+              $de = (struct ext4_dir_entry_2 *)((char *)$fde +
+                  ext4_rec_len_from_disk($fde->rec_len));
+              $len = ((char *)root) + $blocksize - (char *)$de;
+          - pattern: |
+              $de = (struct ext4_dir_entry_2 *)((char *)&root->dotdot +
+                  ext4_rec_len_from_disk(root->dotdot.rec_len));
+              $len = ((char *)root) + $blocksize - (char *)$de;
+    message: "Missing validation of rec_len field for '..' entry may lead to buffer overrun (CVE-2009-0746, CWE-20)."
+    severity: ERROR
+    languages: [c]

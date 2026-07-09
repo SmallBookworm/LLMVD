@@ -1,0 +1,25 @@
+rules:
+  - id: cve-2013-2917-reverb-convolver-stage-oob-read
+    message: "Potential out-of-bounds read in ReverbConvolverStage due to missing bounds checks on stageOffset and stageLength in direct mode."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!m_directMode) {
+                ...
+              } else {
+                ...
+                $ARRAY->copyToRange(impulseResponse + stageOffset, 0, fftSize / 2);
+                ...
+              }
+          - pattern: |
+              if (!m_directMode) {
+                ...
+              } else {
+                ...
+                $ARRAY->copyToRange(impulseResponse + stageOffset, 0, stageLength);
+                ...
+              }
+    metavariable-pattern:
+      $ARRAY: AudioFloatArray

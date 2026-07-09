@@ -1,0 +1,28 @@
+rules:
+  - id: elog-svg-xss
+    message: "SVG files are served inline without Content-Disposition: attachment, leading to potential XSS (CVE-2019-20376)"
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (filetype[i].ext[0]) {
+            if (strncmp(filetype[i].type, "text", 4) == 0)
+              rsprintf("Content-Type: %s;charset=%s\r\n", filetype[i].type, charset);
+            else
+              rsprintf("Content-Type: %s\r\n", filetype[i].type);
+          }
+      - pattern: |
+          if (filetype[i].ext[0]) {
+            ...
+            rsprintf("Content-Type: %s\r\n", filetype[i].type);
+            ...
+          }
+    metavariable-pattern:
+      metavariable: $FILETYPE
+      pattern: filetype[i]
+    pattern-not-inside: |
+      if (strcmp(filetype[i].ext, ".SVG") == 0) {
+        ...
+        rsprintf("Content-Disposition: attachment; filename=\"%s\"\r\n", ...);
+        ...
+      }

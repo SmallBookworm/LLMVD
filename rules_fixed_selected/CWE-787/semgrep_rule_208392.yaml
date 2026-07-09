@@ -1,0 +1,30 @@
+rules:
+  - id: cirrus_blt_unsafe_check_missing
+    message: "Missing BLTUNSAFE check before buffer operations may lead to heap-based buffer overflow (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (s->ds->dpy_copy) {
+            ...
+          } else {
+            if (BLTUNSAFE(s))
+              return 0;
+            ...
+          }
+      - pattern: |
+          if (s->ds->dpy_copy) {
+            ...
+          } else {
+            (*s->cirrus_rop)(...);
+            cirrus_invalidate_region(...);
+          }
+    pattern-not: |
+      if (BLTUNSAFE(s))
+        return 0;
+
+      if (s->ds->dpy_copy) {
+        ...
+      } else {
+        ...
+      }

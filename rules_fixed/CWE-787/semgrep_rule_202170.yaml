@@ -1,0 +1,7 @@
+rules:
+  - id: cwe-787-buffer-overflow-mj_raster_cmd
+    message: Buffer overflow vulnerability in mj_raster_cmd due to missing bounds check before dereferencing pointer.
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      for ( ... ; ... && *q == *p ; ... )

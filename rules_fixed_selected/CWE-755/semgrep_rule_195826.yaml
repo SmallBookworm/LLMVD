@@ -1,0 +1,18 @@
+rules:
+  - id: detect-character-encoding-null-check-missing
+    message: "Missing null check for charsetMatch after ucsdet_detect() may cause segmentation fault (CVE-2021-39157)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $CHARSET_MATCH = ucsdet_detect(...);
+          ...
+          ucsdet_getName($CHARSET_MATCH, ...);
+      - pattern: |
+          $CHARSET_MATCH = ucsdet_detect(...);
+          ...
+          ucsdet_getConfidence($CHARSET_MATCH, ...);
+    metavariable-pattern:
+      metavariable: $CHARSET_MATCH
+      pattern-not: |
+        if ($CHARSET_MATCH == NULL) { ... }

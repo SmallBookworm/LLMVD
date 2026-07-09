@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2018-16086-navigation-restriction-bypass
+    message: "Insufficient policy enforcement may allow bypassing navigation restrictions in Chrome extensions (CVE-2018-16086)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (SearchBouncer::GetInstance()->IsNewTabPage(...)) {
+                ...
+                return true;
+              }
+    metadata:
+      cwe: ["CWE-285"]
+      cve: "CVE-2018-16086"

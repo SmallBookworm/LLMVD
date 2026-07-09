@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2019-15118-unbounded-recursion
+    message: "Unbounded recursion in check_input_term may lead to kernel stack exhaustion (CVE-2019-15118, CWE-674). Missing recursion guard via termbitmap."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          check_input_term($state, $id, $term)
+      - pattern: |
+          err = check_input_term($state, $source_id, $term);
+    metavariable-regex:
+      metavariable: $state
+      regex: "state"
+    metavariable-regex:
+      metavariable: $term
+      regex: "term"
+    focus-metavariable: $id

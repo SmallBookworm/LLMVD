@@ -1,0 +1,11 @@
+rules:
+  - id: ghostscript-text-distance-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              int code = gs_distance_transform_inverse($DX, $DY, $PMAT, $PDIST);
+          - pattern: |
+              code = gs_distance_transform_inverse($DX, $DY, $PMAT, $PDIST);
+    message: "Missing overflow check before calling gs_distance_transform_inverse may lead to buffer overflow (CWE-119)."
+    severity: ERROR
+    languages: [c]

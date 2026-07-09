@@ -1,0 +1,13 @@
+rules:
+  - id: cwe-125-heap-buffer-overread-psp
+    patterns:
+      - pattern-either:
+          - pattern: |
+              string = g_malloc($LEN + 1);
+              if (fread(string, $LEN, 1, $F) < 1) { ... }
+          - pattern: |
+              $STRING = g_malloc($LEN + 1);
+              if (fread($STRING, $LEN, 1, $F) < 1) { ... }
+    message: "Heap-based buffer over-read vulnerability due to missing null-termination check after reading external string data. Ensure string[$LEN - 1] == '\0'."
+    severity: ERROR
+    languages: [c]

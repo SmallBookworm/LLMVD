@@ -1,0 +1,16 @@
+rules:
+  - id: exiv2-png-integer-overflow
+    message: "Integer overflow vulnerability in PNG iCCP chunk handling. If iccOffset > chunkLength, chunkLength - iccOffset becomes negative, leading to potential buffer overread or crash."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              zlibToDataBuf(..., chunkLength - iccOffset, ...);
+          - pattern: |
+              ... = chunkLength - iccOffset;
+    metavariable-conditions:
+      - metavariable: chunkLength
+        type: uint32_t
+      - metavariable: iccOffset
+        type: uint32_t

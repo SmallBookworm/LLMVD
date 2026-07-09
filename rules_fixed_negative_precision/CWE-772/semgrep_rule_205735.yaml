@@ -1,0 +1,19 @@
+rules:
+  - id: qemu-kbd-delay-queue-count-leak
+    patterns:
+      - pattern-either:
+          - pattern: |
+              QTAILQ_REMOVE($QUEUE, $ITEM, node);
+              g_free($ITEM);
+          - pattern: |
+              QTAILQ_REMOVE($QUEUE, $ITEM, node);
+              ...;
+              g_free($ITEM);
+    message: "Missing decrement of queue_count after removing a QEMU_INPUT_QUEUE_DELAY event, leading to memory leak (CVE-2017-8379)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-772"
+      references:
+        - https://github.com/qemu/qemu/commit/77b0359bf414ad666d1714dc9888f1017c08e283
+        - CVE-2017-8379

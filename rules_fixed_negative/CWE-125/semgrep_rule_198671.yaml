@@ -1,0 +1,11 @@
+rules:
+  - id: cwe-125-qemu-ram-access
+    message: "Use of qemu_map_ram_ptr without length validation may lead to out-of-bounds access (CWE-125). Use qemu_ram_ptr_length instead."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          qemu_map_ram_ptr($RAM_BLOCK, $ADDR)
+    metadata:
+      cwe: ["CWE-125"]
+      cve: "CVE-2017-11334"

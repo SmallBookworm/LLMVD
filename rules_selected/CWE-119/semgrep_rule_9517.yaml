@@ -1,0 +1,9 @@
+rules:
+  - id: jasper-jpc_tsfb_band_array_overflow
+    message: Stack-based buffer overflow due to fixed-size array 'bnds[64]' which may be insufficient for the number of bands accessed via 'bndno'. Use 'JPC_MAXBANDS' instead.
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      jpc_tsfb_band_t bnds[64];
+    fix: |
+      jpc_tsfb_band_t bnds[JPC_MAXBANDS];

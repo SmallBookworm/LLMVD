@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2019-12817-missing-realloc-context-ids
+    message: "Missing reallocation of extended context IDs on fork may lead to memory corruption (CVE-2019-12817, CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      hash__init_new_context(...) {
+        ...
+        index = hash__alloc_context_id();
+        ...
+      }
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2019-12817"

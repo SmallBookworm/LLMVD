@@ -1,0 +1,32 @@
+rules:
+  - id: veracrypt-buffer-overflow-CVE-2019-1010208
+    message: "Buffer overflow vulnerability in TC_IOCTL_GET_SYSTEM_DRIVE_CONFIG due to missing validation of read buffer size before memcpy. This may lead to disclosure of kernel stack memory."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              case TC_IOCTL_GET_SYSTEM_DRIVE_CONFIG:
+                ...
+                byte readBuffer[TC_SECTOR_SIZE_BIOS];
+                ...
+                memcpy(request->CustomUserMessage, readBuffer + TC_BOOT_SECTOR_USER_MESSAGE_OFFSET, TC_BOOT_SECTOR_USER_MESSAGE_MAX_LENGTH);
+          - pattern: |
+              case TC_IOCTL_GET_SYSTEM_DRIVE_CONFIG:
+                ...
+                byte readBuffer[TC_SECTOR_SIZE_BIOS];
+                ...
+                for ($A; $B; $C)
+                {
+                  if (memcmp(readBuffer + $D, TC_APP_NAME, $E) == 0)
+                  {
+                    ...
+                    memcpy(request->CustomUserMessage, readBuffer + TC_BOOT_SECTOR_USER_MESSAGE_OFFSET, TC_BOOT_SECTOR_USER_MESSAGE_MAX_LENGTH);
+                    ...
+                  }
+                }
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2019-1010208"
+      references:
+        - https://github.com/veracrypt/VeraCrypt/commit/f30f9339c9a0b9bbcc6f5ad38804af39db1f479e

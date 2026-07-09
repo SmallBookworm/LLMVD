@@ -1,0 +1,28 @@
+rules:
+  - id: cve-2020-25643-ppp-cp-parse-cr-validation
+    message: "Missing input validation in ppp_cp_parse_cr may lead to memory corruption or denial of service (CVE-2020-25643, CWE-20)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (len < 2 || len < opt[1]) {
+            ...
+          }
+      - pattern: |
+          case LCP_OPTION_ACCM:
+            ...
+            if (!memcmp(opt, valid_accm, sizeof(valid_accm)))
+              continue;
+            ...
+      - pattern: |
+          case LCP_OPTION_MAGIC:
+            if (opt[1] != 6 || ...)
+              break;
+            continue;
+    metavariable-regex:
+      metavariable: $func
+      regex: ppp_cp_parse_cr
+    fix-regex:
+      regex: .*
+      replacement: ${0}
+      enabled: false

@@ -1,0 +1,22 @@
+rules:
+  - id: acrn_ioctl_memory_leak
+    message: "Memory leak detected: allocated vm_param or cpu_regs not freed before returning -EINVAL"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (($$vm_param->reserved0 | $$vm_param->reserved1) != 0)
+            return -EINVAL;
+      - pattern: |
+          if ($$cpu_regs->reserved[$$i])
+            return -EINVAL;
+      - pattern: |
+          if ($$cpu_regs->vcpu_regs.reserved_32[$$i])
+            return -EINVAL;
+      - pattern: |
+          if ($$cpu_regs->vcpu_regs.reserved_64[$$i])
+            return -EINVAL;
+      - pattern: |
+          if ($$cpu_regs->vcpu_regs.gdt.reserved[$$i] |
+              $$cpu_regs->vcpu_regs.idt.reserved[$$i])
+            return -EINVAL;

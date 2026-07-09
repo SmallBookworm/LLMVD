@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2016-2476-omx-buffer-validation
+    message: "Missing validation of OMX buffer sizes may lead to buffer overflow (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ((index == (OMX_INDEXTYPE) OMX_IndexParamConsumerUsageBits && size < 4) ||
+                  (code != SET_INTERNAL_OPTION && size < 8)) {
+              ...
+          }
+      - pattern: |
+          if ((index == (OMX_INDEXTYPE) OMX_IndexParamConsumerUsageBits && size < 4) ||
+              (code != SET_INTERNAL_OPTION && size < 8)) {
+              ...
+          }

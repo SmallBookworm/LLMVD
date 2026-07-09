@@ -1,0 +1,10 @@
+rules:
+  - id: peak_usb_cmd_buf_info_leak
+    message: "Use of kmalloc without zeroing may leak uninitialized memory via USB command buffer (CVE-2019-19534)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern: |
+          $DEV->cmd_buf = kmalloc(PCAN_USB_MAX_CMD_LEN, GFP_KERNEL);
+    fix: |
+          $DEV->cmd_buf = kzalloc(PCAN_USB_MAX_CMD_LEN, GFP_KERNEL);

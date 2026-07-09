@@ -1,0 +1,33 @@
+rules:
+  - id: cwe-125-asylo-inet_pton-unchecked-buffer-size
+    message: "Unchecked buffer size in enc_untrusted_inet_pton may lead to out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (af == AF_INET) {
+            ...
+            memcpy(..., klinux_addr_buffer.data(), std::min(klinux_addr_buffer.size(), ...));
+          }
+      - pattern: |
+          if (af == AF_INET6) {
+            ...
+            memcpy(..., klinux_addr_buffer.data(), std::min(klinux_addr_buffer.size(), ...));
+          }
+    patterns:
+      - pattern-not-inside: |
+          if (af == AF_INET) {
+            if (klinux_addr_buffer.size() != sizeof(...)) {
+              ...
+            }
+            ...
+            memcpy(..., klinux_addr_buffer.data(), std::min(klinux_addr_buffer.size(), ...));
+          }
+      - pattern-not-inside: |
+          if (af == AF_INET6) {
+            if (klinux_addr_buffer.size() != sizeof(...)) {
+              ...
+            }
+            ...
+            memcpy(..., klinux_addr_buffer.data(), std::min(klinux_addr_buffer.size(), ...));
+          }

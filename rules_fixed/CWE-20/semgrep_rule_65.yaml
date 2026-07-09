@@ -1,0 +1,13 @@
+rules:
+  - id: c-format-string-vulnerability-pdfseparate
+    message: "Potential format string vulnerability due to unsanitized user-controlled destination filename passed to snprintf"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          snprintf($PATH, $SIZE, $DEST_FILE_NAME, $PAGE_NO);
+      - metavariable-pattern:
+          metavariable: $DEST_FILE_NAME
+          patterns:
+            - pattern-not: |
+                $DEST_FILE_NAME

@@ -1,0 +1,39 @@
+rules:
+  - id: kvm_memory_region_iommu_map_unmap_order
+    message: "Memory leak due to incorrect IOMMU map/unmap order in __kvm_set_memory_region. IOMMU unmap should occur before marking slot invalid and map after final memslot installation."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - patterns:
+        - pattern: |
+            if (!npages || base_gfn != old.base_gfn) {
+                ...
+                kvm_iommu_unmap_pages(kvm, &old);
+                ...
+            }
+        - pattern-inside: |
+            __kvm_set_memory_region(...) {
+              ...
+            }
+        - focus-metavariable: kvm_iommu_unmap_pages
+      - patterns:
+        - pattern: |
+            if (!npages || base_gfn != old.base_gfn) {
+                ...
+                slots = kmemdup(...);
+                ...
+                update_memslots(slots, NULL);
+                ...
+                rcu_assign_pointer(...);
+                ...
+                kvm_arch_flush_shadow_memslot(...);
+                ...
+            }
+        - pattern-inside: |
+            __kvm_set_memory_region(...) {
+              ...
+            }
+        - focus-metavariable: update_memslots
+    metavariable-regex:
+      metavariable: $...
+      regex: ".*"

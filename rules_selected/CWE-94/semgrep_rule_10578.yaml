@@ -1,0 +1,35 @@
+rules:
+  - id: cve-2017-8284-instruction-size-check
+    message: Missing instruction size check in disas_insn function may lead to code injection via oversized instructions.
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          if (s->pc - pc_start > 14) {
+              goto illegal_op;
+          }
+      - pattern-either:
+          - pattern: |
+              static target_ulong disas_insn(..., target_ulong pc_start)
+              {
+                  ...
+                  next_byte:
+                      ...
+                      b = cpu_ldub_code(..., s->pc);
+                      s->pc++;
+                      ...
+              }
+          - pattern: |
+              static target_ulong disas_insn(..., target_ulong pc_start)
+              {
+                  ...
+                  next_byte:
+                      b = cpu_ldub_code(..., s->pc);
+                      s->pc++;
+                      ...
+              }
+    metadata:
+      cwe: "CWE-94"
+      cve: "CVE-2017-8284"
+      references:
+        - https://github.com/qemu/qemu/commit/30663fd26c0307e414622c7a8607fbc04f92ec14

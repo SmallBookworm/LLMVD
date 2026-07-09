@@ -1,0 +1,15 @@
+rules:
+  - id: libarchive-lzma-cleanup-typo
+    message: "Typo in preprocessor macro 'HAVA_LZMA_H' instead of 'HAVE_LZMA_H' may cause memory leak in LZMA stream cleanup."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      #if HAVA_LZMA_H && HAVE_LIBLZMA
+    patterns:
+      - pattern: |
+          #if HAVA_LZMA_H && HAVE_LIBLZMA
+      - metavariable-regex:
+          metavariable: HAVA_LZMA_H
+          regex: HAVA_LZMA_H
+    fix: |
+      #if HAVE_LZMA_H && HAVE_LIBLZMA

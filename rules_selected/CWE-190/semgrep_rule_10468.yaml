@@ -1,0 +1,11 @@
+rules:
+  - id: integer-overflow-riff-chunk-size
+    patterns:
+      - pattern: |
+          $SIZE = XIO::ReadUns32_LE($FILE) + 8;
+    message: "Potential integer overflow in RIFF chunk size calculation. Addition should occur after assignment to avoid overflow during ReadUns32_LE result handling."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-190"
+      cve: "CVE-2017-18233"

@@ -1,0 +1,21 @@
+rules:
+  - id: bmp-bitcount-zero-check-missing
+    message: Missing check for zero biBitCount in BMP header parsing, which may lead to memory allocation failure (CVE-2017-12982).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $header->biBitCount = (OPJ_UINT16)getc($IN);
+          $header->biBitCount |= (OPJ_UINT16)((OPJ_UINT32)getc($IN) << 8);
+          if ($header->biSize >= 40U) { ... }
+      - pattern: |
+          $header->biBitCount = (OPJ_UINT16)getc($IN);
+          $header->biBitCount |= (OPJ_UINT16)((OPJ_UINT32)getc($IN) << 8);
+          ...
+          if ($header->biSize >= 40U) { ... }
+    metavariable-pattern:
+      metavariable: $header
+      pattern: OPJ_BITMAPINFOHEADER*
+    fix-regex:
+      regex: ''
+      replacement: ''

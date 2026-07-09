@@ -1,0 +1,10 @@
+rules:
+  - id: cwe-125-buffer-overread-gx_ttfReader__Read
+    patterns:
+      - pattern-either:
+          - pattern: |
+              r->error = (r->glyph_data.bits.size - r->pos < $N ?
+                          gs_note_error(gs_error_invalidfont) : 0);
+    message: "Missing bounds check for r->pos before subtraction may lead to heap-based buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]

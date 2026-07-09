@@ -1,0 +1,15 @@
+rules:
+  - id: iwl_pcie_ctxt_info_gen3_init_memory_leak
+    message: "Memory leak in iwl_pcie_ctxt_info_gen3_init: allocated DMA memory not freed on error path."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!prph_info)
+            return -ENOMEM;
+      - pattern: |
+          if (!ctxt_info_gen3)
+            return -ENOMEM;
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: iwl_pcie_ctxt_info_gen3_init

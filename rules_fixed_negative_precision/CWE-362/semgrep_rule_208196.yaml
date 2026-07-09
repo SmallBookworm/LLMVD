@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2020-29374-gup-cow-write-access
+    message: "get_user_pages() on a copy-on-write page without proper FOLL_WRITE handling may grant unintended write access (CVE-2020-29374, CWE-362)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          pmd_write($PMD) || (($FLAGS & FOLL_FORCE) && ($FLAGS & FOLL_COW) && pmd_dirty($PMD))
+      - pattern: |
+          pmd_write($PMD) || ((FOLL_FORCE & $FLAGS) && (FOLL_COW & $FLAGS) && pmd_dirty($PMD))
+    metadata:
+      cwe: ["CWE-362"]
+      cve: "CVE-2020-29374"

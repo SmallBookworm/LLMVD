@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2018-17473-idn-spoof-checker-missing-confusable-char
+    message: "Missing confusable character mapping for U+0E01 (ก) in IDN spoof checker may allow homograph attacks."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          extra_confusable_mapper_.reset(icu::Transliterator::createFromRules(
+              ...,
+              icu::UnicodeString::fromUTF8(..."[\\u014B\\u043F\\u0525] > n;"...),
+              ...));
+      - pattern: |
+          extra_confusable_mapper_.reset(icu::Transliterator::createFromRules(
+              ...,
+              icu::UnicodeString::fromUTF8(..."[ŋпԥ] > n;"...),
+              ...));

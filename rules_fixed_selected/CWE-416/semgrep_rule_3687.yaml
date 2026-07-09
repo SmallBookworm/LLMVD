@@ -1,0 +1,25 @@
+rules:
+  - id: use-after-free-r_anal_bb_free
+    message: Use-after-free vulnerability in r_anal_bb_free due to missing null check for bb->next before freeing.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (bb->jumpbb) {
+            bb->jumpbb->prev = NULL;
+            bb->jumpbb = NULL;
+          }
+          if (bb->failbb) {
+            bb->failbb->prev = NULL;
+            bb->failbb = NULL;
+          }
+          R_FREE (bb);
+      - pattern: |
+          if (bb->failbb) {
+            bb->failbb->prev = NULL;
+            bb->failbb = NULL;
+          }
+          R_FREE (bb);
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: r_anal_bb_free

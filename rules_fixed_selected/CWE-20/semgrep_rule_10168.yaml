@@ -1,0 +1,27 @@
+rules:
+  - id: cve-2016-3742-intra-pred-mode-validation
+    message: "Missing validation of intra prediction mode may lead to memory corruption (CVE-2016-3742)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          $INTRA_PRED = ...;
+          $INTRA_PRED = CLIP3(0, 8, $INTRA_PRED);
+          ...
+          $ERR_CODE = gau1_ih264d_intra_pred_err_code[$INTRA_PRED];
+      - pattern-either:
+          - pattern: |
+              $INTRA_PRED = ...;
+              ...
+              $ERR_CODE = gau1_ih264d_intra_pred_err_code[$INTRA_PRED];
+          - pattern: |
+              $INTRA_PRED = ...;
+              ...
+              ps_dec->apf_intra_pred_luma_4x4[$INTRA_PRED](...);
+          - pattern: |
+              $INTRA_PRED = ...;
+              ...
+              ps_dec->apf_intra_pred_luma_8x8[$INTRA_PRED](...);
+    metavariable-regex:
+      metavariable: $INTRA_PRED
+      regex: "i1_intra_pred"

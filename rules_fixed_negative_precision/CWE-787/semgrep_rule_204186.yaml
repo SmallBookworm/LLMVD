@@ -1,0 +1,15 @@
+rules:
+  - id: cwe-787-driver-override-bounds-check
+    message: "Insufficient bounds check before kstrndup may lead to out-of-bounds write (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (count > PATH_MAX)
+              return -EINVAL;
+      - pattern: |
+          if (count >= PATH_MAX)
+              return -EINVAL;
+    metavariable-regex:
+      metavariable: $PATH_MAX
+      regex: "PATH_MAX"

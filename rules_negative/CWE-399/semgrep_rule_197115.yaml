@@ -1,0 +1,18 @@
+rules:
+  - id: xterm-utf8-combining-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if_OPT_WIDE_CHARS($SCREEN, {
+                  $NEED *= 4;
+              });
+          - pattern: |
+              if_OPT_WIDE_CHARS($SCREEN, {
+                  $NEED *= $FACTOR;
+              });
+    message: "Insufficient buffer size estimation for UTF-8 combining characters may lead to buffer overflow (CVE-2021-27135)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-399"
+      cve: "CVE-2021-27135"

@@ -1,0 +1,30 @@
+rules:
+  - id: cve-2014-3184-hid-fixup-oob-write
+    message: |
+      Out-of-bounds write vulnerability in HID report descriptor fixup.
+      The size check (*rsize >= N) is insufficient for the highest index accessed (e.g., 111),
+      which requires *rsize >= 112. This may lead to denial of service via crafted HID device.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (*$RSIZE >= 107 && ... ) {
+                ...
+                $RDESC[110] = ...;
+                $RDESC[111] = ...;
+                ...
+              }
+          - pattern: |
+              if (*$RSIZE >= 107 && ... ) {
+                ...
+                $RDESC[111] = ...;
+                ...
+              }
+          - pattern: |
+              if (*$RSIZE >= 107 && ... ) {
+                ...
+                ... = $RDESC[110];
+                ... = $RDESC[111];
+                ...
+              }

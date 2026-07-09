@@ -1,0 +1,7 @@
+rules:
+  - id: ghostscript-lxm5700m-buffer-overflow
+    message: "Buffer overflow vulnerability in lxm5700m_print_page due to unsafe buffer expansion in buffer_store macro. This can lead to out-of-bounds write (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      #define buffer_store(x) do { if (outp - swipeBuf >= swipeBuf_size) { } } while (0)

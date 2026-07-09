@@ -1,0 +1,6 @@
+rules:
+  - id: deepin-clone-tmp-symlink-vulnerability
+    message: "Use of fixed /tmp path may allow symlink attacks. Use a secure temporary directory instead."
+    severity: WARNING
+    languages: [c]
+    pattern: 'const QString tmp_dir = (tmp_paths.isEmpty() ? "/tmp" : tmp_paths.first()) + "/.deepin-clone";'

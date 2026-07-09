@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2017-5545-buffer-overread
+    message: "Buffer over-read vulnerability due to missing input size check before memcmp. Input file must be at least 8 bytes to safely compare with 'bplist00'."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (memcmp($BUF, "bplist00", 8) == 0)
+              {
+                ...
+              }
+          - pattern: |
+              if (memcmp($BUF, "bplist00", 8) == 0)
+                ...
+    metavariable-pattern:
+      metavariable: $BUF
+      pattern-not: |
+        if ($SIZE >= 8)
+        {
+          ...
+          if (memcmp($BUF, "bplist00", 8) == 0)
+          ...
+        }

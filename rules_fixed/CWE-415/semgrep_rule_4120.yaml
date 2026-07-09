@@ -1,0 +1,16 @@
+rules:
+  - id: double-free-f_midi_set_alt
+    message: "Potential double-free vulnerability in f_midi_set_alt. The request may be freed twice if usb_ep_queue fails and the completion callback already freed it."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $err = usb_ep_queue(..., $REQ, ...);
+          if ($err) {
+              ...
+              free_ep_req(..., $REQ);
+              return $err;
+          }
+    metadata:
+      cwe: "CWE-415"
+      cve: "CVE-2018-20961"

@@ -1,0 +1,15 @@
+rules:
+  - id: poppler-filespec-dictlookup-without-check
+    message: "dictLookup called on 'fileSpec' without verifying it is a dictionary, which may trigger an assertion and cause denial of service."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $OBJ = $FILESPEC.dictLookup(...);
+          - pattern: |
+              $OBJ = $FILESPEC.dictLookupNF(...);
+    metavariable-pattern:
+      metavariable: $FILESPEC
+      pattern-not: $FILESPEC.isDict()
+    fix: ""

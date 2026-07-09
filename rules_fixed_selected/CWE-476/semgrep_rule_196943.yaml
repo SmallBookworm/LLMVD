@@ -1,0 +1,19 @@
+rules:
+  - id: null-pointer-dereference-iccprofile
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (selector == 0 || selector == 1) {
+                  ...
+                  dbuf_copy(..., d->iccprofile_file);
+              }
+          - pattern: |
+              if (selector == 0 || selector == 1) {
+                  dbuf_copy(..., d->iccprofile_file);
+              }
+    message: "Potential NULL pointer dereference in dbuf_copy if d->iccprofile_file is NULL. Ensure d->iccprofile_file is checked before use."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2021-28855"

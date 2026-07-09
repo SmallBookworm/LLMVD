@@ -1,0 +1,28 @@
+rules:
+  - id: cve-2017-9077-missing-ipv6-mc-list-clear
+    message: "Missing initialization of ipv6_mc_list to NULL in tcp_v6_syn_recv_sock may lead to improper inheritance and potential use-after-free or denial of service."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          memcpy($NEWNP, $NP, sizeof(struct ipv6_pinfo));
+          ...
+          $NEWNP->ipv6_ac_list = NULL;
+          $NEWNP->ipv6_fl_list = NULL;
+          ...
+          $NEWNP->pktoptions = NULL;
+      - pattern: |
+          memcpy($NEWNP, $NP, sizeof(struct ipv6_pinfo));
+          ...
+          $NEWNP->ipv6_ac_list = NULL;
+          $NEWNP->ipv6_fl_list = NULL;
+    metavariable-pattern:
+      - metavariable: $NEWNP
+        patterns:
+          - pattern-inside: struct ipv6_pinfo*
+      - metavariable: $NP
+        patterns:
+          - pattern-inside: const struct ipv6_pinfo*
+    patterns:
+      - pattern-not: |
+          $NEWNP->ipv6_mc_list = NULL;

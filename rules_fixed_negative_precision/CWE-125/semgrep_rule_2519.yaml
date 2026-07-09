@@ -1,0 +1,28 @@
+rules:
+  - id: cwe-125-rsvp-generalized-uni-buffer-overread
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while (total_subobj_len > 0) {
+                  ...
+                  subobj_len = EXTRACT_16BITS(obj_tptr);
+                  ...
+                  if (subobj_len == 0)
+                      goto invalid;
+                  ...
+              }
+          - pattern: |
+              while (total_subobj_len > 0) {
+                  ...
+                  subobj_len = EXTRACT_16BITS(obj_tptr);
+                  ...
+                  if (subobj_len < 4)
+                      return -1;
+                  ...
+              }
+    message: "Missing bounds check on subobj_len before use may lead to buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2017-13051"

@@ -1,0 +1,7 @@
+rules:
+  - id: puff_construct_gzip_inflation_vulnerability
+    message: "Potential out-of-bounds access in puff.c due to missing bounds check on length[symbol] before use as array index."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      (h->count[length[$$symbol]])++

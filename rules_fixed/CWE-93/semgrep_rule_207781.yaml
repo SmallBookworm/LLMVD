@@ -1,0 +1,33 @@
+rules:
+  - id: cups-ipp-filter-crlf-injection
+    message: "Insufficient restriction of IPP filters may lead to CRLF injection (CVE-2017-15400). Only known-safe PDLs should be written to the PPD file."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((attr = ippFindAttribute(response, "document-format-supported", IPP_TAG_MIMETYPE)) != NULL) {
+                ...
+                for (; ; ) {
+                  const char *format = ippGetString(attr, _, _);
+                  ...
+                  if (!_cups_strcasecmp(format, "application/pdf")) {
+                    ...
+                  } else if (!_cups_strcasecmp(format, "image/jpeg") || !_cups_strcasecmp(format, "image/png")) {
+                    ...
+                  } else if (!_cups_strcasecmp(format, "image/pwg-raster") || !_cups_strcasecmp(format, "image/urf")) {
+                    ...
+                  } else if (_cups_strcasecmp(format, "application/octet-stream") &&
+                             _cups_strcasecmp(format, "application/postscript") &&
+                             _cups_strncasecmp(format, "application/vnd.", 16) &&
+                             _cups_strncasecmp(format, "image/vnd.", 10) &&
+                             _cups_strcasecmp(format, "image/tiff") &&
+                             _cups_strncasecmp(format, "text/", 5)) {
+                    cupsFilePrintf(fp, "*cupsFilter2: \"%s %s 10 -\"\n", format, format);
+                  }
+                }
+                ...
+              }
+    metadata:
+      cwe: "CWE-93"
+      cve: "CVE-2017-15400"

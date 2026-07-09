@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2016-2428-unbounded-thread-increment
+    message: "Unbounded increment of numThreads may lead to stack-based buffer overflow (CWE-119). Ensure numThreads is capped at MAX_DRC_THREADS - 1 before use as an array index."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (bitsParsed > 0) {
+            self->numThreads++;
+          }
+      - pattern: |
+          self->numThreads++;
+    metavariable-pattern:
+      metavariable: self
+      pattern: { type: "HANDLE_AAC_DRC" }
+    focus-metavariable: self->numThreads

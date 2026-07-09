@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2020-16298-buffer-overflow
+    message: "Potential buffer overflow due to out-of-bounds array access in grnsep2[H-256]. H can exceed 767, leading to access beyond the 512-element array."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          if (H > 256 && H < 1024) {
+            ... grnsep2[H - 256] ...;
+          }

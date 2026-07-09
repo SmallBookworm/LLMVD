@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2016-2420-tombstone-dir-handling
+    message: "Potential privilege escalation due to unsafe handling of /data/tombstones directory creation and ownership in Debuggerd."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((mkdir(TOMBSTONE_DIR, 0755) == -1) && (errno != EEXIST)) {
+                ...
+              }
+              if (chown(TOMBSTONE_DIR, AID_SYSTEM, AID_SYSTEM) == -1) {
+                ...
+              }
+          - pattern: |
+              mkdir(TOMBSTONE_DIR, 0755)
+          - pattern: |
+              chown(TOMBSTONE_DIR, AID_SYSTEM, AID_SYSTEM)
+    metadata:
+      cwe: "CWE-264"
+      cve: "CVE-2016-2420"

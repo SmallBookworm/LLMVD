@@ -1,0 +1,31 @@
+rules:
+  - id: vhost-vsock-missing-detach-on-error
+    message: "Virtqueue element is freed without being detached in error path, leading to potential memory leak (CVE-2022-26354)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ($COND) {
+              ...
+              goto out;
+          }
+          ...
+          out:
+          g_free($ELEM);
+      - pattern: |
+          if ($COND) {
+              ...
+              goto out;
+          }
+          ...
+          if ($COND2) {
+              ...
+              goto out;
+          }
+          ...
+          out:
+          g_free($ELEM);
+    metavariable-pattern:
+      metavariable: $ELEM
+      pattern: elem
+    focus-metavariable: $ELEM

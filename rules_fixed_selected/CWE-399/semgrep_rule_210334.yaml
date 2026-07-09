@@ -1,0 +1,22 @@
+rules:
+  - id: double-free-omelasticsearch
+    message: "Double free vulnerability in writeDataError function: 'rendered' is freed both before and in finalize_it block."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          free($VAR);
+          ...
+          finalize_it:
+          ...
+          if ($VAR != NULL)
+              free($VAR);
+      - pattern: |
+          free($VAR);
+          ...
+          finalize_it:
+          ...
+          free($VAR);
+    metavariable-pattern:
+      metavariable: $VAR
+      pattern: rendered

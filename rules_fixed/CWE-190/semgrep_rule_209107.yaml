@@ -1,0 +1,36 @@
+rules:
+  - id: libexif_integer_overflow_cve_2016_6328
+    message: "Potential integer overflow leading to buffer overread in EXIF parsing (CVE-2016-6328). Missing bounds check on entry->size before reading components."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          for(...; ...; ...) {
+            ...
+            $vs = exif_get_short($data, ...);
+            ...
+            $data += 2;
+          }
+      - pattern: |
+          for(...; ...; ...) {
+            ...
+            $vl = exif_get_long($data, ...);
+            ...
+            $data += 4;
+          }
+    pattern-not-inside: |
+      {
+        ...
+        size_t ..., sizeleft;
+        sizeleft = $entry->size;
+        for(...; ...; ...) {
+          if (sizeleft < ...) break;
+          ...
+          $data += ...;
+          sizeleft -= ...;
+        }
+        ...
+      }
+    metavariable-pattern:
+      metavariable: $entry
+      pattern: entry

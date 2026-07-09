@@ -1,0 +1,15 @@
+rules:
+  - id: integer-overflow-in-stringutil-implode
+    patterns:
+      - pattern-either:
+          - pattern: |
+              int len = 0;
+              ...
+              len += ...;
+          - pattern: |
+              int len = 0;
+              ...
+              len = len + ...;
+    message: "Potential integer overflow due to use of 'int' for accumulating string length. Use 'size_t' instead to prevent overflow (CWE-190)."
+    severity: ERROR
+    languages: [c]

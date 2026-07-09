@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2022-0897-missing-mutex-lock
+    message: Missing mutex lock before calling virNWFilterObjListNumOfNWFilters may lead to race condition and crash (CVE-2022-0897).
+    severity: MEDIUM
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          virNWFilterObjListNumOfNWFilters(driver->nwfilters, $CONN, $ACL)
+      - pattern: |
+          return virNWFilterObjListNumOfNWFilters(driver->nwfilters, $CONN, $ACL);
+    metavariable-regex:
+      metavariable: $ACL
+      regex: .*CheckACL.*

@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2017-6903-openal-driver-validation
+    message: |
+      Missing validation for OpenAL driver filename allows loading of malicious DLLs via auto-downloaded files.
+      The fix adds a check to reject driver names with '.pk3' extension and uses CVAR_PROTECTED flag.
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          if ( COM_CompareExtension( $VAR->string, ".pk3" ) )
+          {
+            ...
+            return qfalse;
+          }
+      - pattern-either:
+          - pattern: |
+              $VAR = Cvar_Get( "s_alDriver", ..., CVAR_ARCHIVE | CVAR_LATCH );
+          - pattern: |
+              $VAR = Cvar_Get( "s_alDriver", ..., CVAR_LATCH | CVAR_ARCHIVE );
+    fix-regex:
+      regex: '(CVAR_ARCHIVE\\s*\\|\\s*CVAR_LATCH|CVAR_LATCH\\s*\\|\\s*CVAR_ARCHIVE)'
+      replacement: 'CVAR_PROTECTED'
+      count: 1

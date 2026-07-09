@@ -1,0 +1,13 @@
+rules:
+  - id: libtiff-putagreytile-left-shift-undefined-behavior
+    message: "Left-shift of a potentially signed value may cause undefined behavior. Cast to uint32 before shifting."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          *$CP++ = $BWMAP[*$PP][0] & (*($PP+1) << 24 | ~$A1);
+    fix: |
+      *$CP++ = $BWMAP[*$PP][0] & ((uint32)*($PP+1) << 24 | ~$A1);
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2017-7592"

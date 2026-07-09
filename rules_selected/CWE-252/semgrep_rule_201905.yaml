@@ -1,0 +1,12 @@
+rules:
+  - id: unchecked-fputc
+    patterns:
+      - pattern-either:
+          - pattern: (void) fputc(...);
+          - pattern: fputc(...);
+    message: "fputc return value is not checked, which may lead to silent write failures and potential denial of service (CWE-252)."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-252"
+      cve: "CVE-2018-16643"

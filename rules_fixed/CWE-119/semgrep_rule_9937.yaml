@@ -1,0 +1,16 @@
+rules:
+  - id: cwe-119-out-of-bounds-access-v8-json-stringifier
+    message: Potential out-of-bounds memory access due to improper array element handling.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (uint32_t i = 0; i < num_ifs; ++i) {
+                ...
+                ioctl_netc_get_if_info_at(s, &i, &interface);
+                ...
+              }
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2015-6764"

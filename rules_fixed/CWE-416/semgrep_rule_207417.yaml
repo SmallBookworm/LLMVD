@@ -1,0 +1,13 @@
+rules:
+  - id: cwe-416-radare2-rcc_context
+    message: "Potential use-after-free or invalid memory access due to missing bounds check on CTX before array access."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (CTX > 0) {
+        ...
+        egg->lang.nested_callname[CTX];
+      }
+    metadata:
+      cwe: ["CWE-416"]
+      cve: "CVE-2019-12802"

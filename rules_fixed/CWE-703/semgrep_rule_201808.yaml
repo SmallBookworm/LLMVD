@@ -1,0 +1,31 @@
+rules:
+  - id: vboxguest_memory_leak_copy_from_user
+    message: "Memory leak in hgcm_call_preprocess_linaddr: bounce_buf is allocated but not assigned to bounce_buf_ret before copy_from_user failure check, leading to unreleased memory on error."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $bounce_buf = kvmalloc(...);
+              if (!$bounce_buf)
+                return ...;
+              ...
+              if ($copy_in) {
+                $ret = copy_from_user($bounce_buf, ..., $len);
+                if ($ret)
+                  return -EFAULT;
+              }
+              ...
+              *$bounce_buf_ret = $bounce_buf;
+          - pattern: |
+              $bounce_buf = kvmalloc(...);
+              if (!$bounce_buf)
+                return ...;
+              ...
+              if ($copy_in) {
+                $ret = copy_from_user($bounce_buf, ..., $len);
+                if ($ret)
+                  return ...;
+              }
+              ...
+              *$bounce_buf_ret = $bounce_buf;

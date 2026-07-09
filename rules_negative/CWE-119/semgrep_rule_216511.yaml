@@ -1,0 +1,41 @@
+rules:
+  - id: cve-2015-1789-x509-cmp-time-oob-read
+    message: "Potential out-of-bounds read in X509_cmp_time due to insufficient length validation of ASN1_TIME input. This may lead to denial of service (CVE-2015-1789)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2015-1789"
+    pattern-either:
+      - pattern: |
+          if (ctm->type == V_ASN1_UTCTIME) {
+              if ((i < 11) || (i > 17))
+                  return 0;
+              ...
+          } else {
+              if (i < 13)
+                  return 0;
+              ...
+          }
+      - pattern: |
+          if ((*str == 'Z') || (*str == '-') || (*str == '+')) {
+              ...
+          } else {
+              *(p++) = *(str++);
+              *(p++) = *(str++);
+              if (*str == '.') {
+                  str++;
+                  while ((*str >= '0') && (*str <= '9'))
+                      str++;
+              }
+          }
+      - pattern: |
+          if (*str == 'Z')
+              offset = 0;
+          else {
+              if ((*str != '+') && (*str != '-'))
+                  return 0;
+              offset = ((str[1] - '0') * 10 + (str[2] - '0')) * 60;
+              offset += (str[3] - '0') * 10 + (str[4] - '0');
+              ...
+          }

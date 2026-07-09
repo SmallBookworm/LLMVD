@@ -1,0 +1,17 @@
+rules:
+  - id: qemu-ehci-infinite-loop-cve-2016-4037
+    message: "Missing iTD/siTD descriptor count limit in ehci_advance_state may lead to infinite loop (CVE-2016-4037, CWE-20)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          case EST_FETCHITD:
+              ...
+              break;
+      - pattern: |
+          case EST_FETCHSITD:
+              ...
+              break;
+    metavariable-regex:
+      metavariable: $...
+      regex: "^(?!.*itd_count\\s*\\+\\+).*$"

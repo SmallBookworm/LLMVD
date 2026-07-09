@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2018-8799-oob-read-process-demand-active
+    message: "Missing bounds check before consuming data from stream may lead to out-of-bounds read (CVE-2018-8799, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          in_uint16_le($S, $LEN);
+          ...
+          in_uint8s($S, $LEN);
+      - pattern: |
+          in_uint16_le($S, $LEN_SRC_DESCRIPTOR);
+          in_uint16_le($S, $LEN_COMBINED_CAPS);
+          ...
+          in_uint8s($S, $LEN_SRC_DESCRIPTOR);
+    metavariable-pattern:
+      $S: { type: "STREAM" }

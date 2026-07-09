@@ -1,0 +1,20 @@
+rules:
+  - id: exiv2-pngchunk-parse-txtchunk-buffer-overread
+    message: "Potential heap-based buffer over-read in PngChunk::parseTXTChunk due to missing bounds checks before pointer arithmetic."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              const byte* text = data.pData_ + keysize + 1;
+          - pattern: |
+              const byte* compressedText = data.pData_ + keysize + 2;
+          - pattern: |
+              std::string ...((const char*)(data.pData_ + keysize + 3));
+          - pattern: |
+              std::string ...((const char*)(data.pData_ + keysize + 3 + ... + 1));
+    metavariable-pattern:
+      metavariable: data
+      pattern: { type: "const DataBuf&" }
+    fix-regex:
+      regex: ""

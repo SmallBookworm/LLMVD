@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2015-6772-javascript-url-navigation-bypass
+    message: "Missing Same Origin Policy check for javascript: URL navigation during document detachment. This may allow SOP bypass via crafted JavaScript interacting with plugins."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern: |
+          Java_OfflinePageDownloadBridge_openItem(
+            ...,
+            ConvertUTF8ToJavaString(..., $URL.spec()),
+            $OFFLINE_ID
+          );
+      - pattern-not: |
+          Java_OfflinePageDownloadBridge_openItem(
+            ...,
+            ConvertUTF8ToJavaString(..., $URL.spec()),
+            $OFFLINE_ID,
+            offline_pages::ShouldOfflinePagesInDownloadHomeOpenInCct()
+          );

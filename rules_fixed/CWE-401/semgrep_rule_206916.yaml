@@ -1,0 +1,37 @@
+rules:
+  - id: perf_event_parse_addr_filter_memory_leak
+    message: "Memory leak of 'filename' in perf_event_parse_addr_filter(). Allocation via match_strdup() may not be freed on all paths."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $FILENAME = match_strdup(...);
+          ...
+          goto fail;
+      - pattern: |
+          if (... != IF_SRC_FILE && ... != IF_SRC_FILEADDR) {
+            ...
+          } else {
+            ...
+            $FILENAME = match_strdup(...);
+            ...
+            if (...) goto fail;
+            ...
+          }
+          ...
+          if (state == IF_STATE_END) {
+            ...
+            if (!kernel) {
+              ...
+              if (!event->ctx->task)
+                goto fail;
+              ...
+            }
+          }
+          ...
+          kfree(orig);
+          return 0;
+    metavariable-pattern:
+      - metavariable: $FILENAME
+        patterns:
+          - pattern-equals: filename

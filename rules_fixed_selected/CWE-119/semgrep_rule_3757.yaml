@@ -1,0 +1,19 @@
+rules:
+  - id: freerdp-zgfx-decompress-segment-buffer-overflow
+    message: "Heap-based buffer overflow in zgfx_decompress_segment due to missing bounds checks on OutputBuffer writes. This can lead to memory corruption or remote code execution (CVE-2018-8784)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          # Missing check before writing literal byte
+          - pattern: |
+              zgfx->OutputBuffer[zgfx->OutputCount++] = $C;
+          # Missing check before CopyMemory in unencoded case
+          - pattern: |
+              CopyMemory(&(zgfx->OutputBuffer[zgfx->OutputCount]), ..., $COUNT);
+          # Missing check before history buffer read/write for match case
+          - pattern: |
+              zgfx_history_buffer_ring_read(..., &(zgfx->OutputBuffer[zgfx->OutputCount]), $COUNT);
+    metavariable-regex:
+      - metavariable: $C
+        regex: .*

@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2018-6041-omnibox-spoofing
+    message: "Missing check for navigation origin may lead to Omnibox spoofing (CVE-2018-6041)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (speculative_render_frame_host_->navigation_handle()) {
+              frame_tree_node_->navigator()->DiscardPendingEntryIfNeeded(...);
+          }
+      - pattern: |
+          if (speculative_render_frame_host_->navigation_handle() && ...)
+            frame_tree_node_->navigator()->DiscardPendingEntryIfNeeded(...);
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2018-6041"

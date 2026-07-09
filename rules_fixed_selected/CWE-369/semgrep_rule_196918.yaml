@@ -1,0 +1,27 @@
+rules:
+  - id: opencv-dis-flow-out-of-bounds-read
+    patterns:
+      - pattern-either:
+          - pattern: |
+              coarsest_scale = ...;
+              ...
+              for (int i = coarsest_scale; i >= finest_scale; i--)
+              {
+                ...
+              }
+          - pattern: |
+              coarsest_scale = ...;
+              ...
+              u_Ux[coarsest_scale]...;
+              u_Uy[coarsest_scale]...;
+              ...
+              for (int i = coarsest_scale; i >= finest_scale; i--)
+              {
+                ...
+              }
+    message: "Potential out-of-bounds read in DISOpticalFlow due to missing validation of coarsest_scale against finest_scale. See CVE-2019-19624."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-369"
+      cve: "CVE-2019-19624"

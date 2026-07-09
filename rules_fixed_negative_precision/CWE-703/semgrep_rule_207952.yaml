@@ -1,0 +1,19 @@
+rules:
+  - id: libheif_fraction_floating_point_exception
+    message: "Potential floating point exception due to unsafe fraction reduction in Fraction constructor."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while ($DENOM > MAX_FRACTION_DENOMINATOR) {
+                $NUM >>= 1;
+                $DENOM >>= 1;
+              }
+          - pattern: |
+              while ($DENOM > MAX_FRACTION_DENOMINATOR) {
+                ...
+              }
+    metadata:
+      cwe: ["CWE-703"]
+      cve: "CVE-2020-19498"

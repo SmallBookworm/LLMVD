@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2018-17206-buffer-overread-bundle
+    message: "Buffer over-read vulnerability in decode_bundle function. The loop accessing slave ports is not guarded by a length check, potentially reading beyond allocated buffer."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: |
+                  if (slaves_size < bundle->n_slaves * sizeof(ovs_be16)) {
+                    ...
+                    error = OFPERR_OFPBAC_BAD_LEN;
+                  }
+              - pattern: |
+                  for (i = 0; i < bundle->n_slaves; i++) {
+                    ... ((ovs_be16 *)(nab + 1))[i] ...
+                  }
+    metadata:
+      cwe: ["CWE-125"]
+      cve: "CVE-2018-17206"

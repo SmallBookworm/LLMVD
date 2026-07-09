@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2022-29242-buffer-overflow
+    message: Potential buffer overflow in GOST engine when handling TLS_GOSTR341112_256_WITH_KUZNYECHIK_CTR_OMAC ciphersuite due to missing output buffer size check before calling i2d_PSKeyTransport_gost.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (($OUT_LEN = i2d_PSKeyTransport_gost($PST, $OUT ? &$OUT : NULL)) > 0) {
+            $RET = 1;
+          }
+      - pattern: |
+          if ((*$OUT_LEN = i2d_PSKeyTransport_gost($PST, $OUT ? &$OUT : NULL)) > 0) {
+            $RET = 1;
+          }
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2022-29242"

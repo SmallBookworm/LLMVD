@@ -1,0 +1,38 @@
+rules:
+  - id: cve-2013-4539-tsc210x-buffer-overflow
+    message: "Unvalidated input from savevm image used as array index may cause buffer overflow (CVE-2013-4539)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $S->function = qemu_get_byte($F);
+              ...
+              $S->nextfunction = qemu_get_byte($F);
+              ...
+              $S->precision = qemu_get_byte($F);
+              ...
+              $S->nextprecision = qemu_get_byte($F);
+              ...
+              TSC_CUT_RESOLUTION(..., $S->function, ...);
+          - pattern: |
+              $S->function = qemu_get_byte($F);
+              ...
+              TSC_CUT_RESOLUTION(..., $S->function, ...);
+          - pattern: |
+              $S->nextfunction = qemu_get_byte($F);
+              ...
+              TSC_CUT_RESOLUTION(..., $S->nextfunction, ...);
+          - pattern: |
+              $S->precision = qemu_get_byte($F);
+              ...
+              TSC_CUT_RESOLUTION(..., $S->precision, ...);
+          - pattern: |
+              $S->nextprecision = qemu_get_byte($F);
+              ...
+              TSC_CUT_RESOLUTION(..., $S->nextprecision, ...);
+    metavariable-regex:
+      - metavariable: $S
+        regex: "s"
+    fix-regex:
+      enabled: false

@@ -1,0 +1,18 @@
+rules:
+  - id: airodump-ng-buffer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              plen = len - 2;
+              ...
+              memcpy(..., data + 2, plen);
+          - pattern: |
+              plen = len - 2;
+              ...
+              *cmd++ = htons(plen);
+    message: "Potential stack-based buffer overflow due to missing validation of 'plen' before use in memcpy. If 'len < 2', 'plen' becomes negative, leading to undefined behavior."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2014-8321"

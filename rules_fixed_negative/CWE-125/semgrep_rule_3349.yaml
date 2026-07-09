@@ -1,0 +1,18 @@
+rules:
+  - id: imagemagick-wpg-out-of-bounds-read-cve-2016-7533
+    message: "Potential out-of-bounds read in WPG image parsing due to insufficient buffer allocation. Fixed by allocating an extra byte (ldblk+1)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              ldblk = ...;
+              BImgBuff = AcquireQuantumMemory((size_t) ldblk, sizeof(*BImgBuff));
+          - pattern: |
+              BImgBuff = AcquireQuantumMemory((size_t) ldblk, ...);
+    metadata:
+      cwe: ["CWE-125"]
+      cve: "CVE-2016-7533"
+      references:
+        - https://github.com/ImageMagick/ImageMagick/issues/120
+        - https://github.com/ImageMagick/ImageMagick/commit/bef1e4f637d8f665bc133a9c6d30df08d983bc3a

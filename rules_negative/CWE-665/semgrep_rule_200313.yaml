@@ -1,0 +1,8 @@
+rules:
+  - id: imagemagick-uninitialized-value-cve-2019-12979
+    message: "Use of uninitialized value in resolution.y assignment in AcquireImage. Missing check for RhoValue flag before assigning resolution.x."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      if ((flags & SigmaValue) == 0)
+        image->resolution.y=image->resolution.x;

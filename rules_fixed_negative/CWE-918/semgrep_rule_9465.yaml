@@ -1,0 +1,14 @@
+rules:
+  - id: cwe-918-fsockopen-port-parsing
+    message: "Potential SSRF due to unsafe port parsing in fsockopen; port extracted via atoi() may ignore trailing non-numeric characters, leading to unexpected behavior when both host:port and explicit port are provided."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $PORTNO = atoi($PTR);
+          - pattern: |
+              *$PORTNO = atoi($PTR);
+    metadata:
+      cwe: "CWE-918"
+      cve: "CVE-2017-7189"

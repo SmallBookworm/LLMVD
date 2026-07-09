@@ -1,0 +1,12 @@
+rules:
+  - id: crypto_module_autoload_without_prefix
+    message: "Crypto module autoload without 'crypto-' prefix may allow loading arbitrary kernel modules via AF_ALG socket (CVE-2013-7421)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: 'request_module("%s", ...);'
+      - pattern: 'request_module("%s-all", ...);'
+    metavariable-pattern:
+      metavariable: $STR
+      pattern: '"%s"'
+    fix: ""

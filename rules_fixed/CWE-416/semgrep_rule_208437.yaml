@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2018-10879-use-after-free-ext4-xattr
+    message: "Use-after-free vulnerability in ext4 xattr block validation. Magic number check must occur before buffer_verified() to prevent CVE-2018-10879."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (buffer_verified($BH)) {
+            return 0;
+          }
+          if ($MAGIC_CHECK || ...) {
+            goto ...;
+          }
+      - pattern: |
+          if (buffer_verified($BH)) {
+            return 0;
+          }
+          if (... || $MAGIC_CHECK) {
+            goto ...;
+          }
+    metavariable-pattern:
+      metavariable: $MAGIC_CHECK
+      pattern: BHDR($BH)->h_magic != cpu_to_le32(EXT4_XATTR_MAGIC)

@@ -1,0 +1,20 @@
+rules:
+  - id: libcacard-vcard_apdu_new-memory-leak
+    message: "Memory leak in vcard_apdu_new: allocated VCardAPDU object is not properly freed via vcard_apdu_delete on error paths."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ($STATUS != VCARD7816_STATUS_SUCCESS) {
+              g_free($APDU);
+              ...
+          }
+      - pattern: |
+          if ($STATUS != VCARD7816_STATUS_SUCCESS) {
+              g_free($APDU);
+              $APDU = NULL;
+              ...
+          }
+    metavariable-regex:
+      metavariable: $APDU
+      regex: new_apdu

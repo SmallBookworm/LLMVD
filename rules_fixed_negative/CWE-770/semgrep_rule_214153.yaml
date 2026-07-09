@@ -1,0 +1,19 @@
+rules:
+  - id: exiv2-pngchunk-uncontrolled-allocation
+    message: Uncontrolled memory allocation due to missing upper bound check before allocation in PngChunk::readRawProfile. This may lead to denial of service via std::bad_alloc.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              long length = (long) atol(...);
+              enforce(length >= 0, ...);
+              enforce(length <= ..., ...);
+          - pattern: |
+              long length = (long) atol(...);
+              enforce(length >= 0, ...);
+              ...
+              info.alloc(length);
+    metadata:
+      cwe: ["CWE-770"]
+      cve: "CVE-2019-13112"

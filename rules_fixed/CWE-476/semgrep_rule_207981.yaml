@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2019-14584-null-dereference
+    message: "Potential null pointer dereference due to missing PKCS7_get_detached() check after PKCS7_type_is_signed(). This may lead to a crash or privilege escalation (CVE-2019-14584, CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!PKCS7_type_is_signed($PKCS7)) {
+            ...
+          }
+      - pattern: |
+          if (!PKCS7_type_is_signed($PKCS7)) goto ...;
+    metadata: {}

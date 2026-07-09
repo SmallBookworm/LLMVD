@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2019-11479-mss-hardcoded
+    message: "Missing enforcement of tcp_min_snd_mss in tcp_mtu_probing() may lead to denial of service (CVE-2019-11479)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              mss = max($MSS, 68 - $HEADER_LEN);
+              $SEARCH_LOW = tcp_mss_to_mtu($SK, $MSS);
+          - pattern: |
+              mss = max($X, 68 - $HEADER_LEN);
+              $Y = tcp_mss_to_mtu($SK, $X);
+    metavariable-regex:
+      metavariable: $HEADER_LEN
+      regex: tcp_sk\([^)]+\)->tcp_header_len

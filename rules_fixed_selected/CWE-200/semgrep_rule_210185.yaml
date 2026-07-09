@@ -1,0 +1,15 @@
+rules:
+  - id: spice-vdagent-file-xfer-id-reuse
+    message: "File transfer ID reuse is not checked, leading to potential data leakage or DoS (CVE-2020-25651)."
+    severity: HIGH
+    languages: [c]
+    pattern: |
+      g_hash_table_insert(active_xfers, GUINT_TO_POINTER(id), ...)
+    pattern-not: |
+      g_hash_table_lookup(active_xfers, GUINT_TO_POINTER(s->id)) != NULL
+    fix-regex:
+      regex: ''
+      replacement: ''
+    metadata:
+      cwe: ["CWE-200"]
+      vulnerability: "CVE-2020-25651"

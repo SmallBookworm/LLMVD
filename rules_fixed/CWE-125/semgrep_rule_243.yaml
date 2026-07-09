@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2017-5956-virglrenderer-oob
+    message: "Missing bounds check on vertex_buffer_index may lead to out-of-bounds array access (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          ve[$I].vertex_buffer_index = get_buf_entry(...);
+          ...
+          ve[$I].src_format = get_buf_entry(...);
+      - pattern: |
+          $VE.vertex_buffer_index = get_buf_entry(...);
+          ...
+          $VE.src_format = get_buf_entry(...);
+    metavariable-pattern:
+      $I: expression
+      $VE: expression

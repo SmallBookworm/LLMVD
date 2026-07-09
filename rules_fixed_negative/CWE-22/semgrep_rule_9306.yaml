@@ -1,0 +1,24 @@
+rules:
+  - id: pigz-directory-traversal-cve-2015-1191
+    message: |
+      Potential directory traversal vulnerability in pigz. When decompressing with -N or -NT,
+      the output filename is constructed using the header name without stripping path information,
+      which may allow writing to arbitrary files via absolute or relative paths (e.g., '../').
+    severity: HIGH
+    languages: [c]
+    cwe: ["CWE-22"]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (g.decode && (g.headis & 1) != 0 && g.hname != NULL) {
+                  ...
+                  to = g.hname;
+                  ...
+              }
+          - pattern: |
+              if (g.decode && (g.headis & 1) != 0 && g.hname != NULL)
+                  to = g.hname;
+    metadata:
+      cve: "CVE-2015-1191"
+      references:
+        - https://github.com/madler/pigz/commit/fdad1406b3ec809f4954ff7cdf9e99eb18c2458f

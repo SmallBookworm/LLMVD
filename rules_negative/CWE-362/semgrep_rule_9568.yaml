@@ -1,0 +1,10 @@
+rules:
+  - id: cwe-362-sockfs-setattr-null-deref
+    message: "Missing NULL check for sock->sk in sockfs_setattr may lead to race condition and NULL pointer dereference (CWE-362)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (!err && (iattr->ia_valid & ATTR_UID)) {
+          struct socket *sock = SOCKET_I(d_inode(dentry));
+          sock->sk->sk_uid = iattr->ia_uid;
+      }

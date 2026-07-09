@@ -1,0 +1,16 @@
+rules:
+  - id: rds6_inc_info_copy-uninitialized-fields
+    message: "Uninitialized 'tos' and 'flags' fields in struct rds6_info_message may leak kernel stack memory (CVE-2019-16714, CWE-200)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - patterns:
+          - pattern: |
+              struct rds6_info_message $MINFO;
+          - pattern: |
+              rds_info_copy(..., &$MINFO, ...);
+          - pattern-not: $MINFO.tos = ...;
+          - pattern-not: $MINFO.flags = ...;
+    metadata:
+      cwe: ["CWE-200"]
+      cve: "CVE-2019-16714"

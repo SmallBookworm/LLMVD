@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2014-4668-ldap-empty-password
+    message: LDAP authentication bypass due to missing empty password check. An empty password may allow unauthenticated access.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          if ((... ||
+              cherokee_buffer_is_empty (&conn->validator->passwd))
+              ...)
+                return ...;
+      - pattern-either:
+          - pattern: |
+              if ((conn->validator == NULL) ||
+                  cherokee_buffer_is_empty (&conn->validator->user))
+                  return ...;
+          - pattern: |
+              if (cherokee_buffer_is_empty (&conn->validator->user))
+                  return ...;

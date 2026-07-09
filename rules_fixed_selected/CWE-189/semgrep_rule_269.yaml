@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2010-2497-integer-underflow
+    message: "Integer underflow vulnerability in glyph handling may lead to denial of service or arbitrary code execution."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              args -= 2 + ( args[-2] >> 16 );
+              break;
+          - pattern: |
+              args -= 2 + (args[-2] >> 16);
+              break;
+    metadata:
+      cwe: "CWE-189"
+      cve: "CVE-2010-2497"

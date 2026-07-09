@@ -1,0 +1,25 @@
+rules:
+  - id: cve-2018-7456-null-pointer-dereference
+    message: Potential NULL pointer dereference in TIFFPrintDirectory due to unsafe access of td_transferfunction without proper bounds checking.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          for (...; ...; ...) {
+              ...
+              fprintf(..., td->td_transferfunction[0][...]);
+              for (... i = 1; i < td->td_samplesperpixel; i++)
+                  fprintf(..., td->td_transferfunction[i][...]);
+              ...
+          }
+      - pattern: |
+          for (...; ...; ...) {
+              ...
+              fprintf(..., td->td_transferfunction[0][...]);
+              for (... i = 1; i < ...; i++)
+                  fprintf(..., td->td_transferfunction[i][...]);
+              ...
+          }
+    metavariable-pattern:
+      metavariable: $i
+      pattern: i

@@ -1,0 +1,7 @@
+rules:
+  - id: cve-2021-3640-sco-use-after-free
+    message: "Use-after-free vulnerability in sco_sock_sendmsg due to unsafe use of memcpy_from_msg and manual buffer management. Consider using bt_skb_sendmsg instead."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      memcpy_from_msg($BUF, $MSG, $LEN)

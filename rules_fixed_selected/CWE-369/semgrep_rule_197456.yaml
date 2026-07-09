@@ -1,0 +1,22 @@
+rules:
+  - id: tensorlist_reserve_negative_num_elements
+    message: "Missing validation for num_elements in TensorListReserve may cause std::vector resize with negative size, leading to process abort."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              int32 num_elements = ...;
+              ...
+              output.tensors().resize(num_elements, ...);
+          - pattern: |
+              auto num_elements = ...;
+              ...
+              output.tensors().resize(num_elements, ...);
+    metavariable-regex:
+      metavariable: num_elements
+      regex: num_elements
+    pattern-not-inside: |
+      OP_REQUIRES(..., num_elements >= 0, ...);
+      ...
+      output.tensors().resize(num_elements, ...);

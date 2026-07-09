@@ -1,0 +1,8 @@
+rules:
+  - id: path_traversal_tar_sanitization
+    message: "Path traversal vulnerability detected. The sanitize_filename function does not properly reject paths containing '../'."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (ISDOT (p[0]) && ISDOT (p[1]) && (ISSLASH (p[2]) || !p[2]))
+          prefix_len = p + 2 - file_name;

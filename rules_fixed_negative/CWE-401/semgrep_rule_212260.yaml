@@ -1,0 +1,12 @@
+rules:
+  - id: imagemagick-annotateimage-memory-leak
+    message: "Memory leak in AnnotateImage due to missing cleanup of annotate_info and annotate on early return"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (textlist == (char **) NULL)
+            return(MagickFalse);
+      - pattern: |
+          if (SetImageStorageClass(image,DirectClass) == MagickFalse)
+            return(MagickFalse);

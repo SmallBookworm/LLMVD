@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2017-0861-use-after-free
+    message: "Use-after-free vulnerability in snd_pcm_info_user due to missing open_mutex lock. This may lead to privilege escalation (CVE-2017-0861)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          mutex_unlock(&register_mutex);
+          ...
+          snd_pcm_info_user($SUBSTREAM, $INFO);
+      - pattern: |
+          snd_pcm_info_user($SUBSTREAM, $INFO);
+          ...
+          mutex_unlock(&register_mutex);

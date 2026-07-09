@@ -1,0 +1,20 @@
+rules:
+  - id: chrome-omnibox-spoofing-cve-2018-17467
+    message: "Potential Omnibox spoofing due to insufficient clearing of stale rendered content. Stale LocalSurfaceId comparison may bypass navigation rendering timeout."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (enable_surface_synchronization_) {
+                ...
+                $OLD_ID = view_->GetLocalSurfaceId();
+                ...
+                $NEW_ID = view_->GetLocalSurfaceId();
+                if ($OLD_ID == $NEW_ID)
+                  return;
+                ...
+              }
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2018-17467"

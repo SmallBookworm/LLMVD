@@ -1,0 +1,16 @@
+rules:
+  - id: udf_pc_to_char_buffer_overflow
+    message: "Missing bounds check on component length before use in udf_pc_to_char may lead to buffer overread (CVE-2014-9730)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          elen += sizeof(struct pathComponent) + pc->lengthComponentIdent;
+      - pattern: |
+          comp_len = udf_get_filename(..., pc->componentIdent, pc->lengthComponentIdent, ...);
+          ...
+          elen += sizeof(struct pathComponent) + pc->lengthComponentIdent;
+    metavariable-pattern:
+      metavariable: pc
+      pattern: struct pathComponent *
+    fix: ""

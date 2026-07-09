@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2014-2894-smart-selftest-counter-reset
+    message: "Off-by-one error in SMART self-test counter reset may lead to buffer underflow and memory corruption (CVE-2014-2894)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($COUNT > 21) {
+                  $COUNT = 0;
+              }
+          - pattern: |
+              if ($EXPR > 21)
+                  $EXPR = 0;
+    metavariable-pattern:
+      metavariable: $COUNT
+      pattern: s->smart_selftest_count

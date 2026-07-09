@@ -1,0 +1,9 @@
+rules:
+  - id: cwe-125-uas-altsetting-misuse
+    message: "Potential out-of-bounds read due to misuse of alternate setting value as array index (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      $alt = uas_find_uas_alt_setting($intf);
+      ...;
+      $intf->altsetting[$alt];

@@ -1,0 +1,19 @@
+rules:
+  - id: knc-read-packet-memory-leak
+    message: "Missing free of 'tmpbuf' on error paths in read_packet may lead to memory exhaustion (DoS)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (... == NULL) {
+                ...
+                return -1;
+              }
+          - pattern: |
+              LOG(...);
+              return -1;
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern: read_packet(...)
+    focus-metavariable: $FUNC

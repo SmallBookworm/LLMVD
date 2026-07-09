@@ -1,0 +1,28 @@
+rules:
+  - id: bro-contentline-oob-write
+    message: "Potential out-of-bounds write in ContentLine analyzer when handling '\\n' after '\\r' with empty buffer. This may lead to denial of service or memory corruption (CVE-2017-1000458, CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ( last_char == '\r' )
+            {
+            --offset;
+            ...
+            buf[offset] = '\0';
+            ...
+            }
+      - pattern: |
+          if ( last_char == '\r' )
+            {
+            --offset; /* remove '\r' */
+            ${EMIT_LINE}
+            }
+    metavariable-patterns:
+      - metavariable: $EMIT_LINE
+        patterns:
+          - pattern: |
+              {
+              buf[offset] = '\0';
+              ...
+              }

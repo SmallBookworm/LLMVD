@@ -1,0 +1,40 @@
+rules:
+  - id: ntp_crypto_recv_buffer_length_check_missing
+    message: Missing buffer length validation before processing extension fields in crypto_recv, leading to potential denial of service (CVE-2015-7691).
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while (... > (int)MAX_MAC_LEN) {
+                ...
+                len = ntohl(...->opcode) & 0x0000ffff;
+                ...
+                if (len >= VALUE_LEN) {
+                  ...
+                }
+                ...
+              }
+          - pattern: |
+              while (... > (int)MAX_MAC_LEN) {
+                ...
+                len = ntohl(...->opcode) & 0x0000ffff;
+                ...
+                switch (...) {
+                  ...
+                }
+                ...
+              }
+    pattern-not: |
+      while (... > (int)MAX_MAC_LEN) {
+        ...
+        len = ntohl(...->opcode) & 0x0000ffff;
+        ...
+        if (len > macbytes) {
+          ...
+          return XEVNT_LEN;
+        }
+        ...
+      }
+    metadata:
+      cwe: "CWE-20"

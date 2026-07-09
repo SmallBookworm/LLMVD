@@ -1,0 +1,14 @@
+rules:
+  - id: tor-relay-send-end-cell-null-cpath-layer
+    message: "Potential NULL cpath_layer passed to relay_send_end_cell_from_edge_ may cause assertion failure (CVE-2017-0375)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          relay_send_end_cell_from_edge(..., $CIRC, ..., NULL)
+      - pattern: |
+          relay_send_end_cell_from_edge(..., $CIRC, ..., 0)
+    metavariable-pattern:
+      metavariable: $CIRC
+      pattern: |
+        $CIRC->purpose == CIRCUIT_PURPOSE_S_REND_JOINED

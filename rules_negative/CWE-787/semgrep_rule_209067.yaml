@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2021-28660-ssid-overflow
+    message: "Potential buffer overflow in ssid[] array due to missing length validation. This could lead to out-of-bounds write (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (sec_len > 0 && sec_len <= len) {
+              ssid[...].ssid_length = sec_len;
+              memcpy(ssid[...].ssid, pos, ssid[...].ssid_length);
+              ...
+          }
+      - pattern: |
+          if (sec_len > 0 && sec_len <= len) {
+              ssid[...].ssid_length = sec_len;
+              memcpy(ssid[...].ssid, pos, sec_len);
+              ...
+          }
+    metavariable-regex:
+      metavariable: $SSID_INDEX
+      regex: "ssid_index"

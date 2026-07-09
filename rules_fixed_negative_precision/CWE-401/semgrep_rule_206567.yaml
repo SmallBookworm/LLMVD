@@ -1,0 +1,16 @@
+rules:
+  - id: rtl_usb_probe-memory-leak
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!rtlpriv->usb_data)
+                return -ENOMEM;
+          - pattern: |
+              if (!rtlpriv->usb_data)
+                goto $LABEL;
+    message: "Memory leak in rtl_usb_probe: allocated hw is not freed when usb_data allocation fails."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-401"
+      cve: "CVE-2019-19063"

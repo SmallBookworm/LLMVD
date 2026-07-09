@@ -1,0 +1,40 @@
+rules:
+  - id: cve-2015-8816-hub-activate-missing-refcount
+    message: "Missing reference count (kref_get) and device lock in hub_activate() may lead to use-after-free if hub is unplugged before delayed work runs."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (type == HUB_INIT2 || type == HUB_INIT3) {
+              ...
+              if (hub->disconnected) {
+                  ...
+                  return;
+              }
+              ...
+          }
+          kref_get(&hub->kref);
+      - pattern: |
+          if (type == HUB_INIT2)
+              goto init2;
+          if (type == HUB_INIT3)
+              goto init3;
+          ...
+          if (type == HUB_INIT) {
+              ...
+              return;
+          }
+    metavariable-regex:
+      metavariable: $type
+      regex: "HUB_INIT2|HUB_INIT3"
+    pattern-not: |
+      if (type == HUB_INIT2 || type == HUB_INIT3) {
+          device_lock(...);
+          if (hub->disconnected) {
+              device_unlock(...);
+              kref_put(...);
+              return;
+          }
+          ...
+      }
+      kref_get(&hub->kref);

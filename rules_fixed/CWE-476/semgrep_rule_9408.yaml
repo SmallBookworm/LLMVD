@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2017-16532-null-deref-usbtest
+    message: "Potential NULL pointer dereference when accessing 'out->desc.bEndpointAddress' without checking if 'out' is NULL."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      $OUT->desc.bEndpointAddress
+    metavariable-comparison:
+      - metavariable: $OUT
+        comparison: $OUT != NULL
+    focus-metavariable: $OUT

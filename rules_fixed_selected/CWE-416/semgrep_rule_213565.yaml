@@ -1,0 +1,19 @@
+rules:
+  - id: libxml2-use-after-free-xinclude-dropdtd
+    message: "Potential use-after-free vulnerability in libxml2 when processing XInclude with --dropdtd due to unsafe node traversal. Upgrade to libxml2 >= 2.9.11."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((cur->children != NULL) &&
+                  (cur->children->type != XML_ENTITY_DECL) &&
+                  (cur->children->type != XML_XINCLUDE_START) &&
+                  (cur->children->type != XML_XINCLUDE_END)) {
+                ...
+              }
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2021-3518"
+      references:
+        - https://gitlab.gnome.org/GNOME/libxml2/-/commit/1098c30a040e72a4654968547f415be4e4c40fe7

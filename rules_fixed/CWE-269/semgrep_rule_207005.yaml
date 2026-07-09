@@ -1,0 +1,11 @@
+rules:
+  - id: cyrus-imap-sieve-autocreate-admin-mailbox
+    patterns:
+      - pattern: |
+          mboxlist_createmailbox($INTERNALNAME, $..., 1, $USERID, $AUTH_STATE, $$...)
+    message: "mboxlist_createmailbox is called with isAdmin=1 in autosieve_createfolder, which may allow creation of mailboxes with admin privileges (CVE-2019-19783)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-269"
+      cve: "CVE-2019-19783"

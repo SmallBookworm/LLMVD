@@ -1,0 +1,32 @@
+rules:
+  - id: cve-2017-5985-missing-netns-ownership-check
+    message: "Missing privilege drop before operating in target network namespace. This may allow unprivileged users to manipulate host network interfaces (CVE-2017-5985, CWE-862)."
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (setns($FD, 0) < 0) { ... }
+          ...
+          $FUNC(...);
+      - pattern: |
+          if (setns($FD, $FLAGS) < 0) { ... }
+          ...
+          $FUNC(...);
+    pattern-not-inside: |
+      int $FUNC(...) {
+        ...
+        uid_t ruid, suid, euid;
+        ...
+        getresuid(&ruid, &euid, &suid);
+        ...
+        setns($FD, ...);
+        ...
+        setresuid(ruid, ruid, 0);
+        ...
+      }
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern-either:
+        - pattern: lxc_netdev_rename_by_name
+        - pattern: if_nametoindex
+        - pattern: if_indextoname

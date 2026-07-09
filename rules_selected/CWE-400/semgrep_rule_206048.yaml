@@ -1,0 +1,23 @@
+rules:
+  - id: imagemagick-webp-memory-allocation-cve-2017-14137
+    message: "Potential unbounded memory allocation based on untrusted input from WebP header. Missing validation against actual blob size may lead to excessive memory consumption (CWE-400)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              length = (size_t) (ReadWebPLSBWord(...) + 8);
+              ...
+              stream = (unsigned char *) AcquireQuantumMemory(length, sizeof(*stream));
+          - pattern: |
+              length = (size_t) (ReadWebPLSBWord(...) + 8);
+              ...
+              if (length < 12) ...
+              ...
+              stream = (unsigned char *) AcquireQuantumMemory(length, sizeof(*stream));
+    metadata:
+      cwe: "CWE-400"
+      cve: "CVE-2017-14137"
+      references:
+        - "https://github.com/ImageMagick/ImageMagick/issues/641"
+        - "https://github.com/ImageMagick/ImageMagick/commit/cb63560ba25e4a6c51ab282538c24877fff7d471"

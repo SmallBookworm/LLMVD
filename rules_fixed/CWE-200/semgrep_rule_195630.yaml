@@ -1,0 +1,22 @@
+rules:
+  - id: electron-case-sensitive-blacklist-bypass
+    message: "Case-sensitive comparison in blacklisted argument check may allow command injection via case variation (CVE-2018-1000118)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: std::string switch_name(a, strcspn(a, "="));
+              - pattern-inside: |
+                  ...
+                  switch_name == *iter
+          - patterns:
+              - pattern: std::string switch_name(...);
+              - pattern-inside: |
+                  ...
+                  switch_name == *iter
+    metavariable-pattern:
+      metavariable: switch_name
+      pattern: |
+        std::string($A, strcspn($A, "="))
+    focus-metavariable: switch_name

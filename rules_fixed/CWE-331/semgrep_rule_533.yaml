@@ -1,0 +1,22 @@
+rules:
+  - id: weak-entropy-magic-cookie
+    message: "Use of weak entropy (time and PID) for generating magic cookie may lead to session hijacking (CWE-331)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - patterns:
+        - pattern: srand(...)
+        - pattern-inside: |
+            ...
+            rand()
+      - patterns:
+        - pattern: ldata[0] = time(...);
+        - pattern: ldata[1] = getpid();
+        - pattern-inside: |
+            ...
+            srand(...);
+            ...
+            rand()
+    metavariable-pattern:
+      metavariable: $SEED
+      pattern: (ldata[0]) + (ldata[1] << 16)

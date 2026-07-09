@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2020-7062-null-pointer-dereference
+    message: "Potential null pointer dereference in session upload progress handling when rfc1867_cleanup is disabled. This may lead to a crash (CVE-2020-7062, CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (PS(rfc1867_cleanup)) {
+              php_session_rfc1867_cleanup(progress);
+          } else {
+              SEPARATE_ARRAY(&progress->data);
+              ...
+          }
+      - pattern: |
+          if (PS(rfc1867_cleanup)) {
+              php_session_rfc1867_cleanup(progress);
+          } else {
+              add_assoc_bool_ex(&progress->data, ...);
+              ...
+          }

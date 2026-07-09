@@ -1,0 +1,12 @@
+rules:
+  - id: tpm_data_buffer_uninitialized
+    message: "Uninitialized data buffer may leak kernel memory contents to userspace."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $chip->data_buffer = kmalloc(...);
+          - pattern: |
+              $chip->data_buffer = kmalloc($size * sizeof(u8), ...);
+    fix: ""

@@ -1,0 +1,30 @@
+rules:
+  - id: cve-2017-6348-hashbin-delete-locking
+    message: "Improper lock management in hashbin_delete may cause deadlock (CVE-2017-6348, CWE-200). The lock must be dropped before calling free_func and reacquired afterward."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (hashbin->hb_type & HB_LOCK) {
+            spin_lock_irqsave_nested(&hashbin->hb_spinlock, flags, ...);
+          }
+          ...
+          if (free_func)
+            (*free_func)(...);
+      - pattern: |
+          for (...; ...; ...) {
+            ...
+            while (...) {
+              ...
+              if (free_func)
+                (*free_func)(...);
+              ...
+            }
+          }
+          ...
+          if (hashbin->hb_type & HB_LOCK) {
+            spin_unlock_irqrestore(&hashbin->hb_spinlock, flags);
+          }
+    metavariable-pattern:
+      metavariable: free_func
+      pattern: $FUNC

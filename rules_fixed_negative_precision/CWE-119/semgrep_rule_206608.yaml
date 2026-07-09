@@ -1,0 +1,29 @@
+rules:
+  - id: cve-2017-1000257
+    message: "Potential buffer overread due to zero-size IMAP FETCH response passed to Curl_client_write without validation (CVE-2017-1000257)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (pp->cache) {
+            ...
+            size_t chunk = ...;
+            ...
+            if (chunk > (size_t)size)
+              chunk = (size_t)size;
+            result = Curl_client_write(..., pp->cache, chunk);
+            ...
+          }
+      - pattern: |
+          if (pp->cache) {
+            ...
+            size_t chunk = ...;
+            ...
+            if (chunk > (size_t)size)
+              chunk = (size_t)size;
+            $RESULT = Curl_client_write(..., pp->cache, chunk);
+            ...
+          }
+    metavariable-regex:
+      metavariable: $RESULT
+      regex: "result|ret|res|code"

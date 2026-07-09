@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2016-9841-zlib-inffast-pointer-arithmetic
+    message: "Potential undefined behavior due to improper pointer arithmetic. Decrementing a pointer before its allocated memory is undefined in C."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: $PTR - OFF
+          - pattern: $PTR + (- OFF)
+    metavariable-pattern:
+      metavariable: PTR
+      pattern-either:
+        - pattern: strm->next_in
+        - pattern: strm->next_out
+        - pattern: window

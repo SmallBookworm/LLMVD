@@ -1,0 +1,11 @@
+rules:
+  - id: libgadu_missing_ssl_cert_verification
+    message: "libgadu before 1.12.0 does not verify X.509 certificates, allowing man-in-the-middle attacks (CVE-2013-4488)."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      gg_send_packet(..., descr, descr_len, NULL)
+    fix-regex:
+      regex: null
+      replacement: null
+      enabled: false

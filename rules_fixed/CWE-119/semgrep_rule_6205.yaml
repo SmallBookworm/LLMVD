@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2014-3198-out-of-bounds-read
+    message: "Potential out-of-bounds read due to missing check for -1 return value from GetFirstVisiblePage()."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          int page = engine_->GetFirstVisiblePage();
+          if (page >= 0) {
+            if (engine_->GetPageRect(page).bottom() * zoom_ <= v_scrollbar_->GetValue())
+          }
+      - pattern: |
+          int page = engine_->GetFirstVisiblePage();
+          if (page >= 0) {
+            if (engine_->GetPageRect(page).y() * zoom_ >= v_scrollbar_->GetValue())
+          }

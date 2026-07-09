@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2012-3365-sqlite-open-basedir-bypass
+    patterns:
+      - pattern: |
+          if (*$FILENAME && strncmp($FILENAME, ":memory:", sizeof(":memory:") - 1)) {
+              ...
+          }
+    message: "Use of strncmp with 'sizeof(\":memory:\") - 1' may bypass open_basedir protection. Use memcmp with 'sizeof(\":memory:\")' instead."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-264"
+      cve: "CVE-2012-3365"

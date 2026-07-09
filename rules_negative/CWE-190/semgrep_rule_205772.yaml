@@ -1,0 +1,11 @@
+rules:
+  - id: cwe-190-integer-overflow-regcomp
+    patterns:
+      - pattern: |
+          p->ssize = (long) (len/(size_t)2*(size_t)3 + (size_t)1);
+    message: "Potential integer overflow leading to heap-based buffer overflow in regcomp (CWE-190). Missing overflow checks before allocation."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-190"
+      cve: "CVE-2015-2305"

@@ -1,0 +1,20 @@
+rules:
+  - id: salsa20_zero_length_blkcipher_walk_done
+    message: "Calling blkcipher_walk_done() when walk.nbytes may be zero can lead to use of uninitialized memory (CVE-2017-17805)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (likely($WALK.nbytes == $NBYTES))
+          {
+              ...
+              return blkcipher_walk_done($DESC, &$WALK, 0);
+          }
+      - pattern: |
+          if ($WALK.nbytes == $NBYTES)
+          {
+              ...
+              return blkcipher_walk_done($DESC, &$WALK, 0);
+          }
+    metavariable-pattern:
+      $WALK: "walk"

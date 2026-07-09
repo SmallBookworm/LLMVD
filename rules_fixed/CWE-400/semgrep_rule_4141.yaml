@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2018-20784-infinite-loop-sched-fair
+    message: "Detected vulnerable pattern in update_blocked_averages that may cause infinite loop due to improper manipulation of leaf cfs_rq list (CVE-2018-20784)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for_each_leaf_cfs_rq_safe(...) {
+                ...
+                if (cfs_rq_is_decayed($$cfs_rq))
+                  list_del_leaf_cfs_rq($$cfs_rq);
+                ...
+              }
+          - pattern: |
+              for_each_leaf_cfs_rq_safe(...) {
+                ...
+                list_del_leaf_cfs_rq(...);
+                ...
+              }

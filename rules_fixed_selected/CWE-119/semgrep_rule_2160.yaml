@@ -1,0 +1,16 @@
+rules:
+  - id: kamailio-encode_msg-buffer-overflow
+    message: "Potential heap-based buffer overflow in encode_msg due to missing size check before memcpy. This could lead to memory corruption, denial of service, or arbitrary code execution."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (len < MAX_ENCODED_MSG + MAX_MESSAGE_LEN)
+         return -1;
+      ...
+      memcpy(&payload[j], msg->buf, msg->len);
+    pattern-not: |
+      if (len < j + msg->len + 1) {
+         ...
+         return -1;
+      }
+      memcpy(&payload[j], msg->buf, msg->len);

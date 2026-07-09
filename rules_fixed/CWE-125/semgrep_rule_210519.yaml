@@ -1,0 +1,14 @@
+rules:
+  - id: cwe-125-ntfs-dotgit-oob-read
+    message: "Use of 'int' for string traversal may lead to out-of-bounds read due to integer overflow (CWE-125). Use 'size_t' instead."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      int $VAR;
+      ...
+      for ($VAR = 0; ; $VAR++) {
+        if (!$EXPR[$VAR] || ...)
+      }
+    metadata:
+      cwe: ["CWE-125"]
+      cve: "CVE-2018-11233"

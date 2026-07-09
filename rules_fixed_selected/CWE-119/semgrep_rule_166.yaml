@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2012-5669-bdf-glyphs-oob-read
+    message: "Out-of-bounds read vulnerability in BDF glyph parsing due to incorrect bounds check on glyph encoding. This can lead to denial of service or arbitrary code execution."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          if ( $ENC > 0 &&
+               (size_t)$ENC >= sizeof ( $HAVE ) * 8 )
+          {
+            ...
+          }
+    metavariable-pattern:
+      ENC: "p->glyph_enc"
+      HAVE: "p->have"

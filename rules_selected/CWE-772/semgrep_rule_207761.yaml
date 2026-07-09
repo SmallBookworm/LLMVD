@@ -1,0 +1,7 @@
+rules:
+  - id: ttusb_dec_uninitialized_memory_leak
+    message: "Use of kmalloc without zero-initialization may leak uninitialized kernel memory via USB (CVE-2019-19533, CWE-772)."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      kmalloc(COMMAND_PACKET_SIZE + 4, GFP_KERNEL)

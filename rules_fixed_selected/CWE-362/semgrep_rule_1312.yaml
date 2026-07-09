@@ -1,0 +1,16 @@
+rules:
+  - id: cwe-362-race-condition-ath-tx-aggr-sleep
+    message: "Race condition: accessing 'tid->sched' without holding the txq lock may lead to double list_del and crash."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!tid->sched)
+              continue;
+          ...
+          ath_txq_lock(..., $TXQ);
+      - pattern: |
+          if (!tid->sched)
+              continue;
+          ...
+          ath_txq_lock($SC, $TXQ);

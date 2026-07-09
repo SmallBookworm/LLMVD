@@ -1,0 +1,17 @@
+rules:
+  - id: cwe-200-uninitialized-nlmsgerr-padding
+    message: "Uninitialized padding fields in struct nlmsgerr may leak kernel memory"
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              ((struct nlmsgerr*)NLMSG_DATA($NLH))->error = ...;
+          - pattern: |
+              $E = NLMSG_DATA($NLH);
+              $E->error = ...;
+              memset(&($E->msg), 0, sizeof($E->msg));
+      - pattern-not: |
+          $E = NLMSG_DATA($NLH);
+          $E->error = ...;
+          memset(&($E->msg), 0, sizeof($E->msg));

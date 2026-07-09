@@ -1,0 +1,18 @@
+rules:
+  - id: cwe-843-hidp-unsafe-l2cap-pi
+    message: "Unsafe use of l2cap_pi() before verifying sockets. This may lead to type confusion or privilege escalation (CWE-843)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      l2cap_pi($SOCK->sk)->chan
+    pattern-not-inside: |
+      if (...)
+        ...
+      $RET = hidp_verify_sockets(..., ...);
+      if ($RET)
+        return ...;
+      ...
+      l2cap_pi($SOCK->sk)->chan
+    metadata:
+      cwe: "CWE-843"
+      cve: "CVE-2017-13220"

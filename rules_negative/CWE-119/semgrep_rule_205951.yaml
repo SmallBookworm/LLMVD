@@ -1,0 +1,24 @@
+rules:
+  - id: htmlparsecomment-uninitialized-access
+    message: "Potential out-of-bounds heap memory access in htmlParseComment due to missing character validation before use."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          q = CUR_CHAR(ql);
+          NEXTL(ql);
+          r = CUR_CHAR(rl);
+          NEXTL(rl);
+          cur = CUR_CHAR(l);
+          ...
+          while (IS_CHAR(cur) && ((cur != '>') || (r != '-') || (q != '-'))) {...}
+      - pattern: |
+          q = CUR_CHAR(ql);
+          NEXTL(ql);
+          r = CUR_CHAR(rl);
+          NEXTL(rl);
+          cur = CUR_CHAR(l);
+          while (IS_CHAR(cur) && ((cur != '>') || (r != '-') || (q != '-'))) {...}
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2015-8710"

@@ -1,0 +1,12 @@
+rules:
+  - id: heap_buffer_overflow_de_dotdot
+    patterns:
+      - pattern-either:
+          - pattern: memmove($DST, $SRC, strlen($FILE) - ...)
+          - pattern: memmove($DST, $SRC, strlen($STR) - ...)
+    message: "Potential heap-based buffer overflow due to unsafe use of strlen in memmove. The length argument should be based on the source buffer, not the entire string."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2017-10671"

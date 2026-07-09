@@ -1,0 +1,27 @@
+rules:
+  - id: cve-2016-9630-buffer-overflow-parseurl
+    message: "Missing port initialization for SCM_UNKNOWN scheme in parseURL may lead to global buffer overflow (CVE-2016-9630, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (p_url->scheme == SCM_UNKNOWN) {
+            ...
+            p_url->file = allocStr(...);
+            return;
+          }
+          ...
+          p_url->host = copyPath(...);
+          p_url->port = DefaultPort[p_url->scheme];
+      - pattern: |
+          p_url->host = copyPath(...);
+          p_url->port = DefaultPort[p_url->scheme];
+          ...
+          if (p_url->scheme == SCM_UNKNOWN) {
+            ...
+            p_url->file = allocStr(...);
+            return;
+          }
+    metavariable-regex:
+      metavariable: $p_url
+      regex: p_url

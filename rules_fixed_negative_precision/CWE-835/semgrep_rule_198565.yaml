@@ -1,0 +1,16 @@
+rules:
+  - id: qemu_pcnet_infinite_loop_dos
+    message: "Potential infinite loop in PCNet transmit leading to DoS (CVE-2021-3416). Use qemu_receive_packet() instead of pcnet_receive() in loopback mode to prevent reentrancy issues."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (CSR_LOOP($S)) {
+                ...
+                pcnet_receive(qemu_get_queue($S->nic), $BUF, $LEN);
+                ...
+              }
+    metadata:
+      cwe: "CWE-835"
+      cve: "CVE-2021-3416"

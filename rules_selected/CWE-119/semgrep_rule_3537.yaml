@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2018-17407-buffer-overflow
+    message: |
+      Potential buffer overflow in t1_check_unusual_charstring due to unsafe strcat/strcpy usage.
+      This may lead to arbitrary code execution when processing malicious Type 1 fonts.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          strcpy(t1_line_array, t1_buf_array);
+      - pattern: |
+          strcat(t1_buf_array, t1_line_array);
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: t1_check_unusual_charstring

@@ -1,0 +1,16 @@
+rules:
+  - id: imagemagick-tiffseekcustomstream-integer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((profile->offset + offset) < 0)
+                return(-1);
+          - pattern: |
+              if (((MagickOffsetType) profile->length + offset) < 0)
+                return(-1);
+    message: "Potential integer overflow in TIFFSeekCustomStream due to missing overflow checks before addition. See CVE-2019-13136."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-190"
+      cve: "CVE-2019-13136"

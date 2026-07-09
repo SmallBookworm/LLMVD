@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2017-14505-null-deref
+    message: "Potential NULL pointer dereference due to missing check after AcquireQuantumMemory. This may lead to denial of service (CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $DASHARRAY = (double *) AcquireQuantumMemory(...);
+          $p = CurrentContext->dash_pattern;
+          ...
+          *$q++ = (*$p++);
+      - pattern: |
+          $DASHARRAY = (double *) AcquireQuantumMemory(...);
+          ...
+          for (...; ...; ...)
+            *$q++ = (*$p++);
+    metavariable-regex:
+      metavariable: $DASHARRAY
+      regex: dasharray

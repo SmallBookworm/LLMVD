@@ -1,0 +1,11 @@
+rules:
+  - id: imagemagick-mogrifyimagelist-assertion-failure
+    message: "Detected vulnerable pattern in MogrifyImageList that may lead to assertion failure (CVE-2017-18252, CWE-617)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      ReplaceImageInList(&p, CloneImage(q, 0, 0, MagickTrue, exception));
+      ReplaceImageInList(&q, swap);
+    metadata:
+      cwe: "CWE-617"
+      cve: "CVE-2017-18252"

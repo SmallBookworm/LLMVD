@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2015-3194-null-deref
+    message: "NULL pointer dereference vulnerability in RSA PSS ASN.1 signature parsing. Missing NULL check on 'param' before accessing 'param->type'."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (OBJ_obj2nid($ALG->algorithm) == NID_mgf1
+          && $PARAM->type == V_ASN1_SEQUENCE)
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2015-3194"

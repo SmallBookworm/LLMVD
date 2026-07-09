@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2017-16546-wpg-colormap-index-validation
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((WPG_Palette.NumOfEntries - WPG_Palette.StartIndex) > ...)
+                ThrowReaderException(...);
+          - pattern: |
+              if ((WPG_Palette.NumOfEntries-WPG_Palette.StartIndex) > ...)
+                ThrowReaderException(...);
+    pattern-not: |
+      if (WPG_Palette.StartIndex > WPG_Palette.NumOfEntries)
+        ThrowReaderException(...);
+    message: "Missing validation for colormap StartIndex <= NumOfEntries may lead to out-of-bounds access (CWE-119, CVE-2017-16546)."
+    severity: ERROR
+    languages: [c]

@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2019-5780-apple-events-javascript-toggle
+    message: "Direct modification of kAllowJavascriptAppleEvents preference without proper validation may allow unauthorized Apple Events execution (CVE-2019-5780)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              PrefService* prefs = ...;
+              prefs->SetBoolean(prefs::kAllowJavascriptAppleEvents, ...);
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2019-5780"

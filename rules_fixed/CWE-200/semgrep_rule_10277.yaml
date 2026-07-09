@@ -1,0 +1,25 @@
+rules:
+  - id: cwe-200-soap-xxe-vulnerability
+    message: "XML External Entity (XXE) vulnerability detected. The XML parser context is not disabling DTD loading, which may allow remote attackers to read arbitrary files."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              xmlParserCtxtPtr $CTX;
+              ...
+              $CTX = xmlCreateFileParserCtxt(...);
+              ...
+              xmlParseDocument($CTX);
+          - pattern: |
+              xmlParserCtxtPtr $CTX;
+              ...
+              $CTX = xmlCreateMemoryParserCtxt(...);
+              ...
+              xmlParseDocument($CTX);
+      - pattern-not: |
+          $CTX->options -= XML_PARSE_DTDLOAD;
+    metavariable-regex:
+      metavariable: $CTX
+      regex: ctxt
+    fix: ""

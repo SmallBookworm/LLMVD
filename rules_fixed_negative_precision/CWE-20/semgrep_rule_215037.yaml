@@ -1,0 +1,14 @@
+rules:
+  - id: file_roller_symlink_vulnerability
+    message: "Missing G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS flag in g_file_enumerate_children may allow symlink attacks during recursive directory deletion."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      g_file_enumerate_children($DIR,
+                                $ATTRIBUTES,
+                                0,
+                                $CANCELLABLE,
+                                $ERROR)
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2016-7162"

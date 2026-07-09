@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2016-8646-hash-accept-null-data
+    message: "hash_accept may trigger OOPS on sockets with zero received bytes due to unconditional crypto_ahash_export/import. Missing check for 'more' flag before export/import."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              err = crypto_ahash_export(..., ...);
+              ...
+              err = crypto_ahash_import(..., ...);
+          - pattern: |
+              crypto_ahash_export(..., ...);
+              ...
+              crypto_ahash_import(..., ...);
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: hash_accept
+    focus-metavariable: $FUNC

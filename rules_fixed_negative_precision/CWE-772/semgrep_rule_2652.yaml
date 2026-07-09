@@ -1,0 +1,25 @@
+rules:
+  - id: imagemagick-palm-memory-leak-cve-2017-12664
+    message: "Memory leak in WritePALMImage due to missing error handling after AcquireQuantumMemory for 'lastrow' when compression is FaxCompression."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (image_info->compression == FaxCompression)
+                lastrow=(unsigned char *) AcquireQuantumMemory(...);
+              ... 
+              one_row=(unsigned char *) AcquireQuantumMemory(...);
+              if (one_row == (unsigned char *) NULL)
+                ThrowWriterException(...);
+          - pattern: |
+              if (image_info->compression == FaxCompression)
+                lastrow=(unsigned char *) AcquireQuantumMemory(...);
+              /* TODO check whether memory really was acquired? */
+              ...
+              one_row=(unsigned char *) AcquireQuantumMemory(...);
+              if (one_row == (unsigned char *) NULL)
+                ThrowWriterException(...);
+    metadata:
+      cwe: "CWE-772"
+      cve: "CVE-2017-12664"

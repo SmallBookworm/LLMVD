@@ -1,0 +1,19 @@
+rules:
+  - id: imagemagick-dib-out-of-bounds-write
+    message: "Potential out-of-bounds write in DIB image parsing due to unsafe memory allocation. This may lead to heap corruption or remote code execution."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2018-12600"
+      references:
+        - https://github.com/ImageMagick/ImageMagick/issues/1178
+        - https://github.com/ImageMagick/ImageMagick/commit/921f208c2ea3cc45847f380257f270ff424adfff
+    patterns:
+      - pattern-either:
+          - pattern: |
+              pixel_info=AcquireVirtualMemory((size_t) image->rows, MagickMax(
+                bytes_per_line, image->columns+256UL)*sizeof(*pixels));
+          - pattern: |
+              pixel_info=AcquireVirtualMemory((size_t) image->rows,MagickMax(
+                bytes_per_line,image->columns+256UL)*sizeof(*pixels));

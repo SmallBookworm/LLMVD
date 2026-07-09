@@ -1,0 +1,18 @@
+rules:
+  - id: unsafe_ring_foreach_in_red_channel
+    message: "Unsafe use of RING_FOREACH may lead to denial of service due to ring modification during iteration. Use RING_FOREACH_SAFE instead."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              RING_FOREACH($link, &$channel->clients) {
+                $$STATEMENTS
+              }
+          - pattern: |
+              RING_FOREACH($link, & $channel->clients) {
+                $$STATEMENTS
+              }
+    metadata:
+      cwe: "CWE-399"
+      cve: "CVE-2013-4130"

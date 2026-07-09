@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2011-2358-missing-install-confirmation
+    message: Extension installation proceeds without user confirmation, allowing potential unauthorized installations.
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2011-2358"
+    patterns:
+      - pattern-either:
+          - pattern: |
+              ShowExtensionInstallDialog(...);
+          - pattern: |
+              ShowExtensionInstallDialog($PROFILE, $THIS, $EXTENSION, $ICON, $PERMISSIONS, $PROMPT);
+    pattern-not-inside: |
+      if ($AUTO_CONFIRM != DO_NOT_SKIP) {
+        ...
+        return;
+      }
+      ...
+      ShowExtensionInstallDialog(...);

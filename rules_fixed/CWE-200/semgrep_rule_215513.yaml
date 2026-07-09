@@ -1,0 +1,27 @@
+rules:
+  - id: cwe-200-uninitialized-padding-netlink
+    message: "Uninitialized padding field in netlink structure may leak kernel memory"
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - patterns:
+            - pattern: struct tcmsg *$tcm;
+            - pattern: $tcm->tcm_family = ...;
+            - pattern: $tcm->tcm_ifindex = ...;
+          - patterns:
+            - pattern: struct tcmsg *$tcm;
+            - pattern: $tcm->tcm_family = ...;
+            - pattern-inside: |
+                ...
+                $tcm->tcm_parent = ...;
+          - patterns:
+            - pattern: struct tcmsg *$tcm;
+            - pattern: $tcm->tcm_info = ...;
+      - pattern-not: |
+          $tcm->tcm__pad1 = 0;
+      - pattern-not: |
+          memset($tcm, 0, sizeof(*$tcm));
+    metavariable-pattern:
+      $tcm:
+        type: "struct tcmsg *"

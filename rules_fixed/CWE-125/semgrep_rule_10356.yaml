@@ -1,0 +1,30 @@
+rules:
+  - id: cwe-125-buffer-overread-zero-length-check
+    message: "Missing zero-length check before pointer arithmetic may lead to heap-based buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ($COND && $SIZE > 0) {
+            ...
+            $PTR + $SIZE - 1
+            ...
+          }
+      - pattern: |
+          if ($COND) {
+            ...
+            $PTR + $SIZE - 1
+            ...
+          }
+    pattern-not-inside: |
+      if (... && $SIZE > 0) {
+        ...
+        $PTR + $SIZE - 1
+        ...
+      }
+    pattern-inside: |
+      if ((iptcDigestState == kDigestDiffers) && (kTIFF_TypeSizes[iptcInfo.type] > 1)) {
+        ...
+        (XMP_Uns8*)iptcInfo.dataPtr + iptcInfo.dataLen - 1
+        ...
+      }

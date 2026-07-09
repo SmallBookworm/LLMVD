@@ -1,0 +1,22 @@
+rules:
+  - id: freerdp-oob-read-irp
+    message: "Potential out-of-bounds read due to unsafe stream seeking. Use Stream_SafeSeek instead of Stream_Seek to prevent reading beyond buffer limits."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (Stream_GetRemainingLength($STREAM) < $LENGTH)
+                  return ...;
+              ...
+              Stream_Seek($STREAM, $LENGTH);
+          - pattern: |
+              if (Stream_GetRemainingLength($STREAM) < $LENGTH)
+                  return ...;
+              ...
+              Stream_Seek($STREAM, $PATHLENGTH);
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2020-11089"
+      references:
+        - https://github.com/FreeRDP/FreeRDP/commit/6b485b146a1b9d6ce72dfd7b5f36456c166e7a16

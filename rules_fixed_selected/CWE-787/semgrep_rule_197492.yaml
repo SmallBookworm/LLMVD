@@ -1,0 +1,13 @@
+rules:
+  - id: cwe-787-imap-quote-string-buffer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              void imap_quote_string(..., size_t dlen, ...) {
+                ...
+                dlen -= 2;
+                ...
+              }
+    message: "Buffer overflow vulnerability in imap_quote_string: insufficient space reserved for quote characters (CWE-787)."
+    severity: ERROR
+    languages: [c]

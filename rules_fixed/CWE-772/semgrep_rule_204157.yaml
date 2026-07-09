@@ -1,0 +1,29 @@
+rules:
+  - id: qemu-hid-kbd-modifiers-not-reset
+    message: "Keyboard modifiers are not reset in hid_reset(), which may lead to memory leak and denial of service (CVE-2017-8379)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          switch (hs->kind) {
+          case HID_KEYBOARD:
+              ...
+              $X = 0;
+              break;
+              ...
+          }
+          ...
+          hs->kbd.modifiers = 0;
+      - pattern-not: |
+          switch (hs->kind) {
+          case HID_KEYBOARD:
+              ...
+              hs->kbd.modifiers = 0;
+              ...
+              break;
+              ...
+          }
+    metavariable-pattern:
+      metavariable: $X
+      pattern: hs->kbd.keys
+    fix: ""

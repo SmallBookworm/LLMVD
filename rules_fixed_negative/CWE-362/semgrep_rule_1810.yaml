@@ -1,0 +1,20 @@
+rules:
+  - id: double_fetch_sclp_ctl_ioctl_sccb
+    message: "Double fetch vulnerability detected: the length field from user space is read twice via copy_from_user, allowing a race condition that may lead to information disclosure or memory corruption."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (copy_from_user($PTR1, $USER_PTR1, sizeof(*$PTR1))) { ... }
+              ...
+              if (copy_from_user($PTR2, $USER_PTR2, $PTR2->length)) { ... }
+          - pattern: |
+              copy_from_user($PTR1, $USER_PTR1, sizeof(*$PTR1));
+              ...
+              copy_from_user($PTR2, $USER_PTR2, $PTR2->length);
+    metavariable-pattern:
+      $PTR1: 
+        pattern: sccb
+      $PTR2: 
+        pattern: sccb

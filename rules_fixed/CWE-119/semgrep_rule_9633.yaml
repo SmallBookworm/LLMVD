@@ -1,0 +1,32 @@
+rules:
+  - id: cve-2018-8799-out-of-bounds-read
+    message: |
+      Missing stream validation before use may lead to out-of-bounds read (CVE-2018-8799).
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $FUNC(STREAM *$s)
+              {
+                  ...
+                  $pkglen = $s->end - $s->p;
+                  ...
+              }
+          - pattern: |
+              $FUNC(STREAM *$s)
+              {
+                  ...
+                  xmalloc($s->end - $s->p + ...);
+                  ...
+              }
+      - pattern-not: |
+          $FUNC(STREAM *$s)
+          {
+              ...
+              if (!s_check($s)) { ... }
+              ...
+          }
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: rdpsnddbg_process

@@ -1,0 +1,11 @@
+rules:
+  - id: capstone_integer_overflow_cs_winkernel_malloc
+    patterns:
+      - pattern: |
+          ExAllocatePoolWithTag(..., $SIZE + sizeof(...), ...)
+    message: "Integer overflow possible in allocation size. Use RtlSizeTAdd to safely compute size."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-190"
+      cve: "CVE-2017-6952"

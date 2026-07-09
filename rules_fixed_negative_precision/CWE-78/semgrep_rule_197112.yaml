@@ -1,0 +1,15 @@
+rules:
+  - id: cwe-78-os-command-injection-podcast-filename
+    message: |
+      Unsanitized filename from RSS enclosure may contain shell metacharacters,
+      leading to OS command injection when used in shell contexts.
+    severity: HIGH
+    languages: [c]
+    cwe: ["CWE-78"]
+    pattern: |
+      fn.append(base);
+    pattern-not: |
+      fn.append(utils::replace_all(base, "'", "%27"));
+    metavariable-pattern:
+      metavariable: base
+      pattern: char * base = basename(...);

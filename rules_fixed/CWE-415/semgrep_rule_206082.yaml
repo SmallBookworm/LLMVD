@@ -1,0 +1,18 @@
+rules:
+  - id: double-free-usb_8dev_start_xmit
+    patterns:
+      - pattern-either:
+          - pattern: |
+              can_put_echo_skb(..., $skb, ..., 0);
+              ...
+              err = usb_submit_urb($urb, $gfp);
+              if (unlikely(err))
+                  goto failed;
+          - pattern: |
+              can_put_echo_skb(..., $skb, ..., 0);
+              ...
+              if (unlikely(usb_submit_urb($urb, $gfp)))
+                  goto failed;
+    message: "Double free vulnerability in usb_8dev_start_xmit: dev_kfree_skb() is called after can_put_echo_skb() and usb_submit_urb() fails, leading to a double free (CWE-415)."
+    severity: ERROR
+    languages: [c]

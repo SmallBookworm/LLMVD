@@ -1,0 +1,10 @@
+rules:
+  - id: xss-via-string-replace
+    message: "Potential XSS vulnerability due to unsafe string replacement without proper escaping."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      $DATA.replace($POS, $SIZE, $INPUT)
+    metadata:
+      cwe: "CWE-79"
+      cve: "CVE-2016-1652"

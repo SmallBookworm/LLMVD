@@ -1,0 +1,19 @@
+rules:
+  - id: imagemagick-sgi-heap-overflow-cve-2019-19948
+    message: "Heap-based buffer overflow in WriteSGIImage due to missing dimension validation before header initialization."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if ((image->columns > 65535UL) || (image->rows > 65535UL))
+        ThrowWriterException(...);
+      ...;
+      (void) TransformImageColorspace(...);
+      (void) memset(&iris_info,0,sizeof(iris_info));
+    pattern-not: |
+      (void) TransformImageColorspace(...);
+      (void) memset(&iris_info,0,sizeof(iris_info));
+      ...;
+      if ((image->columns > 65535UL) || (image->rows > 65535UL))
+        ThrowWriterException(...);
+    metadata:
+      cwe: "CWE-787"

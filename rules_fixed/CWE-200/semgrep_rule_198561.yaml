@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2017-18549-uninitialized-stack-memory
+    message: "Stack-allocated struct 'aac_srb_reply' is copied to userspace without being fully initialized, potentially leaking kernel memory."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              struct aac_srb_reply $REPLY;
+              ...
+              copy_to_user($USER_REPLY, &$REPLY, sizeof(struct aac_srb_reply))
+          - pattern: |
+              struct aac_srb_reply $REPLY = {...};
+              ...
+              copy_to_user($USER_REPLY, &$REPLY, sizeof(struct aac_srb_reply))
+    metavariable-regex:
+      metavariable: $REPLY
+      regex: "reply"
+    fix-regex:
+      regex: "struct aac_srb_reply \$REPLY"
+      replacement: "struct aac_srb_reply \$REPLY; memset(&\$REPLY, 0, sizeof(\$REPLY))"

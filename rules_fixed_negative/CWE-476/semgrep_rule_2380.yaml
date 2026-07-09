@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2017-17439-null-deref
+    message: "Potential NULL pointer dereference in _kdc_fast_mk_error call when client_princ is NULL. This can lead to a segmentation fault (CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          _kdc_fast_mk_error(..., &r->client_princ->name, &r->client_princ->realm, ...)
+      - pattern: |
+          _kdc_fast_mk_error(..., &(r->client_princ->name), &(r->client_princ->realm), ...)
+    metavariable-pattern:
+      metavariable: r
+      pattern: $X

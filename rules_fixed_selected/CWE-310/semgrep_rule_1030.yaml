@@ -1,0 +1,18 @@
+rules:
+  - id: crypto_user_info_leak
+    message: "Use of memcpy/snprintf for copying strings may leak kernel stack memory. Use strncpy instead to ensure null-padding."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: memcpy(&$X, $SRC, sizeof($X))
+          - pattern: snprintf($BUF, $SIZE, "%s", $STR)
+    metavariable-patterns:
+      - metavariable: $X
+        patterns:
+          - pattern-inside: struct crypto_user_alg *$UALG; ... $UALG->$FIELD
+      - metavariable: $BUF
+        patterns:
+          - pattern-inside: struct crypto_report_larval $RL; ... $RL.$MEMBER
+    CWE:
+      - "CWE-310"

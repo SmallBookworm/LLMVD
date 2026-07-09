@@ -1,0 +1,20 @@
+rules:
+  - id: hid_report_fixup_out_of_bounds_write
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (*$rsize >= 31 && $rdesc[29] == ... && $rdesc[30] == ...) {
+                  ...
+                  $rdesc[30] = ...;
+              }
+          - pattern: |
+              if ($rsize >= 31 && $rdesc[29] == ... && $rdesc[30] == ...) {
+                  ...
+                  $rdesc[30] = ...;
+              }
+    message: "Potential out-of-bounds write due to off-by-one error in HID report descriptor size check. Ensure buffer size is at least 31 before accessing index 30."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2014-3184"

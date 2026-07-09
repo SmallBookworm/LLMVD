@@ -1,0 +1,16 @@
+rules:
+  - id: mono_array_fastcopy_racy_paths
+    message: "Detected vulnerable FastCopy fast path that was disabled due to race conditions (CVE-2011-0989)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (src_class == mono_defaults.object_class && dest_class->valuetype) {
+              ... 
+              return TRUE;
+          }
+      - pattern: |
+          if (mono_class_is_subclass_of (dest_class, src_class, FALSE)) {
+              ...
+              return TRUE;
+          }

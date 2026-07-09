@@ -1,0 +1,11 @@
+rules:
+  - id: cwe-125-heap-buffer-overread-hdlr_dump
+    message: "Heap-based buffer over-read in hdlr_dump due to incorrect strlen offset. This may lead to out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if ($PTR && (u32) $PTR[0] == strlen($PTR+1)) {
+        ...
+      }
+    metavariable-pattern:
+      $PTR: "p->nameUTF8"

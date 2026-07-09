@@ -1,0 +1,7 @@
+rules:
+  - id: cups-localhost-localdomain-whitelist
+    message: "Insecure whitelist entry 'localhost.localdomain' allows DNS rebinding attacks (CVE-2017-18190)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      !_cups_strcasecmp(con->clientname, "localhost.localdomain")

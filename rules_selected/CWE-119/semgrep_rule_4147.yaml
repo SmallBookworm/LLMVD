@@ -1,0 +1,16 @@
+rules:
+  - id: cwe-119-buffer-overflow-strcpy-szext
+    message: |
+      Potential buffer overflow due to unsafe strcpy usage. The destination buffer 'szExt' has a fixed size of 50,
+      but the source string '&ext[1]' is not validated for length before copying, which may lead to memory corruption.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              char szExt[50];
+              ...
+              strcpy(szExt, &ext[1]);
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2018-20761"

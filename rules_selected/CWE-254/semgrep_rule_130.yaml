@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2015-1793-alt-chains-ca-bypass
+    message: "OpenSSL CVE-2015-1793: Improper handling of alternative certificate chains may allow bypassing CA flag checks."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while (num > j) {
+                  ...
+                  ctx->last_untrusted--;
+                  ...
+              }
+          - pattern: |
+              while (num > $J) {
+                  ...
+                  ctx->last_untrusted--;
+                  ...
+              }
+    metadata:
+      cwe: ["CWE-254"]
+      cve: "CVE-2015-1793"
+      references:
+        - "http://git.openssl.org/?p=openssl.git;a=commitdiff;h=9a0db453ba017ebcaccbee933ee6511a9ae4d1c8"

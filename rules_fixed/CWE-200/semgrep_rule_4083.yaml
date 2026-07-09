@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2019-10638-missing-hash-mix-entropy
+    message: "Missing call to get_random_bytes() for net->hash_mix may leak kernel address information, defeating KASLR (CVE-2019-10638)."
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          refcount_set(&net->count, 1);
+          refcount_set(&net->passive, 1);
+          net->dev_base_seq = 1;
+      - pattern: |
+          refcount_set(&net->count, 1);
+          refcount_set(&net->passive, 1);
+          net->user_ns = ...;
+    metadata:
+      cwe: ["CWE-200"]
+      references:
+        - https://github.com/torvalds/linux/commit/355b98553789b646ed97ad801a619ff898471b92
+        - https://nvd.nist.gov/vuln/detail/CVE-2019-10638

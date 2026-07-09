@@ -1,0 +1,25 @@
+rules:
+  - id: imagemagick-cve-2020-27762
+    message: "Potential integer overflow leading to undefined behavior when casting double to unsigned char without bounds check (CWE-190)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              pixel[0] = (unsigned char) (...);
+          - pattern: |
+              pixel[1] = (unsigned char) (...);
+          - pattern: |
+              pixel[2] = (unsigned char) (...);
+          - pattern: |
+              pixel[3] = (unsigned char) (...);
+    pattern-not-inside: |
+      if (GetPixelRed(image, p) > 0)
+        pixel[0] = (unsigned char) (...);
+      if (GetPixelGreen(image, p) > 0)
+        pixel[1] = (unsigned char) (...);
+      if (GetPixelBlue(image, p) > 0)
+        pixel[2] = (unsigned char) (...);
+    metavariable-regex:
+      metavariable: $...
+      regex: 'gamma\s*\*\s*QuantumScale\s*\*\s*GetPixel(Red|Green|Blue)\s*\(.*\)'

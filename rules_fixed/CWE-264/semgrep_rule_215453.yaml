@@ -1,0 +1,17 @@
+rules:
+  - id: clone_parent_exec_id_mismatch
+    message: "CLONE_PARENT flag used without correctly setting parent_exec_id, which may allow unprivileged processes to send arbitrary signals to parent processes."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (clone_flags & (CLONE_PARENT|CLONE_THREAD))
+              $P->real_parent = current->real_parent;
+          ...
+          $P->parent_exec_id = $P->self_exec_id;
+      - pattern: |
+          if (clone_flags & (CLONE_PARENT|CLONE_THREAD)) {
+              $P->real_parent = current->real_parent;
+          }
+          ...
+          $P->parent_exec_id = $P->self_exec_id;

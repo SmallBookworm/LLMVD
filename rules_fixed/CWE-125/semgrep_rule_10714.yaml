@@ -1,0 +1,44 @@
+rules:
+  - id: haproxy-dns-oob-read-cve-2018-20102
+    message: |
+      Missing bounds check before reading DNS record data may lead to out-of-bounds read (CWE-125).
+      Ensure that `reader + dns_answer_record->data_len` does not exceed `bufend` before accessing the data.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: |
+                  if (reader + 2 > bufend) { ... }
+              - pattern: |
+                  ... = reader[0] * 256 + reader[1];
+                  reader += 2;
+                  switch (...->type) {
+                    case DNS_RTYPE_A: ...
+                    case DNS_RTYPE_AAAA: ...
+                    ...
+                  }
+            metavariable-regex:
+              variable: reader
+              regex: ^reader$
+          - patterns:
+              - pattern: |
+                  ... = reader[0] * 256 + reader[1];
+                  reader += 2;
+                  switch (...->type) {
+                    case DNS_RTYPE_A: ...
+                    case DNS_RTYPE_AAAA: ...
+                    ...
+                  }
+            metavariable-regex:
+              variable: reader
+              regex: ^reader$
+      - pattern-not:
+          patterns:
+            - pattern: |
+                if (reader + 2 > bufend) { ... }
+            - pattern: |
+                ... = reader[0] * 256 + reader[1];
+                reader += 2;
+            - pattern: |
+                if (reader + ...->data_len >= bufend) { ... }

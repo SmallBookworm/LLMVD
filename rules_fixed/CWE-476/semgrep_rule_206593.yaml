@@ -1,0 +1,9 @@
+rules:
+  - id: cve-2018-19149-null-dereference
+    message: "Potential NULL pointer dereference when accessing embedded file without checking its existence. This may lead to a crash (CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      $embFile = $emb_file->getEmbeddedFile();
+      if ($embFile == NULL) { }
+      $embFile->...;

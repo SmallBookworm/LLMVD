@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2019-3560-buffer-length-miscalculation
+    message: "Potential buffer length miscalculation due to unsafe arithmetic on uint16_t read from input. This may lead to integer overflow and denial-of-service (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $LENGTH += sizeof(ContentType) + sizeof(ProtocolVersion) + sizeof(uint16_t);
+          $BUF.trimStart($LENGTH);
+      - pattern: |
+          $LENGTH += ...;
+          $BUF.trimStart($LENGTH);
+    metavariable-pattern:
+      $LENGTH:
+        pattern: "auto $VAR = cursor.readBE<uint16_t>();"
+        language: c

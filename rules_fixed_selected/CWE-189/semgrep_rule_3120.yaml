@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2016-10094-off-by-one-jpegtables
+    message: "Potential heap-based buffer overflow due to off-by-one error in JPEGTables handling. The condition 'count >= 4' should be 'count > 4' to avoid reading beyond buffer bounds."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          if (count >= 4) {
+              ...
+          }
+    metavariable-pattern:
+      metavariable: count
+      pattern: $COUNT
+    focus-metavariable: count

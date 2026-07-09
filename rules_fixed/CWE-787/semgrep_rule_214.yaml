@@ -1,0 +1,16 @@
+rules:
+  - id: freetype-out-of-bounds-write-cve-2017-7857
+    message: "Potential out-of-bounds write due to missing CFF2 table check before accessing instance data. This may lead to heap-based buffer overflow (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ( face->goto_table( face, TTAG_glyf, stream, 0 ) &&
+               !face->goto_table( face, TTAG_CFF, stream, 0 ) )
+            num_instances = 0;
+      - pattern: |
+          if ( face->goto_table( face, TTAG_glyf, stream, 0 ) &&
+              !face->goto_table( face, TTAG_CFF, stream, 0 ) )
+            num_instances = 0;
+    metadata:
+      cwe: "CWE-787"

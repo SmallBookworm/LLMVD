@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2019-9500-ssid-len-check
+    message: "Missing SSID length validation may lead to heap buffer overflow (CWE-787). Ensure SSID length is capped at IEEE80211_MAX_SSID_LEN before memcpy."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          memcpy(..., netinfo->SSID, netinfo->SSID_len);
+          ...
+          .ssid_len = netinfo->SSID_len;
+      - pattern: |
+          {
+            ...
+            .ssid_len = netinfo->SSID_len;
+            ...
+            memcpy(..., netinfo->SSID, netinfo->SSID_len);
+            ...
+          }
+    metavariable-pattern:
+      metavariable: netinfo
+      pattern: struct brcmf_pno_net_info_le *
+    pattern-not: |
+      if (netinfo->SSID_len > IEEE80211_MAX_SSID_LEN)
+          netinfo->SSID_len = IEEE80211_MAX_SSID_LEN;

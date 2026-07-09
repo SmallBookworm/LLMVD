@@ -1,0 +1,57 @@
+rules:
+  - id: imagemagick-mogrify-memory-leak-cve-2019-13311
+    message: "Memory leak detected in MogrifyImageList due to missing error handling after RemoveFirstImageFromList. This may lead to resource exhaustion (CWE-399)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $image1 = RemoveFirstImageFromList($images);
+          $image2 = RemoveFirstImageFromList($images);
+          if ($image2 == (Image *) NULL)
+            {
+              status=MagickFalse;
+              break;
+            }
+      - pattern: |
+          $image1 = RemoveFirstImageFromList($images);
+          $image2 = RemoveFirstImageFromList($images);
+          if ($image2 == (Image *) NULL)
+            {
+              status=MagickFalse;
+              break;
+            }
+      - pattern: |
+          $image1 = RemoveFirstImageFromList($images);
+          $image2 = RemoveFirstImageFromList($images);
+          if ($image2 == (Image *) NULL)
+            {
+              status=MagickFalse;
+              break;
+            }
+      - pattern: |
+          $image1 = RemoveFirstImageFromList($images);
+          $image2 = RemoveFirstImageFromList($images);
+          if ($image2 == (Image *) NULL)
+            {
+              status=MagickFalse;
+              break;
+            }
+      - pattern: |
+          $image1 = RemoveFirstImageFromList($images);
+          $image2 = RemoveFirstImageFromList($images);
+          if ($image2 == (Image *) NULL)
+            {
+              status=MagickFalse;
+              break;
+            }
+      - pattern: |
+          $image1 = RemoveFirstImageFromList($images);
+          $image2 = RemoveFirstImageFromList($images);
+          if ($image2 == (Image *) NULL)
+            {
+              status=MagickFalse;
+              break;
+            }
+    metadata:
+      cwe: "CWE-399"
+      cve: "CVE-2019-13311"

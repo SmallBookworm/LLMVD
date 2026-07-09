@@ -1,0 +1,32 @@
+rules:
+  - id: fuse_ioctl_iov_verification_missing
+    message: Missing verification of iovec length in FUSE_IOCTL_RETRY path may lead to buffer overflow (CVE-2010-4650).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (outarg.flags & FUSE_IOCTL_RETRY) {
+              ...
+              in_iov = ...;
+              out_iov = ...;
+              goto retry;
+          }
+      - pattern: |
+          if (outarg.flags & FUSE_IOCTL_RETRY) {
+              ...
+              in_iov = ...;
+              out_iov = in_iov + ...;
+              goto retry;
+          }
+    pattern-not: |
+      if (outarg.flags & FUSE_IOCTL_RETRY) {
+          ...
+          in_iov = ...;
+          out_iov = ...;
+          ...
+          fuse_verify_ioctl_iov(in_iov, ...);
+          ...
+          fuse_verify_ioctl_iov(out_iov, ...);
+          ...
+          goto retry;
+      }

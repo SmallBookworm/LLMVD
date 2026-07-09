@@ -1,0 +1,20 @@
+rules:
+  - id: imagetruecolortopalette-ncolors-validation
+    message: "Missing upper bound check on 'ncolors' argument in imagetruecolortopalette may lead to out-of-bounds write (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (zend_parse_parameters(..., "rbl", ..., &ncolors) == FAILURE) { ... }
+              ...
+              if (ncolors <= 0) { ... }
+              gdImageTrueColorToPalette(..., ncolors);
+          - pattern: |
+              if (zend_parse_parameters(..., "rbl", ..., &ncolors) == FAILURE) { ... }
+              ...
+              if (ncolors <= 0) { ... }
+              ...
+              gdImageTrueColorToPalette(..., ncolors);
+    metavariable-pattern:
+      ncolors: $ncolors

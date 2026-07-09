@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2013-6431-null-ptr-deref
+    message: "Potential NULL pointer dereference in fib6_add due to missing fn=NULL assignment on error path when CONFIG_IPV6_SUBTREES is enabled."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (IS_ERR($FN)) {
+            $ERR = PTR_ERR($FN);
+            goto out;
+          }
+    metadata:
+      cwe: "CWE-264"
+      cve: "CVE-2013-6431"

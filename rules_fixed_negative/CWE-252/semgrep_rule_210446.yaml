@@ -1,0 +1,28 @@
+rules:
+  - id: opensmtpd_cve_2020_7247
+    message: "Improper input validation in smtp_mailaddr may allow remote command execution via crafted MAIL FROM field (CVE-2020-7247)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!valid_localpart(...->user) ||
+              !valid_domainpart(...->domain)) {
+            if (mailfrom && ...->user[0] == '\0' && ...->domain[0] == '\0')
+              return (1);
+            if (...->user[0] == '\0')
+              return (0);
+            if (...->domain[0] == '\0') {
+              ...
+              return (1);
+            }
+            return (0);
+          }
+      - pattern: |
+          if (!valid_localpart($USER) ||
+              !valid_domainpart($DOMAIN)) {
+            ...
+            return (0);
+          }
+    metadata:
+      cwe: ["CWE-252"]
+      cve: "CVE-2020-7247"

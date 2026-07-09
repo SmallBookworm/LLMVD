@@ -1,0 +1,34 @@
+rules:
+  - id: tigervnc-tightdecoder-gradient-heap-overflow
+    message: "Heap buffer overflow in TightDecoder::FilterGradient when handling zero-width rectangles. This could lead to remote code execution."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for ($Y = 0; $Y < $RECT_HEIGHT; $Y++) {
+                ...
+                pf.rgbFromBuffer(..., &$INBUF[$Y * $RECT_WIDTH], 1);
+                ...
+                for ($X = 1; $X < $RECT_WIDTH; $X++) {
+                  ...
+                }
+                ...
+              }
+          - pattern: |
+              for ($Y = 0; $Y < $RECT_HEIGHT; $Y++) {
+                ...
+                ...[... $Y * $RECT_WIDTH ...]
+                ...
+                for ($X = 1; $X < $RECT_WIDTH; $X++) {
+                  ...
+                }
+                ...
+              }
+    metavariable-pattern:
+      metavariable: $RECT_WIDTH
+      patterns:
+        - pattern-not:
+            regex: "^0$"
+    fix-regex:
+      enabled: false

@@ -1,0 +1,44 @@
+rules:
+  - id: imagemagick-msl-xml-external-entity
+    message: "Potential XML external entity (XXE) vulnerability in MSL interpreter leading to denial of service (CVE-2016-10068)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (LocaleCompare((const char *) tag,"read") == 0)
+                {
+                  ...
+                  for (...; ...; ...)
+                  {
+                    ...
+                    if (LocaleCompare(keyword,"filename") == 0)
+                      {
+                        ...
+                        (void) CopyMagickString(...->filename, value, ...);
+                        image=ReadImage(..., exception);
+                        ...
+                      }
+                    ...
+                  }
+                  ...
+                }
+          - pattern: |
+              if (LocaleCompare((const char *) tag,"image") == 0)
+                {
+                  ...
+                  if (LocaleCompare(keyword,"color") == 0)
+                    {
+                      ...
+                      (void) CopyMagickString(...->filename, "xc:", ...);
+                      (void) ConcatenateMagickString(...->filename, value, ...);
+                      next_image=ReadImage(..., exception);
+                      ...
+                    }
+                  ...
+                }
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2016-10068"
+      references:
+        - "https://github.com/ImageMagick/ImageMagick/commit/56d6e20de489113617cbbddaf41e92600a34db22"

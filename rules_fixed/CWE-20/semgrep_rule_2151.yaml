@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2016-2548-snd-timer-close-race
+    message: "Missing proper locking and list cleanup in snd_timer_close may lead to use-after-free or system crash (CVE-2016-2548)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          list_for_each_entry_safe($SLAVE, ..., &timeri->slave_list_head, ...) {
+            spin_lock_irq(&slave_active_lock);
+            _snd_timer_stop(...);
+            ...
+            spin_unlock_irq(&slave_active_lock);
+          }
+      - pattern: |
+          list_for_each_entry_safe($SLAVE, ..., &timeri->slave_list_head, ...) {
+            ...
+            list_move_tail(...);
+            ...
+            // missing list_del_init(&slave->ack_list) and list_del_init(&slave->active_list)
+          }
+    metavariable-pattern:
+      metavariable: $SLAVE
+      pattern: $SLAVE

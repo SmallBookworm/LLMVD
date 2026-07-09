@@ -1,0 +1,16 @@
+rules:
+  - id: yodl-buffer-overread-queuepush
+    message: Buffer over-read vulnerability in queue_push due to incorrect memcpy size when reallocating buffer.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          memcpy($cp, $qp->d_memory, $memory_length);
+      - pattern: |
+          memcpy($cp, $qp->d_memory, memory_length);
+    metavariable-pattern:
+      metavariable: $memory_length
+      patterns:
+        - pattern-not: original_length
+    fix-regex:
+      enabled: false

@@ -1,0 +1,15 @@
+rules:
+  - id: cwe-20-null-pointer-dereference-fnmatch
+    message: "Potential null pointer dereference in fnmatch() when 'str' is NULL. Use 'str ?: \"\"' to safely handle NULL input."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      fnmatch($PATTERN, $STR, $FLAGS)
+    metavariable-pattern:
+      metavariable: $STR
+      pattern: (const char *)0
+    pattern-not: |
+      fnmatch($PATTERN, $STR ?: "", $FLAGS)
+    fix-regex:
+      regex: 'fnmatch\(([^,]+),\s*([^,]+),\s*([^)]+)\)'
+      replacement: 'fnmatch(\1, \2 ?: "", \3)'

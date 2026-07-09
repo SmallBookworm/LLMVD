@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2017-13715-uninitialized-flow-dissector-fields
+    message: "Uninitialized n_proto, ip_proto, or thoff in __skb_flow_dissect may lead to denial of service or arbitrary code execution."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!...)
+                  return false;
+          - pattern: |
+              if (!...)
+                  return false;
+          - pattern: |
+              default:
+                  return false;
+    metavariable-regex:
+      metavariable: $...
+      regex: "__skb_header_pointer\\s*\\([^)]*\\)"

@@ -1,0 +1,26 @@
+rules:
+  - id: cwe-787-bn_bn2dec-overflow-check
+    message: "Missing bounds check before writing to buffer in BN_bn2dec may lead to out-of-bounds write (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          while (!BN_is_zero($T)) {
+              *$LP = BN_div_word($T, $BN_DEC_CONV);
+              ...
+              $LP++;
+              if ($LP - $BN_DATA >= $BN_DATA_NUM)
+                  goto err;
+          }
+      - pattern: |
+          while (!BN_is_zero($T)) {
+              *$LP = BN_div_word($T, $BN_DEC_CONV);
+              if (*$LP == (BN_ULONG)-1)
+                  goto err;
+              $LP++;
+              if ($LP - $BN_DATA >= $BN_DATA_NUM)
+                  goto err;
+          }
+    metadata:
+      cwe: ["CWE-787"]
+      cve: "CVE-2016-2182"

@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2015-8961-use-after-free
+    message: "Potential use-after-free in __ext4_journal_stop due to accessing handle->h_err after jbd2_journal_stop may have freed the handle."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!handle->h_transaction) {
+              ... 
+              jbd2_journal_stop(handle);
+              return handle->h_err ? ... : ...;
+          }
+      - pattern: |
+          if (!handle->h_transaction) {
+              ...
+              int rc = jbd2_journal_stop(handle);
+              return handle->h_err ? ... : ...;
+          }

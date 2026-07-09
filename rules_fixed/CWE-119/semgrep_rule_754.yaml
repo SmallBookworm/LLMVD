@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2011-4086-journal-unmap-buffer-missing-clear
+    message: "Missing clear_buffer_delay() and clear_buffer_unwritten() in journal_unmap_buffer may lead to use-after-free or system crash (CVE-2011-4086, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          clear_buffer_dirty($BH);
+          ...
+          clear_buffer_mapped($BH);
+          clear_buffer_req($BH);
+          clear_buffer_new($BH);
+          $BH->b_bdev = NULL;
+      - pattern: |
+          clear_buffer_dirty(...);
+          ...
+          clear_buffer_mapped(...);
+          clear_buffer_req(...);
+          clear_buffer_new(...);
+          ...->b_bdev = NULL;
+    metavariable-pattern:
+      $BH: 
+        pattern: struct buffer_head *
+    fix: ""

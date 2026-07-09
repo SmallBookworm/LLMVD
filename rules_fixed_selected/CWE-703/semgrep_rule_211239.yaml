@@ -1,0 +1,15 @@
+rules:
+  - id: imagemagick-tiff-heap-buffer-overflow
+    message: "Potential heap buffer overflow in TIFF image processing due to insufficient memory allocation validation."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          extent=4*(samples_per_pixel+1)*TIFFStripSize(tiff);
+          strip_pixels=(unsigned char *) AcquireQuantumMemory(extent, sizeof(*strip_pixels));
+      - pattern: |
+          extent=4*(samples_per_pixel+1)*MagickMax(rows*TIFFTileRowSize(tiff), TIFFTileSize(tiff));
+          tile_pixels=(unsigned char *) AcquireQuantumMemory(extent, sizeof(*tile_pixels));
+    metadata:
+      cwe: "CWE-703"
+      cve: "CVE-2022-3213"

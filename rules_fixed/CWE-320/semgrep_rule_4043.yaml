@@ -1,0 +1,26 @@
+rules:
+  - id: cve-2019-12098-missing-pkinit-kx-confirmation
+    message: Missing verification of PA-PKINIT-KX key exchange for anonymous PKINIT, which may allow a man-in-the-middle attack (CVE-2019-12098).
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (ret == 0)
+            ret = copy_EncKDCRepPart(...);
+      - patterns:
+        - pattern: |
+            if (ret == 0 && $CTX->pk_init_ctx)
+              ...
+            if (ret == 0)
+              ret = copy_EncKDCRepPart(...);
+        - metavariable-comparison:
+            metavariable: $CTX
+            comparison: $CTX matches /^ctx$/
+    pattern-not-inside: |
+      if (ret == 0 && $CTX->pk_init_ctx) {
+        ...
+        ret = _krb5_pk_kx_confirm(...);
+        ...
+      }
+      if (ret == 0)
+        ret = copy_EncKDCRepPart(...);

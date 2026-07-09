@@ -1,0 +1,36 @@
+rules:
+  - id: cve-2017-16525-use-after-free
+    message: "Use-after-free vulnerability in usb_console_setup due to missing reset of info->port on error path. This can lead to a denial of service or unspecified impact upon device disconnection."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          fail:
+          ...
+          tty_port_tty_set(...);
+          tty_kref_put(...);
+          reset_open_count:
+          ...
+          port->port.count = 0;
+          ...
+          usb_autopm_put_interface(...);
+          ...
+          usb_serial_put(...);
+          ...
+          mutex_unlock(...);
+          return ...;
+      - pattern: |
+          goto fail;
+          ...
+          fail:
+          ...
+          reset_open_count:
+          ...
+          port->port.count = 0;
+          ...
+          usb_autopm_put_interface(...);
+          ...
+          usb_serial_put(...);
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern: usb_console_setup

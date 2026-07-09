@@ -1,0 +1,24 @@
+rules:
+  - id: use-after-free-ffs-user-copy-worker
+    message: Use-after-free vulnerability due to accessing kiocb after ki_complete() which may free it.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: $IO_DATA->kiocb->ki_complete($IO_DATA->kiocb, ..., ...);
+              - pattern-inside: |
+                  $IO_DATA->kiocb->ki_complete($IO_DATA->kiocb, ..., ...);
+                  ...
+                  $IO_DATA->kiocb->$FIELD
+              - pattern: $IO_DATA->kiocb->$FIELD
+          - patterns:
+              - pattern: $IO_DATA->kiocb->ki_complete($IO_DATA->kiocb, ..., ...);
+              - pattern-inside: |
+                  $IO_DATA->kiocb->ki_complete($IO_DATA->kiocb, ..., ...);
+                  ...
+                  $IO_DATA->kiocb->ki_flags
+              - pattern: $IO_DATA->kiocb->ki_flags
+    metavariable-pattern:
+      metavariable: $IO_DATA
+      pattern: struct ffs_io_data *

@@ -1,0 +1,11 @@
+rules:
+  - id: cwe-284-insecure-socket-binding
+    message: Binding socket to INADDR_ANY allows remote attackers to bypass access restrictions. Use INADDR_LOOPBACK instead.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          $$saddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    metadata:
+      cwe: "CWE-284"
+      cve: "CVE-2016-5104"

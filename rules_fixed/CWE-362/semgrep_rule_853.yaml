@@ -1,0 +1,27 @@
+rules:
+  - id: ksm_null_pointer_dereference_race_condition
+    message: "Potential NULL pointer dereference due to race condition in KSM scan_get_next_rmap_item. Missing revalidation of slot after list traversal."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (slot == &ksm_mm_head) {
+          ...
+          spin_lock(&ksm_mmlist_lock);
+          slot = list_entry(slot->mm_list.next, struct mm_slot, mm_list);
+          ksm_scan.mm_slot = slot;
+          spin_unlock(&ksm_mmlist_lock);
+          if (slot == &ksm_mm_head)
+              return NULL;
+          ...
+      }
+    pattern-not-inside: |
+      if (slot == &ksm_mm_head) {
+          ...
+          spin_lock(&ksm_mmlist_lock);
+          slot = list_entry(slot->mm_list.next, struct mm_slot, mm_list);
+          ksm_scan.mm_slot = slot;
+          spin_unlock(&ksm_mmlist_lock);
+          if (slot == &ksm_mm_head)
+              return NULL;
+          ...
+      }

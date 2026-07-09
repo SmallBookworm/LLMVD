@@ -1,0 +1,12 @@
+rules:
+  - id: cwe-787-out-of-bounds-read-retdec
+    message: "Potential out-of-bounds read due to missing check before decrementing iterator from upper_bound. This may lead to heap buffer overflow (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          auto up = $SET.upper_bound($ADDR);
+          --up;
+      - pattern: |
+          auto up = $SET.upper_bound($ADDR);
+          $OTHER = --up;

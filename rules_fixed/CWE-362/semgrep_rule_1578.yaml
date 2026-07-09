@@ -1,0 +1,33 @@
+rules:
+  - id: kvm_sysenter_cwe362
+    message: "SYSENTER emulation does not properly validate or mask MSR values, potentially leading to privilege escalation or guest OS crash (CVE-2015-0239)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              switch ($MODE) {
+              case X86EMUL_MODE_PROT32:
+                  if (($MSR & 0xfffc) == 0x0)
+                      return emulate_gp(...);
+                  break;
+              case X86EMUL_MODE_PROT64:
+                  if ($MSR == 0x0)
+                      return emulate_gp(...);
+                  break;
+              ...
+              }
+          - pattern: |
+              ops->get_msr(..., MSR_IA32_SYSENTER_EIP, &$msr_data);
+              $ctxt->_eip = $msr_data;
+          - pattern: |
+              ops->get_msr(..., MSR_IA32_SYSENTER_ESP, &$msr_data);
+              *reg_write(...) = $msr_data;
+    metavariable-pattern:
+      - metavariable: $msr_data
+        patterns:
+          - pattern-either:
+              - pattern: msr_data
+    metadata:
+      cwe: ["CWE-362"]
+      cve: "CVE-2015-0239"

@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2013-4160-null-deref-no-cleanup
+    message: "Missing NULL check after _cmsCalloc may lead to NULL pointer dereference (CVE-2013-4160)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $c16->Curves[$i] = _cmsCalloc($ContextID, $nElements, sizeof(cmsUInt16Number));
+          if ($nElements == 256) { ... }
+      - pattern: |
+          $c16->Curves[$i] = _cmsCalloc($ContextID, $nElements, sizeof(cmsUInt16Number));
+          else { ... }

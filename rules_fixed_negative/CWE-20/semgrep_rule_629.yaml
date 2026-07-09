@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2012-2669-netlink-message-validation
+    message: "Netlink connector message origin is not validated. Use recvfrom and verify nl_pid to prevent spoofing."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          recv($FD, $BUF, $SIZE, 0)
+      - pattern: |
+          recv($FD, $BUF, $SIZE, $FLAGS)
+    metadata:
+      cwe: "CWE-20"
+    fix-regex:
+      regex: 'recv\([^)]*\)'
+      replacement: 'recvfrom(...) with nl_pid check'
+      enabled: false

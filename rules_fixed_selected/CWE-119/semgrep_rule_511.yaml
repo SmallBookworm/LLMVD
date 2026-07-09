@@ -1,0 +1,7 @@
+rules:
+  - id: cve-2007-5199-readlink-buffer-overflow
+    message: "Potential buffer overflow in readlink usage. The third argument to readlink should be 'sizeof(dest) - 1' to leave space for null termination."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      readlink(..., ..., sizeof dest)

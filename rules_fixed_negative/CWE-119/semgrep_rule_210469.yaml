@@ -1,0 +1,19 @@
+rules:
+  - id: rsyslog_legacy_syslog_tag_buffer_overflow
+    message: "Potential stack-based buffer overflow in parseLegacySyslogMsg due to off-by-one error when parsing TAG field. Ensure loop condition uses 'CONF_TAG_MAXSIZE - 2' to leave space for colon and null terminator."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while(... && i < CONF_TAG_MAXSIZE) {
+                ...
+              }
+          - pattern: |
+              while(... && i < CONF_TAG_MAXSIZE - 1) {
+                ...
+              }
+    metavariable-pattern:
+      metavariable: $LOOP
+      pattern: |
+        while(lenMsg > 0 && *p2parse != ':' && *p2parse != ' ' && i < CONF_TAG_MAXSIZE)

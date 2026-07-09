@@ -1,0 +1,11 @@
+rules:
+  - id: cwe-189-integer-overflow-emalloc
+    message: "Integer overflow vulnerability due to use of emalloc instead of safe_emalloc. This can lead to heap-based buffer overflow."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          emalloc($SIZE + 1)
+    metadata:
+      cwe: ["CWE-189"]
+      cve: "CVE-2012-2386"

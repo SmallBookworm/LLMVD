@@ -1,0 +1,25 @@
+rules:
+  - id: cve-2017-14230-off-by-one-uninitialized-memory
+    message: Off-by-one error in prefix calculation may lead to use of uninitialized memory in mboxlist_do_find.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (prefixlen < len) {
+                ...
+                strlcpy(...);
+              }
+          - pattern: |
+              if (prefixlen <= len) {
+                ...
+                strlcpy(...);
+              }
+    pattern-not: |
+      if (prefixlen <= len) {
+        ...
+        strlcpy(...);
+      }
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2017-14230"

@@ -1,0 +1,10 @@
+rules:
+  - id: gnulib-vasnprintf-buffer-overflow
+    message: Heap-based buffer overflow in convert_to_decimal due to missing space for null terminator.
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      malloc (xsum (c_len, extra_zeroes))
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2018-17942"

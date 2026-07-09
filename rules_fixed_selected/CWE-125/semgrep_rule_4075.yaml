@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2019-11339-out-of-bounds-access
+    message: "Potential out-of-bounds array access in mpeg4_decode_studio_block due to missing index validation before using 'idx' to access 'scantable'."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              idx += run;
+              j = scantable[idx++];
+              ...
+          - pattern: |
+              j = scantable[idx++];
+              ...
+    metavariable-pattern:
+      metavariable: idx
+      pattern-not: |
+        if (idx > 63)
+            return AVERROR_INVALIDDATA;
+        j = scantable[idx++];

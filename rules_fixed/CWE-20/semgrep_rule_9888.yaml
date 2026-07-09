@@ -1,0 +1,24 @@
+rules:
+  - id: cwe-20-array-index-validation-missing
+    message: Missing bounds check on array index 'type' before use as array subscript. This can lead to out-of-bounds access.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          if ($TYPE < 0 || $TYPE >= $BOUND) {
+            return;
+          }
+          ...
+          $ARRAY[$TYPE] = ...;
+      - pattern-either:
+          - pattern: |
+              $ARRAY[$TYPE] = ...;
+          - pattern: |
+              ... $ARRAY[$TYPE] ...
+    metavariable-patterns:
+      - metavariable: $ARRAY
+        patterns:
+          - pattern-regex: (content_accessed_|content_blocked_|content_blockage_indicated_to_user_)
+      - metavariable: $TYPE
+        patterns:
+          - pattern-regex: \btype\b

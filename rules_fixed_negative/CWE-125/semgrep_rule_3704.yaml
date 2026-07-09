@@ -1,0 +1,22 @@
+rules:
+  - id: cwe-125-oob-read-string-scan-range
+    message: "Potential heap-based out-of-bounds read in string_scan_range due to insufficient bounds check before accessing 'w' array."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              char *w = (char *)buf + needle + rc - from;
+              if ((to - needle) > 5) {
+                ...
+                bool is_wide32 = needle + rc + 2 < to && !w[0] && !w[1] && !w[2] && w[3] && !w[4];
+              }
+          - pattern: |
+              char *w = (char *)buf + needle + rc - from;
+              if ((to - needle) > 5) {
+                ...
+                bool is_wide = needle + rc + 2 < to && !w[0] && w[1] && !w[2];
+              }
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2018-11381"

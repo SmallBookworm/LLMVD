@@ -1,0 +1,7 @@
+rules:
+  - id: cwe-125-out-of-bounds-read-base64-decode-xmlrpc
+    message: "Out-of-bounds read vulnerability in base64_decode_xmlrpc due to missing cast to unsigned char when indexing dtable. This can lead to reading memory outside allocated areas (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (dtable[c] & 0x80)

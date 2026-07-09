@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2015-5522-buffer-overflow
+    message: "Potential heap-based buffer overflow due to unchecked decrement of 'len' which may become negative. This could lead to a denial of service or memory corruption (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          while (TY_(IsWhite)(lexer->lexbuf[start+len-1]))
+              --len;
+      - pattern: |
+          while (TY_(IsWhite)(lexer->lexbuf[start]) && start < len)
+          {
+              ++start;
+              --len;
+          }

@@ -1,0 +1,7 @@
+rules:
+  - id: cve-2012-2824-use-after-free-svg-painting
+    message: "Potential use-after-free vulnerability due to unsafe BitmapImage frame alpha check. This may lead to denial of service or arbitrary code execution (CVE-2012-2824)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      image->isBitmapImage() ? static_cast<BitmapImage*>(image)->frameHasAlphaAtIndex(0) : ...

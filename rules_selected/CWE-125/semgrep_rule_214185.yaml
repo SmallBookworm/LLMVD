@@ -1,0 +1,33 @@
+rules:
+  - id: cwe-125-mpegts-section-size-check
+    message: "Missing minimum section size check before accessing MPEG-TS section data, leading to potential out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (G_UNLIKELY (data_size < section_length + 3))
+            goto short_packet;
+          ...
+          if (!res->short_section) {
+            ...
+          }
+      - pattern: |
+          section_length = GST_READ_UINT16_BE (data + 1) & 0x0FFF;
+          if (G_UNLIKELY (data_size < section_length + 3))
+            goto short_packet;
+          ...
+          if (!res->short_section) {
+            ...
+          }
+    metavariable-regex:
+      metavariable: $func
+      regex: gst_mpegts_section_new
+    pattern-not: |
+      if (G_UNLIKELY (data_size < 3))
+        goto short_packet;
+      ...
+      if (!res->short_section) {
+        if (G_UNLIKELY (data_size < 11))
+          goto bad_long_packet;
+        ...
+      }

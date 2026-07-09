@@ -1,0 +1,13 @@
+rules:
+  - id: imagemagick-cve-2020-27752
+    message: "Heap buffer overflow vulnerability in ImageMagick (CVE-2020-27752) due to insufficient memory allocation for pixel buffer."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      pixel_info=AcquireVirtualMemory(rowbytes+256,sizeof(*ping_pixels));
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2020-27752"
+      references:
+        - https://github.com/ImageMagick/ImageMagick/issues/1752
+        - https://github.com/ImageMagick/ImageMagick/commit/a9d563d3d73874312080d30dc4ba07cecad56192

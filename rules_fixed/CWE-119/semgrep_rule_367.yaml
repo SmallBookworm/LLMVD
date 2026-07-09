@@ -1,0 +1,34 @@
+rules:
+  - id: openssl-bio-printf-memory-allocation-check-missing
+    message: "Missing return value check for doapr_outch or formatting functions may lead to out-of-bounds write or memory consumption (CVE-2016-2842)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          doapr_outch($SBUF, $BUF, $CURRLEN, $MAXLEN, $CH);
+      - pattern: |
+          fmtint($SBUF, $BUF, $CURRLEN, $MAXLEN, $VALUE, $BASE, $MIN, $MAX, $FLAGS);
+      - pattern: |
+          fmtfp($SBUF, $BUF, $CURRLEN, $MAXLEN, $FVALUE, $MIN, $MAX, $FLAGS);
+      - pattern: |
+          fmtstr($SBUF, $BUF, $CURRLEN, $MAXLEN, $STR, $FLAGS, $MIN, $MAX);
+    metavariable-patterns:
+      - metavariable: $SBUF
+        patterns:
+          - pattern-inside: |
+              char **$SBUF;
+      - metavariable: $BUF
+        patterns:
+          - pattern-inside: |
+              char **$BUF;
+      - metavariable: $CURRLEN
+        patterns:
+          - pattern-inside: |
+              size_t *$CURRLEN;
+      - metavariable: $MAXLEN
+        patterns:
+          - pattern-inside: |
+              size_t *$MAXLEN;
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2016-2842"

@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2018-9055-jpc-firstone-assert
+    message: "Reachable assertion in jpc_firstone may lead to denial of service (CVE-2018-9055)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      assert($X >= 0);
+    pattern-inside: |
+      int jpc_firstone(int $X)
+      {
+        ...
+      }
+    metadata:
+      cwe: "CWE-617"
+      cve: "CVE-2018-9055"

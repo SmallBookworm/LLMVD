@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2019-19480-incorrect-free
+    message: "Incorrect free operation detected. The code frees 'asn1_com_prkey_attr[0].parm' instead of 'info.subject.value', which may lead to use-after-free or double-free (CWE-672)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (asn1_com_prkey_attr->flags & SC_ASN1_PRESENT &&
+          asn1_com_prkey_attr[0].flags & SC_ASN1_PRESENT) {
+            free(asn1_com_prkey_attr[0].parm);
+      }

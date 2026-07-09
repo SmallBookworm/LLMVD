@@ -1,0 +1,11 @@
+rules:
+  - id: cwe-787-mptsas-g_new-instead-of-g_new0
+    message: Use of g_new instead of g_new0 may lead to out-of-bounds write in mptsas_free_request due to uninitialized pointer fields.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          $REQ = g_new(MPTSASRequest, 1);
+    metadata:
+      cwe: ["CWE-787"]
+      cve: ["CVE-2016-7423"]

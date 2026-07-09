@@ -1,0 +1,38 @@
+rules:
+  - id: pango_buffer_overflow_cve_2019_1010238
+    message: "Potential heap-based buffer overflow in pango_log2vis_get_embedding_levels due to missing bounds check in loop. Invalid UTF-8 input may cause out-of-bounds write."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          for (...; ...; ...)
+            {
+              ...
+              $ARR[$I] = ...;
+              ...
+            }
+      - pattern: |
+          for ($I = 0, ...; ...; ..., $I++)
+            {
+              ...
+              $ARR[$I] = ...;
+              ...
+            }
+    pattern-not-inside: |
+      for ($I = 0, ...; ...; ..., $I++)
+        {
+          ...
+          if ($I == $N_CHARS) break;
+          ...
+          $ARR[$I] = ...;
+          ...
+        }
+    metavariable-pattern:
+      - metavariable: $ARR
+        pattern-either:
+          - pattern: bidi_types
+          - pattern: bracket_types
+      - metavariable: $N_CHARS
+        pattern: n_chars
+    fix-regex:
+      enabled: false

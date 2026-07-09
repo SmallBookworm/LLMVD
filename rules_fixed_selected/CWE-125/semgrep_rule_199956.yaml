@@ -1,0 +1,16 @@
+rules:
+  - id: libraw-x3f-out-of-bounds-read
+    patterns:
+      - pattern-either:
+          - pattern: |
+              set_bit_state(&BS, (uint8_t *)ID->data + HUF->row_offsets.element[...]);
+          - pattern: |
+              set_bit_state(&BS, (uint8_t *)ID->data + HUF->row_offsets.element[$ROW]);
+    message: "Missing bounds check on HUF->row_offsets.element[row] before use in set_bit_state may lead to out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2020-35531"
+      references:
+        - https://github.com/LibRaw/LibRaw/commit/d75af00681a74dcc8b929207eb895611a6eceb68

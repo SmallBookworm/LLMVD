@@ -1,0 +1,18 @@
+rules:
+  - id: cwe-189-integer-overflow-palloc
+    message: "Potential integer overflow in palloc() size calculation leading to buffer overflow. Ensure size is validated against MaxAllocSize before allocation."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $pcount = ...;
+              ...
+              palloc($pcount * sizeof(...));
+          - pattern: |
+              palloc($pcount * sizeof(...));
+    metavariable-pattern:
+      $pcount:
+        pattern-not: |
+          if ($pcount < 0 || $pcount > MaxAllocSize / sizeof(...))
+              ereport(...);

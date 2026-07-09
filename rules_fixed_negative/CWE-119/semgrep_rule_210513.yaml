@@ -1,0 +1,11 @@
+rules:
+  - id: jio_vsnprintf-unsafe-usage
+    patterns:
+      - pattern-either:
+          - pattern: |
+              vsprintf($STR, $FORMAT, $ARGS)
+          - pattern: |
+              _vsnprintf($STR, $N, $FORMAT, $ARGS)
+    message: "Use of vsprintf or _vsnprintf in jio_vsnprintf may ignore buffer length, leading to potential buffer overflow (CWE-119). Use vsnprintf instead."
+    severity: ERROR
+    languages: [c]

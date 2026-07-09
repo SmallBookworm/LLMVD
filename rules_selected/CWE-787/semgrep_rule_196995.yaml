@@ -1,0 +1,14 @@
+rules:
+  - id: tensorflow-quantize-and-dequantize-axis-validation
+    message: "Missing validation for axis_ < -1 in QuantizeAndDequantizeV2 may lead to heap underflow (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          OP_REQUIRES(
+              ctx, (axis_ == -1 || axis_ < $INPUT.shape().dims()),
+              ...
+          );
+    metadata:
+      cwe: ["CWE-787"]
+      cve: "CVE-2021-29610"

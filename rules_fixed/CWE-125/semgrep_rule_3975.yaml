@@ -1,0 +1,20 @@
+rules:
+  - id: floppy_set_geometry_overflow_check_missing
+    message: Missing overflow check for g->sect * g->head in set_geometry may lead to out-of-bounds read (CVE-2019-14283, CWE-125).
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (
+        ... &&
+        !(... (g->sect * g->head) <= 0 ...) &&
+        ...
+      )
+    pattern-not: |
+      if (
+        ... &&
+        (int)(g->sect * g->head) <= 0 &&
+        ...
+      )
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2019-14283"

@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2014-8176-buffered-app-data-free
+    message: "Improper freeing of buffered application data in DTLS may lead to memory corruption (CVE-2014-8176, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          while ( (item = pqueue_pop(s->d1->buffered_app_data.q)) != NULL)
+            {
+            frag = (hm_fragment *)item->data;
+            OPENSSL_free(frag->fragment);
+            OPENSSL_free(frag);
+            pitem_free(item);
+            }
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2014-8176"

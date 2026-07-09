@@ -1,0 +1,18 @@
+rules:
+  - id: bwa-stack-buffer-overflow-alt-file
+    message: "Potential stack-based buffer overflow in .alt file parsing due to missing bounds check on sequence name length (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      while ((... = fgetc(...)) != EOF) {
+        ...
+        } else str[i++] = ...;
+      }
+    fix-regex:
+      regex: 'str$$i\\+\\+$$ = c;'
+      replacement: |
+        if (i >= 1022) {
+          fprintf(stderr, "[E::%s] sequence name longer than 1023 characters. Abort!\n", __func__);
+          exit(1);
+        }
+        str[i++] = c;

@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2014-0240-mod_wsgi-setuid-error-handling
+    patterns:
+      - pattern: |
+          if (setuid(...) == -1) {
+              ...
+          }
+    message: "Missing exit after setuid() failure may lead to privilege escalation (CVE-2014-0240)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-264"
+      cve: "CVE-2014-0240"

@@ -1,0 +1,25 @@
+rules:
+  - id: curl_buffer_overflow_missing_check
+    message: Missing buffer size check before memcpy in curl_read_cb may lead to buffer overflow (CVE-2014-0144).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          memcpy($BUF + $OFF, $PTR, $REALSIZE);
+      - pattern: |
+          $BUF_OFF += $REALSIZE;
+    pattern-not-inside: |
+      if ($BUF_OFF >= $BUF_LEN) { ... }
+      ...
+      $REALSIZE = MIN($REALSIZE, $BUF_LEN - $BUF_OFF);
+      ...
+      memcpy($BUF + $BUF_OFF, $PTR, $REALSIZE);
+    fix-regex:
+      regex: '($BUF \+ $OFF)'
+      replacement: '$BUF + ($OFF < $BUF_LEN ? $OFF : 0)'
+      enabled: false
+    metadata:
+      cwe: ["CWE-20"]
+      references:
+        - "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2014-0144"
+        - "http://git.qemu.org/?p=qemu.git;a=commit;h=6d4b9e55fc625514a38d27cff4b9933f617fa7dc"

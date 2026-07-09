@@ -1,0 +1,8 @@
+rules:
+  - id: trojita-preauth-starttls-mitm
+    message: "PREAUTH response accepted when STARTTLS is required, leading to cleartext transmission and potential MITM (CVE-2014-2567)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      case PREAUTH:
+          // Cool, we're already authenticated. Now, let's see if we have to issue CAPABILITY or if we already know that

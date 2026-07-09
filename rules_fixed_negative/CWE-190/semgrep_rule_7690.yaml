@@ -1,0 +1,17 @@
+rules:
+  - id: integer-overflow-use-after-free-cve-2019-5788
+    message: "Potential integer overflow leading to use-after-free due to unsafe map insertion using emplace with incrementing ID."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - patterns:
+          - pattern: |
+              OperationID $ID = next_operation_id_++;
+              ...
+              operations_.emplace($ID, $VALUE);
+      - pattern: |
+          operations_.emplace(...);
+    metavariable-pattern:
+      metavariable: $MAP
+      pattern: operations_
+    focus-metavariable: $ID

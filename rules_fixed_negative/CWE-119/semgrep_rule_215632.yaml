@@ -1,0 +1,19 @@
+rules:
+  - id: virtio_blk_unaligned_request
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (sector & $MASK) {
+                  virtio_blk_rw_complete($REQ, -EIO);
+                  return;
+              }
+              $ACB = bdrv_aio_readv(...);
+          - pattern: |
+              if (sector & $MASK) {
+                  virtio_blk_rw_complete($REQ, -EIO);
+                  return;
+              }
+              $ACB = bdrv_aio_writev(...);
+    message: "Unaligned I/O request may lead to heap-based buffer overflow (CVE-2011-1750). Missing check for request size alignment with logical block size."
+    severity: ERROR
+    languages: [c]

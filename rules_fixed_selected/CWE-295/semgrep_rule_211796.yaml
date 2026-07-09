@@ -1,0 +1,15 @@
+rules:
+  - id: cwe-295-improper-certificate-validation-evolution-ews
+    message: "SSL certificate validation bypass due to improper handling of 'none' authentication method. This may lead to man-in-the-middle attacks (CWE-295, CVE-2019-3890)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          can_use_collection = !method_source || !method_collection ||
+              g_ascii_strcasecmp (method_source, method_collection) == 0;
+      - pattern: |
+          can_use_collection = !method_source || !method_collection ||
+              g_ascii_strcasecmp (method_collection, method_source) == 0;
+    metadata:
+      cwe: ["CWE-295"]
+      cve: "CVE-2019-3890"

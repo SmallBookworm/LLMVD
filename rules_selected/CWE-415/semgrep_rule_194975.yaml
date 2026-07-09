@@ -1,0 +1,16 @@
+rules:
+  - id: cwe-415-double-free-gpac-avc-sps
+    message: "Potential double-free vulnerability due to missing reset of poc_cycle_length before error return. This may lead to use-after-free or double-free in avc_compute_poc."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          if ($POC_CYCLE_LENGTH > GF_ARRAY_LENGTH($OFFSET_ARRAY)) {
+              GF_LOG(...);
+              return -1;
+          }
+    metavariable-pattern:
+      $POC_CYCLE_LENGTH: 
+        pattern: sps->poc_cycle_length
+      $OFFSET_ARRAY:
+        pattern: sps->offset_for_ref_frame

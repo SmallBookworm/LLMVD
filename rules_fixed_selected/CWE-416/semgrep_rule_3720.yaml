@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2018-10675-use-after-free
+    message: "Potential use-after-free in do_get_mempolicy due to premature release of mmap_sem. This may lead to denial of service or unspecified impact (CVE-2018-10675, CWE-416)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (vma) {
+              up_read(&current->mm->mmap_sem);
+              vma = NULL;
+          }
+          ...
+          mpol_cond_put($POL);
+      - pattern: |
+          if (vma) {
+              up_read(&$MM->mmap_sem);
+              vma = NULL;
+          }
+          ...
+          mpol_cond_put($POL);
+    metavariable-regex:
+      metavariable: $POL
+      regex: pol

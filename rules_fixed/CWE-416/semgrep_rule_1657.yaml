@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2016-10088-kernel-ds-check-missing
+    message: Missing check for KERNEL_DS in bsg_write or sg_write may lead to use-after-free (CWE-416).
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-inside: |
+          $FUNC(struct file *file, const char __user *buf, size_t count, loff_t *ppos)
+          {
+              ...
+          }
+      - pattern-not: |
+          if (unlikely(segment_eq(get_fs(), KERNEL_DS)))
+              return -EINVAL;
+      - metavariable-regex:
+          metavariable: $FUNC
+          regex: "^(bsg_write|sg_write)$"

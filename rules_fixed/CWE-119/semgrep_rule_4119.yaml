@@ -1,0 +1,33 @@
+rules:
+  - id: heap_buffer_overflow_color_apply_icc_profile
+    message: "Potential heap buffer overflow in color_apply_icc_profile due to missing component dimension validation."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (image->numcomps > 2) {
+            ...
+            $R = image->comps[0].data;
+            $G = image->comps[1].data;
+            $B = image->comps[2].data;
+            ...
+          }
+      - pattern: |
+          if (image->numcomps > 2) {
+            ...
+            for (...; ...; ...) {
+              ... image->comps[0] ... image->comps[1] ... image->comps[2] ...
+            }
+            ...
+          }
+    metavariable-conditions:
+      - metavariable: "$R"
+        pattern: "int *"
+        language: c
+      - metavariable: "$G"
+        pattern: "int *"
+        language: c
+      - metavariable: "$B"
+        pattern: "int *"
+    fix-regex:
+      enabled: false

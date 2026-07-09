@@ -1,0 +1,12 @@
+rules:
+  - id: openvpn-hmac-timing-vulnerability
+    message: "Use of non-constant-time memcmp in HMAC comparison may lead to timing attacks (CWE-200)."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern: |
+          if (memcmp ($LOCAL_HMAC, $BUF_PTR, $HMAC_LEN))
+            ...
+    metadata:
+      cwe: ["CWE-200"]
+      cve: "CVE-2013-2061"

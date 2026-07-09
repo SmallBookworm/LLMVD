@@ -1,0 +1,23 @@
+rules:
+  - id: cwe-617-soundtouch-setchannels-assertion-dos
+    message: |
+      Direct assignment of 'numChannels' without validation may lead to assertion failure 
+      in downstream components (e.g., RateTransposer::setChannels), causing denial of service.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - patterns:
+        - pattern: |
+            $OBJ->setChannels((int)$NUM_CHANNELS);
+        - pattern-not: |
+            if (!verifyNumberOfChannels($NUM_CHANNELS)) return;
+            ...
+            $OBJ->setChannels((int)$NUM_CHANNELS);
+      - patterns:
+        - pattern: |
+            channels = $NUM_CHANNELS;
+            pRateTransposer->setChannels((int)$NUM_CHANNELS);
+        - pattern-not: |
+            if (!verifyNumberOfChannels($NUM_CHANNELS)) return;
+            channels = $NUM_CHANNELS;
+            pRateTransposer->setChannels((int)$NUM_CHANNELS);

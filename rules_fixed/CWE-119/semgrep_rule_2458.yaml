@@ -1,0 +1,22 @@
+rules:
+  - id: weechat-logger-strftime-uninitialized-buffer
+    message: "Buffer passed to strftime may be uninitialized, leading to potential crash (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $BUF = malloc(...);
+          ...
+          strftime($BUF, ..., $MASK, ...);
+      - pattern: |
+          $BUF = malloc(...);
+          ...
+          if (!...) { goto ...; }
+          ...
+          strftime($BUF, ..., $MASK, ...);
+    metavariable-pattern:
+      metavariable: $MASK
+      patterns:
+        - pattern-not:
+            pattern: mask
+    focus-metavariable: $BUF

@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2018-14665-xorg-privilege-escalation
+    message: "Detected vulnerable handling of -modulepath or -logfile without privilege check. This can lead to privilege escalation when Xorg is running with elevated privileges."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!strcmp(argv[i], "-modulepath")) {
+              ...
+              xf86ModulePath = argv[i + 1];
+              ...
+          }
+      - pattern: |
+          if (!strcmp(argv[i], "-logfile")) {
+              ...
+              xf86LogFile = argv[i + 1];
+              ...
+          }
+    pattern-not-inside: |
+      $STMTS1;
+      if (xf86PrivsElevated())
+          FatalError(...);
+      $STMTS2;

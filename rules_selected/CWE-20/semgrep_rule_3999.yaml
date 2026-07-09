@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2019-13220-unchecked-array-index
+    message: "Potential out-of-bounds read due to unchecked array index in inverse_db_table access. This may lead to denial of service or information disclosure (CVE-2019-13220)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      inverse_db_table[y]
+    pattern-not: |
+      inverse_db_table[y & 255]
+    fix-regex:
+      regex: inverse_db_table\[(y)\]
+      replacement: inverse_db_table[\1 & 255]

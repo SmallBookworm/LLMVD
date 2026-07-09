@@ -1,0 +1,23 @@
+rules:
+  - id: cwe-281-phar-permissions
+    message: "PHAR archive entries created via buildFromIterator() may have overly permissive default permissions (CWE-281, CVE-2020-7063)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!(data = phar_get_or_create_entry_data(..., 0, ...))) {
+            ...
+          } else {
+            ...
+            data->internal_file->uncompressed_filesize = ...;
+          }
+      - pattern: |
+          if (!(data = phar_get_or_create_entry_data(..., 0, ...))) {
+            ...
+          } else {
+            ...
+            data->internal_file->compressed_filesize = ...;
+          }
+    metavariable-pattern:
+      metavariable: $data
+      pattern: phar_entry_data

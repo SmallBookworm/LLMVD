@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2011-2495-proc-io-access-check
+    message: Missing ptrace_may_access check before exposing I/O statistics in /proc/PID/io, which may leak sensitive information.
+    severity: WARNING
+    languages: [c]
+    pattern-not-inside: |
+      static int do_io_accounting(struct task_struct *task, char *buffer, int whole)
+      {
+        ...
+        if (!ptrace_may_access(task, PTRACE_MODE_READ))
+          return -EACCES;
+        ...
+      }
+    patterns:
+      - pattern: |
+          static int do_io_accounting(struct task_struct *task, char *buffer, int whole)
+          {
+            ...
+          }

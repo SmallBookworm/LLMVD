@@ -1,0 +1,19 @@
+rules:
+  - id: nfc_llcp_build_tlv_null_dereference
+    message: "nfc_llcp_build_tlv may return NULL; missing null check before use leads to NULL pointer dereference (CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $T = nfc_llcp_build_tlv(...);
+          ...
+          memcpy(..., $T, ...);
+      - pattern: |
+          $T = nfc_llcp_build_tlv(...);
+          ...
+          memcpy(..., $T, ...);
+          ...
+          kfree($T);
+    metavariable-pattern:
+      $T:
+        pattern-regex: ".*_tlv"

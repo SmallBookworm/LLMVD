@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2016-3185
+    message: "Potential type confusion vulnerability in SOAP cookie handling. Missing type checks on cookie path and domain fields may lead to memory disclosure or crash."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((... = zend_hash_index_find(..., 1)) == NULL ||
+                  strncmp(...) == 0) &&
+                 ((... = zend_hash_index_find(..., 2)) == NULL ||
+                  in_domain(...))
+          - pattern: |
+              if ((... = zend_hash_index_find(..., 1)) == NULL ||
+                  strncmp(...) == 0) &&
+                 ((... = zend_hash_index_find(..., 2)) == NULL ||
+                  in_domain(...)) &&
+                 (...)

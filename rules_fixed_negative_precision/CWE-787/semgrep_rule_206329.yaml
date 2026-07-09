@@ -1,0 +1,16 @@
+rules:
+  - id: cracklib-mangle-buffer-overflow
+    message: "Potential stack-based buffer overflow in Mangle function due to insufficient buffer size (STRINGSIZE vs STRINGSIZE*2)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          static char area[STRINGSIZE];
+          char area2[STRINGSIZE];
+      - pattern: |
+          static char area[STRINGSIZE];
+          ...
+          char area2[STRINGSIZE];
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2016-6318"

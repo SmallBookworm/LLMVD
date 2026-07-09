@@ -1,0 +1,20 @@
+rules:
+  - id: cwe-94-mruby-hash-access
+    message: "Potential out-of-bounds read due to missing hash type check before hash access in mruby VM."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              mrb_hash_set(mrb, $HASH, $KEY, $VAL);
+          - pattern: |
+              mrb_hash_get(mrb, $HASH, $KEY);
+          - pattern: |
+              mrb_hash_merge(mrb, $HASH, $OTHER);
+    pattern-not-inside: |
+      if (mrb_hash_p($HASH)) {
+        ...
+      }
+    fix-regex:
+      regex: ""
+      replacement: ""

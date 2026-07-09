@@ -1,0 +1,22 @@
+rules:
+  - id: ffmpeg-hls-infinite-loop
+    message: "Potential infinite loop in HLS playlist reloading due to missing reload attempt limit (CWE-835)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          goto reload;
+          ...
+          reload:
+            if (!v->finished && ...)
+      - pattern: |
+          reload:
+            if (!v->finished && ...)
+            ...
+            goto reload;
+    metavariable-pattern:
+      metavariable: v
+      pattern: struct playlist *
+    fix-regex:
+      regex: ""
+      replacement: ""

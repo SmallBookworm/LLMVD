@@ -1,0 +1,20 @@
+rules:
+  - id: libraw-thumbnail-size-unchecked
+    message: "Missing thumbnail size range check may lead to out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (ID.toffset + ... > ID.input->size() + ...)
+            throw ...;
+          ...
+          T.tlength = S.width * S.height * ...;
+      - pattern: |
+          if (ID.toffset + ... > ID.input->size() + ...)
+            throw ...;
+          ...
+          T.thumb = (char *)calloc(S.width * S.height, ...);
+    metavariable-pattern:
+      metavariable: T
+      pattern: "T"
+    focus-metavariable: T

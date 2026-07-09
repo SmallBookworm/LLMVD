@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2013-2141-tkill-infoleak
+    message: "Uninitialized siginfo structure in do_tkill may leak kernel memory via tkill/tgkill syscalls (CVE-2013-2141)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              struct siginfo $INFO;
+              ...
+              $INFO.si_signo = ...;
+              $INFO.si_errno = ...;
+              $INFO.si_code = SI_TKILL;
+              ...
+              do_send_specific(..., &$INFO);
+          - pattern: |
+              struct siginfo $INFO = { .si_signo = ..., .si_errno = ..., .si_code = SI_TKILL, ... };
+              ...
+              do_send_specific(..., &$INFO);
+    metadata:
+      cwe: "CWE-399"
+      cve: "CVE-2013-2141"

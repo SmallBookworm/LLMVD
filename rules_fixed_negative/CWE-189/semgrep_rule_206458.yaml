@@ -1,0 +1,16 @@
+rules:
+  - id: cwe-189-integer-overflow-taglib-mid
+    message: Integer overflow possible in mid function due to unchecked addition of 'length + index'. This may lead to large memory allocation and denial of service.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($LENGTH < 0xffffffff && $LENGTH + $INDEX < $SIZE())
+                ...
+          - pattern: |
+              if ($LENGTH + $INDEX < $SIZE() && $LENGTH < 0xffffffff)
+                ...
+    metadata:
+      cwe: "CWE-189"
+      cve: "CVE-2012-1584"

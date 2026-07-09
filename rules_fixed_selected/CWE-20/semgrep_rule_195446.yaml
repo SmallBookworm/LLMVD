@@ -1,0 +1,19 @@
+rules:
+  - id: audiofile-adpcm-coefficients-check
+    message: "Missing validation of numCoefficients before use may lead to out-of-bounds access (CVE-2017-6837)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          readU16(&numCoefficients);
+          assert(...);
+          $VAR = numCoefficients;
+          for (...; ...; ...) {
+              ...
+          }
+      - pattern: |
+          readU16(&numCoefficients);
+          assert(...);
+          for (int i=0; i<numCoefficients; i++) {
+              ...
+          }

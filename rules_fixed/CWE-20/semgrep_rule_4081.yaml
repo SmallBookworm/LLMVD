@@ -1,0 +1,24 @@
+rules:
+  - id: libmysofa-treeRead-bounds-check-missing
+    message: Missing bounds check on array index 'j' before writing to data->data. This can lead to out-of-bounds write (CWE-20).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          j = ...;
+          if (... && ...) {
+            ((char*)data->data)[j] = ...;
+          }
+      - pattern: |
+          j = ...;
+          if (...) {
+            ((char*)data->data)[j] = ...;
+          }
+    pattern-not-inside: |
+      j = ...;
+      if (j >= 0 && j < elements * size) {
+        ((char*)data->data)[j] = ...;
+      }
+    fix-regex:
+      regex: ""
+      replacement: ""

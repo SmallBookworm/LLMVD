@@ -1,0 +1,17 @@
+rules:
+  - id: bluez-buffer-overflow-parse-line
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while (1) {
+                ...
+                $ARRAY[$LENGTH++] = ...;
+                $ARRAY[$LENGTH++] = ...;
+                ...
+              }
+    message: "Potential buffer overflow due to missing bounds check in loop writing two bytes per iteration. Ensure loop condition checks that at least two bytes are available before writing."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2016-7837"

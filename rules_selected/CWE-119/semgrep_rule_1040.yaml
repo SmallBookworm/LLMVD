@@ -1,0 +1,22 @@
+rules:
+  - id: curl_urldecode_buffer_overflow
+    message: "Heap-based buffer overflow in curl_easy_unescape due to missing bounds check before reading hex digits after '%'."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (('%' == $IN) && ISXDIGIT($STRING[1]) && ISXDIGIT($STRING[2])) {
+                ...
+              }
+          - pattern: |
+              if (('%' == $IN) && ... && ISXDIGIT($STRING[1]) && ISXDIGIT($STRING[2])) {
+                ...
+              }
+    metavariable-pattern:
+      metavariable: $IN
+      pattern: "*$STRING"
+    focus-metavariable: $IN
+    fix-regex:
+      regex: ""
+      replacement: ""

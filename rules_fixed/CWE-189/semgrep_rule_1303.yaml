@@ -1,0 +1,37 @@
+rules:
+  - id: cve-2014-3144-nlattr-bounds-check
+    message: "Missing minimum length check and incorrect remainder calculation in __skb_get_nlattr_nest may lead to integer underflow (CWE-189)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ($A > $skb->len - sizeof(struct nlattr))
+            return 0;
+          ...
+          if ($nla->nla_len > $A - $skb->len)
+            return 0;
+      - pattern: |
+          if ($skb->len < sizeof(struct nlattr))
+            return 0;
+          ...
+          if ($nla->nla_len > $A - $skb->len)
+            return 0;
+    metavariable-pattern:
+      - metavariable: $skb
+        patterns:
+          - pattern-either:
+              - pattern: skb
+              - pattern: $X
+        focus-metavariable: $skb
+      - metavariable: $nla
+        patterns:
+          - pattern-either:
+              - pattern: nla
+              - pattern: $Y
+        focus-metavariable: $nla
+      - metavariable: $A
+        patterns:
+          - pattern-either:
+              - pattern: len
+              - pattern: $Z
+        focus-metavariable: $A

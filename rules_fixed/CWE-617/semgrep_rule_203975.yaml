@@ -1,0 +1,26 @@
+rules:
+  - id: cve-2020-8622-bind9-truncated-response-assertion-failure
+    message: "Truncated TSIG-signed response may trigger assertion failure leading to denial of service (CVE-2020-8622). Ensure message buffer is saved before parsing."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $origsource = *$source;
+              ...
+              if ((($options & DNS_MESSAGEPARSE_CLONEBUFFER) == 0))
+                  isc_buffer_usedregion(&origsource, &$msg->saved);
+              else {
+                  ...
+              }
+          - pattern: |
+              $origsource = *$source;
+              ...
+              if ((($options & DNS_MESSAGEPARSE_CLONEBUFFER) == 0)) {
+                  isc_buffer_usedregion(&origsource, &$msg->saved);
+              } else {
+                  ...
+              }
+    metavariable-regex:
+      - metavariable: $msg
+        regex: "msg"

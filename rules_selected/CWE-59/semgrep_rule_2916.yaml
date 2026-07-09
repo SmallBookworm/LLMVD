@@ -1,0 +1,19 @@
+rules:
+  - id: proftpd-allowchrootsymlinks-bypass
+    message: "Incomplete symlink check in DefaultRoot path when AllowChrootSymlinks is disabled. Only the final path component is checked, allowing attackers to bypass restrictions via symlinks in intermediate path components."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (allow_symlinks == FALSE) {
+                ...
+                res = pr_fsio_lstat(path, &st);
+                ...
+                if (S_ISLNK(st.st_mode)) {
+                  ...
+                }
+              }
+    metadata:
+      cwe: ["CWE-59"]
+      cve: "CVE-2017-7418"

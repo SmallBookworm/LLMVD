@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2018-5745-bind9-managed-keys-unsupported-algorithm
+    message: "Use of RUNTIME_CHECK after compute_tag may cause assertion failure when algorithm is unsupported. Handle errors gracefully instead."
+    severity: ERROR
+    languages: [c]
+    cwe: ["CWE-327"]
+    pattern-either:
+      - pattern: |
+          result = compute_tag(..., ..., ..., ...);
+          RUNTIME_CHECK(result == ISC_R_SUCCESS);
+      - pattern: |
+          $RESULT = compute_tag(..., ..., ..., ...);
+          RUNTIME_CHECK($RESULT == ISC_R_SUCCESS);

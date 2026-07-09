@@ -1,0 +1,16 @@
+rules:
+  - id: cwe-362-race-condition-web-audio
+    message: "Potential race condition due to unsafe concurrent access pattern detected. This may lead to denial of service or unspecified impact in multi-threaded contexts."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-362"
+      cve: "CVE-2013-2906"
+    patterns:
+      - pattern-either:
+          - pattern: |
+              controller_->GetToolbarModel()->set_url_replacement_enabled(
+                !state || state->url_replacement_enabled);
+          - pattern: |
+              controller_->GetToolbarModel()->set_url_replacement_enabled(
+                state ? state->url_replacement_enabled : true);

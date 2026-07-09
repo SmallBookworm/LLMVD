@@ -1,0 +1,24 @@
+rules:
+  - id: imageworsener-divide-by-zero-density
+    message: "Potential divide-by-zero due to missing validation of image density values before use."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($CTX->img1.density_code != IW_DENSITY_UNKNOWN) {
+                  $PX = $CTX->img1.density_x;
+                  $PY = $CTX->img1.density_y;
+                  ...
+                  return 1;
+              }
+          - pattern: |
+              if ($CTX->img1.density_code != IW_DENSITY_UNKNOWN) {
+                  ...
+                  $PX = $CTX->img1.density_x;
+                  $PY = $CTX->img1.density_y;
+                  return 1;
+              }
+    metadata:
+      cwe: "CWE-369"
+      cve: "CVE-2017-9201"

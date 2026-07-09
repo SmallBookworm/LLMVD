@@ -1,0 +1,13 @@
+rules:
+  - id: insecure_tmp_socket_usage
+    patterns:
+      - pattern: |
+          g_snprintf(..., "%s/.%s-socket-%s-%d-%s",
+                     g_get_tmp_dir(),
+                     ...,
+                     ...,
+                     ...,
+                     g_get_user_name());
+    message: "Insecure use of /tmp for socket file; may lead to denial of service (CWE-20). Use g_get_user_runtime_dir() instead."
+    severity: WARNING
+    languages: [c]

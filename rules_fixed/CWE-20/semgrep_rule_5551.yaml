@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2011-3965-signature-check-missing-null-check
+    message: Missing null check before dereferencing cert_chain_context or simple_chain may lead to denial of service.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          for (...; ...; ...) {
+            ... = prov_data->pasSigners[...].pChainContext;
+            for (...; ...; ...) {
+              CERT_SIMPLE_CHAIN* ... = cert_chain_context->rgpChain[...];
+              ...
+            }
+          }
+      - pattern: |
+          const CERT_CHAIN_CONTEXT* ... = prov_data->pasSigners[...].pChainContext;
+          for (...; ...; ...) {
+            CERT_SIMPLE_CHAIN* ... = ...->rgpChain[...];
+            ...
+          }
+    metavariable-pattern:
+      metavariable: cert_chain_context
+      pattern-not: |
+        if (!cert_chain_context) ...

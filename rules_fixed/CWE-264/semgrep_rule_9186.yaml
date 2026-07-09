@@ -1,0 +1,17 @@
+rules:
+  - id: cifs_lookup_special_file_oops
+    message: "cifs_lookup may cause OOPS when accessing special files (e.g., FIFOs) due to missing S_ISREG check after posix open."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (rc == 0 || rc == -ENOENT) {
+            posix_open = true;
+          }
+      - pattern: |
+          if ((rc == 0 || rc == -ENOENT)) {
+            posix_open = true;
+          }
+    metadata:
+      cwe: "CWE-264"
+      cve: "CVE-2012-1090"

@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2014-3144-missing-nlattr-size-check
+    message: Missing check for minimal netlink attribute header size before offset validation, leading to potential integer underflow (CVE-2014-3144).
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if ($A > $skb->len - sizeof(struct nlattr))
+        return 0;
+    metavariable-pattern:
+      $skb: "struct sk_buff *"

@@ -1,0 +1,17 @@
+rules:
+  - id: tflite_split_division_by_zero
+    message: "Division by zero possible due to missing check for num_splits != 0 before division."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              const int input_size = ...;
+              TF_LITE_ENSURE_MSG(..., input_size % num_splits == 0, ...);
+              const int slice_size = input_size / num_splits;
+          - pattern: |
+              TF_LITE_ENSURE_MSG(..., input_size % num_splits == 0, ...);
+              const int slice_size = input_size / num_splits;
+    metadata:
+      cwe: "CWE-369"
+      cve: "CVE-2021-29599"

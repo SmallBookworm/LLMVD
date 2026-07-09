@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2012-6657-sock-keepalive-check
+    message: "Missing check for SOCK_STREAM socket type before calling tcp_set_keepalive(), which may lead to denial of service via raw sockets."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (sk->sk_protocol == IPPROTO_TCP)
+            tcp_set_keepalive(...);
+      - pattern: |
+          if (sk->sk_protocol == IPPROTO_TCP)
+            { ... tcp_set_keepalive(...); ... }

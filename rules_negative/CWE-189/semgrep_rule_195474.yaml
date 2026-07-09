@@ -1,0 +1,13 @@
+rules:
+  - id: chunk_split_integer_overflow
+    message: "Potential integer overflow in chunk_split due to unsafe arithmetic in buffer size calculation."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              int out_len = ($CHUNKS + 1) * $ENDLEN + $SRCLEN;
+              String ret(out_len, ReserveString);
+    metadata:
+      cwe: ["CWE-189"]
+      cve: "CVE-2014-6228"

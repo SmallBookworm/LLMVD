@@ -1,0 +1,11 @@
+rules:
+  - id: jpc_bitstream_assert_vulnerability
+    patterns:
+      - pattern: |
+          assert($N >= 0 && $N < 32);
+    message: "Use of assert for input validation may lead to denial of service. Replace with proper error handling."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-703"
+      cve: "CVE-2016-9391"

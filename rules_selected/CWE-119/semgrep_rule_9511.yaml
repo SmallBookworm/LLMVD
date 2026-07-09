@@ -1,0 +1,12 @@
+rules:
+  - id: imagemagick-sixel-buffer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: AcquireQuantumMemory($X * $Y, 1)
+          - pattern: AcquireQuantumMemory($X * $Y,1)
+    message: "Potential buffer overflow due to incorrect usage of AcquireQuantumMemory. The vulnerable code passes the product of dimensions as the first argument and 1 as the second, which may lead to integer overflow or insufficient allocation. Fixed version uses AcquireQuantumMemory($X, $Y)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2016-10054"

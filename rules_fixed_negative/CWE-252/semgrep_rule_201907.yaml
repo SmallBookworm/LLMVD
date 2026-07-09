@@ -1,0 +1,7 @@
+rules:
+  - id: unchecked-fputc
+    patterns:
+      - pattern: (void) fputc(...);
+    message: "Return value of fputc is not checked, which may lead to undetected I/O errors (CWE-252)."
+    severity: WARNING
+    languages: [c]

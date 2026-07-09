@@ -1,0 +1,40 @@
+rules:
+  - id: rose_ccitt_nsap_length_check_missing
+    message: Missing length validation for FAC_CCITT_DEST_NSAP/FAC_CCITT_SRC_NSAP may lead to heap or stack overflow.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - patterns:
+          - pattern: |
+              case 0xC0:
+                ...
+                l = p[1];
+                if (*p == FAC_CCITT_DEST_NSAP) { ... }
+                ...
+          - metavariable-regex:
+              metavariable: $...
+              regex: '(?s).*memcpy\\(callsign, p \\+ 12, l - 10\\).*'
+          - pattern-not: |
+              case 0xC0:
+                ...
+                l = p[1];
+                if (l < 10 || l > 20)
+                  return ...;
+                ...
+      - patterns:
+          - pattern: |
+              case 0xC0:
+                ...
+                l = p[1];
+                if (*p == FAC_CCITT_SRC_NSAP) { ... }
+                ...
+          - metavariable-regex:
+              metavariable: $...
+              regex: '(?s).*memcpy\\(callsign, p \\+ 12, l - 10\\).*'
+          - pattern-not: |
+              case 0xC0:
+                ...
+                l = p[1];
+                if (l < 10 || l > 20)
+                  return ...;
+                ...

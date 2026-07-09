@@ -1,0 +1,24 @@
+rules:
+  - id: wget-iconv-buffer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (iconv (..., ..., ..., ..., ...) != (size_t)(-1) &&
+                  iconv (..., NULL, NULL, ..., ...) != (size_t)(-1))
+                {
+                  ...;
+                  *(s + len - outlen - done) = '\0';
+                  ...;
+                }
+          - pattern: |
+              **out = *in;
+              in++;
+              inlen--;
+              (*out)++;
+              outlen--;
+    message: "Potential buffer overflow due to unsafe iconv output handling (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2019-5953"

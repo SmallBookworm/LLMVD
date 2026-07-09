@@ -1,0 +1,12 @@
+rules:
+  - id: null_pointer_dereference_pdfunite
+    message: "Potential NULL pointer dereference when accessing page objects without checking for NULL. This can lead to a crash with specially crafted PDF documents (CVE-2017-7511)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          docs[$I]->getCatalog()->getPage($J)->...
+      - pattern: |
+          Ref *refPage = docs[$I]->getCatalog()->getPageRef(1);
+          ...
+          if (... && !refPage->...)

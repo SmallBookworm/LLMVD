@@ -1,0 +1,19 @@
+rules:
+  - id: cwe-787-buffer-overflow-abcm2ps
+    message: "Potential stack-based buffer overflow due to missing bounds check before writing to fixed-size array 'accs' or 'pits'."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (j == nacc) {
+                  accs[j] = ...;
+                  pits[j] = ...;
+                  nacc++;
+              }
+          - pattern-inside: |
+              if (j == nacc) {
+                ...
+                nacc++;
+              }
+            pattern: $ARRAY[j] = ...;

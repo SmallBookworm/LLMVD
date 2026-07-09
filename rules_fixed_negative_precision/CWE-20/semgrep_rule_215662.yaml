@@ -1,0 +1,10 @@
+rules:
+  - id: unvalidated_ssl_certificates
+    message: "SSL certificates are not validated, which could allow man-in-the-middle attacks. Use soup_session_sync_new_with_options() with SOUP_SESSION_SSL_CA_FILE to enforce certificate validation."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      soup_session_sync_new()
+    fix-regex:
+      regex: ""
+      replacement: ""

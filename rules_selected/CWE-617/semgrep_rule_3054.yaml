@@ -1,0 +1,24 @@
+rules:
+  - id: tor-cve-2017-0375-begin-dir-assertion-failure
+    message: "Potential assertion failure in connection_edge_process_relay_cell due to missing circuit purpose check for RELAY_COMMAND_BEGIN_DIR. This can lead to a denial of service (CVE-2017-0375)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (rh.command == RELAY_COMMAND_BEGIN_DIR) {
+                ...
+                TO_OR_CIRCUIT(circ)->p_chan->dirreq_id = ...;
+              }
+          - pattern: |
+              if (rh.command == RELAY_COMMAND_BEGIN_DIR) {
+                ...
+                circ->dirreq_id = ...;
+              }
+    metavariable-pattern:
+      metavariable: circ
+      pattern-not: |
+        if (rh.command == RELAY_COMMAND_BEGIN_DIR &&
+            circ->purpose != CIRCUIT_PURPOSE_S_REND_JOINED) {
+          ...
+        }

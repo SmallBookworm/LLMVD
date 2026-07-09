@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2019-5755-missing-feature-check
+    message: Missing feature flag check 'blink::features::kWritableFilesAPI' before allowing file writer creation, which could lead to security bypass.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          if (!base::FeatureList::IsEnabled(blink::features::kWritableFilesAPI)) {
+            ...
+            return;
+          }
+      - pattern-either:
+          - pattern: |
+              void FileSystemManagerImpl::CreateWriter(...)
+              {
+                ...
+                FileSystemURL url(...);
+                ...
+                blink::mojom::FileWriterPtr writer;
+                ...
+              }
+    metadata:
+      cwe: ["CWE-189"]
+      cve: "CVE-2019-5755"

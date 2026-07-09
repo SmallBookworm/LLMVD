@@ -1,0 +1,28 @@
+rules:
+  - id: cve-2016-3739-mbedtls-hostname-check-bypass
+    message: "Missing unconditional call to mbedtls_ssl_set_hostname() may allow server spoofing via arbitrary valid certificate (CVE-2016-3739)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!Curl_inet_pton(AF_INET, $HOST, ...) &&
+          #ifdef ENABLE_IPV6
+             !Curl_inet_pton(AF_INET6, $HOST, ...) &&
+          #endif
+             $SNI && mbedtls_ssl_set_hostname($SSL, $HOST)) {
+            ...
+          }
+      - pattern: |
+          if (Curl_inet_pton(AF_INET, ..., ...) ||
+          #ifdef ENABLE_IPV6
+             Curl_inet_pton(AF_INET6, ..., ...) ||
+          #endif
+             !$SNI || mbedtls_ssl_set_hostname($SSL, $HOST)) {
+            ...
+          }
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2016-3739"
+      references:
+        - https://curl.haxx.se/docs/adv_20160518A.html
+        - https://github.com/curl/curl/commit/6efd2fa529a189bf41736a610f6184cd8ad94b4d

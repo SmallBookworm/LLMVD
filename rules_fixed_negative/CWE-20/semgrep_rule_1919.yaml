@@ -1,0 +1,35 @@
+rules:
+  - id: wireshark-pktap-ethernet-dissector-missing-eth-phdr
+    message: "Missing struct eth_phdr for WTAP_ENCAP_ETHERNET dissector may lead to denial of service (CVE-2016-5358)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (... == PKT_REC_PACKET) {
+                ...
+                dissector_try_uint(wtap_encap_dissector_table,
+                    wtap_pcap_encap_to_wtap_encap(...), ..., ..., ...);
+              }
+          - pattern: |
+              if (... == PKT_REC_PACKET) {
+                ...
+                dissector_try_uint(..., ..., ..., ..., ...);
+              }
+    metavariable-pattern:
+      metavariable: $DISSECTOR_CALL
+      pattern: dissector_try_uint(...)
+    pattern-not-inside: |
+      if (... == PKT_REC_PACKET) {
+        ...
+        switch (...) {
+        case WTAP_ENCAP_ETHERNET:
+          ...
+          phdr = &...;
+          break;
+        default:
+          phdr = NULL;
+          break;
+        }
+        dissector_try_uint_new(..., ..., ..., ..., ..., TRUE, phdr);
+      }

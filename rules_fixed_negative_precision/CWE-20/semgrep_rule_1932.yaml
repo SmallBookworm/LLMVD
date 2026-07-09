@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2016-5351-eapol-rsn-key-check
+    message: "Missing check for EAPOL_RSN_KEY structure size before casting packet data. This can lead to out-of-bounds reads and denial of service (CVE-2016-5351)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ((tot_len - offset - 4) < bodyLength) {
+            ...
+          }
+    pattern-not: |
+      if (((tot_len - offset - 4) < bodyLength) || (bodyLength < sizeof(EAPOL_RSN_KEY))) {
+        ...
+      }

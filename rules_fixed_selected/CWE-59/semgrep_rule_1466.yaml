@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2015-5273-symlink-vulnerability
+    message: "Potential symlink vulnerability due to use of predictable temporary directory. Fixed version uses mkdtemp to create a unique temporary directory."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-not-inside: |
+          char tmp_directory[] = ...;
+          mkdtemp(tmp_directory);
+      - pattern-either:
+          - pattern: |
+              execvp(..., ...);
+          - pattern: |
+              $EXECUTABLE(...)
+    metadata:
+      cwe: "CWE-59"
+      cve: "CVE-2015-5273"

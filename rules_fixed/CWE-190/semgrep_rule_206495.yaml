@@ -1,0 +1,15 @@
+rules:
+  - id: integer-overflow-in-g_new
+    message: "Potential integer overflow in g_new allocation due to missing cast to gsize. This can lead to a heap-based buffer overflow (CWE-190)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          g_new ($type, $width * $height)
+      - pattern: |
+          g_new ($type, $width * $height * $factor)
+    metavariable-regex:
+      - metavariable: $width
+        regex: "width"
+      - metavariable: $height
+        regex: "height"

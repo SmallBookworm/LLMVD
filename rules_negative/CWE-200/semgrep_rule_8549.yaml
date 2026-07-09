@@ -1,0 +1,17 @@
+rules:
+  - id: android-cve-2016-0811-integer-overflow
+    message: "Potential integer overflow leading to out-of-bounds access in BnCrypto::onTransact (CVE-2016-0811, CWE-200). The condition 'offset + totalSize > sharedBuffer->size()' is vulnerable; the fixed version uses '(size_t)offset > sharedBuffer->size() - totalSize' to prevent overflow."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (offset + totalSize > $BUF->size()) {
+            ...
+          }
+      - pattern: |
+          if ($OFFSET + $TOTALSIZE > $BUF->size()) {
+            ...
+          }
+    metavariable-pattern:
+      $BUF: 
+        pattern-regex: sharedBuffer

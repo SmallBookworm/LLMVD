@@ -1,0 +1,44 @@
+rules:
+  - id: ffv1dec_missing_bits_colorspace_check
+    message: "Missing validation of bits_per_raw_sample and colorspace consistency in FFV1 version 0/1 headers, which may lead to out-of-bounds access (CVE-2013-7020)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (f->version < 2) {
+            ...
+            f->colorspace = get_symbol(...);
+            if (f->version > 0)
+                f->avctx->bits_per_raw_sample = get_symbol(...);
+            ...
+            if (f->plane_count) {
+              if (   chroma_planes != f->chroma_planes
+                  || chroma_h_shift != f->chroma_h_shift
+                  || chroma_v_shift != f->chroma_v_shift
+                  || transparency != f->transparency) {
+                ...
+              }
+            }
+            ...
+          }
+      - pattern: |
+          if (f->version < 2) {
+            ...
+            f->colorspace = get_symbol(...);
+            if (f->version > 0)
+                f->avctx->bits_per_raw_sample = get_symbol(...);
+            ...
+            if (f->plane_count) {
+              if (   chroma_planes != f->chroma_planes
+                  || chroma_h_shift != f->chroma_h_shift
+                  || chroma_v_shift != f->chroma_v_shift
+                  || transparency != f->transparency
+                  || ... ) {
+                ...
+              }
+            }
+            ...
+          }
+    metavariable-pattern:
+      metavariable: f
+      pattern: $F

@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2013-6420-asn1-time-parsing
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (timestr->length < 13) {
+                ...
+                return (time_t)-1;
+              }
+          - pattern: |
+              strbuf = estrdup((char *)timestr->data);
+          - pattern: |
+              thestr = strbuf + timestr->length - 3;
+    message: "Missing validation of ASN.1 string type and length before parsing timestamp, which may lead to memory corruption (CVE-2013-6420, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2013-6420"

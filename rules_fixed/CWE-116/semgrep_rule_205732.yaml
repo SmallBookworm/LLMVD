@@ -1,0 +1,65 @@
+rules:
+  - id: expat-missing-encoding-validation-cve-2022-25235
+    message: Missing validation of UTF-8 encoding in multi-byte character handling may lead to invalid character processing (CVE-2022-25235).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          case BT_LEAD2:
+            ...
+            if (IS_NMSTRT_CHAR(...)) { ... }
+            if (IS_NAME_CHAR(...)) { ... }
+            ...
+            return XML_TOK_INVALID;
+          case BT_LEAD3:
+            ...
+            if (IS_NMSTRT_CHAR(...)) { ... }
+            if (IS_NAME_CHAR(...)) { ... }
+            ...
+            return XML_TOK_INVALID;
+          case BT_LEAD4:
+            ...
+            if (IS_NMSTRT_CHAR(...)) { ... }
+            if (IS_NAME_CHAR(...)) { ... }
+            ...
+            return XML_TOK_INVALID;
+      - pattern: |
+          case BT_LEAD2:
+            ...
+            if (end - ptr < 2) return XML_TOK_PARTIAL_CHAR;
+            if (IS_NMSTRT_CHAR(...)) { ... }
+            if (IS_NAME_CHAR(...)) { ... }
+            ...
+            return XML_TOK_INVALID;
+          case BT_LEAD3:
+            ...
+            if (end - ptr < 3) return XML_TOK_PARTIAL_CHAR;
+            if (IS_NMSTRT_CHAR(...)) { ... }
+            if (IS_NAME_CHAR(...)) { ... }
+            ...
+            return XML_TOK_INVALID;
+          case BT_LEAD4:
+            ...
+            if (end - ptr < 4) return XML_TOK_PARTIAL_CHAR;
+            if (IS_NMSTRT_CHAR(...)) { ... }
+            if (IS_NAME_CHAR(...)) { ... }
+            ...
+            return XML_TOK_INVALID;
+    metavariable-pattern:
+      metavariable: $CASE
+      patterns:
+        - pattern-either:
+            - pattern: BT_LEAD2
+            - pattern: BT_LEAD3
+            - pattern: BT_LEAD4
+    pattern-not: |
+      switch ($X) {
+        ...
+        case $CASE:
+          ...
+          if (IS_INVALID_CHAR(...)) {
+            ...
+            return XML_TOK_INVALID;
+          }
+          ...
+      }

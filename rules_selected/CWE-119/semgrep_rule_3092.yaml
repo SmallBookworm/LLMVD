@@ -1,0 +1,15 @@
+rules:
+  - id: ffmpeg-ffserver-chunk-size-check-missing
+    message: "Missing check for invalid chunk size may lead to heap-based buffer overflow (CVE-2016-10192)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (c->chunk_size == 0)
+              goto fail;
+      - pattern: |
+          if (c->chunk_size == 0) // end of stream
+              goto fail;
+    metavariable-pattern:
+      metavariable: c
+      pattern: HTTPContext *

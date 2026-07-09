@@ -1,0 +1,13 @@
+rules:
+  - id: cpia2_use_after_free_cve_2019_19966
+    patterns:
+      - pattern: |
+          return 0;
+    message: "Potential use-after-free vulnerability due to ignoring return value of cpia2_usb_init(). This may lead to improper cleanup on module exit (CVE-2019-19966, CWE-416)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2019-19966"
+      references:
+        - https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=dea37a97265588da604c6ba80160a287b72c7bfd

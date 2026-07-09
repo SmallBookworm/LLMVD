@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2018-12460-null-pointer-dereference
+    message: "Potential NULL pointer dereference due to missing studio_profile assignment before ff_idctdsp_init. This may lead to denial of service when processing crafted AVI files."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          ff_idctdsp_init(&$IDSP, $AVCTX);
+      - pattern: |
+          ff_idctdsp_init($IDSP, $AVCTX);
+    metavariable-pattern:
+      $IDSP:
+        pattern-either:
+          - pattern: "&$S->idsp"
+          - pattern: "$S->idsp"
+    pattern-not-inside: |
+      if ($S->codec_id == AV_CODEC_ID_MPEG4)
+          $S->idsp.mpeg4_studio_profile = $S->studio_profile;
+      ...
+      ff_idctdsp_init(...);

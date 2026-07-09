@@ -1,0 +1,21 @@
+rules:
+  - id: mpi_powm_zero_exponent_null_dereference
+    message: "Potential NULL pointer dereference in mpi_powm when exponent is zero and result limb space is not allocated."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!esize) {
+                  ...
+                  rp[0] = 1;
+                  ...
+              }
+          - pattern: |
+              if (!esize) {
+                  ...
+                  $RES->d[0] = 1;
+                  ...
+              }
+    metavariable-pattern:
+      $RES: "res"

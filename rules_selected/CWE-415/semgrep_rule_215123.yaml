@@ -1,0 +1,16 @@
+rules:
+  - id: vim_double_free_in_get_function_args
+    message: "Potential double free vulnerability in get_function_args due to missing cmdlinep update before freeing line_to_free"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          vim_free(*$LINE_TO_FREE);
+          *$LINE_TO_FREE = $THELINE;
+      - pattern: |
+          vim_free(*$LINE_TO_FREE);
+          ... 
+          *$LINE_TO_FREE = $THELINE;
+    metavariable-pattern:
+      metavariable: $LINE_TO_FREE
+      pattern: line_to_free

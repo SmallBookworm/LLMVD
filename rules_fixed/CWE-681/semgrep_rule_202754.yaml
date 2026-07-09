@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2018-5711-signedness-error
+    message: "Integer signedness error in GetCode_ may lead to infinite loop when parsing crafted GIF files (CVE-2018-5711)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      unsigned char count;
+      ...
+      if ((count = GetDataBlock($BUF)) <= 0)
+    metadata:
+      cwe: ["CWE-681"]
+      cve: "CVE-2018-5711"

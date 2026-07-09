@@ -1,0 +1,33 @@
+rules:
+  - id: tcpdump-lmp-missing-bounds-checks
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while (... && ...) {
+                ...
+                $$subobj_type = EXTRACT_8BITS($$obj_tptr + $$offset);
+                $$subobj_len = EXTRACT_8BITS($$obj_tptr + $$offset + 1);
+                ...
+              }
+          - pattern: |
+              case INT_SWITCHING_TYPE_SUBOBJ:
+                ...
+                EXTRACT_8BITS($$obj_tptr + $$offset + 2)
+                ...
+                EXTRACT_8BITS($$obj_tptr + $$offset + 3)
+                ...
+                EXTRACT_32BITS($$obj_tptr + $$offset + 4)
+                ...
+                EXTRACT_32BITS($$obj_tptr + $$offset + 8)
+                ...
+          - pattern: |
+              case WAVELENGTH_SUBOBJ:
+                ...
+                EXTRACT_32BITS($$obj_tptr + $$offset + 4)
+                ...
+    message: Missing bounds checks before reading packet data in lmp_print_data_link_subobjs may lead to out-of-bounds reads (CWE-20).
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2019-15166"

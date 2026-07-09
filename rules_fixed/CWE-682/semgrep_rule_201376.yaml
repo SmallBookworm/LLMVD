@@ -1,0 +1,7 @@
+rules:
+  - id: cve-2017-2618-selinux-off-by-one
+    message: "Off-by-one error in SELinux setprocattr may lead to out-of-bounds read (CVE-2017-2618, CWE-682)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (size && str[1] && str[1] != '\n') {

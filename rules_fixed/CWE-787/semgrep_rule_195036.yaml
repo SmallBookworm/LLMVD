@@ -1,0 +1,26 @@
+rules:
+  - id: openexr-composite-deep-scanline-sampling-check
+    message: Missing check for xSampling and ySampling == 1 in CompositeDeepScanLine::setFrameBuffer may lead to heap-based buffer overflow (CWE-787).
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      for (... q = ...; ...; ...)
+      {
+          ...
+          string name(...);
+          ...
+      }
+    pattern-not: |
+      for (... q = ...; ...; ...)
+      {
+          ...
+          if (q.slice().xSampling != 1 || q.slice().ySampling != 1)
+          {
+              ...
+          }
+          string name(...);
+          ...
+      }
+    metadata:
+      cwe: ["CWE-787"]
+      cve: "CVE-2021-45942"

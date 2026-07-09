@@ -1,0 +1,31 @@
+rules:
+  - id: tensorflow_fusedbatchnorm_missing_validation
+    message: "Missing validation that scale, offset, mean, and variance tensors have the same number of elements as the channel dimension of input tensor x. This can lead to heap buffer overflow (CVE-2021-29583)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          OP_REQUIRES(context, scale.dims() == 1, ...);
+          ...
+          OP_REQUIRES(context, offset.dims() == 1, ...);
+          ...
+          OP_REQUIRES(context, estimated_mean.dims() == 1, ...);
+          ...
+          OP_REQUIRES(context, estimated_variance.dims() == 1, ...);
+          ...
+          functor::FusedBatchNorm<...>(...);
+      - pattern: |
+          OP_REQUIRES(context, scale.dims() == 1, ...);
+          ...
+          OP_REQUIRES(context, offset.dims() == 1, ...);
+          ...
+          OP_REQUIRES(context, estimated_mean.dims() == 1, ...);
+          ...
+          OP_REQUIRES(context, estimated_variance.dims() == 1, ...);
+          ...
+          if (is_training_) { ... }
+          else { ... }
+    metavariable-pattern:
+      context:
+        pattern: context
+    focus-metavariable: context

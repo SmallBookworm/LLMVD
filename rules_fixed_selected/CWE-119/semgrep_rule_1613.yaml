@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2014-9496-out-of-bounds-read
+    message: Potential out-of-bounds read due to missing bounds check before calling read_rsrc_marker.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          marker = read_rsrc_marker(&rsrc, rsrc.type_offset + $K * 8);
+      - pattern: |
+          read_rsrc_short(&rsrc, rsrc.type_offset + $K * 8 + 4);
+    metavariable-pattern:
+      metavariable: $K
+      pattern-not: |
+        if (rsrc.type_offset + $K * 8 > rsrc.rsrc_len) {
+          ...
+        }

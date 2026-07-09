@@ -1,0 +1,38 @@
+rules:
+  - id: cve-2016-8858-kexinit-handler-not-unregistered
+    message: "KEXINIT handler not unregistered after receipt, leading to potential DoS via memory exhaustion (CVE-2016-8858)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          kex_input_kexinit(..., void *ctxt)
+          {
+              ...
+              struct ssh *ssh = ctxt;
+              ...
+              if (kex == NULL)
+                  return ...;
+              ptr = sshpkt_ptr(...);
+              ...
+          }
+      - pattern: |
+          kex_input_kexinit(..., void *ctxt)
+          {
+              ...
+              struct ssh *ssh = ctxt;
+              ...
+              if (kex == NULL)
+                  return ...;
+              $PTR = sshpkt_ptr(...);
+              ...
+          }
+    pattern-not: |
+        kex_input_kexinit(..., void *ctxt)
+        {
+            ...
+            ssh_dispatch_set(ssh, SSH2_MSG_KEXINIT, NULL);
+            ...
+        }
+    metavariable-regex:
+      metavariable: $PTR
+      regex: ptr

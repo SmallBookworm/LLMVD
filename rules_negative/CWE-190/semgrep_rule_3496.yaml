@@ -1,0 +1,17 @@
+rules:
+  - id: integer-overflow-in-compose-query
+    message: "Potential integer overflow due to unchecked multiplication in query composition. This could lead to buffer overflows or incorrect size calculations."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          const int worstCase = ...;
+          const int keyLen = ...;
+          const int keyRequiredChars = worstCase * keyLen;
+      - pattern: |
+          const int worstCase = ...;
+          const int valueLen = ...;
+          const int valueRequiredChars = worstCase * valueLen;
+    metavariable-regex:
+      metavariable: $worstCase
+      regex: "(6|3)"

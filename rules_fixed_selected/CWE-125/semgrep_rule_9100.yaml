@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2018-9503-out-of-bounds-read
+    message: "Potential out-of-bounds read due to missing bounds check in RFCOMM frame parsing. This could lead to remote information disclosure."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (eal == 0 && p_buf->len < RFCOMM_CTRL_FRAME_LEN) {
+                ...
+              }
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2018-9503"

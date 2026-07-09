@@ -1,0 +1,18 @@
+rules:
+  - id: rsync-check-secret-infinite-loop
+    message: "Potential infinite loop in check_secret due to unsafe file reading pattern (CVE-2014-2855, CWE-20)."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              int fd;
+              ...
+              if (!fname || !*fname || (fd = open(fname, O_RDONLY)) < 0)
+          - pattern: |
+              int fd = open(...);
+              ...
+              if (!fname || !*fname || (fd = open(fname, O_RDONLY)) < 0)
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2014-2855"

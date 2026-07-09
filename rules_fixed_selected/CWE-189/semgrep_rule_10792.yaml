@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2009-0586-gst-vorbis-integer-overflow
+    message: |
+      Integer overflow in base64 length calculation may lead to heap-based buffer overflow.
+      The expression `base64_len * 3 / 4` can overflow for large `base64_len`, resulting in
+      insufficient memory allocation. Use safe arithmetic or bounds checking.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          g_try_malloc0($LEN * 3 / 4)
+    metadata:
+      cwe: "CWE-189"
+      cve: "CVE-2009-0586"
+      references:
+        - https://cgit.freedesktop.org/gstreamer/gst-plugins-base/commit/?id=566583e87147f774e7fc4c78b5f7e61d427e40a9

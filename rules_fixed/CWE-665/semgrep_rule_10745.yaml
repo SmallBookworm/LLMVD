@@ -1,0 +1,23 @@
+rules:
+  - id: unchecked_sscanf_cwe665
+    message: "sscanf return value is not checked, which may lead to use of uninitialized variables (CWE-665)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          sscanf(..., ..., &...);
+      - pattern: |
+          sscanf(..., ..., ..., &...);
+      - pattern: |
+          sscanf(..., ..., ..., ..., &...);
+      - pattern: |
+          sscanf(..., ..., ..., ..., ..., &...);
+    metavariable-regex:
+      metavariable: $...
+      regex: '.*'
+    pattern-not-inside: |
+      $RET = sscanf(...);
+      ...
+      if ($RET != ...) { ... }
+    pattern-not-inside: |
+      if (sscanf(...) != ...) { ... }

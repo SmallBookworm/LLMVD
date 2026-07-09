@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2017-9984-double-fetch-msnd
+    message: "Double fetch vulnerability in snd_msnd_interrupt: multiple reads of head/tail pointers without validation may lead to out-of-bounds access (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while (readw($PTR + JQS_wTail) != readw($PTR + JQS_wHead)) {
+                  ...
+                  $TMP = readw($PTR + JQS_wHead) + 1;
+                  ...
+                  writew(..., $PTR + JQS_wHead);
+              }
+          - pattern: |
+              while (readw($PTR + JQS_wHead) != readw($PTR + JQS_wTail)) {
+                  ...
+                  $TMP = readw($PTR + JQS_wHead) + 1;
+                  ...
+                  writew(..., $PTR + JQS_wHead);
+              }
+    metadata:
+      cwe: ["CWE-125"]
+      cve: "CVE-2017-9984"

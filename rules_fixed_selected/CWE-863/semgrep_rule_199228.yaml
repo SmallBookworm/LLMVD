@@ -1,0 +1,12 @@
+rules:
+  - id: mysql_backslash_parsing_vulnerability
+    message: "Improper handling of backslash in SQL identifiers may lead to query truncation or unintended command execution (CVE-2017-10379, CWE-863)."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      if (*in_string || inchar == 'N')
+      {
+        *out++='\\';
+        *out++= (char) inchar;
+        continue;
+      }

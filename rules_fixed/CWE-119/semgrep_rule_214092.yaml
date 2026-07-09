@@ -1,0 +1,27 @@
+rules:
+  - id: zziplib-buffer-bounds-check-missing
+    message: Missing lower bound check on zlib input buffer may lead to invalid memory access (CVE-2018-7725).
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($PTR + $SIZE >= $ENDBUF)
+                  goto $LABEL;
+          - pattern: |
+              if ($PTR + $SIZE >= $ENDBUF)
+                  $BLOCK
+      - pattern-not: |
+          if ($PTR + $SIZE >= $ENDBUF)
+              ...
+          if ($PTR < $BUFFER)
+              ...
+      - metavariable-pattern:
+          metavariable: $PTR
+          pattern: file->zlib.next_in
+      - metavariable-pattern:
+          metavariable: $ENDBUF
+          pattern: disk->endbuf
+      - metavariable-pattern:
+          metavariable: $BUFFER
+          pattern: disk->buffer

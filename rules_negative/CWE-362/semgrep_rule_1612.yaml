@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2014-9529-key-gc-race-condition
+    message: "Race condition vulnerability (CVE-2014-9529): key_user_put() is called before key->type->destroy(), which may lead to use-after-free or memory corruption."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          key_user_put($KEY->user);
+          ...
+          if ($KEY->type->destroy)
+            $KEY->type->destroy($KEY);
+      - pattern: |
+          key_user_put($KEY->user);
+          ...
+          $KEY->type->destroy($KEY);
+    metavariable-pattern:
+      metavariable: $KEY
+      pattern: struct key *

@@ -1,0 +1,24 @@
+rules:
+  - id: cwe-200-uninitialized-padding
+    message: "Structure padding field is not initialized, potentially leaking kernel memory (CWE-200)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          struct tc_rsvp_pinfo $X = {...};
+          ...
+          RTA_PUT(..., TCA_RSVP_PINFO, sizeof($X), &$X);
+      - pattern: |
+          struct tc_rsvp_pinfo $X;
+          ...
+          $X.dpi = ...;
+          $X.spi = ...;
+          $X.protocol = ...;
+          $X.tunnelid = ...;
+          $X.tunnelhdr = ...;
+          ...
+          RTA_PUT(..., TCA_RSVP_PINFO, sizeof($X), &$X);
+    metavariable-pattern:
+      metavariable: $X
+      pattern-not: |
+        $X.pad = 0;

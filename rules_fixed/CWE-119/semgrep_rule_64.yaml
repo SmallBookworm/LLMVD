@@ -1,0 +1,25 @@
+rules:
+  - id: musl_dns_buffer_overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              switch (rr) {
+                case RR_A:
+                  ... 
+                  ctx->addrs[ctx->cnt].addr = ...;
+                  ctx->cnt++;
+                  ...
+              }
+          - pattern: |
+              switch (rr) {
+                case RR_AAAA:
+                  ... 
+                  ctx->addrs[ctx->cnt].addr = ...;
+                  ctx->cnt++;
+                  ...
+              }
+      - pattern-not: |
+          if (ctx->cnt >= MAXADDRS) return -1;
+    message: "Missing bounds check on ctx->cnt before writing to ctx->addrs may lead to buffer overflow (CWE-119)."
+    severity: ERROR
+    languages: [c]

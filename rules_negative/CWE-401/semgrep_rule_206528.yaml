@@ -1,0 +1,16 @@
+rules:
+  - id: mlx5_fw_fatal_reporter_dump_memory_leak
+    message: "Memory leak in mlx5_fw_fatal_reporter_dump: cr_data not freed on mlx5_crdump_collect failure."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (err)
+        return err;
+    pattern-inside: |
+      mlx5_fw_fatal_reporter_dump(...) {
+        ...
+        cr_data = kvmalloc(...);
+        ...
+        err = mlx5_crdump_collect(..., cr_data);
+        ...
+      }

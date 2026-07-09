@@ -1,0 +1,46 @@
+rules:
+  - id: imagemagick-readpsimage-missing-eof-check
+    message: "Missing EOF check in ReadPSImage() may lead to excessive CPU consumption when parsing crafted PSD files (CVE-2017-14172)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (LocaleNCompare(PhotoshopProfile, $A, $B) == 0)
+              {
+                ...
+                count = (ssize_t) sscanf($C, PhotoshopProfile " %lu", &extent);
+                if (count != 1)
+                  continue;
+                length = extent;
+                profile = BlobToStringInfo((const void *) NULL, length);
+                if (profile != (StringInfo *) NULL)
+                {
+                  ...
+                  for (i = 0; i < (ssize_t) length; i++)
+                    $X = (unsigned char) ProfileInteger(image, hex_digits);
+                  ...
+                }
+                continue;
+              }
+          - pattern: |
+              if (LocaleNCompare(PhotoshopProfile, $A, $B) == 0)
+              {
+                ...
+                count = (ssize_t) sscanf($C, PhotoshopProfile " %lu", &extent);
+                if (count != 1)
+                  continue;
+                length = extent;
+                profile = AcquireStringInfo(length);
+                if (profile != (StringInfo *) NULL)
+                {
+                  ...
+                  for (i = 0; i < (ssize_t) length; i++)
+                    $X = (unsigned char) ProfileInteger(image, hex_digits);
+                  ...
+                }
+                continue;
+              }
+    metavariable-regex:
+      metavariable: extent
+      regex: extent

@@ -1,0 +1,8 @@
+rules:
+  - id: nettle-ecdsa-sign-non-canonical-scalar
+    message: "Non-canonical scalar used in ECDSA signature may lead to out-of-range ECC point multiplication (CVE-2021-20305, CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      ecc_mod_mul (&ecc->q, tp, hp, kinv, tp);
+      mpn_copyi (sp, tp, ecc->p.size);

@@ -1,0 +1,18 @@
+rules:
+  - id: ims_pcu_missing_interface_check
+    message: Missing null check after usb_ifnum_to_if may lead to denial of service via crafted USB device.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: $pcu->ctrl_intf = usb_ifnum_to_if(...)
+              - pattern: $pcu->ctrl_intf->...
+              - focus-metavariable: $pcu
+          - patterns:
+              - pattern: $pcu->data_intf = usb_ifnum_to_if(...)
+              - pattern: $pcu->data_intf->...
+              - focus-metavariable: $pcu
+    metavariable-regex:
+      metavariable: $pcu
+      regex: 'pcu'

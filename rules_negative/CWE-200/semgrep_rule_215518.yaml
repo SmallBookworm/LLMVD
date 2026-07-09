@@ -1,0 +1,14 @@
+rules:
+  - id: cwe-200-uninitialized-padding-netlink
+    patterns:
+      - pattern-either:
+          - pattern: |
+              memcpy(RTA_DATA($RTA), $DATA, $ATTRLEN);
+          - pattern: |
+              __rta_fill(..., $ATTRLEN, ...)
+    message: "Uninitialized padding in netlink message may leak kernel memory. Use memset to zero out padding after memcpy."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2005-4881"

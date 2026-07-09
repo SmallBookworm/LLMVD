@@ -1,0 +1,21 @@
+rules:
+  - id: armass_shift_length_check_missing
+    message: "Missing length check before accessing token + 4 in ARM shift parsing may lead to out-of-bounds read (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          if (op->operands[...].shift != ARM_NO_SHIFT) {
+              ...
+              op->operands[...].shift_amount = r_num_math(NULL, token + 4);
+              ...
+          }
+      - pattern-not: |
+          if (strlen(token) > 4 && op->operands[...].shift != ARM_NO_SHIFT) {
+              ...
+              op->operands[...].shift_amount = r_num_math(NULL, token + 4);
+              ...
+          }
+    metavariable-regex:
+      metavariable: $...
+      regex: "operand"

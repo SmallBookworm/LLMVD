@@ -1,0 +1,30 @@
+rules:
+  - id: cve-2017-15277-uninitialized-palette
+    message: "Uninitialized palette memory may lead to information disclosure (CWE-200, CVE-2017-15277)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $GLOBAL_COLORMAP = (unsigned char *) AcquireQuantumMemory(...);
+          ...
+          if (BitSet(..., 0x80) != 0)
+            {
+              ...
+            }
+          ...
+          if (BitSet(..., 0x80) == 0)
+            {
+              ...
+            }
+      - pattern: |
+          $GLOBAL_COLORMAP = (unsigned char *) AcquireQuantumMemory(...);
+          ...
+          if ($COND)
+            {
+              count = ReadBlob(..., $GLOBAL_COLORMAP);
+              ...
+            }
+    metavariable-pattern:
+      metavariable: $GLOBAL_COLORMAP
+      pattern: global_colormap
+    focus-metavariable: $GLOBAL_COLORMAP

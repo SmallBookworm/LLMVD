@@ -1,0 +1,19 @@
+rules:
+  - id: cwe-416-libxml2-use-after-free
+    message: "Use-after-free vulnerability in htmlParsePubidLiteral or htmlParseSystemLiteral due to storing raw pointer into potentially reallocated buffer."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $Q = CUR_PTR;
+          ...
+          xmlStrndup($Q, ...);
+      - pattern: |
+          const xmlChar *$Q;
+          ...
+          $Q = CUR_PTR;
+          ...
+          xmlStrndup($Q, ...);
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2016-1837"

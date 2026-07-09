@@ -1,0 +1,24 @@
+rules:
+  - id: openldap-cve-2021-27212
+    message: "Missing length check for 'thisUpdate' timestamp may lead to assertion failure and denial of service (CVE-2021-27212)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ( tu->bv_len < x.bv_len; tu->bv_len++ ) {
+            if ( tu->bv_val[tu->bv_len] == '"' ) {
+              break;
+            }
+          }
+          x.bv_val += tu->bv_len + 1;
+          x.bv_len -= tu->bv_len + 1;
+      - pattern: |
+          for ( ; tu->bv_len < x.bv_len; tu->bv_len++ ) {
+            if ( tu->bv_val[tu->bv_len] == '"' ) {
+              break;
+            }
+          }
+          x.bv_val += tu->bv_len + 1;
+          x.bv_len -= tu->bv_len + 1;
+    pattern-not: |
+      if ( tu->bv_len < STRLENOF("YYYYmmddHHmmssZ") ) return LDAP_INVALID_SYNTAX;

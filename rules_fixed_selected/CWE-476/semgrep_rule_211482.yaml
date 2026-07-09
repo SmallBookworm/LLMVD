@@ -1,0 +1,34 @@
+rules:
+  - id: imagemagick-null-pointer-dereference-CVE-2018-16329
+    message: "Potential NULL pointer dereference in GetMagickProperty due to missing image check before accessing image fields."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          GetPathComponent(image->magick_filename, ..., ...);
+      - pattern: |
+          CommandOptionToMnemonic(..., (ssize_t) image->...);
+      - pattern: |
+          FormatLocaleString(..., (double) image->...);
+      - pattern: |
+          GetImageDepth(image, ...);
+      - pattern: |
+          GetImageEntropy(image, ...);
+      - pattern: |
+          GetImageKurtosis(image, ...);
+      - pattern: |
+          GetImageMean(image, ...);
+      - pattern: |
+          GetImageRange(image, ...);
+      - pattern: |
+          IsImageOpaque(image, ...);
+      - pattern: |
+          IdentifyImageType(image, ...);
+      - pattern: |
+          GetBlobSize(image);
+      - pattern: |
+          GetImageListLength(image);
+    metavariable-pattern:
+      metavariable: image
+      pattern-not: |
+        WarnNoImageReturn(...)

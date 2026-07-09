@@ -1,0 +1,38 @@
+rules:
+  - id: cve-2017-9454-buffer-overflow-ares-parse-a-reply
+    message: "Missing bounds check before reading DNS resource record data may lead to out-of-bounds read (CWE-125, CVE-2017-9454)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (aptr + RRFIXEDSZ > abuf + alen)
+            {
+              ...
+            }
+          ...
+          aptr += RRFIXEDSZ;
+          ...
+          if (rr_class == C_IN && rr_type == T_A
+              && rr_len == sizeof(struct in_addr)
+              && strcasecmp(rr_name, hostname) == 0)
+            {
+              memcpy(&addrs[naddrs], aptr, sizeof(struct in_addr));
+              ...
+            }
+      - pattern: |
+          if (aptr + RRFIXEDSZ > abuf + alen)
+            {
+              ...
+            }
+          ...
+          aptr += RRFIXEDSZ;
+          ...
+          if (rr_class == C_IN && rr_type == T_CNAME)
+            {
+              ...
+              status = ares_expand_name(aptr, abuf, alen, &rr_data, &len);
+              ...
+            }
+    metavariable-regex:
+      metavariable: $func
+      regex: ares_parse_a_reply

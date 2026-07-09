@@ -1,0 +1,8 @@
+rules:
+  - id: cwe-119-out-of-bounds-access-pch_write_line
+    patterns:
+      - pattern: |
+          p_line[...][p_len[...] - 1]
+    message: "Potential out-of-bounds read due to missing length check before array access. This may lead to DoS (CWE-119)."
+    severity: ERROR
+    languages: [c]

@@ -1,0 +1,13 @@
+rules:
+  - id: cwe-125-out-of-bounds-read-jpc_pi_nextrpcl
+    message: Potential out-of-bounds heap read in jpc_pi_nextrpcl due to missing bounds check before array access.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          pi->prcno = ...;
+          $$ assert(pi->prcno < pi->pirlvl->numprcs);
+          ... = &pi->pirlvl->prclyrnos[pi->prcno];
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2016-9583"

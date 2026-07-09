@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2018-6346-http2-circular-priority
+    message: "HTTP/2 codec may enter invalid state due to missing circular dependency check before setting priority. This can lead to denial-of-service (CVE-2018-6346)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (priority) {
+            if (curHeader_.stream == priority->streamDependency) {
+              ...
+              return ErrorCode::NO_ERROR;
+            }
+            ...
+            decodeInfo_.msg->setHTTP2Priority(...);
+          }
+    metadata:
+      cwe: "CWE-388"
+      cve: "CVE-2018-6346"

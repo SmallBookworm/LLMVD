@@ -1,0 +1,24 @@
+rules:
+  - id: xdelta3_buffer_overflow_appheader
+    patterns:
+      - pattern-either:
+          - pattern: |
+              char *parsed[4];
+              ...
+              while (($$x = strchr($$y, '/')) != NULL)
+              {
+                ...
+                parsed[place++] = ...;
+              }
+          - pattern: |
+              char *parsed[4];
+              ...
+              while (($$x = strchr($$y, '/')) != NULL)
+              {
+                *$$z = 0;
+                parsed[place++] = ...;
+                $$w = $$w + 1;
+              }
+    message: "Buffer overflow vulnerability in main_get_appheader due to missing bounds check on parsed array. CVE-2014-9765 (CWE-119)."
+    severity: ERROR
+    languages: [c]

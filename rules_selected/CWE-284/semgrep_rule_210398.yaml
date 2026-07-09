@@ -1,0 +1,21 @@
+rules:
+  - id: crypto_reportstat_memory_leak
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (err)
+                  return err;
+          - pattern: |
+              if (err)
+                  return ...;
+    metavariable-pattern:
+      metavariable: err
+      pattern: crypto_reportstat_alg(...)
+    pattern-not: |
+      if (err) {
+          kfree_skb(skb);
+          return err;
+      }
+    message: "Memory leak detected: 'skb' is not freed on error path in crypto_reportstat. This may lead to denial of service via memory exhaustion (CVE-2019-19050, CWE-284)."
+    severity: ERROR
+    languages: [c]

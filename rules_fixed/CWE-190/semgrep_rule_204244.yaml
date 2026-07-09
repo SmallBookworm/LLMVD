@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2016-5095-integer-overflow-filter
+    message: "Missing FILTER_SANITIZE_FULL_SPECIAL_CHARS constant registration may lead to integer overflow in php_escape_html_entities_ex (CVE-2016-5095)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          REGISTER_LONG_CONSTANT("FILTER_SANITIZE_FULL_SPECIAL_CHARS", ...);
+      - pattern-not: |
+          REGISTER_LONG_CONSTANT("FILTER_SANITIZE_FULL_SPECIAL_CHARS", FILTER_SANITIZE_SPECIAL_CHARS, CONST_CS | CONST_PERSISTENT);
+    fix: ""

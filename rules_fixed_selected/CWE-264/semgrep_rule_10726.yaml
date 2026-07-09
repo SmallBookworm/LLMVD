@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2014-0185-unix-socket-permissions
+    message: "UNIX socket created with insecure permissions (0666). This allows local users to gain privileges via a crafted FastCGI client. Use 0660 instead."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern: |
+          $WP->socket_mode = 0666;
+    metadata:
+      cwe: "CWE-264"
+      cve: "CVE-2014-0185"

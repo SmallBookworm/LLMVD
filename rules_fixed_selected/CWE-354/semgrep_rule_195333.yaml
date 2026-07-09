@@ -1,0 +1,41 @@
+rules:
+  - id: tensorflow-tridiagonal-matmul-missing-shape-validation
+    patterns:
+      - pattern-either:
+          - pattern: |
+              void Compute(OpKernelContext* context) final {
+                  ...
+                  const Tensor& superdiag = context->input(0);
+                  const Tensor& maindiag = context->input(1);
+                  const Tensor& subdiag = context->input(2);
+                  const Tensor& rhs = context->input(3);
+                  ...
+                  const int ndims = rhs.dims();
+                  ...
+                  int64 batch_size = 1;
+                  for (int i = 0; i < ndims - 2; i++) {
+                      batch_size *= rhs.dim_size(i);
+                  }
+                  ...
+              }
+          - pattern: |
+              void Compute(OpKernelContext* context) final {
+                  ...
+                  const Tensor& superdiag = context->input(0);
+                  const Tensor& maindiag = context->input(1);
+                  const Tensor& subdiag = context->input(2);
+                  const Tensor& rhs = context->input(3);
+                  ...
+                  const int ndims = rhs.dims();
+                  int64 batch_size = 1;
+                  for (int i = 0; i < ndims - 2; i++) {
+                      batch_size *= rhs.dim_size(i);
+                  }
+                  ...
+              }
+    message: "Missing input tensor shape validation in TridiagonalMatMul GPU op may lead to invalid memory access (CWE-354, CVE-2021-41206)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-354"
+      cve: "CVE-2021-41206"

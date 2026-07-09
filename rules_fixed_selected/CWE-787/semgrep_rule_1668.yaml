@@ -1,0 +1,9 @@
+rules:
+  - id: cve-2016-9755-ipv6-defrag-missing-drop
+    message: "Missing error handling in IPv6 defragmentation may lead to out-of-bounds write (CWE-787). Return NF_DROP on error instead of NF_ACCEPT."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (err == -EINPROGRESS)
+        return NF_STOLEN;
+      return NF_ACCEPT;

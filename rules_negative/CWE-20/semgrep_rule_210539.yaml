@@ -1,0 +1,29 @@
+rules:
+  - id: ip_frag_reasm_missing_sk_null
+    message: "Missing 'fp->sk = NULL;' in ip_frag_reasm() may cause use-after-free in ip_do_fragment()."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          while (fp) {
+              ...
+              memset(&fp->rbnode, 0, sizeof(fp->rbnode));
+              head->data_len += fp->len;
+              ...
+          }
+      - pattern: |
+          while (fp) {
+              ...
+              memset(&fp->rbnode, 0, sizeof(fp->rbnode));
+              head->len += fp->len;
+              ...
+          }
+    metavariable-pattern:
+      metavariable: fp
+      pattern: fp
+    pattern-not: |
+      while (fp) {
+          ...
+          fp->sk = NULL;
+          ...
+      }

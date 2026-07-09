@@ -1,0 +1,27 @@
+rules:
+  - id: cve-2017-5993-missing-initialised-flag
+    message: "Missing assignment to 'blit_ctx->initialised = true' may cause memory leak on repeated calls (CVE-2017-5993, CWE-772)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (blit_ctx->initialised) {
+            ...
+            return;
+          }
+          ...
+          blit_ctx->gl_context = vrend_clicbs->create_gl_context(...);
+          ...
+          // missing blit_ctx->initialised = true;
+      - pattern: |
+          if (blit_ctx->initialised) {
+            ...
+            return;
+          }
+          ...
+          vrend_clicbs->create_gl_context(...);
+          ...
+          // missing blit_ctx->initialised = true;
+    metavariable-pattern:
+      metavariable: blit_ctx
+      pattern: struct vrend_blitter_ctx *

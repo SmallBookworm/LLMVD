@@ -1,0 +1,28 @@
+rules:
+  - id: kvm_vcpu_id_unchecked
+    message: "Missing validation of vcpu_id against KVM_MAX_VCPUS may lead to out-of-bounds access (CVE-2013-4587)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          static int $FUNC(struct kvm * $kvm, u32 $id) {
+            ...
+            $vcpu = kvm_arch_vcpu_create($kvm, $id);
+            ...
+          }
+      - pattern: |
+          static int $FUNC(struct kvm * $kvm, u32 $id) {
+            ...
+            if (IS_ERR(kvm_arch_vcpu_create($kvm, $id)))
+              ...
+          }
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern: "kvm_vm_ioctl_create_vcpu"
+    pattern-not: |
+      static int $FUNC(struct kvm * $kvm, u32 $id) {
+        ...
+        if ($id >= KVM_MAX_VCPUS)
+          return -EINVAL;
+        ...
+      }

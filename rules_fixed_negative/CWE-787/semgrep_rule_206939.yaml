@@ -1,0 +1,7 @@
+rules:
+  - id: liblouis-buffer-overflow-compileHyphenation
+    message: "Buffer overflow vulnerability in compileHyphenation due to insufficient buffer size for 'pattern' array. Fixed by increasing buffer size from MAXSTRING to MAXSTRING + 1."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      char pattern[MAXSTRING];

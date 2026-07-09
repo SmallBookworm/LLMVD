@@ -1,0 +1,17 @@
+rules:
+  - id: cwe-200-uninitialized-struct-member
+    patterns:
+      - pattern-either:
+          - pattern: |
+              struct sockaddr_at $SAT;
+              ...
+              memcpy($UADDR, &$SAT, sizeof($SAT));
+          - pattern: |
+              struct sockaddr_at $SAT = {...};
+              ...
+              memcpy($UADDR, &$SAT, sizeof($SAT));
+    pattern-not: |
+      memset(&$SAT.sat_zero, 0, sizeof($SAT.sat_zero));
+    message: "Uninitialized struct member in sockaddr_at may leak kernel memory via getsockname (CWE-200)."
+    severity: WARNING
+    languages: [c]

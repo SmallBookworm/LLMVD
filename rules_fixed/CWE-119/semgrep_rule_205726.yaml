@@ -1,0 +1,31 @@
+rules:
+  - id: cve-2015-5291-buffer-overflow
+    message: "Potential heap-based buffer overflow due to insufficient buffer size check before writing SNI extension. Missing underflow guard 'end < p'."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if( (size_t)(end - p) < ... )
+              {
+                ...
+                return;
+              }
+          - pattern: |
+              if( (size_t)( end - p ) < ... )
+              {
+                ...
+                return;
+              }
+      - pattern-not: |
+          if( end < p || (size_t)( end - p ) < ... )
+          {
+            ...
+            return;
+          }
+      - metavariable-pattern:
+          metavariable: end
+          pattern: "const unsigned char *"
+      - metavariable-pattern:
+          metavariable: p
+          pattern: "unsigned char *"

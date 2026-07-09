@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2022-1122-uninitialized-pointer-free
+    message: "Uninitialized pointer 'dirptr' may be freed if malloc fails, leading to undefined behavior (CWE-824). Use calloc or initialize pointer members to avoid freeing uninitialized memory."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      $DIRPTR = (dircnt_t*)malloc(sizeof(dircnt_t));
+      ...
+      if (!$DIRPTR->filename_buf) {
+        ...
+        goto fin;
+      }

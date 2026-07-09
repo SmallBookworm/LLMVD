@@ -1,0 +1,14 @@
+rules:
+  - id: skia_unchecked_convexity_initialization
+    message: "Uninitialized or blindly assumed convexity may lead to undefined behavior or denial of service."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      path->setIsConvex(true);
+    fix-regex:
+      regex: ""
+      replacement: ""
+      count: 1
+    metadata:
+      cwe: "CWE-19"
+      cve: "CVE-2011-3927"

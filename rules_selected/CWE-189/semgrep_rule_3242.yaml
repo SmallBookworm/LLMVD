@@ -1,0 +1,14 @@
+rules:
+  - id: cwe-189-inflate-mark-negative-shift
+    patterns:
+      - pattern-either:
+          - pattern: (long)($X) << $Y
+          - pattern: $X << $Y
+    pattern-not-inside: |
+      (long)(((unsigned long)...)
+    message: "Potential undefined behavior due to left shift of a negative integer. Cast to unsigned before shifting to avoid CWE-189."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: ["CWE-189"]
+      cve: "CVE-2016-9842"

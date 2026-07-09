@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2018-6088-iterator-invalidation
+    message: "Iterator invalidation vulnerability: iterating over a container that may be modified during iteration. Use a copy of the container to prevent undefined behavior."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for ($ITER : $CONTAINER) {
+                ...;
+                $OBJ->GetPage() == ...;
+                ...;
+              }
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2018-6088"
+      references:
+        - https://github.com/chromium/chromium/commit/94b3728a2836da335a10085d4089c9d8e1c9d225

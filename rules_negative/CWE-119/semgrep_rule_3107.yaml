@@ -1,0 +1,18 @@
+rules:
+  - id: cifs_smbhash_stack_scatterlist
+    message: "smbhash uses scatterlist pointing to stack memory, which is unsafe with CONFIG_VMAP_STACK. Use crypto_cipher_encrypt_one instead."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              sg_init_one(&sgin, in, 8);
+              ...
+              skcipher_request_set_crypt(req, &sgin, ..., 8, NULL);
+          - pattern: |
+              sg_init_one(&sgout, out, 8);
+              ...
+              skcipher_request_set_crypt(req, ..., &sgout, 8, NULL);
+    metavariable-regex:
+      metavariable: $func
+      regex: smbhash

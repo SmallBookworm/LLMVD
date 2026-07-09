@@ -1,0 +1,21 @@
+rules:
+  - id: ecryptfs-tag11-buffer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              (*tag_11_contents_size) = (body_size - 14);
+              ...
+              memcpy(contents, ..., (*tag_11_contents_size));
+          - pattern: |
+              (*tag_11_contents_size) = body_size - 14;
+              ...
+              memcpy(contents, ..., (*tag_11_contents_size));
+    pattern-not: |
+      if (unlikely((*tag_11_contents_size) > max_contents_bytes)) {
+          ...
+          rc = -EINVAL;
+          goto out;
+      }
+    message: "Missing bounds check on tag_11_contents_size before memcpy may lead to stack-based buffer overflow (CVE-2009-2406, CWE-119)."
+    severity: ERROR
+    languages: [c]

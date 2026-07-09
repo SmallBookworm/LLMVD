@@ -1,0 +1,11 @@
+rules:
+  - id: libgit2-ntfs-alternate-data-stream-vulnerability
+    message: "NTFS Alternate Data Stream attack vector not properly blocked; may allow remote code execution when cloning a repository."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (path[start] == '\\')
+          return false;
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2020-12278"

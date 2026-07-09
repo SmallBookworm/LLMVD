@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2016-4913-rock-ridge-nm-handling
+    message: "Potential information disclosure due to mishandling of NM entries containing NUL characters in Rock Ridge filename parsing."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              strncat(retname, rr->u.NM.name, rr->len - 5);
+              retnamlen += rr->len - 5;
+    metadata:
+      cwe: ["CWE-200"]
+      cve: "CVE-2016-4913"

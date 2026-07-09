@@ -1,0 +1,27 @@
+rules:
+  - id: cve-2017-12899-decnet-buffer-overread
+    message: "Missing bounds check after adjusting pointer 'ap' for padding may lead to buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (mflags & RMF_PAD) {
+                  ...
+                  ap += padlen;
+                  ...
+                  rhp = (const union routehdr *)&(ap[sizeof(short)]);
+                  mflags = EXTRACT_LE_8BITS(rhp->rh_short.sh_flags);
+              }
+          - pattern: |
+              if (mflags & RMF_PAD) {
+                  ...
+                  ap += padlen;
+                  ...
+                  rhp = (const union routehdr *)&(ap[sizeof(short)]);
+                  ...;
+                  mflags = EXTRACT_LE_8BITS(rhp->rh_short.sh_flags);
+              }
+    metavariable-pattern:
+      metavariable: mflags
+      pattern: "mflags"

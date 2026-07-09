@@ -1,0 +1,32 @@
+rules:
+  - id: cve-2013-7027-radiotap-buffer-overread
+    message: |
+      Missing bounds check in ieee80211_radiotap_iterator_init may lead to buffer over-read.
+      The code does not ensure that extended bitmap parsing stays within the radiotap header bounds.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          # Missing initial header size check
+          - pattern: |
+              if (max_length < get_unaligned_le16(&radiotap_header->it_len))
+                  return -EINVAL;
+            metavariable-pattern:
+              metavariable: radiotap_header
+              pattern: struct ieee80211_radiotap_header *
+            pattern-not: |
+              if (max_length < sizeof(struct ieee80211_radiotap_header))
+                  return -EINVAL;
+          # Inadequate extended bitmap bounds check (missing + sizeof(uint32_t))
+          - pattern: |
+              if ((unsigned long)iterator->_arg -
+                  (unsigned long)iterator->_rtheader >
+                  (unsigned long)iterator->_max_length)
+                  return -EINVAL;
+            pattern-not: |
+              if ((unsigned long)iterator->_arg -
+                  (unsigned long)iterator->_rtheader +
+                  sizeof(uint32_t) >
+                  (unsigned long)iterator->_max_length)
+                  return -EINVAL;
+    fix: ""

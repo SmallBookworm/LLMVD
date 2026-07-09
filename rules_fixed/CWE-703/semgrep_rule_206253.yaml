@@ -1,0 +1,8 @@
+rules:
+  - id: cve-2022-26280-out-of-bounds-read
+    message: "Missing check for entry_bytes_remaining before reading ahead may cause out-of-bounds read (CVE-2022-26280)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if((p = __archive_read_ahead(a, 9, NULL)) == NULL) {
+    fix: null

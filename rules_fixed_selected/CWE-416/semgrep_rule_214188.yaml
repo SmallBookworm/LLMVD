@@ -1,0 +1,23 @@
+rules:
+  - id: xfs-use-after-free-sb-fs-info
+    message: "Use-after-free vulnerability in xfs_fs_fill_super: sb->s_fs_info is not cleared on mount failure, leading to potential dereference of freed memory (CVE-2018-20976)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          sb->s_fs_info = $MP;
+          ...
+          kfree($MP);
+          ...
+          return $ERR;
+      - pattern: |
+          sb->s_fs_info = $MP;
+          ...
+          goto out;
+          ...
+          kfree($MP);
+          ...
+          return $ERR;
+    metavariable-regex:
+      metavariable: $MP
+      regex: "mp"

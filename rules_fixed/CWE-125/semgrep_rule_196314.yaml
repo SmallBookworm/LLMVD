@@ -1,0 +1,23 @@
+rules:
+  - id: nanopb-invalid-free-after-realloc
+    message: "Potential use of uninitialized pointer after failed realloc() in repeated field handling. This may lead to invalid free() and memory corruption (CVE-2020-5235, CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!allocate_field(..., $size))
+              return false;
+          ...
+          $ptr = ... + $size - 1;
+          ...
+          ($size)++;
+      - pattern: |
+          if (!allocate_field(..., *$size))
+              return false;
+          ...
+          $ptr = ... + *$size - 1;
+          ...
+          (*$size)++
+    fix-regex:
+      regex: null
+      replacement: ""

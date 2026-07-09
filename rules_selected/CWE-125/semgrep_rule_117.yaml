@@ -1,0 +1,16 @@
+rules:
+  - id: ghostscript-out-of-bounds-read-CVE-2017-11714
+    patterns:
+      - pattern-either:
+          - pattern: |
+              pop(1);
+          - pattern: |
+              pop(...);
+    message: "Missing nullification of scanner state reference before pop() may lead to use-after-free or out-of-bounds read (CVE-2017-11714)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-125"
+      references:
+        - "http://git.ghostscript.com/?p=ghostpdl.git;a=commit;h=671fd59eb657743aa86fbc1895cb15872a317caa"
+        - "https://nvd.nist.gov/vuln/detail/CVE-2017-11714"

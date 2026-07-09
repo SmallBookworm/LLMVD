@@ -1,0 +1,17 @@
+rules:
+  - id: pillow-tiff-integer-overflow
+    message: "Potential integer overflow in TIFF decoding due to missing overflow check before realloc (CVE-2020-5310, CWE-190)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          state->bytes = TIFFTileSize(...);
+          $STMTS
+          realloc(state->buffer, state->bytes)
+      - pattern: |
+          state->bytes = TIFFTileSize(...);
+          $STMTS
+          UINT8 *new = realloc(state->buffer, state->bytes)
+    metavariable-regex:
+      metavariable: $STMTS
+      regex: ".*"

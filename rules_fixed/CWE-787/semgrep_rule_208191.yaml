@@ -1,0 +1,23 @@
+rules:
+  - id: ax88179_rx_fixup-oob-access
+    message: "Potential out-of-bounds access in ax88179_rx_fixup due to missing bounds checks on packet metadata and data."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              pkt_cnt = (u16)rx_hdr;
+              hdr_off = (u16)(rx_hdr >> 16);
+              pkt_hdr = (u32 *)(skb->data + hdr_off);
+              ...
+              while (pkt_cnt--) { ... }
+          - pattern: |
+              pkt_cnt = (u16)rx_hdr;
+              hdr_off = (u16)(rx_hdr >> 16);
+              ...
+              pkt_hdr = (u32 *)(skb->data + hdr_off);
+              ...
+              while (pkt_cnt--) { ... }
+    metavariable-regex:
+      - metavariable: $FUNC
+        regex: ax88179_rx_fixup

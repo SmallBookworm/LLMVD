@@ -1,0 +1,19 @@
+rules:
+  - id: imagemagick-readyuvimage-memory-leak
+    message: "Memory leak in ReadYUVImage: 'scanline' is not freed before early return."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ($IMAGE == (Image *) NULL)
+            ThrowReaderException(...);
+      - pattern: |
+          if (status == MagickFalse)
+            {
+              image=DestroyImageList(image);
+              return((Image *) NULL);
+            }
+    metavariable-pattern:
+      metavariable: $IMAGE
+      patterns:
+        - pattern-regex: (chroma_image|resize_image)

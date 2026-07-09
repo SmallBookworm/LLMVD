@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2019-15222-null-dereference
+    message: "NULL pointer dereference vulnerability in snd_usb_pipe_sanity_check. Missing null check for 'ep' before dereferencing."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          $EP = usb_pipe_endpoint($DEV, $PIPE);
+          if (usb_pipetype($PIPE) != $PIPETYPES[usb_endpoint_type(&$EP->desc)])
+              ...
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2019-15222"

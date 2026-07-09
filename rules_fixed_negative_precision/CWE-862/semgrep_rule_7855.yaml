@@ -1,0 +1,8 @@
+rules:
+  - id: cve-2018-16081-hardcoded-font-size
+    message: "Hardcoded font size (12) may indicate a vulnerable pattern related to improper resource access control (CWE-862)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern: |
+          int size_pixels = 12;

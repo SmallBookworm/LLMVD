@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2011-1301-uninitialized-array
+    message: "Uninitialized stack array 'argument' may lead to use-after-free or undefined behavior. Initialize array to zero to prevent reading uninitialized memory."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern: |
+          wchar_t argument[...];
+          ...
+          for (...; ...; ...)
+            argument[...] = ...;
+    metadata:
+      cwe: ["CWE-399"]
+      cve: "CVE-2011-1301"

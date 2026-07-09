@@ -1,0 +1,16 @@
+rules:
+  - id: openssl-asn1-string-not-null-terminated
+    message: "Potential read buffer overrun due to use of non-NUL-terminated ASN1_STRING data in BIO_printf. Use length-limited format specifier %.*s instead of %s."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $ALIAS = X509_alias_get0($X, NULL);
+              ...
+              BIO_printf($OUT, "%*sAlias: %s\n", ..., $ALIAS);
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2021-3712"
+      references:
+        - https://github.com/openssl/openssl/commit/d9d838ddc0ed083fb4c26dd067e71aad7c65ad16

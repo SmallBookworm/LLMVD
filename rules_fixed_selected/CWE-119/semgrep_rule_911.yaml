@@ -1,0 +1,13 @@
+rules:
+  - id: uio_mmap_physical_missing_size_check
+    message: "Missing size validation before calling remap_pfn_range() may lead to memory corruption (CVE-2013-6763)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          remap_pfn_range($VMA, $VMA->vm_start, $ADDR, $VMA->vm_end - $VMA->vm_start, $PROT);
+      - pattern: |
+          io_remap_pfn_range($VMA, $VMA->vm_start, $ADDR, $VMA->vm_end - $VMA->vm_start, $PROT);
+    metavariable-pattern:
+      $VMA: { type: "struct vm_area_struct *" }
+    focus-metavariable: $VMA

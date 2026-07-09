@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2018-16644-missing-length-check
+    message: Missing length validation before memory allocation or data processing may lead to denial of service (CWE-20).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (length > (size_t) GetBlobSize(image)) {
+            ThrowMagickException(...);
+          }
+          ...
+          data = (unsigned char *) AcquireQuantumMemory(length + 1, ...);
+      - pattern: |
+          length = (size_t) (GetQuantumRange(...) + 1);
+          if (length > (size_t) GetBlobSize(image)) {
+            ThrowMagickException(...);
+          }
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2018-16644"

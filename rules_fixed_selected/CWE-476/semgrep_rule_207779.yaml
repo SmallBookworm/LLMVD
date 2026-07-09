@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2021-4209-null-deref-zero-length-hash
+    message: "Potential NULL pointer dereference due to zero-length input passed to hash update function. Add a check for text_size > 0 before calling ctx.update."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      $CTX.update(&$CTX, $TEXT_SIZE, $TEXT);
+    pattern-not: |
+      if ($TEXT_SIZE > 0) { $CTX.update(&$CTX, $TEXT_SIZE, $TEXT); }
+    fix-regex:
+      regex: ''
+      replacement: ''
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2021-4209"

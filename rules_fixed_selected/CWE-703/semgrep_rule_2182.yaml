@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2016-2185-ati-remote2-null-deref
+    message: "Missing validation of USB interface and endpoint counts may lead to NULL pointer dereference (CVE-2016-2185, CWE-703)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          ar2->ep[0] = &alt->endpoint[0].desc;
+      - pattern: |
+          ar2->ep[1] = &alt->endpoint[0].desc;
+    metavariable-pattern:
+      metavariable: alt
+      pattern-not: |
+        if ($X->desc.bNumEndpoints < 1 || !$X->endpoint) { ... }

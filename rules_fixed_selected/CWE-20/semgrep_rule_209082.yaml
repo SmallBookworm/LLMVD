@@ -1,0 +1,14 @@
+rules:
+  - id: missing_access_ok_before_user_access_begin
+    message: "Missing access_ok() check before user_access_begin(). This may lead to kernel memory corruption via unchecked user pointer access."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          user_access_begin();
+      - pattern: |
+          user_access_begin($PTR);
+    metavariable-pattern:
+      $PTR:
+        pattern-not: |
+          user_access_begin($PTR, $SIZE)

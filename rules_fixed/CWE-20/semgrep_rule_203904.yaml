@@ -1,0 +1,23 @@
+rules:
+  - id: spice-flexible-array-overflow
+    message: Missing bounds check before flexible array size computation may lead to integer underflow and buffer overflow (CVE-2018-10873).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $nelements = message_end - (start + $offset);
+      - pattern: |
+          $nelements = message_end - (start2 + $offset);
+    metavariable-pattern:
+      $offset:
+        pattern-regex: \d+
+    pattern-not-inside: |
+      if (SPICE_UNLIKELY(($start_var + $offset) > message_end)) {
+          goto error;
+      }
+      ...
+      $nelements = message_end - ($start_var + $offset);
+    fix-regex:
+      regex: ''
+      replacement: ''
+      enabled: false

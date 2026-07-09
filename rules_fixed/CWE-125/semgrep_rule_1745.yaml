@@ -1,0 +1,13 @@
+rules:
+  - id: openjpeg-opj_pi_create_decode-integer-overflow
+    message: Integer overflow in opj_pi_create_decode may lead to out-of-bounds read/write (CVE-2016-7163, CWE-125).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $$l_current_pi->include = (OPJ_INT16*) opj_calloc(($$l_tcp->numlayers + 1) * $$l_step_l, sizeof(OPJ_INT16));
+      - pattern: |
+          opj_calloc(($$l_tcp->numlayers + 1) * $$l_step_l, ...)
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2016-7163"

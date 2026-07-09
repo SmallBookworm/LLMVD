@@ -1,0 +1,17 @@
+rules:
+  - id: mongodb-bson-utf8-validation-missing
+    message: Missing validation for non-positive string size in BSON UTF-8 string parsing, leading to potential denial of service (CVE-2015-1609).
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if ( !readNumber<int>( &sz ) )
+          return Status( ErrorCodes::InvalidBSON, "invalid bson" );
+      if ( out ) {
+          *out = StringData( _buffer + _position, sz );
+      }
+    pattern-not: |
+      if ( !readNumber<int>( &sz ) )
+          return Status( ErrorCodes::InvalidBSON, "invalid bson" );
+      if ( sz <= 0 ) {
+          return Status( ErrorCodes::InvalidBSON, "invalid bson" );
+      }

@@ -1,0 +1,25 @@
+rules:
+  - id: rl2_missing_eof_check
+    message: "Missing EOF check in loop reading RL2 header tables may lead to DoS (CVE-2017-14056)"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          for(...; ...; ...) {
+            ... = avio_rl32(...);
+          }
+      - pattern: |
+          for(...; ...; ...) {
+            ... = avio_rl32(...) & ...;
+          }
+    metavariable-pattern:
+      metavariable: $LOOP_VAR
+      pattern: |
+        for($LOOP_VAR=0; $LOOP_VAR < frame_count; $LOOP_VAR++)
+    pattern-not-inside: |
+      for(...; ...; ...) {
+        if (avio_feof(...))
+          return ...;
+        ...
+      }
+    fix: ""

@@ -1,0 +1,29 @@
+rules:
+  - id: tflite-resolveaxis-negative-index-check-missing
+    message: "Missing runtime check for negative index conversion in ResolveAxis may lead to buffer underflow (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          int current = $AXIS < 0 ? ($AXIS + $NUM_DIMS) : $AXIS;
+          TFLITE_DCHECK(...);
+          ...
+          if (!...) {
+            $OUT_AXIS[...] = current;
+            ...
+          }
+      - pattern: |
+          int current = $AXIS < 0 ? ($AXIS + $NUM_DIMS) : $AXIS;
+          TFLITE_DCHECK(...);
+          bool $B = false;
+          for ($I; $COND; $INC) {
+            ...
+          }
+          if (!...) {
+            $OUT_AXIS[...] = current;
+            ...
+          }
+    metavariable-pattern:
+      metavariable: $AXIS
+      pattern: axis[...]
+    focus-metavariable: $AXIS

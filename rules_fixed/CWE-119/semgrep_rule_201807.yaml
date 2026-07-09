@@ -1,0 +1,31 @@
+rules:
+  - id: cve-2019-15117-oob-access
+    message: "Missing bounds check on bNrInPins may lead to out-of-bounds memory access (CVE-2019-15117)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - patterns:
+            - pattern: |
+                if (desc->bLength < sizeof(*desc))
+                  return -EINVAL;
+                if (!desc->bNrInPins)
+                  return -EINVAL;
+            - pattern-inside: |
+                switch (...) {
+                ...
+                }
+          - pattern: |
+              if (desc->bLength < sizeof(*desc))
+                return -EINVAL;
+              if (!desc->bNrInPins)
+                return -EINVAL;
+              ...
+              if (desc->bLength < sizeof(*desc) + desc->bNrInPins + 1)
+                ...
+      - metavariable-regex:
+          metavariable: $...
+          regex: "^(?!if \\(desc->bLength < sizeof\\(\\*desc\\) \\+ desc->bNrInPins\\)\n.*return -EINVAL;)"
+      - pattern-not: |
+          if (desc->bLength < sizeof(*desc) + desc->bNrInPins)
+            return -EINVAL;

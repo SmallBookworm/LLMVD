@@ -1,0 +1,22 @@
+rules:
+  - id: cwe-200-uninitialized-padding-netlink
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $nlh = (struct nlmsghdr*)skb_put($skb, NLMSG_ALIGN($$size));
+              ...
+              return $nlh;
+          - pattern: |
+              struct nlmsghdr *$nlh;
+              ...
+              $nlh = (struct nlmsghdr*)skb_put($skb, NLMSG_ALIGN($$size));
+              ...
+              return $nlh;
+      - pattern-not: |
+          memset(NLMSG_DATA($nlh) + $$len, 0, NLMSG_ALIGN($$size) - $$size);
+    message: "Uninitialized padding in netlink message may leak kernel memory (CWE-200). Missing memset to clear padding after skb_put."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2005-4881"

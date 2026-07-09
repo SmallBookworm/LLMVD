@@ -1,0 +1,23 @@
+rules:
+  - id: tcpreplay-buffer-overflow-cve-2017-6429
+    message: "Buffer overflow vulnerability due to missing validation of packet capture length against snaplen. This may lead to reading beyond allocated buffer when processing malformed pcap files."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (pcap_fh.snaplen < pcap_patched_ph.caplen) {
+                  caplentoobig = 1;
+              }
+              ...
+              if ((ret = read(fd, &buf, caplen)) != caplen) { ... }
+          - pattern: |
+              if (pcap_fh.snaplen < pcap_ph.caplen) {
+                  caplentoobig = 1;
+              }
+              ...
+              if ((ret = read(fd, &buf, caplen)) != caplen) { ... }
+    metavariable-pattern:
+      metavariable: buf
+      pattern: char buf[...];
+    fix: ""

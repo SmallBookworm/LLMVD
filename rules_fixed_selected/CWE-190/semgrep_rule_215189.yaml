@@ -1,0 +1,7 @@
+rules:
+  - id: jpxstream-negative-length-integer-overflow
+    message: "JPXStream::init does not validate that the 'Length' dictionary value is positive, which may lead to integer overflow (CWE-190)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (oLen.isInt()) bufSize = oLen.getInt();

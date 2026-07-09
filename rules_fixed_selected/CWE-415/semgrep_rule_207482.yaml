@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2021-30500-null-ptr-deref
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (super::canUnpack()) {
+                  return true;
+              }
+              if (Elf32_Ehdr::ET_DYN == get_te16(&ehdri.e_type)) {
+                  ...
+              }
+          - pattern: |
+              if (super::canUnpack()) {
+                  return true;
+              }
+              if (Elf64_Ehdr::ET_DYN == get_te16(&ehdri.e_type)) {
+                  ...
+              }
+    message: "Missing checkEhdr() call before accessing ehdri fields may lead to null pointer dereference (CWE-415, CVE-2021-30500)."
+    severity: ERROR
+    languages: [c]

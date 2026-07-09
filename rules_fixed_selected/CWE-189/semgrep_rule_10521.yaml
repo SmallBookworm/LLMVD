@@ -1,0 +1,14 @@
+rules:
+  - id: postgresql-cve-2014-0064-integer-overflow
+    message: |
+      Integer overflow possible when allocating memory based on user-controlled array size.
+      This can lead to a buffer overflow. Ensure size is checked against MaxAllocSize before allocation.
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      palloc($X * sizeof($T))
+    pattern-not: |
+      if ($X > MaxAllocSize / sizeof($T))
+        ereport(...)
+      ...
+      palloc($X * sizeof($T))

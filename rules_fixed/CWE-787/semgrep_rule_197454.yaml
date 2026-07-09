@@ -1,0 +1,28 @@
+rules:
+  - id: bentoo4-hvcc-avcc-buffer-overread
+    message: "Missing payload size validation before accessing payload data may lead to heap-based buffer over-read (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $CLASS::$CLASS(AP4_UI32 size, const AP4_UI08* payload) :
+              AP4_Atom($TYPE, size)
+          {
+              unsigned int payload_size = size - AP4_ATOM_HEADER_SIZE;
+              m_RawBytes.SetData(payload, payload_size);
+              ...
+          }
+      - pattern: |
+          $CLASS::$CLASS(AP4_UI32 size, const AP4_UI08* payload) :
+              AP4_Atom($TYPE, size)
+          {
+              unsigned int payload_size = size - AP4_ATOM_HEADER_SIZE;
+              ...
+              m_ConfigurationVersion = payload[0];
+              ...
+          }
+    metavariable-regex:
+      - metavariable: $CLASS
+        regex: "AP4_(Hvcc|Avcc)Atom"
+      - metavariable: $TYPE
+        regex: "AP4_ATOM_TYPE_(HVCC|AVCC)"

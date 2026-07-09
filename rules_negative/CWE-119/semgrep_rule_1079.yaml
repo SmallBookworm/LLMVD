@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2013-1772-buffer-overflow
+    message: "Potential buffer overflow in log_prefix usage due to unsafe direct buffer access. This may lead to denial of service (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (msg_level < 0 && ((end - cur_index) > 2)) {
+              cur_index += log_prefix(&LOG_BUF(cur_index), &msg_level, NULL);
+              ...
+          }
+      - pattern: |
+          if (msg_level < 0 && (end - cur_index) > 2) {
+              cur_index += log_prefix(&LOG_BUF(cur_index), &msg_level, NULL);
+              ...
+          }

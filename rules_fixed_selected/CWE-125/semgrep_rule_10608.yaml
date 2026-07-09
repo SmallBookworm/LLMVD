@@ -1,0 +1,38 @@
+rules:
+  - id: cwe-125-out-of-bounds-check-missing
+    message: Missing explicit bounds check for user_sid_size, strings_size, or data_size before use, which may lead to out-of-bounds read (CWE-125).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (user_sid_size != 0)
+          {
+          ...
+          if (libfvalue_value_set_data(..., &(record_data[user_sid_offset]), (size_t) user_sid_size, ...) != 1)
+          ...
+          }
+      - pattern: |
+          if (strings_size != 0)
+          {
+          ...
+          libfvalue_value_type_set_data_strings_array(..., &(record_data[strings_offset]), strings_size, ...);
+          ...
+          }
+      - pattern: |
+          if (data_size != 0)
+          {
+          ...
+          if (libfvalue_value_set_data(..., &(record_data[record_data_offset]), (size_t) data_size, ...) != 1)
+          ...
+          }
+    metavariable-pattern:
+      metavariable: record_data
+      pattern: $DATA
+    pattern-not-inside: |
+      if ($SIZE > ((record_data_size - 4) - $OFFSET))
+      {
+        ...
+        goto on_error;
+      }
+      ...
+      if (libfvalue_value_...(..., &(record_data[$OFFSET]), ...)

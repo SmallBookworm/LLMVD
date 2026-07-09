@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2011-2854-use-after-free
+    message: Potential use-after-free vulnerability due to unsafe pointer assignment without proper ownership or lifetime management.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          $OBJ = $PTR;
+    metavariable-pattern:
+      metavariable: $OBJ
+      pattern-either:
+        - pattern: m_decoder
+    metavariable-pattern:
+      metavariable: $PTR
+      pattern-either:
+        - pattern: decoder

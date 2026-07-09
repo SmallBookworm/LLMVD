@@ -1,0 +1,49 @@
+rules:
+  - id: lighttpd-mod_alias-path-traversal
+    message: Potential path traversal vulnerability in mod_alias when alias does not end with '/' but target path does.
+    severity: HIGH
+    languages: [c]
+    cwe: ["CWE-22"]
+    pattern-either:
+      - pattern: |
+          if (0 == (con->conf.force_lowercase_filenames ?
+                      strncasecmp($URI_PTR, $ALIAS_KEY, $ALIAS_LEN) :
+                      strncmp($URI_PTR, $ALIAS_KEY, $ALIAS_LEN))) {
+            ...
+            buffer_copy_buffer(con->physical.basedir, $ALIAS_VALUE);
+            ...
+          }
+      - pattern: |
+          if (0 == (con->conf.force_lowercase_filenames ?
+                      strncasecmp($URI_PTR, $ALIAS_KEY, $ALIAS_LEN) :
+                      strncmp($URI_PTR, $ALIAS_KEY, $ALIAS_LEN))) {
+            ...
+            buffer_copy_buffer(srv->tmp_buf, $ALIAS_VALUE);
+            ...
+          }
+    metavariable-pattern:
+      $ALIAS_KEY: 
+        pattern: ds->key
+      $ALIAS_VALUE:
+        pattern: ds->value
+      $URI_PTR:
+        pattern: uri_ptr
+      $ALIAS_LEN:
+        pattern: alias_len
+    pattern-not-inside: |
+      if (0 == (con->conf.force_lowercase_filenames ?
+                  strncasecmp($URI_PTR, $ALIAS_KEY, $ALIAS_LEN) :
+                  strncmp($URI_PTR, $ALIAS_KEY, $ALIAS_LEN))) {
+        ...
+        if ($URI_PTR[$ALIAS_LEN] == '.') {
+          ...
+          if (0 != $ALIAS_LEN && $ALIAS_KEY->ptr[$ALIAS_LEN-1] != '/'
+              && 0 != $VLEN && $ALIAS_VALUE->ptr[$VLEN-1] == '/') {
+            con->http_status = 403;
+            return HANDLER_FINISHED;
+          }
+        }
+        ...
+        buffer_copy_buffer(..., $ALIAS_VALUE);
+        ...
+      }

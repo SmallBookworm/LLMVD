@@ -1,0 +1,33 @@
+rules:
+  - id: cve-2021-3472-integer-underflow
+    message: "Integer underflow vulnerability in XChangeFeedbackControl may lead to local privilege escalation (CVE-2021-3472, CWE-191). Missing request size validation before accessing variable-length data."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          len = stuff->length - bytes_to_int32(sizeof($REQ_TYPE));
+          ...
+          case StringFeedbackClass:
+          {
+              $TYPE *f = ($TYPE *) &stuff[1];
+              ...
+              if (len < bytes_to_int32(sizeof($TYPE)))
+                  return BadLength;
+          }
+      - pattern: |
+          len = stuff->length - bytes_to_int32(sizeof($REQ_TYPE));
+          ...
+          case StringFeedbackClass:
+          {
+              $TYPE *f = ($TYPE *) &stuff[1];
+              ...
+              if (len != (bytes_to_int32(sizeof($TYPE)) + f->num_keysyms))
+                  return BadLength;
+          }
+    metavariable-patterns:
+      - metavariable: $REQ_TYPE
+        patterns:
+          - pattern: xChangeFeedbackControlReq
+      - metavariable: $TYPE
+        patterns:
+          - pattern: xStringFeedbackCtl

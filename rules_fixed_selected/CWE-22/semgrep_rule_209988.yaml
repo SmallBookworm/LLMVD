@@ -1,0 +1,62 @@
+rules:
+  - id: abrt-dbus-directory-traversal
+    message: "Missing validation of problem directory path in SetElement, DeleteElement, or FindProblemByElementInTimeRange may lead to directory traversal (CWE-22)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (g_strcmp0(method_name, "SetElement") == 0)
+              {
+                ...
+                g_variant_get(parameters, "(&s&s&s)", &problem_id, &element, &value);
+                ...
+                if (!str_is_correct_filename(element)) { ... }
+                ...
+              }
+          - pattern: |
+              if (g_strcmp0(method_name, "DeleteElement") == 0)
+              {
+                ...
+                g_variant_get(parameters, "(&s&s)", &problem_id, &element);
+                ...
+                if (!str_is_correct_filename(element)) { ... }
+                ...
+              }
+          - pattern: |
+              if (g_strcmp0(method_name, "FindProblemByElementInTimeRange") == 0)
+              {
+                ...
+                g_variant_get_child(parameters, 0, "&s", &element);
+                ...
+                // missing check for valid element name
+                ...
+              }
+    fixes:
+      - pattern-not-inside: |
+          if (g_strcmp0(method_name, "SetElement") == 0)
+          {
+            ...
+            if (!allowed_problem_dir(problem_id)) { ... }
+            ...
+            if (!str_is_correct_filename(element)) { ... }
+            ...
+          }
+      - pattern-not-inside: |
+          if (g_strcmp0(method_name, "DeleteElement") == 0)
+          {
+            ...
+            if (!allowed_problem_dir(problem_id)) { ... }
+            ...
+            if (!str_is_correct_filename(element)) { ... }
+            ...
+          }
+      - pattern-not-inside: |
+          if (g_strcmp0(method_name, "FindProblemByElementInTimeRange") == 0)
+          {
+            ...
+            g_variant_get_child(parameters, 0, "&s", &element);
+            ...
+            if (!str_is_correct_filename(element)) { ... }
+            ...
+          }

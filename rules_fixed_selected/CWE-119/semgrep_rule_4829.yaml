@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2011-2864-out-of-bounds-read
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (glyph_ids == NULL || glyph_count == 0 || glyph_id_processed == NULL) {
+                return false;
+              }
+              ...
+              while (!glyph_id_remaining.empty()) {
+                ...
+              }
+          - pattern: |
+              while (!glyph_id_remaining.empty()) {
+                ...
+              }
+              return true;
+    message: "Missing return statement after processing loop may lead to out-of-bounds read (CVE-2011-2864, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2011-2864"

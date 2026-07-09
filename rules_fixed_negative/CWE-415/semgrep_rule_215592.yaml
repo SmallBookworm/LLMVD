@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2010-3080-double-free
+    message: Double free vulnerability in error handling path. The object 'dp' is freed via 'delete_port' and then explicitly freed again with 'kfree(dp)'.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              delete_port($DP);
+              ...
+              kfree($DP);
+    metadata:
+      cwe: "CWE-415"
+      cve: "CVE-2010-3080"

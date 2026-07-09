@@ -1,0 +1,30 @@
+rules:
+  - id: cve-2015-5070-case-insensitive-pbl-check
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (ends_with($FILENAME, ".pbl")) {
+                ...
+                return false;
+              }
+          - pattern: |
+              if (ends_with($FILENAME, ".PBL")) {
+                ...
+                return false;
+              }
+          - pattern: |
+              if (ends_with($FILENAME, ".Pbl")) {
+                ...
+                return false;
+              }
+          - pattern: |
+              if (ends_with($FILENAME, ".pBL")) {
+                ...
+                return false;
+              }
+    message: "Use of case-sensitive 'ends_with' to block .pbl files is insufficient on case-insensitive filesystems. Use 'looks_like_pbl()' instead."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2015-5070"

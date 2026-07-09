@@ -1,0 +1,9 @@
+rules:
+  - id: uninitialized_backup_handle
+    message: "Uninitialized variable 'backup_handle' may be returned to user space, leading to information disclosure (CWE-200)."
+    severity: HIGH
+    languages: [c]
+    pattern: |
+      uint32_t backup_handle;
+      ...
+      rep->buffer_handle = backup_handle;

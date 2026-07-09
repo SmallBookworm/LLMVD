@@ -1,0 +1,17 @@
+rules:
+  - id: memory-leak-create-resource-pool
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (construct(..., ..., $POOL))
+                  return &$POOL->base;
+              ...
+              return NULL;
+          - pattern: |
+              if (construct(..., ..., $POOL))
+                  return &$POOL->base;
+              BREAK_TO_DEBUGGER();
+              return NULL;
+    message: "Memory leak detected: allocated memory in create_resource_pool is not freed on failure path."
+    severity: ERROR
+    languages: [c]

@@ -1,0 +1,9 @@
+rules:
+  - id: sddm-reuse-session-auth-bypass
+    message: "Authentication bypass when ReuseSession=true due to use of 'sddm-check' PAM service which does not validate passwords."
+    severity: HIGH
+    languages: [c]
+    cwe: ["CWE-284"]
+    pattern: |
+      if (m_app->session()->path().isEmpty())
+          service = QStringLiteral("sddm-check");

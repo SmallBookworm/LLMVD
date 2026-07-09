@@ -1,0 +1,20 @@
+rules:
+  - id: tiffcp-bitspersample-heap-overflow
+    message: "Heap buffer overflow vulnerability in tiffcp when BitsPerSample != 8. Ensure BitsPerSample is checked before processing."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          cf = pickCopyFunc(in, out, bitspersample, samplesperpixel);
+          return (cf ? (*cf)(in, out, length, width, samplesperpixel) : FALSE);
+      - pattern: |
+          pickCopyFunc(..., bitspersample, ...);
+    metavariable-pattern:
+      metavariable: bitspersample
+      patterns:
+        - pattern-not: |
+            if (bitspersample != 8) {
+              ...
+              return FALSE;
+            }
+        - pattern: pickCopyFunc(..., bitspersample, ...)

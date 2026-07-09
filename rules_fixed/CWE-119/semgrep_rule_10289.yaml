@@ -1,0 +1,29 @@
+rules:
+  - id: cve-2009-0397-buffer-overflow
+    message: "Potential heap-based buffer overflow in qtdemux_parse_samples due to missing bounds check on sample index. This could allow remote attackers to execute arbitrary code via a malformed QuickTime file."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (j = 0; j < n; j++) {
+                ...
+                samples[index]...;
+                index++;
+              }
+          - pattern: |
+              for (k = 0; k < count; k++, j++) {
+                ...
+                samples[j]...;
+              }
+    metavariable-regex:
+      metavariable: $n
+      regex: "n|count"
+    pattern-not-inside: |
+      for (...; (... && (index < stream->n_samples)); ...) {
+        ...
+      }
+    pattern-not-inside: |
+      for (...; (... && (j < stream->n_samples)); ...) {
+        ...
+      }

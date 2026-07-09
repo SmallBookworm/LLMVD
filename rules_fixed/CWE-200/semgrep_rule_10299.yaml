@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2012-6113-openssl-encrypt-uninit-var
+    message: "openssl_encrypt may expose uninitialized memory when input data length is zero. This can lead to information disclosure (CWE-200)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern: |
+          PHP_FUNCTION(openssl_encrypt)
+          {
+              ...
+              int i;
+              ...
+              if (data_len > 0) {
+                  EVP_EncryptUpdate(&cipher_ctx, outbuf, &i, (unsigned char *)data, data_len);
+              }
+              outlen = i;
+              ...
+          }
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2012-6113"

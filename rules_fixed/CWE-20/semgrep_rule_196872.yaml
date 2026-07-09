@@ -1,0 +1,22 @@
+rules:
+  - id: winscp-scp-unrequested-file
+    message: "SCP server can send unrequested files, leading to potential arbitrary file overwrite (CVE-2018-20684)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ((Level == 0) && (OnlyFileName != UnixExtractFileName(FileName)))
+          {
+            ...
+          }
+      - pattern: |
+          UnicodeString OnlyFileName = UnixExtractFileName(Line);
+          if (Line != OnlyFileName)
+          {
+            ...
+          }
+    pattern-not-inside: |
+      if ((Level == 0) && (OnlyFileName != UnixExtractFileName(FileName)))
+      {
+        SCPError(...);
+      }

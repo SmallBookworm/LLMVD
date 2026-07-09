@@ -1,0 +1,22 @@
+rules:
+  - id: hermes_builtin_apply_missing_stack_overflow_check
+    message: Missing stack overflow check in hermesBuiltinApply may lead to stack-based buffer overflow (CWE-787).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - patterns:
+        - pattern: ScopedNativeCallFrame newFrame{...};
+        - pattern-inside: |
+            ...
+            for (...; ...; ...) {
+              newFrame->getArgRef(...) = ...;
+            }
+      - patterns:
+        - pattern: ScopedNativeCallFrame newFrame{...};
+        - pattern-inside: |
+            for (...; ...; ...) {
+              newFrame->getArgRef(...) = ...;
+            }
+    pattern-not: |
+      if (LLVM_UNLIKELY(newFrame.overflowed()))
+        return ...->raiseStackOverflow(...);

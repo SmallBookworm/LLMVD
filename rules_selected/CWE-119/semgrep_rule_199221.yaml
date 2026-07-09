@@ -1,0 +1,23 @@
+rules:
+  - id: ghostscript-xps-font-buffer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              memcpy($NAMEP, $SRC, $LENGTH);
+              $NAMEP[$LENGTH] = 0;
+          - pattern: |
+              for (...; ...; ...)
+              {
+                ...
+                $NAMEP[$K] = ...;
+                ...
+              }
+              $NAMEP[$K] = 0;
+    message: "Potential buffer overflow in xps_load_sfnt_name due to unchecked length when writing to namep buffer. Ensure length is bounded by buffer size."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2017-9618"
+      references:
+        - "http://git.ghostscript.com/?p=ghostpdl.git;a=commit;h=3c2aebbedd37fab054e80f2e315de07d7e9b5bdb"

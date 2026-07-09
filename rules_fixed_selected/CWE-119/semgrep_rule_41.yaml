@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2019-15938-buffer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              len = ntoh32(net_read_uint32(...));
+              ...
+              *target = xzalloc(len + 1);
+          - pattern: |
+              len = ntoh32(net_read_uint32(...));
+              p++;
+              *target = xzalloc(len + 1);
+    message: "Unbounded length value used in allocation may lead to buffer overflow (CVE-2019-15938, CWE-119)."
+    severity: ERROR
+    languages: [c]

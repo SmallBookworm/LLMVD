@@ -1,0 +1,18 @@
+rules:
+  - id: cwe-416-uninitialized-ranalop-esil-free
+    message: "Use of uninitialized RAnalOp structure may lead to invalid free (CWE-416)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              RAnalOp $X;
+              ...
+              r_strbuf_fini(&$X.esil);
+          - pattern: |
+              RAnalOp $X = {...};
+              ...
+              r_strbuf_fini(&$X.esil);
+    metadata:
+      cwe: ["CWE-416"]
+      cve: "CVE-2018-11383"

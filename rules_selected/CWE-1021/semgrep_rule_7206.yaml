@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2017-5016-validation-message-visibility-check
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!page)
+                return;
+          - pattern: |
+              if (!page || ...)
+                return;
+    pattern-not: |
+      if (!page || !page->isPageVisible())
+        return;
+    message: "Missing visibility check before showing validation message. This may allow UI elements to be displayed by non-visible pages (CVE-2017-5016, CWE-1021)."
+    severity: WARNING
+    languages: [c]

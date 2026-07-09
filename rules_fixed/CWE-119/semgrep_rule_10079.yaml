@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2019-5824-parameter-order
+    message: "Incorrect parameter order in OpenDevice call may lead to heap corruption (CVE-2019-5824)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          media_stream_manager_->OpenDevice(
+            $render_process_id_, $render_frame_id_, $page_request_id, $requester_id_,
+            $device_id, $type, std::move($salt_and_origin), std::move($callback),
+            base::BindRepeating(...)
+          );
+      - pattern: |
+          media_stream_manager->OpenDevice(
+            $render_process_id_, $render_frame_id_, $page_request_id, $requester_id_,
+            $device_id, $type, std::move($salt_and_origin), std::move($callback),
+            base::BindRepeating(...)
+          );
+    metavariable-regex:
+      - metavariable: $page_request_id
+        regex: 'page_request_id'
+      - metavariable: $requester_id_
+        regex: 'requester_id_'

@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2015-0206-dtls1-buffer-record-memory-leak
+    message: Memory leak in dtls1_buffer_record due to missing cleanup of rdata->rbuf.buf on ssl3_setup_buffers or pqueue_insert failure. This can lead to denial of service via memory exhaustion (CVE-2015-0206).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!ssl3_setup_buffers($S))
+          {
+            ...
+            OPENSSL_free($RDATA);
+            ...
+            return(0);
+          }
+      - pattern: |
+          if (pqueue_insert($QUEUE, $ITEM) == NULL)
+          {
+            ...
+            OPENSSL_free($RDATA);
+            ...
+            return(0);
+          }
+    metavariable-pattern:
+      $RDATA: "rdata"

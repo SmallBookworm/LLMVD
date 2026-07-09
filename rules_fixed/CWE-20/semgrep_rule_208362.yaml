@@ -1,0 +1,26 @@
+rules:
+  - id: cve-2016-3739-polarssl-hostname-check-bypass
+    message: "Missing unconditional call to ssl_set_hostname() may allow server spoofing via arbitrary valid certificate (CVE-2016-3739)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!Curl_inet_pton(AF_INET, $HOST, ...) &&
+                  #ifdef ENABLE_IPV6
+                  !Curl_inet_pton(AF_INET6, $HOST, ...) &&
+                  #endif
+                  $SNI && ssl_set_hostname($SSL, $HOST)) {
+                ...
+              }
+          - pattern: |
+              if (Curl_inet_pton(AF_INET, $HOST, ...) ||
+                  #ifdef ENABLE_IPV6
+                  Curl_inet_pton(AF_INET6, $HOST, ...) ||
+                  #endif
+                  !$SNI || ssl_set_hostname($SSL, $HOST)) {
+                ...
+              }
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2016-3739"

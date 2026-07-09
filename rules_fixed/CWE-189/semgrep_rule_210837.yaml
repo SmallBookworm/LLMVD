@@ -1,0 +1,22 @@
+rules:
+  - id: memcached-signedness-rlbytes
+    message: "Signedness error in rlbytes handling may lead to integer underflow and crash (CVE-2011-4971)"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (c->rlbytes == 0) {
+                ...
+              }
+              ...
+              read(..., c->ritem, c->rlbytes)
+          - pattern: |
+              if (c->rlbytes == 0) {
+                ...
+              }
+              ...
+              res = read(..., c->ritem, c->rlbytes)
+    metavariable-regex:
+      - metavariable: c
+        regex: "c"

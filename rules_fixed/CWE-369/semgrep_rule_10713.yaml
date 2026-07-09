@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2016-8669-divide-by-zero-serial
+    message: "Possible divide-by-zero vulnerability in serial_update_parameters when divider > baudbase. Check for 's->divider > s->baudbase' before division."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      $BAUDBASE / $DIVIDER
+    pattern-not: |
+      if ($COND || $DIVIDER > $BAUDBASE) { ... }
+    metavariable-patterns:
+      - metavariable: $BAUDBASE
+        patterns:
+          - pattern: s->baudbase
+      - metavariable: $DIVIDER
+        patterns:
+          - pattern: s->divider
+    fix-regex:
+      enabled: false

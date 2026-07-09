@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2017-13033-vtp-tlv-buffer-overread
+    message: "Potential buffer over-read in VTP TLV parsing due to insufficient bounds checking before accessing tlv_len*2+2 bytes."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (type == 0 || tlv_len == 0) {
+                  return;
+              }
+              ND_TCHECK2(*tptr, tlv_len * 2 + 2);
+          - pattern: |
+              if (type == 0 || tlv_len == 0) {
+                  ...
+                  return;
+              }
+              ...
+              ND_TCHECK2(*tptr, tlv_len * 2 + 2);
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2017-13033"

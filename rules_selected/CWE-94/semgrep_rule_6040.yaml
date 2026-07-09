@@ -1,0 +1,22 @@
+rules:
+  - id: cwe-94-type-confusion-webkit
+    message: Potential type confusion vulnerability due to mismatched feature enablement function and flag.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          RuntimeEnabledFeatures::setSpeechSynthesisEnabled(...)
+      - pattern: |
+          RuntimeEnabledFeatures::setFileSystemEnabled(...)
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern-not: |
+        void WebRuntimeFeatures::enableSpeechSynthesis(bool enable)
+        {
+            RuntimeEnabledFeatures::setSpeechSynthesisEnabled(enable);
+        }
+    pattern-not-inside: |
+      void WebRuntimeFeatures::enableFileSystem(bool enable)
+      {
+          RuntimeEnabledFeatures::setFileSystemEnabled(enable);
+      }

@@ -1,0 +1,20 @@
+rules:
+  - id: ndpi-heap-buffer-overread-cve-2020-15471
+    message: Heap-based buffer over-read vulnerability in ndpi_parse_packet_line_info due to unsafe use of ndpi_min with potentially negative diff.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              diff = ndpi_min($BUF_LEN - $OFFSET, $SIZEOF);
+          - pattern: |
+              diff = ndpi_min($EXPR, $SIZEOF);
+    metavariable-pattern:
+      metavariable: $EXPR
+      pattern-either:
+        - pattern: $BUF_LEN - $OFFSET
+    focus-metavariable: $EXPR
+    fix-regex:
+      regex: 'ndpi_min\(\$BUF_LEN - \$OFFSET, \$SIZEOF\)'
+      replacement: 'ndpi_min((int)($BUF_LEN - $OFFSET), $SIZEOF)'
+      enabled: true

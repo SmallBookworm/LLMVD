@@ -1,0 +1,10 @@
+rules:
+  - id: zlib-inftrees-pointer-arithmetic-cve-2016-9840
+    message: "Pointer arithmetic that decrements a pointer before its allocated memory may lead to undefined behavior (CWE-189)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          base -= 257;
+      - pattern: |
+          extra -= 257;

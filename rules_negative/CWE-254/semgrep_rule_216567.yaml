@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2016-2047-hostname-validation
+    message: "Improper hostname validation in SSL certificate verification. Parsing certificate subject using string search (e.g., strstr for '/CN=') is vulnerable to spoofing via multiple CN fields."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              strstr(..., "/CN=")
+          - pattern: |
+              X509_NAME_oneline(...)
+    metadata:
+      cwe: "CWE-254"
+      cve: "CVE-2016-2047"

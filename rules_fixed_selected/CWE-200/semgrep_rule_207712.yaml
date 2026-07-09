@@ -1,0 +1,27 @@
+rules:
+  - id: cve-2015-5069-pbl-file-inclusion
+    message: "Potential information disclosure via inclusion of .pbl files from WML. Ensure is_legal_file() is used to validate filenames."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          if (!is_legal_file(...))
+            return ...;
+      - pattern-either:
+          - pattern: |
+              std::string get_wml_location(...) {
+                  ...
+                  if (filename.find("..") != std::string::npos) {
+                      ...
+                      return ...;
+                  }
+                  ...
+              }
+          - pattern: |
+              bool is_legal_file(...) {
+                  ...
+                  return ...;
+              }
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2015-5069"

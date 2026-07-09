@@ -1,0 +1,46 @@
+rules:
+  - id: cve-2019-6128-memory-leak
+    message: "Memory leak due to missing TIFFClose() on error paths. This may lead to resource exhaustion (CWE-401)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (... || ...) {
+                ...
+                return (...);
+              }
+          - pattern: |
+              if (!TIFFGetField(...)) {
+                ...
+                return (...);
+              }
+          - pattern: |
+              if (out == NULL)
+                return (...);
+      - metavariable-regex:
+          metavariable: $FUNC
+          regex: main
+      - pattern-not-inside: |
+          $FUNC(...) {
+            ...
+            if (...) {
+              ...
+              (void) TIFFClose(in);
+              ...
+              return (...);
+            }
+            ...
+          }
+      - pattern-inside: |
+          $FUNC(...) {
+            ...
+            in = TIFFOpen(...);
+            ...
+            if (... || ...) {
+              ...
+              return (...);
+            }
+            ...
+          }
+    fix: ""

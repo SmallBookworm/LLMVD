@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2014-2739-cma-req-handler-roce-dereference
+    message: "Potential incorrect pointer dereference in cma_req_handler when handling RoCE addresses. This may lead to denial of service via crafted network traffic."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (is_iboe) {
+                  if (ib_event->param.req_rcvd.primary_path != NULL)
+                      rdma_addr_find_smac_by_sgid(...);
+                  ...
+              }
+          - pattern: |
+              if (is_iboe)
+                  ib_update_cm_av(...);
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2014-2739"

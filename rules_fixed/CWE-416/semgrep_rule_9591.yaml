@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2017-18202-oom-reaper-tlb-gather
+    message: "Use of tlb_gather_mmu with full address space (0, -1) in __oom_reap_task_mm may cause TLB entry leaks or use-after-free on certain architectures (e.g., arm64). Each VMA should be gathered individually."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              tlb_gather_mmu(&$tlb, $mm, 0, -1);
+          - pattern: |
+              tlb_gather_mmu(&$tlb, $mm, 0UL, -1UL);
+          - pattern: |
+              tlb_gather_mmu(&$tlb, $mm, 0, ~0UL);
+          - pattern: |
+              tlb_gather_mmu(&$tlb, $mm, 0UL, ~0UL);
+    metavariable-regex:
+      metavariable: $tlb
+      regex: "tlb"

@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2020-10663-json-create-additions-default
+    patterns:
+      - pattern: |
+          if (!NIL_P(opts)) {
+              ...
+          } else {
+              ...
+              json->create_additions = 1;
+              ...
+          }
+    message: "Unsafe default value for 'create_additions' may lead to unsafe object creation (CVE-2020-10663)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2020-10663"

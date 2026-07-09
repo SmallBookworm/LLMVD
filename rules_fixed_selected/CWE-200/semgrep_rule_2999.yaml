@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2017-5550-pipe-advance-off-by-one
+    message: "Off-by-one error in pipe_advance() may lead to information disclosure from uninitialized heap memory (CVE-2017-5550, CWE-200)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (pipe->nrbufs) {
+            int unused = (pipe->curbuf + pipe->nrbufs) & (pipe->buffers - 1);
+            while (idx != unused) {
+              pipe_buf_release(pipe, &pipe->bufs[idx]);
+              idx = next_idx(idx, pipe);
+              pipe->nrbufs--;
+            }
+          }
+      - pattern: |
+          while (idx != unused) {
+            pipe_buf_release(pipe, &pipe->bufs[idx]);
+            idx = next_idx(idx, pipe);
+            pipe->nrbufs--;
+          }
+    metadata:
+      cwe: ["CWE-200"]
+      cve: "CVE-2017-5550"

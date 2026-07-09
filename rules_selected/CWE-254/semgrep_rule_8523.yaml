@@ -1,0 +1,18 @@
+rules:
+  - id: uninitialized_queuebufferoutput
+    message: "QueueBufferOutput structure is not initialized before use, potentially leaking sensitive information (CVE-2016-0829)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          QueueBufferOutput* const $OUTPUT = reinterpret_cast<QueueBufferOutput *>(...);
+          ...
+          queueBuffer(..., $OUTPUT);
+      - pattern: |
+          QueueBufferOutput* const $OUTPUT = reinterpret_cast<QueueBufferOutput *>(...);
+          ...
+          connect(..., $OUTPUT);
+    metavariable-pattern:
+      $OUTPUT:
+        pattern-not: |
+          memset($OUTPUT, ..., sizeof(QueueBufferOutput));

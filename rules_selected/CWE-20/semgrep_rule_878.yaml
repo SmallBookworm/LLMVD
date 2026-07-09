@@ -1,0 +1,20 @@
+rules:
+  - id: bnep_sock_ioctl_missing_null_termination
+    message: "Missing null termination of 'device' field in bnep_connadd_req may lead to buffer overread or information leak (CVE-2011-1079)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (copy_from_user(&ca, ..., sizeof(ca)))
+            ...
+          ...
+          bnep_add_connection(&ca, ...);
+      - pattern: |
+          copy_from_user(&ca, ..., sizeof(ca));
+          ...
+          bnep_add_connection(&ca, ...);
+    metavariable-pattern:
+      metavariable: ca
+      pattern: struct bnep_connadd_req
+    pattern-not: |
+      ca.device[sizeof(ca.device)-1] = 0;

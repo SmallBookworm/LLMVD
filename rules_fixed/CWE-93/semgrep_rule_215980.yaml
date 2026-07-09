@@ -1,0 +1,20 @@
+rules:
+  - id: crlf_injection_wget_host
+    message: "CRLF injection vulnerability in host part of URL. Control characters in host name can lead to HTTP header injection."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      url_unescape (u->host);
+      ...
+      for (...; *p; ...)
+        {
+          if (c_iscntrl(*p))
+            {
+              ...
+              goto error;
+            }
+        }
+    pattern-not: []
+    metadata:
+      cwe: "CWE-93"
+      cve: "CVE-2017-6508"

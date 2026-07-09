@@ -1,0 +1,10 @@
+rules:
+  - id: cwe-125-dwarf-string-pointer-validation
+    message: "Missing validation of string pointer before use may lead to out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if ($ATTR_VALUE.name == DW_AT_comp_dir) {
+        const char *$NAME = $ATTR_VALUE.encoding.str_struct.string;
+        sdb_set($SDB, "DW_AT_comp_dir", $NAME, 0);
+      }

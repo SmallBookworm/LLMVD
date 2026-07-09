@@ -1,0 +1,7 @@
+rules:
+  - id: cve-2015-5330-ldb-dn-explode-string-copy
+    message: "Use of talloc_strdup() instead of talloc_memdup() may lead to reading beyond string terminator and leaking heap memory (CVE-2015-5330, CWE-200)."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      dn->components[...].value.data = (uint8_t *)talloc_strdup(...)

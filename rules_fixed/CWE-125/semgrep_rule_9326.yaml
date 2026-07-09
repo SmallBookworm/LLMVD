@@ -1,0 +1,40 @@
+rules:
+  - id: sctp_sf_ootb_missing_chunk_length_check
+    message: "Missing chunk length validation before processing the first SCTP chunk, leading to potential out-of-bounds access (CVE-2016-9555, CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          do {
+            if (ntohs($CH->length) < sizeof(sctp_chunkhdr_t))
+              return ...;
+            ...
+            if (SCTP_CID_... == $CH->type)
+              ...;
+            ...
+            $CH_END = ((__u8 *)$CH) + SCTP_PAD4(ntohs($CH->length));
+            if ($CH_END > skb_tail_pointer($SKB))
+              return ...;
+            $CH = (sctp_chunkhdr_t *) $CH_END;
+          } while (...);
+      - pattern: |
+          do {
+            if (ntohs($CH->length) < sizeof(sctp_chunkhdr_t))
+              return ...;
+            ...
+            if (SCTP_CID_... == $CH->type)
+              ...;
+            ...
+            if (SCTP_CID_... == $CH->type) {
+              ...
+            }
+            ...
+            $CH_END = ((__u8 *)$CH) + SCTP_PAD4(ntohs($CH->length));
+            if ($CH_END > skb_tail_pointer($SKB))
+              return ...;
+            $CH = (sctp_chunkhdr_t *) $CH_END;
+          } while (...);
+    metavariable-pattern:
+      $CH: "sctp_chunkhdr_t *"
+      $CH_END: "__u8 *"
+      $SKB: "struct sk_buff *"

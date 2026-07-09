@@ -1,0 +1,24 @@
+rules:
+  - id: freetype-stream-enterframe-integer-overflow
+    message: "Potential integer overflow in stream position validation leading to buffer overread (CVE-2010-2805)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ( $POS >= $SIZE ||
+               $POS + $COUNT > $SIZE )
+          { ... }
+      - pattern: |
+          if ( $POS >= $SIZE ||
+               $COUNT > $SIZE - $POS )
+          { ... }
+    metavariable-patterns:
+      - metavariable: $POS
+        pattern: stream->pos
+      - metavariable: $SIZE
+        pattern: stream->size
+      - metavariable: $COUNT
+        pattern: count
+    fix-regex:
+      regex: 'stream->pos \\+ count > stream->size'
+      replacement: 'stream->size - stream->pos < count'

@@ -1,0 +1,35 @@
+rules:
+  - id: cve-2020-26269-out-of-bounds-access
+    message: "Potential out-of-bounds array access in GetMatchingPaths due to missing validation of dir_index before accessing dirs[dir_index]."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              dirs[dir_index]
+          - pattern: |
+              dirs.at(dir_index)
+        where:
+          - metavariable: dir_index
+            pattern: dir_index
+          - metavariable: dirs
+            pattern: dirs
+        focus-metavariable: dir_index
+      - pattern-not-inside: |
+          if (dir_index < dirs.size()) {
+            ...
+            dirs[dir_index]
+            ...
+          }
+      - pattern-not-inside: |
+          if (dir_index >= 0 && dir_index < dirs.size()) {
+            ...
+            dirs[dir_index]
+            ...
+          }
+      - pattern-not-inside: |
+          if (static_cast<size_t>(dir_index) < dirs.size()) {
+            ...
+            dirs[dir_index]
+            ...
+          }

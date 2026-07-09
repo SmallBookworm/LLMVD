@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2015-6783-improper-eocd-search
+    message: "Improper search for EOCD record in ZIP file parsing may allow signature bypass. The loop should start from `stat_buf.st_size - kEndOfCentralDirectoryRecordSize`, not `stat_buf.st_size - sizeof(kEndOfCentralDirectoryMarker)`."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          for ($OFF = $STAT.st_size - sizeof($MARKER); $OFF >= 0; --$OFF) {
+            ...
+          }
+      - pattern: |
+          int $OFF;
+          for ($OFF = $STAT.st_size - sizeof($MARKER); $OFF >= 0; --$OFF) {
+            ...
+          }
+    metavariable-pattern:
+      metavariable: $MARKER
+      pattern: kEndOfCentralDirectoryMarker

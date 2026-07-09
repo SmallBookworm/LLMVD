@@ -1,0 +1,25 @@
+rules:
+  - id: cve-2018-16541-use-after-free-pagedevice
+    message: "Potential use-after-free vulnerability in pagedevice handling due to missing null device check before rc_decrement."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (i_ctx_p->pgs != NULL && i_ctx_p->pgs->device != NULL) {
+                  ...
+                  rc_decrement(i_ctx_p->pgs->device, ...);
+                  ...
+              }
+          - pattern: |
+              if (i_ctx_p->pgs != NULL && i_ctx_p->pgs->device != NULL) {
+                  gx_device *pdev = i_ctx_p->pgs->device;
+                  ...
+                  rc_decrement(pdev, ...);
+                  ...
+              }
+    metavariable-pattern:
+      metavariable: i_ctx_p
+      pattern: $X
+    fixes:
+      - regex: .*

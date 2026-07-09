@@ -1,0 +1,16 @@
+rules:
+  - id: adts_frame_size_underflow
+    message: "Potential heap overflow due to unchecked frame_size < hdr_size leading to negative size in memcpy"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          if (ctx->hdr.frame_size < ctx->hdr.hdr_size) {
+              ...
+          }
+      - pattern-not: |
+          if (ctx->hdr.frame_size < ctx->hdr.hdr_size) {
+              GF_LOG(...);
+              ctx->nb_frames = 0;
+              goto drop_byte;
+          }

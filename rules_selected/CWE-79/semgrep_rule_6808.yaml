@@ -1,0 +1,17 @@
+rules:
+  - id: chromium-bookmark-url-uxss
+    message: "Insufficient validation in bookmark URL formatting may lead to UXSS via javascript: scheme injection (CVE-2016-5191)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              url_formatter::FormatUrl(
+                $URL,
+                url_formatter::kFormatUrlOmitAll &
+                ~url_formatter::kFormatUrlOmitUsernamePassword,
+                ...
+              )
+    metadata:
+      cwe: ["CWE-79"]
+      cve: "CVE-2016-5191"

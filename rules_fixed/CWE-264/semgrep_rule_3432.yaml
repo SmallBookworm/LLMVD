@@ -1,0 +1,18 @@
+rules:
+  - id: ecryptfs_missing_stack_depth_check
+    message: "Missing filesystem stacking depth check in eCryptfs mount function. This may allow privilege escalation via deep filesystem stacking (CVE-2014-9922)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          s->s_magic = ECRYPTFS_SUPER_MAGIC;
+          ...
+          inode = ecryptfs_get_inode(...);
+      - pattern: |
+          s->s_magic = ECRYPTFS_SUPER_MAGIC;
+          ...
+          if (IS_ERR(inode))
+    fix-regex:
+      regex: ""
+      replacement: ""
+      count: 1

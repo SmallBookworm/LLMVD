@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2018-1046-buffer-overflow
+    message: Buffer overflow vulnerability in dnsreplay when using -ecs-stamp option. Missing bounds check may lead to out-of-bounds write.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (packetSize - *len > $SIZE) {
+                ...
+                memcpy($BUF + *len, ..., $SIZE);
+                ...
+              }
+          - pattern: |
+              if (packetSize - *$LEN > $SIZE) {
+                ...
+                memcpy($BUF + *$LEN, ..., $SIZE);
+                ...
+              }
+    metavariable-regex:
+      metavariable: $SIZE
+      regex: EDNSRR\.size\(\)
+    # fix-regex is removed because 'pass' is not a valid object and causes schema error

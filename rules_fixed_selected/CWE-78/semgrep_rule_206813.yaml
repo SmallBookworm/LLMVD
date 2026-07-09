@@ -1,0 +1,11 @@
+rules:
+  - id: cwe-78-os-command-injection-podcast-filename
+    patterns:
+      - pattern: |
+          fn.append($BASE);
+    message: "Unsanitized filename used in path construction may lead to OS command injection (CWE-78). Filenames containing shell metacharacters (e.g., single quotes) are not neutralized."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-78"
+      cve: "CVE-2017-14500"

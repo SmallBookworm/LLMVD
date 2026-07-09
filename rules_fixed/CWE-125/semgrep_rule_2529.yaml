@@ -1,0 +1,32 @@
+rules:
+  - id: cve-2017-13042-hncp-dhcpv6-buffer-overread
+    message: "Missing bounds check before accessing DHCPv6 TLV data may lead to buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while (... < $LENGTH) {
+                  ...
+                  $TLV = $CP + $I;
+                  $TYPE = EXTRACT_16BITS($TLV);
+                  $OPTLEN = EXTRACT_16BITS($TLV + 2);
+                  $VALUE = $TLV + 4;
+                  ...
+                  switch ($TYPE) { ... }
+                  ...
+              }
+          - pattern-not: |
+              while (... < $LENGTH) {
+                  ...
+                  if ($I + 4 > $LENGTH) return ...;
+                  ...
+                  if ($I + 4 + $OPTLEN > $LENGTH) return ...;
+                  ...
+              }
+    metavariable-pattern:
+      metavariable: $LENGTH
+      pattern: $LENGTH
+    fix-regex:
+      regex: ""
+      replacement: ""

@@ -1,0 +1,19 @@
+rules:
+  - id: komeda_wb_connector_memory_leak
+    message: "Memory leak in komeda_wb_connector_add: allocated kwb_conn is not freed on drm_writeback_connector_init failure."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $KWB_CONN = kzalloc(...);
+          ...
+          $ERR = drm_writeback_connector_init(...);
+          ...
+          if ($ERR) {
+            return $ERR;
+          }
+    metadata:
+      cwe: ["CWE-401"]
+      references:
+        - https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=a0ecd6fdbf5d648123a7315c695fb6850d702835
+        - https://nvd.nist.gov/vuln/detail/CVE-2019-18810

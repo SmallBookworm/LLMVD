@@ -1,0 +1,22 @@
+rules:
+  - id: cwe-22-directory-traversal-accountsservice
+    message: "Potential directory traversal vulnerability due to missing path canonicalization before prefix check."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $file = g_file_new_for_path ($filename);
+              ...
+              $info = g_file_query_info ($file, ...);
+          - pattern: |
+              g_file_new_for_path ($filename);
+              ...
+              g_file_query_info (...);
+    metavariable-pattern:
+      metavariable: $filename
+      pattern-not: |
+        g_file_get_path(...)
+    fix-regex:
+      regex: ""
+      replacement: ""

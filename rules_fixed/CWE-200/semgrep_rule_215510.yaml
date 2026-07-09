@@ -1,0 +1,45 @@
+rules:
+  - id: cwe-200-uninitialized-padding
+    message: "Uninitialized padding field in netlink message structure may leak kernel memory"
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - patterns:
+        - pattern: |
+            struct ifinfomsg *$R;
+        - pattern: |
+            $R->ifi_family = ...;
+        - pattern: |
+            $R->ifi_type = ...;
+        - pattern-not: |
+            $R->__ifi_pad = 0;
+      - patterns:
+        - pattern: |
+            struct ifinfomsg *$R;
+        - pattern: |
+            $R->ifi_family = ...;
+        - pattern: |
+            $R->ifi_index = ...;
+        - pattern-not: |
+            $R->__ifi_pad = 0;
+      - patterns:
+        - pattern: |
+            struct ifinfomsg *$R;
+        - pattern: |
+            $R->ifi_family = ...;
+        - pattern: |
+            $R->ifi_flags = ...;
+        - pattern-not: |
+            $R->__ifi_pad = 0;
+      - patterns:
+        - pattern: |
+            struct ifinfomsg *$R;
+        - pattern: |
+            $R->ifi_family = ...;
+        - pattern: |
+            $R->ifi_change = ...;
+        - pattern-not: |
+            $R->__ifi_pad = 0;
+    metavariable-regex:
+      metavariable: $R
+      regex: r

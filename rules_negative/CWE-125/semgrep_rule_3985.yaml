@@ -1,0 +1,16 @@
+rules:
+  - id: imagemagick-compleximages-buffer-overread
+    message: "Heap-based buffer over-read in ComplexImages due to unchecked pixel channel access. Use 'number_channels' to bound loop iterations."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (i=0; i < (ssize_t) GetPixelChannels($IMAGE); i++)
+                { ... }
+          - pattern: |
+              for (i = 0; i < (ssize_t)GetPixelChannels($IMAGE); i++)
+                { ... }
+    metavariable-regex:
+      metavariable: $IMAGE
+      regex: "(Ar_image|Ai_image|Br_image|Bi_image|Cr_image|Ci_image)"

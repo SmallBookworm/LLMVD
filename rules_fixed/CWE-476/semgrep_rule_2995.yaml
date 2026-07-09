@@ -1,0 +1,15 @@
+rules:
+  - id: null_pointer_dereference_file_transfer
+    message: "Potential NULL pointer dereference after imcb_file_send_start. Missing NULL check before accessing px->ft fields."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: $PX->ft = imcb_file_send_start(...);
+              - pattern: $PX->ft->$FIELD = ...;
+    metadata:
+      cwe: ["CWE-476"]
+      references:
+        - https://github.com/bitlbee/bitlbee/commit/30d598ce7cd3f136ee9d7097f39fa9818a272441
+        - CVE-2017-5668

@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2018-6063-mojo-wrap-shared-memory-handle
+    message: "Use of boolean 'read_only' parameter in WrapSharedMemoryHandle may lead to out-of-bounds write (CWE-787)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (read_only)
+            flags |= MOJO_PLATFORM_SHARED_BUFFER_HANDLE_FLAG_READ_ONLY;
+      - pattern: |
+          MojoWrapPlatformSharedBufferHandle(..., size, ..., flags, ...);
+    metavariable-pattern:
+      metavariable: $flags
+      pattern: "flags"
+    focus-metavariable: $flags

@@ -1,0 +1,11 @@
+rules:
+  - id: espruino-void-stack-overflow
+    message: "Missing stack overflow check before handling LEX_R_VOID token may lead to denial of service (CVE-2018-11594)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      else if (lex->tk == LEX_R_VOID) {
+        JSP_ASSERT_MATCH(LEX_R_VOID);
+        jsvUnLock(jspeUnaryExpression());
+        return 0;
+      }

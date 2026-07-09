@@ -1,0 +1,25 @@
+rules:
+  - id: systemd-use-after-free-dns-stream
+    message: "Use-after-free vulnerability in DnsStream due to missing reference counting before calling callbacks. Add dns_stream_ref() to pin the stream."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          static int on_stream_io(..., void *userdata) {
+              DnsStream *s = userdata;
+              ...
+              if (s->on_packet) {
+                  $FUNC(s);
+              }
+              ...
+          }
+      - pattern: |
+          static int on_stream_io(..., void *userdata) {
+              DnsStream *s = userdata;
+              ...
+              return dns_stream_complete(s, ...);
+              ...
+          }
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: ".*"

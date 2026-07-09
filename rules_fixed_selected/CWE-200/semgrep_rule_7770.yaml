@@ -1,0 +1,13 @@
+rules:
+  - id: cwe-200-chrome-extended-attributes
+    message: "Extended file attributes are set unconditionally, potentially leaking download URLs on Chrome OS (CVE-2018-20073)."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      setxattr($PATH, $NAME, $VALUE, $VALUE_SIZE, $FLAGS)
+    pattern-not-inside: |
+      #if !defined(OS_CHROMEOS)
+        ...
+        setxattr($PATH, $NAME, $VALUE, $VALUE_SIZE, $FLAGS)
+        ...
+      #endif

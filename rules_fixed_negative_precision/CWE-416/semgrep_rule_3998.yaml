@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2019-13224-use-after-free-onig-new-deluxe
+    message: "Use-after-free vulnerability in onig_new_deluxe() due to unsafe encoding conversion. Different pattern and target encodings can lead to a use-after-free condition (CVE-2019-13224)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (ci->pattern_enc != ci->target_enc) {
+                ... conv_encoding(...);
+                ...
+              }
+    metadata:
+      cwe: ["CWE-416"]
+      cve: "CVE-2019-13224"

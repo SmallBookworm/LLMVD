@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2016-1657-fontconfig-file-write
+    message: "Unsafe temporary file usage in fontconfig setup may lead to symlink attacks or file overwrites (CVE-2016-1657)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              CHECK(WriteFile(..., ..., ...));
+              ...
+              CHECK(ReplaceFile(..., ..., nullptr));
+          - pattern: |
+              CHECK(CreateTemporaryFileInDir(..., ...));
+              ...
+              CHECK(WriteFile(..., ..., ...));
+    metadata:
+      cwe: ["CWE-254"]
+      cve: "CVE-2016-1657"

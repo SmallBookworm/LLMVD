@@ -1,0 +1,14 @@
+rules:
+  - id: memory-leak-sof-dfsentry-write
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (strcmp($DENTRY->d_name.name, "ipc_flood_count") &&
+                  strcmp($DENTRY->d_name.name, "ipc_flood_duration_ms"))
+                  return -EINVAL;
+    message: "Memory leak detected: function returns directly without freeing 'string' allocation. Use 'goto out;' instead to ensure kfree(string) is called."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-401"
+      cve: "CVE-2019-18812"

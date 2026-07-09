@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2012-6549-uninitialized-struct-member
+    message: "Uninitialized struct member 'parent_offset' (fh16[3]) may leak kernel heap memory"
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          fh16[2] = ...;
+          fh32[2] = ...;
+          if (parent) { ... }
+      - pattern: |
+          fh16[2] = ...;
+          fh32[2] = ...;
+          if (...) { ... }
+    pattern-not: |
+      fh16[2] = ...;
+      fh16[3] = 0;
+      fh32[2] = ...;
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: isofs_export_encode_fh

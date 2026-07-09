@@ -1,0 +1,14 @@
+rules:
+  - id: fsl_hypervisor_ioctl_integer_overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              num_pages = (param.count + lb_offset + PAGE_SIZE - 1) >> PAGE_SHIFT;
+          - pattern: |
+              num_pages = (param.count + ... ) >> PAGE_SHIFT;
+    message: "Potential integer overflow in page count calculation due to missing validation of param.count. This can lead to buffer overflows or memory corruption (CWE-190)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-190"
+      cve: "CVE-2019-10142"

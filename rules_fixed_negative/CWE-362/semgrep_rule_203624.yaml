@@ -1,0 +1,20 @@
+rules:
+  - id: cwe-362-arc-emac-tx-race-condition
+    message: "Race condition in arc_emac_tx may cause use-after-free due to incorrect ordering of skb assignment and descriptor info update."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              priv->tx_buff[$TXBD_CURR].skb = $SKB;
+              ...
+              $INFO = cpu_to_le32(FOR_EMAC | ...);
+          - pattern: |
+              $INFO = cpu_to_le32(FOR_EMAC | ...);
+              ...
+              priv->tx_buff[$TXBD_CURR].skb = $SKB;
+              ...
+              $INFO = cpu_to_le32(FOR_EMAC | ...);
+    metavariable-regex:
+      metavariable: $INFO
+      regex: ".*info"

@@ -1,0 +1,35 @@
+rules:
+  - id: cve-2013-2058-missing-disable-streaming
+    message: "Missing check for CI13XXX_DISABLE_STREAMING flag in host mode may lead to denial of service (CVE-2013-2058)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (ci->platdata->flags & CI13XXX_DISABLE_STREAMING)
+                hw_write(...);
+          - pattern: |
+              if (ci->platdata->flags & CI13XXX_DISABLE_STREAMING)
+                ...
+      - metavariable-pattern:
+          metavariable: $FUNC
+          patterns:
+            - pattern: |
+                static int host_start(struct ci13xxx *ci)
+                {
+                  ...
+                  if (ret)
+                    usb_put_hcd(hcd);
+                  else
+                    ci->hcd = hcd;
+                  return ret;
+                }
+      - pattern-not-inside: |
+          static int host_start(struct ci13xxx *ci)
+          {
+            ...
+            if (ci->platdata->flags & CI13XXX_DISABLE_STREAMING)
+              hw_write(ci, OP_USBMODE, USBMODE_CI_SDIS, USBMODE_CI_SDIS);
+            ...
+            return ret;
+          }

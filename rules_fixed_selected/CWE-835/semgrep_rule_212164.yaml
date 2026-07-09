@@ -1,0 +1,16 @@
+rules:
+  - id: svm_need_emulation_on_page_fault_infinite_loop
+    message: "Missing check for invalid RIP in svm_need_emulation_on_page_fault may cause infinite loop on nested page fault (CVE-2020-36310, CWE-835)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (smap && (!smep || is_user)) {
+        ...
+      }
+      return false;
+    pattern-not: |
+      if (!kvm_vcpu_gfn_to_memslot(...)) return true;
+      if (smap && (!smep || is_user)) {
+        ...
+      }
+      return false;

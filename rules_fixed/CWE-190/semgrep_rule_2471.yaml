@@ -1,0 +1,15 @@
+rules:
+  - id: imagemagick-readtxtimage-integer-overflow
+    message: "Integer overflow in GetQuantumRange(depth)+1 may lead to infinite loop when max_value is very large."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (int depth = 1; (GetQuantumRange(depth) + 1) < max_value; depth++)
+                ...
+          - pattern: |
+              for (int depth = 1; (GetQuantumRange(depth) + 1) < max_value; depth++) ;
+    metadata:
+      cwe: ["CWE-190"]
+      cve: "CVE-2017-14173"

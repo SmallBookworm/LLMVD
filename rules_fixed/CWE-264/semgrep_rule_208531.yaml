@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2014-3684-missing-session-owner-validation
+    message: "Missing validation that the session ID being adopted is owned by the calling user. This may allow remote authenticated users to kill arbitrary processes."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      sid = getsid(...);
+      ...
+      if (!ispidowner(sid))
+        return(...);
+    pattern-not: |
+      sid = getsid(...);
+      ...
+      if (!ispidowner(sid))
+        return(...);
+    fix-regex:
+      regex: ''
+      replacement: ''
+    metadata:
+      cwe: ["CWE-264"]
+      cve: "CVE-2014-3684"

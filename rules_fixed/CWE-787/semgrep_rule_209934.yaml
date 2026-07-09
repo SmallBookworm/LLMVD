@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2019-2201-missing-size_t-cast
+    message: Missing (size_t) cast in pointer arithmetic or buffer size calculation may lead to integer overflow and out-of-bounds write (CWE-787).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: memset($BUF, $VAL, $PITCH * $HEIGHT)
+      - pattern: $PTR += $PITCH * $TILEH
+    metavariable-pattern:
+      $PITCH: 
+        pattern-regex: \w+
+      $HEIGHT:
+        pattern-regex: \w+
+      $TILEH:
+        pattern-regex: \w+
+    patterns:
+      - pattern-not-inside: |
+          memset($BUF, $VAL, (size_t)$PITCH * $HEIGHT)
+      - pattern-not-inside: |
+          $PTR += (size_t)$PITCH * $TILEH

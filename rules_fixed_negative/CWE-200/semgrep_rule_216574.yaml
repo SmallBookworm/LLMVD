@@ -1,0 +1,20 @@
+rules:
+  - id: cachebleed-vulnerable-mod-exp-ctime
+    message: "Detected vulnerable MOD_EXP_CTIME implementation susceptible to CacheBleed (CVE-2016-0702). The code does not use a constant-time gather procedure, potentially leaking RSA keys via cache-bank conflicts."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              #if defined(OPENSSL_BN_ASM_MONT5)
+              if (window >= 5) {
+                  window = 5;
+                  if ((top & 7) == 0)
+                      powerbufLen += 2 * top * sizeof(m->d[0]);
+              }
+          - pattern: |
+              #if defined(OPENSSL_BN_ASM_MONT5)
+              if (window >= 5) {
+                  window = 5;
+                  powerbufLen += 2 * top * sizeof(m->d[0]);
+              }

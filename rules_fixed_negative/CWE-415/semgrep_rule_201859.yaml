@@ -1,0 +1,16 @@
+rules:
+  - id: cwe-415-double-free-usm-free-usmstatereference
+    message: "Double free vulnerability in usm_free_usmStateReference due to missing reference count check (CWE-415)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (old_ref) {
+        ...
+        SNMP_FREE(old_ref);
+      }
+    pattern-not: |
+      if (--ref->refcnt > 0)
+        return;
+    metavariable-pattern:
+      metavariable: old_ref
+      pattern: struct usmStateReference *

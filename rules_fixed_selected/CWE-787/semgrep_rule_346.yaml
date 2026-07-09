@@ -1,0 +1,29 @@
+rules:
+  - id: strongswan-stroke-socket-buffer-underflow
+    message: Missing length validation before allocation may lead to buffer underflow (CVE-2018-5388).
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!stream->read_all(..., &len, sizeof(len)))
+              {
+                ...
+                return FALSE;
+              }
+              ...
+              malloc(len + 1);
+          - pattern: |
+              if (!stream->read_all(..., &len, sizeof(len)))
+                  ...
+              ...
+              malloc(len + 1);
+    metavariable-pattern:
+      metavariable: len
+      pattern: uint16_t ...
+    pattern-not: |
+      if (len < offsetof(stroke_msg_t, buffer))
+      {
+        ...
+        return FALSE;
+      }

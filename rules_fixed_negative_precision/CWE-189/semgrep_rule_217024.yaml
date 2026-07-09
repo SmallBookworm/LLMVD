@@ -1,0 +1,24 @@
+rules:
+  - id: android_bionic_integer_overflow_malloc
+    message: Integer overflow in allocation size may lead to buffer overflow. Ensure size is checked for overflow before allocation.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              void* $FUNC(size_t $BYTES)
+              {
+                  ...
+                  void* base = dlmalloc($BYTES + sizeof(...));
+                  ...
+              }
+          - pattern: |
+              void* $FUNC(size_t $BYTES)
+              {
+                  ...
+                  $TYPE* base = dlmalloc($BYTES + sizeof(...));
+                  ...
+              }
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: ^(chk_malloc|leak_malloc|leak_memalign)$

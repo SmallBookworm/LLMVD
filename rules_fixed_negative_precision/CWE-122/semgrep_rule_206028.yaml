@@ -1,0 +1,33 @@
+rules:
+  - id: vim-op_replace-heap-buffer-overflow
+    message: "Heap-based buffer overflow in op_replace when replacing in virtualedit mode. Missing check for replacing NUL after Tab may lead to illegal memory access."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (n == TAB)
+          {
+            ...
+            coladvance_force(...);
+            ...
+          }
+          PBYTE(curwin->w_cursor, c);
+      - pattern: |
+          if (n == TAB)
+          {
+            ...
+            coladvance_force(...);
+            ...
+          }
+          if (gchar_cursor() != NUL)
+          {
+            ...
+          }
+          else
+          {
+            ...
+            PBYTE(curwin->w_cursor, c);
+          }
+    metavariable-pattern:
+      metavariable: n
+      pattern: "gchar_cursor()"

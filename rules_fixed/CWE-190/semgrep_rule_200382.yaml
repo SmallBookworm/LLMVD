@@ -1,0 +1,45 @@
+rules:
+  - id: cve-2016-6823-integer-overflow-pnm
+    message: "Potential integer overflow leading to out-of-bounds write in PNM image reader. Missing EOF check after PNMInteger calls may allow crafted images to cause denial of service."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (...; ...; ...) {
+                ...
+                SetPixelGray(..., PNMInteger(..., ..., ...) == 0 ? ... : ..., ...);
+                ...
+                q += ...;
+              }
+          - pattern: |
+              for (...; ...; ...) {
+                ...
+                ScaleAnyToQuantum(PNMInteger(..., ..., ...), ...);
+                ...
+                SetPixelGray(..., ..., ...);
+                ...
+                q += ...;
+              }
+          - pattern: |
+              for (...; ...; ...) {
+                ...
+                pixel = ScaleAnyToQuantum(PNMInteger(..., ..., ...), ...);
+                ...
+                SetPixelRed(..., pixel, ...);
+                pixel = ScaleAnyToQuantum(PNMInteger(..., ..., ...), ...);
+                ...
+                SetPixelGreen(..., pixel, ...);
+                pixel = ScaleAnyToQuantum(PNMInteger(..., ..., ...), ...);
+                ...
+                SetPixelBlue(..., pixel, ...);
+                ...
+                q += ...;
+              }
+    metavariable-pattern:
+      metavariable: q
+      pattern: "q"
+    fix-regex:
+      regex: 'q'
+      replacement: 'q'
+      enabled: false

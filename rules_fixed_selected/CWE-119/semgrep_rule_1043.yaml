@@ -1,0 +1,26 @@
+rules:
+  - id: cve-2013-2128-tcp-read-sock-copied-seq-update
+    message: "Missing update of tp->copied_seq inside loop may lead to use-after-free in tcp_collapse() when splice is used."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while (... != NULL) {
+                ...
+                sk_eat_skb(...);
+                if (!desc->count)
+                  break;
+              }
+              tp->copied_seq = seq;
+          - pattern: |
+              for (...; ...; ...) {
+                ...
+                sk_eat_skb(...);
+                if (!desc->count)
+                  break;
+              }
+              tp->copied_seq = seq;
+    metavariable-regex:
+      metavariable: $LOOP_VAR
+      regex: "(skb|sk)"

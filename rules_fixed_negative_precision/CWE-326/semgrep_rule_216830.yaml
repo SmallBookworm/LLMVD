@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2021-23839-openssl-sslv23-padding
+    message: "Vulnerable logic in RSA_padding_check_SSLv23 may allow SSLv2 version rollback attacks (CVE-2021-23839). The condition should reject padding when threes_in_row >= 8, but vulnerable code accepts it."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              good &= constant_time_ge(threes_in_row, 8);
+          - pattern: |
+              good = good & constant_time_ge(threes_in_row, 8);
+    metadata:
+      cwe: "CWE-326"
+      cve: "CVE-2021-23839"
+      references:
+        - https://github.com/openssl/openssl/commit/901f1ef7dacb6b3bde63233a1f623e1fa2f0f058

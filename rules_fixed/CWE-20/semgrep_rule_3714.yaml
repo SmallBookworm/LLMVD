@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2018-11232-use-of-invalid-cpu-after-for_each_cpu
+    message: "Use of 'cpu' variable after for_each_cpu loop may lead to invalid memory access. The variable 'cpu' is not guaranteed to be valid after the loop ends. Assign it explicitly using cpumask_first(mask) before use."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      for_each_cpu($CPU, $MASK) { ... }
+      ...
+      sink_ops($SINK)->alloc_buffer($SINK, $CPU, ...)
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2018-11232"

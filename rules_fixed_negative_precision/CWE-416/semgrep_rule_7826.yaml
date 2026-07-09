@@ -1,0 +1,14 @@
+rules:
+  - id: use-after-free-webaudio-cve-2018-16067
+    message: "Potential use-after-free vulnerability due to missing assignment of destination_handler_ before accessing destination_node_ in audio context initialization."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (destination_node_) {
+            destination_node_->Handler().Initialize();
+            listener_ = AudioListener::Create(...);
+          }
+    metadata:
+      cwe: ["CWE-416"]
+      cve: "CVE-2018-16067"

@@ -1,0 +1,21 @@
+rules:
+  - id: kvm_memory_region_base_gfn_change_leak
+    message: "Memory leak due to missing invalidation when base_gfn changes in __kvm_set_memory_region. This can lead to denial of service (CVE-2013-4592)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (!npages) {
+        ...
+        slot->flags |= KVM_MEMSLOT_INVALID;
+        ...
+        kvm_arch_flush_shadow_memslot(...);
+        ...
+      }
+    pattern-not: |
+      if (!npages || base_gfn != old.base_gfn) {
+        ...
+        slot->flags |= KVM_MEMSLOT_INVALID;
+        ...
+        kvm_arch_flush_shadow_memslot(...);
+        ...
+      }

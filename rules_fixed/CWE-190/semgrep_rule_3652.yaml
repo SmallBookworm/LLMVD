@@ -1,0 +1,16 @@
+rules:
+  - id: uvesafb_integer_overflow
+    message: "Potential integer overflow in kmalloc allocation. Use kmalloc_array to avoid multiplication overflow."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      kmalloc(sizeof(*) * $LEN, ...)
+    metavariable-patterns:
+      - metavariable: $LEN
+        patterns:
+          - pattern-either:
+            - pattern: cmap->len
+    paths:
+      include:
+        - "drivers/video/fbdev/uvesafb.c"
+    cwe: ["CWE-190"]

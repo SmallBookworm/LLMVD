@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2016-10161-unserialize-buffer-overread
+    message: "Missing bounds check before accessing serialized data may lead to buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          elements = parse_iv2((*p) + 2, p);
+          (*p) += 2;
+      - pattern: |
+          $ELEMENTS = parse_iv2((*$P) + 2, $P);
+          (*$P) += 2;
+    metavariable-pattern:
+      metavariable: $P
+      patterns:
+        - pattern-not: |
+            if ($P >= $MAX - 2) { ... }

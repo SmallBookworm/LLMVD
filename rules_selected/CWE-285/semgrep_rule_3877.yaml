@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2016-7035-improper-ipc-guarding
+    message: "Improper IPC authorization check may allow unprivileged users to gain elevated privileges (CVE-2016-7035, CWE-285)."
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (gid_cluster != 0 && gid_client != 0) {
+              ...
+              if (uid_client == 0 || uid_server == 0) {
+                  ...
+                  qb_ipcs_connection_auth_set(..., best_uid, ...);
+              }
+          }
+      - pattern: |
+          if (gid_cluster != 0 && gid_client != 0) {
+              ...
+              qb_ipcs_connection_auth_set(..., best_uid, ...);
+          }

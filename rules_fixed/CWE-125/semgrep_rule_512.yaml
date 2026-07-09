@@ -1,0 +1,22 @@
+rules:
+  - id: freetype-cve-2015-9383-buffer-overread
+    message: "Heap-based buffer over-read in tt_cmap14_validate due to insufficient bounds checking before reading numRanges or numMappings."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ( defp + numRanges * 4 > valid->limit )
+                ...
+          - pattern: |
+              if ( numRanges > (FT_ULong)( valid->limit - defp ) / 4 )
+                ...
+          - pattern: |
+              if ( numMappings > ( (FT_ULong)( valid->limit - ndp ) ) / 4 )
+                ...
+    metavariable-pattern:
+      metavariable: $VAR
+      pattern: numRanges|numMappings
+    fix-regex:
+      regex: ""
+      replacement: ""

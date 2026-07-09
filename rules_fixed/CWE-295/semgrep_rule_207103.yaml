@@ -1,0 +1,36 @@
+rules:
+  - id: gnutls_signature_algorithm_mismatch
+    message: "Missing validation that signature algorithms match in certificate import (CWE-295, CVE-2015-0294)"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - patterns:
+          - pattern: |
+              asn1_der_decoding(...);
+              ...
+              _gnutls_x509_get_raw_field2(...);
+          - pattern-not: |
+              asn1_der_decoding(...);
+              ...
+              _gnutls_x509_get_signature_algorithm($CERT, "signatureAlgorithm.algorithm");
+              ...
+              _gnutls_x509_get_signature_algorithm($CERT, "tbsCertificate.signature.algorithm");
+              ...
+              if ($RESULT != $S2) { ... }
+              ...
+              _gnutls_x509_get_raw_field2(...);
+      - patterns:
+          - pattern: |
+              asn1_der_decoding(...);
+              ...
+              gnutls_x509_crt_get_version(...);
+          - pattern-not: |
+              asn1_der_decoding(...);
+              ...
+              _gnutls_x509_get_signature_algorithm($CERT, "signatureAlgorithm.algorithm");
+              ...
+              _gnutls_x509_get_signature_algorithm($CERT, "tbsCertificate.signature.algorithm");
+              ...
+              if ($RESULT != $S2) { ... }
+              ...
+              _gnutls_x509_get_raw_field2(...);

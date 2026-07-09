@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2017-9608-null-deref-dnxhd
+    message: "Potential NULL pointer dereference due to returning invalid negative value from dnxhd_find_frame_end() on error (CVE-2017-9608)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (dctx->remaining <= 0)
+              return dctx->remaining;
+      - pattern: |
+          if ($X <= 0)
+              return $X;
+    metavariable-pattern:
+      $X: "dctx->remaining"

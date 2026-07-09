@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2011-2851-yuv-scaling-bounds-check
+    message: Missing bounds check on source dimensions before YUV to RGB conversion may lead to out-of-bounds read (CWE-119).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (width == 0 || height == 0)
+            return;
+      - pattern: |
+          if (source_width > $BUF_SIZE || $ROTATE)
+            $FILTER = FILTER_NONE;
+    metavariable-pattern:
+      $BUF_SIZE: "kFilterBufferSize"
+    pattern-not-inside: |
+      if (($YUV_TYPE == YV12 && (source_width < 2 || source_height < 2)) ||
+          ($YUV_TYPE == YV16 && (source_width < 2 || source_height < 1)) ||
+          width == 0 || height == 0)
+        return;

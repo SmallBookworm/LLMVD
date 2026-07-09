@@ -1,0 +1,15 @@
+rules:
+  - id: excessive-memory-allocation-bmp-dib
+    message: "Excessive memory allocation vulnerability in BMP/DIB image parsing may lead to denial of service (CVE-2018-16645, CWE-770)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (bmp_info.number_colors > (1U << bmp_info.bits_per_pixel))
+            ThrowReaderException(...);
+      - pattern: |
+          if (((MagickSizeType) length/8) > GetBlobSize(image))
+            ThrowReaderException(...);
+    metavariable-pattern:
+      metavariable: $...
+      pattern: "..."

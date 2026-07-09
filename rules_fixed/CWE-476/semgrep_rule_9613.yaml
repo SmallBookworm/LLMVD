@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2019-12984-null-pointer-dereference
+    message: Missing check for NFC_ATTR_TARGET_INDEX attribute may lead to NULL pointer dereference.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!info->attrs[NFC_ATTR_DEVICE_INDEX]) {
+            ...
+          }
+          ...
+          nla_get_u32(info->attrs[NFC_ATTR_TARGET_INDEX]);
+      - pattern: |
+          if (!info->attrs[NFC_ATTR_DEVICE_INDEX]) {
+            ...
+          }
+          ...
+          = nla_get_u32(info->attrs[NFC_ATTR_TARGET_INDEX]);
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2019-12984"

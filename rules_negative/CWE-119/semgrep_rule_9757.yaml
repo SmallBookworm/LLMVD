@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2011-2345-out-of-bounds-read
+    message: "Use of base::strdup with std::string::c_str() may lead to out-of-bounds read due to missing null termination handling (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          STRINGN_TO_NPVARIANT(base::strdup($STR.c_str()), $SIZE, $RESULT)
+      - pattern: |
+          STRINGN_TO_NPVARIANT(base::strdup($STR->c_str()), $SIZE, $RESULT)

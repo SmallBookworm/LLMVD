@@ -1,0 +1,29 @@
+rules:
+  - id: cwe-125-rsvp-buffer-overread
+    message: "Missing bounds check may lead to buffer over-read in RSVP parser (CVE-2018-14465)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          case RSVP_OBJ_CLASSTYPE:
+              /* fall through */
+          case RSVP_OBJ_CLASSTYPE_OLD:
+              switch(rsvp_obj_ctype) {
+              case RSVP_CTYPE_1:
+                  ND_PRINT((_, EXTRACT_32BITS(obj_tptr) & _));
+                  obj_tlen -= 4;
+                  obj_tptr += 4;
+                  break;
+              ...
+              }
+      - pattern: |
+          case RSVP_OBJ_CLASSTYPE:
+          case RSVP_OBJ_CLASSTYPE_OLD:
+              switch(rsvp_obj_ctype) {
+              case RSVP_CTYPE_1:
+                  ND_PRINT((_, EXTRACT_32BITS(obj_tptr) & _));
+                  obj_tlen -= 4;
+                  obj_tptr += 4;
+                  break;
+              ...
+              }

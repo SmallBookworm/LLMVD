@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2013-2884-use-after-free
+    message: "Potential use-after-free vulnerability due to missing adoptIfNeeded call when attaching Attr node to element."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $ATTR_NODE->attachToElement($THIS);
+              ensureAttrNodeListForElement($THIS)->append($ATTR_NODE);
+          - pattern: |
+              $ATTR_NODE->attachToElement(...);
+              ensureAttrNodeListForElement(...)->append($ATTR_NODE);
+    metavariable-pattern:
+      $ATTR_NODE:
+        type: "Attr*"

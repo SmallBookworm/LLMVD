@@ -1,0 +1,19 @@
+rules:
+  - id: nfnetlink_rcv_batch_invalid_length_check
+    message: "Missing validation for nlh->nlmsg_len against NLMSG_HDRLEN may lead to out-of-bounds read or infinite loop (CVE-2016-7917, CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (nlmsg_len($NLH) < sizeof(struct nfgenmsg) ||
+              $SKB->len < $NLH->nlmsg_len) {
+            ...
+          }
+      - pattern: |
+          if ($SKB->len < $NLH->nlmsg_len ||
+              nlmsg_len($NLH) < sizeof(struct nfgenmsg)) {
+            ...
+          }
+    metavariable-pattern:
+      $NLH: "struct nlmsghdr *"
+      $SKB: "struct sk_buff *"

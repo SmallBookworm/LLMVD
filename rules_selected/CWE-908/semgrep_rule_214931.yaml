@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2019-19535-uninitialized-kernel-memory-leak
+    message: "Uninitialized kernel memory may be leaked to USB devices. Use kzalloc() instead of kmalloc() to zero-initialize the buffer."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $PTR = kmalloc(PCAN_UFD_CMD_BUFFER_SIZE, GFP_KERNEL);
+          - pattern: |
+              $PTR = kmalloc($SIZE, GFP_KERNEL);
+    metavariable-pattern:
+      $SIZE: 
+        pattern: PCAN_UFD_CMD_BUFFER_SIZE
+    fix-regex:
+      regex: kmalloc
+      replacement: kzalloc

@@ -1,0 +1,27 @@
+rules:
+  - id: git-submodule-update-command-injection
+    message: "Arbitrary command execution possible via 'update = !command' in .gitmodules. This violates security policy and can lead to remote code execution."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!strcmp(item.buf, "update")) {
+                ...
+                else if (parse_submodule_update_strategy(value, &submodule->update_strategy) < 0)
+                  ...
+              }
+          - pattern: |
+              if (!strcmp(item.buf, "update")) {
+                ...
+                else if (parse_submodule_update_strategy(value, &submodule->update_strategy) < 0 ||
+                         submodule->update_strategy.type != SM_UPDATE_COMMAND)
+                  ...
+              }
+      - pattern-not: |
+          if (!strcmp(item.buf, "update")) {
+            ...
+            else if (parse_submodule_update_strategy(value, &submodule->update_strategy) < 0 ||
+                     submodule->update_strategy.type == SM_UPDATE_COMMAND)
+              die(...);
+          }

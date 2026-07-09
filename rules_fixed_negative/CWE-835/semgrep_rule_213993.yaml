@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2021-3416-infinite-loop-loopback
+    message: "Potential infinite loop due to missing reentrancy check in loopback mode. Use qemu_can_receive_packet() instead of direct peer->info->can_receive() call."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (sender->peer->info->can_receive &&
+          !sender->peer->info->can_receive(sender->peer)) {
+          return 0;
+      }

@@ -1,0 +1,25 @@
+rules:
+  - id: cwe-787-imap-nul-check-missing
+    message: Missing check for NUL character in IMAP string parsing may lead to out-of-bounds write (CWE-787).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (data[$I] == '"') { ... }
+          ...
+          if (data[$I] == '\\') { ... }
+      - pattern: |
+          if (data[$I] == '\\') { ... }
+          ...
+          if (is_linebreak(data[$I]) && ...) { ... }
+    pattern-not: |
+      if (data[$I] == '\0') {
+        ...parser->error = ...;
+        return FALSE;
+      }
+    metavariable-pattern:
+      metavariable: $I
+      pattern: i
+    fix-regex:
+      regex: ""
+      replacement: ""

@@ -1,0 +1,21 @@
+rules:
+  - id: wavm_null_pointer_dereference_cve_2018_17293
+    message: "Potential NULL pointer dereference when injecting Emscripten command-line arguments without checking emscriptenInstance"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if(functionType.params().size() == 2)
+          {
+              MemoryInstance* defaultMemory = Runtime::getDefaultMemory(...);
+              if(!defaultMemory)
+              {
+                  ...
+                  return ...;
+              }
+              ...
+              Emscripten::injectCommandArgs(emscriptenInstance, ..., ...);
+          }
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2018-17293"

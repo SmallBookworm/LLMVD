@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2018-0735-ecdsa-timing-vulnerability
+    message: "Potential timing side-channel vulnerability in ECDSA signature generation due to insufficient preallocation of BIGNUM limbs. This may allow private key recovery. Fixed by preallocating group_top + 2 limbs instead of group_top + 1."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((bn_wexpand($K, $GROUP_TOP + 1) == NULL)
+                  || (bn_wexpand($LAMBDA, $GROUP_TOP + 1) == NULL)) {
+                ...
+              }
+          - pattern: |
+              BN_consttime_swap($KBIT, $K, $LAMBDA, $GROUP_TOP + 1);
+    metadata:
+      cwe: "CWE-320"
+      cve: "CVE-2018-0735"
+      references:
+        - https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=b1d6d55ece1c26fa2829e2b819b038d7b6d692b4

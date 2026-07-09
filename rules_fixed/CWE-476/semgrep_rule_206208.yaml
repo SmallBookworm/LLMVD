@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2017-18253-null-deref
+    message: "Potential NULL pointer dereference due to unchecked memory allocation in LoadOpenCLDevices. Use AcquireCriticalMemory instead of AcquireQuantumMemory to avoid NULL dereference."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      $x = AcquireQuantumMemory($size, $elem_size);
+      ... 
+      $x->$field
+    fix-regex:
+      regex: AcquireQuantumMemory
+      replacement: AcquireCriticalMemory

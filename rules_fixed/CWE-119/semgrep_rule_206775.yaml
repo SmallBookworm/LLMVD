@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2018-8822-ncp-read-kernel-buffer-overflow
+    message: "Potential buffer overflow in ncp_read_kernel due to missing validation of bytes_read against to_read before memcpy."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              memcpy(/*$*/target, /*$*/source, /*$**/bytes_read);
+          - pattern: |
+              memcpy(/*$*/target, /*$*/source, /*$**/bytes_read);
+    pattern-not-inside: |
+      if (*$bytes_read > $to_read) {
+        ...
+        goto ...;
+      }
+      ...
+      memcpy(/*$*/target, /*$*/source, /*$**/bytes_read);
+    metavariable-regex:
+      metavariable: $bytes_read
+      regex: bytes_read
+    focus-metavariable: $bytes_read

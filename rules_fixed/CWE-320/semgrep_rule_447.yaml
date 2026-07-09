@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2018-0732-dh-modulus-check
+    message: "Missing check for excessively large DH prime modulus, which may lead to Denial of Service (CVE-2018-0732)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (BN_num_bits(dh->p) > OPENSSL_DH_MAX_MODULUS_BITS) {
+          ...
+          return 0;
+      }
+    pattern-not-inside: |
+      if (BN_num_bits(dh->p) > OPENSSL_DH_MAX_MODULUS_BITS) {
+          ...
+          return 0;
+      }
+      ...
+      $FUNC(...)
+    metadata:
+      cwe: "CWE-320"
+      cve: "CVE-2018-0732"

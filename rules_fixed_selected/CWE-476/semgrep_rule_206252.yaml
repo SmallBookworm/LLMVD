@@ -1,0 +1,15 @@
+rules:
+  - id: kvm_null_pointer_dereference_synic_irq
+    message: "NULL pointer dereference possible in kvm_irq_delivery_to_apic_fast when irq->shorthand == APIC_DEST_SELF and src is NULL. Missing KVM_BUG_ON check."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($IRQ->shorthand == APIC_DEST_SELF) {
+                  $R = kvm_apic_set_irq($SRC->vcpu, $IRQ, $DEST_MAP);
+                  return true;
+              }
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2022-2153"

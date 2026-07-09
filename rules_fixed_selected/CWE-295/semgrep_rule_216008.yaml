@@ -1,0 +1,28 @@
+rules:
+  - id: busybox-wget-missing-tls-verification
+    message: "Missing TLS certificate verification in busybox wget with ENABLE_FEATURE_WGET_OPENSSL. This can lead to arbitrary code execution via man-in-the-middle attacks."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-295"
+      cve: "CVE-2018-1000500"
+    patterns:
+      - pattern-either:
+          - pattern: |
+              argv[0] = (char*)"openssl";
+              argv[1] = (char*)"s_client";
+              ...
+              BB_EXECVP(argv[0], argv);
+          - pattern: |
+              argv[0] = (char*)"openssl";
+              argv[1] = (char*)"s_client";
+              ...
+              if (!(option_mask32 & WGET_OPT_NO_CHECK_CERT)) {
+                  argv[$N] = (char*)"-verify_return_error";
+              }
+              BB_EXECVP(argv[0], argv);
+      - pattern-not: |
+          if (!(option_mask32 & WGET_OPT_NO_CHECK_CERT)) {
+              argv[$N] = (char*)"-verify_return_error";
+          }
+          BB_EXECVP(argv[0], argv);

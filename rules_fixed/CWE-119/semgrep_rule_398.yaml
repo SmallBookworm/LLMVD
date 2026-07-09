@@ -1,0 +1,39 @@
+rules:
+  - id: mupdf-xps-parse-color-buffer-overflow
+    message: "Potential stack-based buffer overflow in xps_parse_color due to missing bounds check on color component count (CVE-2014-2013)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (strstr($STR, "ContextColor ") == $STR)
+              {
+                ...
+                $N = count_commas($P) + 1;
+                ...
+                while ($I < $N)
+                {
+                  $SAMPLES[$I++] = ...;
+                }
+                ...
+              }
+          - pattern-inside: |
+              else if (strstr($STR, "ContextColor ") == $STR)
+              {
+                ...
+                $N = count_commas($P) + 1;
+                ...
+                while ($I < $N)
+                {
+                  $SAMPLES[$I++] = ...;
+                }
+                ...
+              }
+    metavariable-pattern:
+      metavariable: $N
+      pattern-not: |
+        if ($N > FZ_MAX_COLORS)
+        {
+          ...
+          $N = FZ_MAX_COLORS;
+        }

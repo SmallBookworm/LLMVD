@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2021-28971-pebs-status-zero-assignment
+    message: "PEBS status is assigned to local variable but not updated in the record, which may cause a crash when all PEBS records have zero status."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!pebs_status && cpuc->pebs_enabled &&
+                  !(cpuc->pebs_enabled & (cpuc->pebs_enabled - 1)))
+                  pebs_status = cpuc->pebs_enabled;
+    metadata:
+      cwe: ["CWE-755"]
+      cve: "CVE-2021-28971"

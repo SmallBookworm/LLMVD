@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2018-13303-null-deref-init_get_bits8
+    message: "Missing error check for init_get_bits8() may lead to NULL pointer dereference (CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          init_get_bits8(&$gb, $buf, $size);
+          ...
+          ff_ac3_parse_header(&$gb, $hdr);
+      - pattern: |
+          init_get_bits8(&$gb, $buf, $size);
+          ...
+          get_bits_count(&$gb);

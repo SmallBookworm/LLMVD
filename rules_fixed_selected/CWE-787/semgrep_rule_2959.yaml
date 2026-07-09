@@ -1,0 +1,26 @@
+rules:
+  - id: cwe-787-bplist-overflow-check-missing
+    message: Missing integer overflow check before pointer arithmetic may lead to buffer overflow (CWE-787).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (*object + $SIZE > $LIMIT) {
+          ...
+          }
+      - pattern: |
+          if (*object + ($SIZE * 2) > $LIMIT) {
+          ...
+          }
+    metavariable-pattern:
+      $SIZE:
+        pattern-either:
+          - pattern: size
+          - pattern: size*2
+    pattern-not-inside: |
+      if (*object + $SIZE < *object || *object + $SIZE > $LIMIT) {
+      ...
+      }
+    fix-regex:
+      regex: ""
+      replacement: ""

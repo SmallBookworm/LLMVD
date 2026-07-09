@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2016-3062-mov-read-dref-dref-count-not-reset
+    message: "Potential memory corruption due to drefs_count not being reset before reallocation. This may lead to out-of-bounds access if an error occurs during allocation."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          av_free($SC->drefs);
+          $SC->drefs = av_mallocz(...);
+          ...
+          $SC->drefs_count = $ENTRIES;
+      - pattern: |
+          av_free($SC->drefs);
+          $SC->drefs = av_malloc(...);
+          ...
+          $SC->drefs_count = $ENTRIES;
+    metavariable-pattern:
+      $SC:
+        type: "MOVStreamContext *"
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2016-3062"

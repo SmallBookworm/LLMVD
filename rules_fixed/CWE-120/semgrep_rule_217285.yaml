@@ -1,0 +1,32 @@
+rules:
+  - id: jsish-to-precision-buffer-overflow
+    message: Buffer overflow vulnerability in NumberToPrecisionCmd due to insufficient buffer size and missing precision bounds check.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-inside: |
+          static Jsi_RC NumberToPrecisionCmd(...) {
+            ...
+            char buf[...];
+            ...
+            if (prec<=0) return ...;
+            ...
+            snprintf(buf, sizeof(buf), "%.*" ..., prec, num);
+            ...
+          }
+      - pattern-either:
+        - pattern: |
+            char buf[100];
+            ...
+            if (prec<=0) return ...;
+        - pattern: |
+            char buf[100];
+            ...
+            if (prec<=0 || prec>...) return ...;
+      - metavariable-regex:
+          metavariable: $BUF_SIZE
+          regex: "100"
+      - pattern-not: |
+          char buf[JSI_MAX_NUMBER_STRING*2];
+          ...
+          if (prec<=0 || prec>JSI_MAX_NUMBER_STRING) return Jsi_LogError(...);

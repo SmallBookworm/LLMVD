@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2014-9653-buffer-bounds-check
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (ptr >= eptr + 4)
+                  break;
+    message: "Incorrect buffer bounds check may lead to buffer overflow (CVE-2014-9653, CWE-20). Should be 'eptr - 3' instead of 'eptr + 4'."
+    severity: ERROR
+    languages: [c]

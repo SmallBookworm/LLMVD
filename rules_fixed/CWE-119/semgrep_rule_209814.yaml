@@ -1,0 +1,11 @@
+rules:
+  - id: ppm_load_buffer_overflow
+    message: "Potential buffer overflow due to missing upper bound check on memory allocation size in ppm_load_read_header. This could lead to denial of service or arbitrary code execution via malformed PPM files."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (!img->width || !img->height ||
+          G_MAXSIZE / img->width / img->height / CHANNEL_COUNT < img->bpc)
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2018-10114"

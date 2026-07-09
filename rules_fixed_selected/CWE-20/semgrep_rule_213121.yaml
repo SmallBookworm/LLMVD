@@ -1,0 +1,14 @@
+rules:
+  - id: ox_parse_obj_invalid_xml_crash
+    message: "Missing null check after helper_stack_pop may lead to crash on invalid XML input (CVE-2017-15928)"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          helper_stack_pop(...);
+          gh = helper_stack_peek(...);
+          rb_hash_aset(...);
+      - pattern: |
+          helper_stack_pop(&pi->helpers);
+          gh = helper_stack_peek(&pi->helpers);
+          rb_hash_aset(...);

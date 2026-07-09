@@ -1,0 +1,21 @@
+rules:
+  - id: cwe-189-freetype-strike-index-overflow
+    message: "Potential integer overflow in strike index count validation leading to out-of-bounds read (CWE-189)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ( $ARRAY > $SIZE ||
+               $ARRAY + 8 * $COUNT > $SIZE )
+            ...
+      - pattern: |
+          if ( $ARRAY > $SIZE ||
+               $COUNT > ( $SIZE - $ARRAY ) / 8 )
+            ...
+    metavariable-patterns:
+      - metavariable: $ARRAY
+        pattern: decoder->strike_index_array
+      - metavariable: $COUNT
+        pattern: decoder->strike_index_count
+      - metavariable: $SIZE
+        pattern: face->sbit_table_size

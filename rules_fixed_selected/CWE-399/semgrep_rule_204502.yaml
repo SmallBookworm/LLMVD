@@ -1,0 +1,43 @@
+rules:
+  - id: imagemagick-isoptionmember-memory-leak
+    message: "Memory leak in IsOptionMember: option_list[0] is not freed before early return or loop break."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          option_list=StringToArgv(...);
+          ...
+          if (option_list == (char **) NULL)
+            return(...);
+          ...
+          for (i=1; ...; ...)
+          {
+            ...
+            break;
+            ...
+          }
+          ...
+          option_list=(char **) RelinquishMagickMemory(option_list);
+      - pattern: |
+          option_list=StringToArgv(...);
+          ...
+          if (option_list == (char **) NULL)
+            return(...);
+          ...
+          for (i=1; ...; ...)
+          {
+            ...
+            if (... != MagickFalse)
+            {
+              ...
+              break;
+            }
+            ...
+          }
+          ...
+          option_list=(char **) RelinquishMagickMemory(option_list);
+    metavariable-pattern:
+      metavariable: option_list
+      pattern: StringToArgv(...)
+    pattern-not: |
+      option_list[0]=DestroyString(option_list[0]);

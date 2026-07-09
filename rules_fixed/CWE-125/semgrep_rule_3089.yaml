@@ -1,0 +1,13 @@
+rules:
+  - id: cwe-125-out-of-bounds-read-empty-hostname
+    message: "Out-of-bounds read when base_name is empty. strlen(base_name) can be 0, leading to base_name[-1] access."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          const size_t base_len = strlen($BASE_NAME);
+          ...;
+          $BASE_NAME[base_len - 1];
+    metadata:
+      cwe: ["CWE-125"]
+      cve: "CVE-2016-10197"

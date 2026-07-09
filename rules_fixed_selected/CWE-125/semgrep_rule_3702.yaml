@@ -1,0 +1,15 @@
+rules:
+  - id: cwe-125-out-of-bounds-read-sh_op
+    message: "Missing length check before accessing data[0] and data[1] may lead to heap-based out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!data)
+            return ...;
+      - pattern: |
+          if (!data || len < 2)
+            return ...;
+    pattern-not: |
+      if (!data || len < 2)
+        return ...;

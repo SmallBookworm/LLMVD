@@ -1,0 +1,7 @@
+rules:
+  - id: cve-2016-0775-fli-decode-buffer-overflow
+    message: "Buffer overflow vulnerability in FLI COPY chunk handling due to incorrect memcpy offset (CVE-2016-0775, CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      memcpy(buf+x, data, state->xsize)

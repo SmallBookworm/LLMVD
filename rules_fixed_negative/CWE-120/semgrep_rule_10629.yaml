@@ -1,0 +1,15 @@
+rules:
+  - id: modplug_buffer_overflow
+    message: "Potential buffer overflow in ModPlug_SampleName or ModPlug_InstrumentName due to missing output buffer length restriction."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              memcpy($BUF, $STR, $LEN + 1);
+          - pattern: |
+              $BUF[$LEN] = '\0';
+    metavariable-pattern:
+      $BUF: "buff"
+      $LEN: "retval"
+    focus-metavariable: "$BUF"

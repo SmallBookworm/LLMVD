@@ -1,0 +1,21 @@
+rules:
+  - id: cwe-125-heap-out-of-bounds-read-6502-op
+    message: Heap out-of-bounds read in _6502_op due to missing length check before accessing data[1].
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (data[1] <= 127)
+                  ...
+              else
+                  ...
+          - pattern: |
+              op->jump = addr + data[1] + ...
+          - pattern: |
+              op->jump = addr - (256 - data[1]) + ...
+    metavariable-pattern:
+      metavariable: data
+      pattern: "const ut8 *data"
+    focus-metavariable: data
+    fix: null

@@ -1,0 +1,18 @@
+rules:
+  - id: bochs_catalog_size_integer_overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              s->catalog_size = le32_to_cpu(...);
+              s->catalog_bitmap = g_malloc(s->catalog_size * 4);
+          - pattern: |
+              $S.catalog_size = le32_to_cpu(...);
+              $S.catalog_bitmap = g_malloc($S.catalog_size * 4);
+    message: "Missing upper bound check on catalog_size before memory allocation may lead to integer overflow or excessive allocation (CVE-2014-0143)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-190"
+      references:
+        - "https://nvd.nist.gov/vuln/detail/CVE-2014-0143"
+        - "http://git.qemu.org/?p=qemu.git;a=commit;h=e3737b820b45e54b059656dc3f914f895ac7a88b"

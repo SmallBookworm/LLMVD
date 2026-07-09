@@ -1,0 +1,18 @@
+rules:
+  - id: unchecked-setuid
+    patterns:
+      - pattern: setuid(...)
+      - pattern-not-inside: |
+          if (... $X = setuid(...) ...) {...}
+      - pattern-not: |
+          if (setuid(...) == -1) {...}
+      - pattern-not: |
+          if (setuid(...) != 0) {...}
+      - pattern-not-inside: |
+          if ((setuid(...) == -1) && ...) {...}
+    message: "Return value of setuid() is not checked. This can lead to privilege escalation if setuid fails."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-264"
+      cve: "CVE-2013-6825"

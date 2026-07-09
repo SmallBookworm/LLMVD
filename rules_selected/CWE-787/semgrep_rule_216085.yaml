@@ -1,0 +1,10 @@
+rules:
+  - id: nettle-gostdsa-vko-out-of-range-scalar
+    patterns:
+      - pattern: ecc_mod_mul(&ecc->q, ..., ..., ..., ...)
+    message: "Use of ecc_mod_mul instead of ecc_mod_mul_canonical may result in out-of-range scalars being passed to ECC multiplication, leading to incorrect results or crashes (CVE-2021-20305)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-787"
+      confidence: HIGH

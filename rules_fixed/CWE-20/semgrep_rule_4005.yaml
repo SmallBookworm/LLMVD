@@ -1,0 +1,16 @@
+rules:
+  - id: imagemagick-cut-uninitialized-value
+    message: "Use of uninitialized value in ReadCUTImage due to missing initialization of BImgBuff"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $BImgBuff=(unsigned char *) AcquireQuantumMemory(...);
+          if($BImgBuff==NULL) ...;
+          ...
+          InsertRow(..., $BImgBuff, ...);
+      - pattern: |
+          $BImgBuff=(unsigned char *) AcquireQuantumMemory(...);
+          if($BImgBuff==NULL) ...;
+          ...
+          $ptrB=$BImgBuff;

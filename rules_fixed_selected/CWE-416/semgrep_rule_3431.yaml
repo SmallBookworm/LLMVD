@@ -1,0 +1,29 @@
+rules:
+  - id: cve-2014-9940-use-after-free
+    message: Use-after-free vulnerability in regulator_ena_gpio_free due to missing rdev->ena_pin = NULL after kfree(pin)
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (pin->request_count <= 1) {
+                  ...
+                  kfree(pin);
+                  ...
+              }
+          - pattern: |
+              if (pin->request_count <= 1) {
+                  ...
+                  kfree($PIN);
+                  ...
+              }
+    metavariable-pattern:
+      $PIN: pin
+    pattern-not: |
+      if (pin->request_count <= 1) {
+          ...
+          kfree(pin);
+          ...
+          rdev->ena_pin = NULL;
+          return;
+      }

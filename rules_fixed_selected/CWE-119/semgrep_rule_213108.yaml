@@ -1,0 +1,36 @@
+rules:
+  - id: libxslt_namespace_node_doc_access
+    message: "Accessing 'doc' field on a namespace node (xmlNs) treated as xmlNode may read past struct bounds, leading to memory corruption (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          ctxt->context->doc = $NODE->doc;
+      - pattern: |
+          $DOC = $NODE->doc;
+    metavariable-pattern:
+      $NODE:
+        pattern-either:
+          - pattern: nodeset->nodeTab[$I]
+          - pattern: ctxt->context->node
+    filters:
+      - not:
+          pattern-inside: |
+            if ($NODE->type == XML_NAMESPACE_DECL) {
+                ...
+                ctxt->context->doc = $SAFE_NODE->doc;
+                ...
+            } else {
+                ...
+                ctxt->context->doc = $NODE->doc;
+                ...
+            }
+      - not:
+          pattern-inside: |
+            if ($NODE->type == XML_NAMESPACE_DECL) {
+                ...
+            } else {
+                ...
+                ctxt->context->doc = $NODE->doc;
+                ...
+            }

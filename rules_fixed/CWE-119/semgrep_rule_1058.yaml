@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2013-1860-buffer-overflow
+    message: Heap-based buffer overflow in wdm_in_callback due to missing bounds check before memmove.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              memmove($BUF + $LEN, $SRC, $COPY_LEN);
+              $LEN += $COPY_LEN;
+          - pattern: |
+              $VAR = $URB->actual_length;
+              ...
+              memmove($BUF + $LEN, $SRC, $VAR);
+              $LEN += $VAR;
+    metavariable-pattern:
+      $BUF: desc->ubuf
+      $LEN: desc->length
+      $SRC: desc->inbuf
+    fix: ""

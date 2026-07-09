@@ -1,0 +1,29 @@
+rules:
+  - id: zziplib-memory-leak-cve-2018-16548
+    message: Memory leak in __zzip_parse_root_directory due to missing free(hdr0) when p_reclen is NULL.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (p_reclen)
+          {
+            ...
+            if (hdr_return)
+                *hdr_return = hdr0;
+            else
+            {
+                free(hdr0);
+            }
+          }
+      - pattern: |
+          if (p_reclen)
+          {
+            ...
+          }
+          else
+          {
+            free(hdr0);
+          }
+    metavariable-comparison:
+      metavariable: $...
+      comparison: "<"

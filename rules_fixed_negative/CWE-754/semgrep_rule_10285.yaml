@@ -1,0 +1,17 @@
+rules:
+  - id: openssl_seal_missing_return_check
+    message: "Missing return value check for EVP_SealInit may lead to crash (CVE-2017-11144)"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!EVP_SealInit(...)) {
+                ...
+              }
+          - pattern: |
+              if (!EVP_SealInit(...) || ...)
+              { ... }
+    metadata:
+      cwe: "CWE-754"
+      cve: "CVE-2017-11144"

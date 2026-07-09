@@ -1,0 +1,20 @@
+rules:
+  - id: ultravnc-dsm-plugin-path-traversal
+    message: "Potential path traversal vulnerability in DSM plugin loading. User-controlled plugin path is not sanitized before being used to load a plugin, which could lead to arbitrary code execution."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              GetDlgItemText(..., IDC_PLUGINS_COMBO, $PLUGIN, ...);
+              ...
+              $OBJ->LoadPlugin($PLUGIN, ...);
+          - pattern: |
+              GetDlgItemText(..., IDC_PLUGINS_COMBO, $PLUGIN, ...);
+              ...
+              $OBJ->LoadPlugin($PLUGIN, false);
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2022-24750"
+      references:
+        - https://github.com/ultravnc/UltraVNC/commit/36a31b37b98f70c1db0428f5ad83170d604fb352

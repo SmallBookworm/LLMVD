@@ -1,0 +1,22 @@
+rules:
+  - id: cpp-peglib-null-deref-cve-2020-23914
+    message: "Potential NULL pointer dereference due to missing validation of start rule before use in perform_core function."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          auto &start_rule = (*data.grammar)[data.start];
+          ...
+          DetectInfiniteLoop vis(..., data.start);
+          start_rule.accept(vis);
+      - pattern: |
+          auto &start_rule = (*data.grammar)[data.start];
+          ...
+          start_rule.whitespaceOpe = ...;
+      - pattern: |
+          auto &start_rule = (*data.grammar)[data.start];
+          ...
+          start_rule.wordOpe = ...;
+    metavariable-pattern:
+      metavariable: data
+      pattern: {}

@@ -1,0 +1,43 @@
+rules:
+  - id: ia64_rse_workaround_missing
+    message: Missing RSE workaround for IA-64 architecture may lead to stack overflow via invalid Register Stack Engine state (CVE-2006-3635).
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - patterns:
+        - pattern-not: |
+            #ifdef CONFIG_ITANIUM
+            ia64_patch_rse(...);
+            #else
+            {
+                u64 num_phys_stacked;
+                if (ia64_pal_rse_info(&num_phys_stacked, 0) == 0 && num_phys_stacked > 96)
+                    ia64_patch_rse(...);
+            }
+            #endif
+        - pattern: |
+            find_memory();
+            ...
+            ia64_sal_init(...);
+            ...
+            cpu_physical_id(0) = ...;
+      - patterns:
+        - pattern-not: |
+            #ifdef CONFIG_ITANIUM
+            ia64_patch_rse(...);
+            #else
+            {
+                u64 num_phys_stacked;
+                if (ia64_pal_rse_info(&num_phys_stacked, 0) == 0 && num_phys_stacked > 96)
+                    ia64_patch_rse(...);
+            }
+            #endif
+        - pattern: |
+            find_memory();
+            ...
+            ia64_sal_init(...);
+            ...
+            cpu_init(...);
+    metavariable-regex:
+      metavariable: $...
+      regex: "(?s).*"

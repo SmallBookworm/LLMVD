@@ -1,0 +1,34 @@
+rules:
+  - id: edk2-stack-guard-missing-initialization
+    message: Missing call to InitializeMpExceptionStackSwitchHandlers() may lead to stack overflow (CWE-787).
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          Status = InitializeCpuExceptionHandlers (...);
+          ...
+          Status = MpInitLibInitialize ();
+          ...
+          CollectBistDataFromPpi (...);
+      - pattern: |
+          Status = InitializeCpuExceptionHandlers (...);
+          ASSERT_EFI_ERROR (...);
+          ...
+          Status = MpInitLibInitialize ();
+          ASSERT_EFI_ERROR (...);
+          ...
+          CollectBistDataFromPpi (...);
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern: |
+        $FUNC (...) {
+          ...
+          Status = InitializeCpuExceptionHandlers (...);
+          ...
+          Status = MpInitLibInitialize ();
+          ...
+          CollectBistDataFromPpi (...);
+          ...
+        }
+    pattern-not: |
+      InitializeMpExceptionStackSwitchHandlers ();

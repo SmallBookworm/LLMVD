@@ -1,0 +1,11 @@
+rules:
+  - id: libvncserver-integer-overflow-mallocframebuffer
+    patterns:
+      - pattern: |
+          malloc($CLIENT->width * $CLIENT->height * $CLIENT->format.bitsPerPixel / 8)
+    message: "Integer overflow possible in frame buffer allocation. Multiplication of width, height, and bitsPerPixel may overflow before being passed to malloc. Promote to uint64_t and validate against SIZE_MAX."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-189"
+      cve: "CVE-2014-6051"

@@ -1,0 +1,37 @@
+rules:
+  - id: cve-2015-1790-null-deref-pkcs7
+    message: "NULL pointer dereference in PKCS7_dataDecode when data_body is NULL and in_bio is NULL, leading to denial of service (CVE-2015-1790)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (PKCS7_is_detached($P7) || ($IN_BIO != NULL)) {
+              $BIO = $IN_BIO;
+          } else {
+              if ($DATA_BODY->length > 0)
+                  $BIO = BIO_new_mem_buf($DATA_BODY->data, $DATA_BODY->length);
+              else {
+                  $BIO = BIO_new(BIO_s_mem());
+                  BIO_set_mem_eof_return($BIO, 0);
+              }
+              ...
+          }
+      - pattern: |
+          if ($IN_BIO != NULL) {
+              $BIO = $IN_BIO;
+          } else {
+              if ($DATA_BODY->length > 0)
+                  $BIO = BIO_new_mem_buf($DATA_BODY->data, $DATA_BODY->length);
+              else {
+                  $BIO = BIO_new(BIO_s_mem());
+                  BIO_set_mem_eof_return($BIO, 0);
+              }
+              ...
+          }
+    metavariable-pattern:
+      - metavariable: DATA_BODY
+        patterns:
+          - pattern: data_body
+    metadata:
+      cwe: ["CWE-703"]
+      cve: "CVE-2015-1790"

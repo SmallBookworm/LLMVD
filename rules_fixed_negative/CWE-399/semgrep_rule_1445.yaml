@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2015-6526-infinite-loop-perf-callchain
+    message: "Infinite loop in perf_callchain_user_64 due to missing stack depth limit. This can lead to denial of service (CWE-399)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          for (;;) {
+            ...
+          }
+      - pattern: |
+          while (1) {
+            ...
+          }
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: perf_callchain_user_64
+    focus-metavariable: $FUNC

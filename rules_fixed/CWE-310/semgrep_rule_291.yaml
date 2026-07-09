@@ -1,0 +1,29 @@
+rules:
+  - id: gnutls_block_cipher_missing_hash_size_check
+    message: "Missing check for ciphertext.size >= hash_size before accessing padding in block cipher decryption, leading to potential heap corruption (CVE-2012-1573)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          case CIPHER_BLOCK:
+            ...
+            if (_gnutls_version_has_explicit_iv(...)) {
+              ciphertext.size -= blocksize;
+              ciphertext.data += blocksize;
+              if (ciphertext.size == 0) {
+                ...
+                return ...;
+              }
+            }
+            pad = ciphertext.data[ciphertext.size - 1] + 1;
+      - pattern: |
+          case CIPHER_BLOCK:
+            ...
+            if (_gnutls_version_has_explicit_iv(...)) {
+              ciphertext.size -= blocksize;
+              ciphertext.data += blocksize;
+            }
+            pad = ciphertext.data[ciphertext.size - 1] + 1;
+    metavariable-pattern:
+      metavariable: $...
+      language: c

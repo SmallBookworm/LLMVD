@@ -1,0 +1,19 @@
+rules:
+  - id: pycrypto-iv-ecb-ctr-buffer-overflow
+    message: "Heap-based buffer overflow possible when IV is used with ECB or CTR mode. IV should not be accepted for these modes."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (IVlen != BLOCK_SIZE && mode != MODE_ECB && mode != MODE_CTR)
+              {
+                  ...
+              }
+          - pattern: |
+              memcpy(new->IV, IV, IVlen);
+    metavariable-regex:
+      - metavariable: IVlen
+        regex: IVlen
+    fix-regex:
+      enabled: false

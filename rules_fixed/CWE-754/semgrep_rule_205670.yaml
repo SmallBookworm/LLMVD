@@ -1,0 +1,25 @@
+rules:
+  - id: gdm3-missing-error-handling-cwe-754
+    message: "Missing proper error handling may lead to incorrect assumptions about user accounts, potentially allowing privilege escalation (CWE-754)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          GError *error = NULL;
+          ...
+          if (!...) {
+            g_critical(..., error->message);
+            goto out;
+          }
+          ...
+          out:
+          g_clear_error(&error);
+      - pattern: |
+          GError *error = NULL;
+          ...
+          if (!...) {
+            g_critical(..., error->message);
+            goto ...;
+          }
+    fix-regex:
+      regex: ""

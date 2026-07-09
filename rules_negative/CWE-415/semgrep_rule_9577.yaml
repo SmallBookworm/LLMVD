@@ -1,0 +1,19 @@
+rules:
+  - id: cwe-415-double-free-libgit2-read_entry
+    message: "Function 'read_entry' returns a size_t but uses 0 to indicate errors, which can lead to double-free (CWE-415). It should return an int for error codes and use an out-parameter for size."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          static size_t read_entry(..., size_t buffer_size, ...)
+          {
+            ...
+            return 0;
+            ...
+          }
+      - pattern: |
+          if (... > buffer_size)
+            return 0;
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: read_entry

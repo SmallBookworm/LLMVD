@@ -1,0 +1,13 @@
+rules:
+  - id: cwe-369-divide-by-zero-tiffreadencodedstrip
+    message: "Potential divide-by-zero vulnerability in TIFFReadEncodedStrip due to unsafe integer division. This can lead to a denial of service via crafted TIFF images."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          stripsperplane = ((td->td_imagelength + rowsperstrip - 1) / rowsperstrip);
+      - pattern: |
+          stripsperplane = (td->td_imagelength + rowsperstrip - 1) / rowsperstrip;
+    metadata:
+      cwe: ["CWE-369"]
+      cve: "CVE-2016-10266"

@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2016-5126-iscsi-cdb-overflow
+    message: |
+      Potential heap-based buffer overflow due to missing validation of cmd_len before memcpy into fixed-size cdb buffer.
+      Ensure cmd_len is checked against SCSI_CDB_MAX_SIZE before copying.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              memcpy(&acb->task->cdb[0], acb->ioh->cmdp, acb->ioh->cmd_len);
+          - pattern: |
+              memcpy(acb->task->cdb, acb->ioh->cmdp, acb->ioh->cmd_len);
+    metavariable-regex:
+      metavariable: $...
+      regex: ".*"
+    filters:
+      - not:
+          pattern-either:
+            - pattern: |
+                if (acb->ioh->cmd_len > SCSI_CDB_MAX_SIZE) { ... }
+            - pattern: |
+                if (acb->ioh->cmd_len <= SCSI_CDB_MAX_SIZE) { ... memcpy(...); ... }

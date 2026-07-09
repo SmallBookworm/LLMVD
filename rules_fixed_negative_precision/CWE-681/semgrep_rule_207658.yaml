@@ -1,0 +1,16 @@
+rules:
+  - id: cwe-681-signedness-error-infinite-loop
+    patterns:
+      - pattern-either:
+          - pattern: |
+              unsigned char count;
+              ...
+              if ((count = GetDataBlock(...)) <= 0) {
+                ...
+              }
+    message: "Unsigned 'count' variable used in comparison with <= 0 may lead to signedness error and infinite loop (CWE-681, CVE-2018-5711)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-681"
+      cve: "CVE-2018-5711"

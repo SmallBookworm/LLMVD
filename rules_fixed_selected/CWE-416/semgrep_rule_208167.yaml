@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2017-14152-use-after-free-zero-numresolution
+    message: "Potential heap-based buffer overflow due to mishandled zero case in numresolution. When numresolution is 1, res_spec becomes 0, leading to out-of-bounds write in precinct initialization."
+    severity: ERROR
+    languages: [c]
+    cwe: ["CWE-416"]
+    patterns:
+      - pattern: |
+          parameters->res_spec = parameters->numresolution - 1;
+          for (...; ... < parameters->res_spec; ...) {
+            parameters->prcw_init[...] = ...;
+            parameters->prch_init[...] = ...;
+          }
+    metadata:
+      cve: "CVE-2017-14152"
+      references:
+        - https://github.com/uclouvain/openjpeg/commit/4241ae6fbbf1de9658764a80944dc8108f2b4154

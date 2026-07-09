@@ -1,0 +1,18 @@
+rules:
+  - id: gnutls-key-share-use-after-free
+    message: "Potential use-after-free in key_share extension due to unsafe pointer usage after buffer reallocation."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $LENGTHP = &extdata->data[extdata->length];
+              ...
+              _gnutls_buffer_append_prefix(extdata, ...);
+              ...
+              _gnutls_write_uint16(..., $LENGTHP);
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2021-20231"
+      references:
+        - https://gitlab.com/gnutls/gnutls/-/commit/15beb4b193b2714d88107e7dffca781798684e7e

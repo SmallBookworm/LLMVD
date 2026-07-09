@@ -1,0 +1,26 @@
+rules:
+  - id: bpf_atomic_fetch_kernel_leak
+    message: "Potential kernel address leak in eBPF atomic fetch operation due to missing check_mem_access with placeholder register (-1) before propagating stack bounds."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (insn->imm & BPF_FETCH) {
+              ...
+              load_reg = ...;
+              ...
+          } else {
+              load_reg = -1;
+          }
+          ...
+          err = check_mem_access(..., BPF_READ, load_reg, ...);
+      - pattern: |
+          err = check_mem_access(..., BPF_READ, load_reg, ...);
+          ...
+          err = check_mem_access(..., BPF_WRITE, -1, ...);
+    metavariable-regex:
+      metavariable: load_reg
+      regex: "load_reg"
+    fixes:
+      - message: ""
+        lines: []

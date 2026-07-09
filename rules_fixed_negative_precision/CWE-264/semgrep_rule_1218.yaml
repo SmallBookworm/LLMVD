@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2014-5206-mnt-lock-readonly-bypass
+    message: "Remount logic preserves only MNT_PROPAGATION_MASK instead of protecting non-user-settable flags like MNT_LOCK_READONLY. This may allow bypassing read-only restrictions."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern: |
+          mnt_flags |= mnt->mnt.mnt_flags & MNT_PROPAGATION_MASK;
+    metadata:
+      cwe: ["CWE-264"]
+      cve: "CVE-2014-5206"

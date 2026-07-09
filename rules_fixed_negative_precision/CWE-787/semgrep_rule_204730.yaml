@@ -1,0 +1,12 @@
+rules:
+  - id: dm_ioctl_oob_write
+    message: "Out-of-bounds write possible due to missing buffer size check for nl->dev. CVE-2021-31916 (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (len < needed) {
+        param->flags |= DM_BUFFER_FULL_FLAG;
+        goto out;
+      }
+      ...
+      nl->dev = 0;

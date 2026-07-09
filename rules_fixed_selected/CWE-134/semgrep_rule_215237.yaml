@@ -1,0 +1,12 @@
+rules:
+  - id: cwe-134-format-string-udisks
+    message: "Potential format string vulnerability in g_log_structured. The 'message' variable may contain format specifiers like %n or %d, leading to information disclosure or memory corruption. Use \"%s\" to safely print the message."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      g_log_structured(..., "MESSAGE", $MSG, ...)
+    pattern-not: |
+      g_log_structured(..., "MESSAGE", "%s", $MSG, ...)
+    fix-regex:
+      regex: '("MESSAGE", )($MSG)(,)'
+      replacement: '\1"%s", \2\3'

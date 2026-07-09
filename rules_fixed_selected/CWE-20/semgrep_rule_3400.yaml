@@ -1,0 +1,23 @@
+rules:
+  - id: imagemagick-hdr-sscanf-check-missing
+    message: Missing check on sscanf return value may lead to infinite loop (CVE-2015-8900)
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          sscanf(...);
+          $IMAGE->columns = ...;
+          $IMAGE->rows = ...;
+      - pattern-inside: |
+          sscanf(...);
+          $IMAGE->chromaticity.red_primary.x = ...;
+          $IMAGE->chromaticity.red_primary.y = ...;
+          $IMAGE->chromaticity.green_primary.x = ...;
+          $IMAGE->chromaticity.green_primary.y = ...;
+          $IMAGE->chromaticity.blue_primary.x = ...;
+          $IMAGE->chromaticity.blue_primary.y = ...;
+          $IMAGE->chromaticity.white_point.x = ...;
+          $IMAGE->chromaticity.white_point.y = ...;
+    metavariable-pattern:
+      metavariable: $IMAGE
+      pattern: image

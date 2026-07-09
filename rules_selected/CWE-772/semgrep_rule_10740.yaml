@@ -1,0 +1,24 @@
+rules:
+  - id: virtio_gpu_set_scanout_memory_leak
+    patterns:
+      - pattern-either:
+          - pattern: |
+              pixman_image_t *rect;
+              ...
+              rect = pixman_image_create_bits(...);
+              ...
+              scanout->ds = qemu_create_displaysurface_pixman(rect);
+              ...
+              dpy_gfx_replace_surface(..., scanout->ds);
+          - pattern: |
+              pixman_image_t *rect = pixman_image_create_bits(...);
+              ...
+              scanout->ds = qemu_create_displaysurface_pixman(rect);
+              ...
+              dpy_gfx_replace_surface(..., scanout->ds);
+    message: "Missing pixman_image_unref(rect) after qemu_create_displaysurface_pixman may cause memory leak (CVE-2017-9060)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-772"
+      cve: "CVE-2017-9060"

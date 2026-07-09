@@ -1,0 +1,29 @@
+rules:
+  - id: upx-elf-header-null-pointer-deref
+    message: "Missing check for e_phoff may lead to invalid pointer dereference when parsing ELF headers (CVE-2017-15056)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          void PackLinuxElf64::unpack(...)
+          {
+              ...
+              unsigned const c_phnum = get_te16(&ehdri.e_phnum);
+              ...
+          }
+      - pattern: |
+          void PackLinuxElf64::unpack(...)
+          {
+              ...
+              unsigned const u_phnum = get_te16(&ehdr->e_phnum);
+              ...
+          }
+    pattern-not: |
+        void PackLinuxElf64::unpack(...)
+        {
+            ...
+            if (e_phoff != sizeof(Elf64_Ehdr)) {
+                throwCantUnpack("bad e_phoff");
+            }
+            ...
+        }

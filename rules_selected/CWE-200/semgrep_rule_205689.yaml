@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2017-5967-timer-stats-pid-leak
+    patterns:
+      - pattern-either:
+          - pattern: |
+              #ifdef CONFIG_TIMER_STATS
+              ...
+              SEQ_printf(..., ", %s/%d", ..., timer->start_pid);
+              #endif
+          - pattern: |
+              SEQ_printf(..., ", %s/%d", ..., timer->start_pid);
+    message: "Use of CONFIG_TIMER_STATS exposes real PID values across namespaces via /proc/timer_list, leading to information disclosure (CVE-2017-5967, CWE-200)."
+    severity: WARNING
+    languages: [c]

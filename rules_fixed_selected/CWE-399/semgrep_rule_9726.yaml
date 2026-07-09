@@ -1,0 +1,18 @@
+rules:
+  - id: missing-const-method-cve-2011-2830
+    message: "Method 'multiple' should be marked const to prevent unintended side effects or crashes as per CVE-2011-2830."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      bool $FUNC(...)
+      {
+          ...
+      }
+    pattern-not: |
+      bool $FUNC(...) const
+      {
+          ...
+      }
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern: multiple

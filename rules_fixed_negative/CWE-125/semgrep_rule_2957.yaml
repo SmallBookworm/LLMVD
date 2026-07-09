@@ -1,0 +1,14 @@
+rules:
+  - id: imagemagick-sun-buffer-overread-cve-2017-6500
+    message: "Heap-based buffer over-read in SUN image reader due to insufficient allocation size. Fixed by adding 'image->rows' to allocation size."
+    severity: ERROR
+    languages: [c]
+    cwe: ["CWE-125"]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              sun_pixels=(unsigned char *) AcquireQuantumMemory(pixels_length,
+                 sizeof(*sun_pixels));
+          - pattern: |
+              sun_pixels=(unsigned char *) AcquireQuantumMemory(pixels_length, sizeof(*sun_pixels));
+    fix: ""

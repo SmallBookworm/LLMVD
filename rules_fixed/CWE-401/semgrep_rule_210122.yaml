@@ -1,0 +1,21 @@
+rules:
+  - id: imagemagick-xwindow-memory-leak
+    message: "Missing deallocation of 'matte_image' XImage resource may cause memory leak (CWE-401)."
+    severity: ERROR
+    languages: [c]
+    pattern-not-inside: |
+      if (magick_windows[...]->matte_image != (XImage *) NULL)
+        {
+          XDestroyImage(magick_windows[...]->matte_image);
+          magick_windows[...]->matte_image=(XImage *) NULL;
+        }
+    patterns:
+      - pattern: |
+          if (magick_windows[...]->ximage != (XImage *) NULL)
+            {
+              XDestroyImage(magick_windows[...]->ximage);
+              magick_windows[...]->ximage=(XImage *) NULL;
+            }
+      - metavariable-regex:
+          metavariable: $...
+          regex: ".*"

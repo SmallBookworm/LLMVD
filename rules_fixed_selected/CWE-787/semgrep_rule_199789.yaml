@@ -1,0 +1,18 @@
+rules:
+  - id: cwe-787-uninitialized-value-fips-decrypt
+    message: "Missing NULL check for 'rdp' or 'rdp->fips_decrypt' may lead to out-of-bounds read (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!winpr_Cipher_Update($RDPRDP->fips_decrypt, ..., ..., ..., ...))
+            return FALSE;
+      - pattern: |
+          winpr_Cipher_Update($RDPRDP->fips_decrypt, ..., ..., ..., ...)
+    metavariable-pattern:
+      $RDPRDP:
+        pattern-regex: rdp
+    pattern-not-inside: |
+      if (!$RDPRDP || !$RDPRDP->fips_decrypt)
+        return FALSE;
+      ...

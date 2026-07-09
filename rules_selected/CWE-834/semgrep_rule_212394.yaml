@@ -1,0 +1,22 @@
+rules:
+  - id: imagemagick-rle-large-loop-cve-2017-11360
+    message: "Potential large loop vulnerability due to missing input validation on image dimensions before computing number_pixels. This may lead to excessive resource consumption (CWE-834)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              number_pixels = (MagickSizeType) $IMAGE->columns * $IMAGE->rows;
+              ...
+              if ((number_pixels * $NUMBER_PLANES_FILLED) != (size_t) (number_pixels * $NUMBER_PLANES_FILLED))
+                ThrowReaderException(ResourceLimitError, "MemoryAllocationFailed");
+          - pattern: |
+              number_pixels = (MagickSizeType) $IMAGE->columns * $IMAGE->rows;
+              ...
+              $PIXEL_INFO = AcquireVirtualMemory($IMAGE->columns, $IMAGE->rows * ...);
+    metadata:
+      cwe: "CWE-834"
+      cve: "CVE-2017-11360"
+      references:
+        - "https://github.com/ImageMagick/ImageMagick/issues/518"
+        - "https://github.com/ImageMagick/ImageMagick/commit/078e9692a257e7a8aa36ccc750927f9617923061"

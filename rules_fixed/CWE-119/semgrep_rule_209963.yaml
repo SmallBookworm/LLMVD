@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2016-9773-buffer-overflow
+    message: "Detected vulnerable pattern related to CVE-2016-9773: missing SyncImagePixelCache call after ReadImage may lead to heap-based buffer overflow."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $image = ReadImage($read_info, $exception);
+              if ($image != (Image *) NULL) {
+                InitializePixelChannelMap($image);
+              }
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2016-9773"

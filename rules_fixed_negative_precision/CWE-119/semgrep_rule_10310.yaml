@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2014-8626-buffer-overflow
+    message: "Potential stack-based buffer overflow in date_from_ISO8601 due to missing bounds check when copying input into fixed-size buffer 'buf'."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              char buf[18];
+              ...
+              if (*p != '-') {
+                  *p2 = *p;
+                  p2++;
+              }
+          - pattern: |
+              char buf[<... 18 ...>];
+              ...
+              *p2 = *p;
+              p2++;
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2014-8626"

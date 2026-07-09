@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2017-2885-buffer-overflow
+    message: "Potential stack-based buffer overflow due to unsafe boundary scanning in soup_filter_input_stream_read_until (CVE-2017-2885, CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          end = buf + fstream->priv->buf->len;
+          if (!eof)
+            end -= boundary_length;
+      - pattern: |
+          end = buf + fstream->priv->buf->len - boundary_length;
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2017-2885"
+      references:
+        - https://bugzilla.gnome.org/show_bug.cgi?id=785774
+        - https://git.gnome.org/browse/libsoup/commit/?id=03c91c76daf70ee227f38304c5e45a155f45073d

@@ -1,0 +1,26 @@
+rules:
+  - id: imagemagick-xbm-missing-eof-check
+    message: "Missing EOF check in XBM image parsing loop may lead to DoS via excessive CPU consumption (CVE-2017-14175)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          for (...; ...; ...)
+          {
+            ...
+            value = XBMInteger(..., ...);
+            ...
+          }
+      - pattern: |
+          for (...; ...; ...)
+          {
+            ...
+            $VAR = XBMInteger(..., ...);
+            *... = (unsigned char) $VAR;
+            ...
+          }
+    metavariable-pattern:
+      metavariable: $VAR
+      pattern-not: |
+        if ($VAR < 0)
+          break;

@@ -1,0 +1,13 @@
+rules:
+  - id: libxml2-xxe-external-parsed-entity-loading
+    message: "Potential XML External Entity (XXE) vulnerability: external parsed entities are loaded without validation or entity substitution flags, which may lead to SSRF, file disclosure, or DoS."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      if (ent->checked == 0) {
+      ...
+      } else if (ent->etype == XML_EXTERNAL_GENERAL_PARSED_ENTITY) {
+      ...
+      xmlParseExternalEntityPrivate(...);
+      ...
+      }

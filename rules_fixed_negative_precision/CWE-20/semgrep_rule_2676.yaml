@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2017-11665-amf-out-of-bounds
+    message: "Potential out-of-bounds read in ff_amf_get_field_value due to insufficient bounds checking before pointer arithmetic."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (size == ... && !memcmp(data - size, ..., ...)) {
+                ...
+                data++;
+                ...
+              }
+          - pattern: |
+              if (size == ... && !memcmp(data - size, ..., ...)) {
+                ...
+                len = bytestream_get_be16(&data);
+                ...
+              }
+    metavariable-pattern:
+      metavariable: data
+      pattern: $DATA
+    mode: search

@@ -1,0 +1,14 @@
+rules:
+  - id: cwe-119-w3m-strgrow-buffer-corruption
+    patterns:
+      - pattern-either:
+          - pattern: |
+              newlen = $X->length * 6 / 5;
+              ...
+              bcopy(..., ..., $X->length);
+    message: "Potential heap buffer corruption due to using 'length' instead of 'area_size' for reallocation size calculation."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2016-9442"

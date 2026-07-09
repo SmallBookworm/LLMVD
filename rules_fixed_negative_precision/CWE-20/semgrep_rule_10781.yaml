@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2014-2957-dmarc-from-header-injection
+    message: "Untrusted From header data passed directly to expand_string(), leading to potential code execution (CVE-2014-2957)."
+    severity: ERROR
+    languages: [c]
+    cwe: ["CWE-20"]
+    pattern: |
+      expand_string(
+        string_sprintf("${domain:${extract{1}{:}{${addresses:%s}}}}",
+          from_header->text)
+      )

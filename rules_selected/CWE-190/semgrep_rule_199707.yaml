@@ -1,0 +1,15 @@
+rules:
+  - id: cwe-190-integer-overflow-pystring-decodeescape
+    message: Integer overflow possible in PyString_DecodeEscape due to missing overflow check before multiplication.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          Py_ssize_t newlen = recode_encoding ? 4*len : len;
+      - pattern: |
+          Py_ssize_t newlen;
+          ...
+          newlen = recode_encoding ? 4*len : len;
+    metavariable-regex:
+      metavariable: $len
+      regex: len

@@ -1,0 +1,26 @@
+rules:
+  - id: cve-2020-0030-binder-use-after-free
+    message: "Missing synchronize_rcu() after wake_up_poll() with POLLFREE may cause use-after-free due to race condition (CVE-2020-0030, CWE-362)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ((thread->looper & BINDER_LOOPER_STATE_POLL) &&
+              waitqueue_active(&thread->wait)) {
+            wake_up_poll(&thread->wait, EPOLLHUP | POLLFREE);
+          }
+          ...
+          binder_inner_proc_unlock(thread->proc);
+          ...
+          if (send_reply)
+      - pattern: |
+          if ((thread->looper & BINDER_LOOPER_STATE_POLL) &&
+              waitqueue_active(&thread->wait)) {
+            wake_up_poll(&thread->wait, EPOLLHUP | POLLFREE);
+          }
+          ...
+          binder_inner_proc_unlock(thread->proc);
+          ...
+          if (send_reply)
+    pattern-not: |
+      synchronize_rcu();

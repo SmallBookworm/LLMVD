@@ -1,0 +1,17 @@
+rules:
+  - id: libpng-plte-buffer-overflow
+    message: "Potential buffer overflow in png_handle_PLTE due to incorrect max_palette_length calculation. This can lead to out-of-bounds writes when bit_depth is small."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          max_palette_length = (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE) ?
+             (1 << png_ptr->bit_depth) : PNG_MAX_PALETTE_LENGTH;
+      - pattern: |
+          max_palette_length = (1 << png_ptr->bit_depth);
+    metavariable-pattern:
+      metavariable: $max_palette_length
+      pattern: "max_palette_length"
+    fix-regex:
+      regex: ""
+      replacement: ""

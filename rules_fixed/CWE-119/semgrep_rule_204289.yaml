@@ -1,0 +1,45 @@
+rules:
+  - id: radvd_process_ra_missing_len_check
+    message: Missing length check before casting and accessing option structure in process_ra(), leading to potential buffer over-read (CVE-2011-3604).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          case ND_OPT_MTU:
+              $MTU = (struct nd_opt_mtu *)$OPT_STR;
+              if (iface->$... && (ntohl($MTU->nd_opt_mtu_mtu) != iface->$...))
+              {
+                  ...
+              }
+      - pattern: |
+          case ND_OPT_PREFIX_INFORMATION:
+              $PINFO = (struct nd_opt_prefix_info *) $OPT_STR;
+              $PREFERRED = ntohl($PINFO->nd_opt_pi_preferred_time);
+              ...
+      - pattern: |
+          case ND_OPT_RDNSS_INFORMATION:
+              $RDNSSINFO = (struct nd_opt_rdnss_info_local *) $OPT_STR;
+              $COUNT = $RDNSSINFO->nd_opt_rdnssi_len;
+              ...
+      - pattern: |
+          case ND_OPT_DNSSL_INFORMATION:
+              $DNSSLINFO = (struct nd_opt_dnssl_info_local *) $OPT_STR;
+              $SUFFIX[0] = '\0';
+              ...
+    metavariable-regex:
+      - metavariable: $MTU
+        regex: mtu
+      - metavariable: $PINFO
+        regex: pinfo
+      - metavariable: $RDNSSINFO
+        regex: rdnssinfo
+      - metavariable: $DNSSLINFO
+        regex: dnsslinfo
+      - metavariable: $OPT_STR
+        regex: opt_str
+      - metavariable: $PREFERRED
+        regex: preferred
+      - metavariable: $COUNT
+        regex: count
+      - metavariable: $SUFFIX
+        regex: suffix

@@ -1,0 +1,12 @@
+rules:
+  - id: gnutls_null_oid_dereference
+    pattern: |
+      if (strcmp($OID, $P->oid) == 0)
+    pattern-not: |
+      if ($P->oid && strcmp($OID, $P->oid) == 0)
+    message: "Potential NULL pointer dereference when comparing OID strings. Ensure $P->oid is checked for NULL before calling strcmp."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-310"
+      cve: "CVE-2006-7239"

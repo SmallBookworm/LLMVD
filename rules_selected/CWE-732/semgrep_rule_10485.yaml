@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2017-7471-virtfs-root-path
+    message: "VirtFS root path is set to absolute '/' which may lead to host filesystem access outside the shared directory (CVE-2017-7471)."
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (dir_path) {
+              ...
+          } else {
+              v9fs_path_sprintf(target, "%s", name);
+          }
+      - pattern: |
+          if (dir_path) {
+              ...
+          } else
+              v9fs_path_sprintf(target, "%s", name);
+    metadata:
+      cwe: "CWE-732"
+      cve: "CVE-2017-7471"

@@ -1,0 +1,20 @@
+rules:
+  - id: virtiofsd-proc-fd-escape
+    message: "Potential path traversal vulnerability via /proc/self/fd due to unsafe temporary directory usage. This could allow a privileged guest to access host devices."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $TMPDIR = mkdtemp($TEMPLATE);
+              ...
+              mount("/proc/self/fd", $TMPDIR, NULL, MS_BIND, NULL);
+          - pattern: |
+              char $TEMPLATE[] = "virtiofsd-XXXXXX";
+              ...
+              $TMPDIR = mkdtemp($TEMPLATE);
+              ...
+              mount("/proc/self/fd", $TMPDIR, NULL, MS_BIND, NULL);
+    metadata:
+      cwe: "CWE-269"
+      cve: "CVE-2020-35517"

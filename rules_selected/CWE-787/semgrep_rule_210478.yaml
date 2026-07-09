@@ -1,0 +1,8 @@
+rules:
+  - id: cwe-787-out-of-bounds-write-oniguruma
+    patterns:
+      - pattern: |
+          if (i + len > OPT_EXACT_MAXLEN) break;
+    message: "Potential out-of-bounds write due to incorrect boundary check. Use '>=' instead of '>' to prevent buffer overflow (CWE-787)."
+    severity: ERROR
+    languages: [c]

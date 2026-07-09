@@ -1,0 +1,25 @@
+rules:
+  - id: cve-2020-29385-lzw-infinite-loop
+    message: "Potential infinite loop in LZW decoder due to missing validation of code after reset (CVE-2020-29385)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (self->code < self->code_table_size)
+            add_code (self, self->code);
+          else if (self->code == self->code_table_size)
+            add_code (self, self->last_code);
+          else {
+            self->last_code = self->eoi_code;
+            return ...;
+          }
+      - pattern: |
+          if (self->code < self->code_table_size)
+            add_code (self, self->code);
+          else if (self->code == self->code_table_size)
+            add_code (self, self->last_code);
+          else
+            ...
+    metadata:
+      cwe: "CWE-835"
+      cve: "CVE-2020-29385"

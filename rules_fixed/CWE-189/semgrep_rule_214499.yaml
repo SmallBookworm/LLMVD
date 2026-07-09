@@ -1,0 +1,35 @@
+rules:
+  - id: cve-2019-7308-bpf-map-meta-missing-index-mask
+    message: "Missing propagation of index_mask and unpriv_array fields in bpf_map_meta_alloc may lead to out-of-bounds speculation (CVE-2019-7308)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          inner_map_meta = kzalloc(sizeof(*inner_map_meta), ...);
+          ...
+          inner_map_meta->ops = inner_map->ops;
+          ...
+          inner_map_meta->unpriv_array = ...;
+      - pattern: |
+          inner_map_meta = kzalloc(sizeof(*inner_map_meta), ...);
+          ...
+          inner_map_meta->ops = inner_map->ops;
+          ...
+          ((struct bpf_array *)container_of(inner_map_meta, struct bpf_array, map))->index_mask = ...;
+    pattern-not-inside: |
+      struct bpf_map *bpf_map_meta_alloc(...) {
+        ...
+        u32 inner_map_meta_size;
+        ...
+        if (inner_map->ops == &array_map_ops)
+          inner_map_meta_size = sizeof(struct bpf_array);
+        ...
+        inner_map_meta = kzalloc(inner_map_meta_size, ...);
+        ...
+        if (inner_map->ops == &array_map_ops) {
+          inner_map_meta->unpriv_array = inner_map->unpriv_array;
+          container_of(inner_map_meta, struct bpf_array, map)->index_mask =
+            container_of(inner_map, struct bpf_array, map)->index_mask;
+        }
+        ...
+      }

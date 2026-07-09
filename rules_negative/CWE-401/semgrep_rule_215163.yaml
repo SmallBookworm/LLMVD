@@ -1,0 +1,23 @@
+rules:
+  - id: mutt-rfc822-group-terminator-memory-leak
+    patterns:
+      - pattern-either:
+          - pattern: |
+              cur = rfc822_new_address ();
+              if (last)
+              {
+                last->next = cur;
+                last = cur;
+              }
+          - pattern: |
+              cur = rfc822_new_address ();
+              if (last)
+                last->next = cur;
+              ...
+              last = cur;
+    message: "Memory leak when parsing group address terminators without a display name. An allocated ADDRESS may not be attached to the list if 'last' is NULL."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-401"
+      cve: "CVE-2021-3181"

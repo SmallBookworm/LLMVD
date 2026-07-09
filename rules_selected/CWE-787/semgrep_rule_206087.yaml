@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2020-35452-missing-base64-validation
+    message: Missing base64 validation of nonce may lead to out-of-bounds write (CWE-787).
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (strlen($NONCE) != $NONCE_LEN) {
+            ...
+          }
+      - pattern: |
+          if (strlen($NONCE) != $NONCE_LEN
+                  || $NONCE[$NONCE_TIME_LEN - 1] != '=') {
+            ...
+          }
+    pattern-not-inside: |
+      if (strlen($NONCE) != $NONCE_LEN
+              || $NONCE[$NONCE_TIME_LEN - 1] != '=') {
+        ...
+      }
+    metavariable-regex:
+      metavariable: $NONCE
+      regex: resp->nonce

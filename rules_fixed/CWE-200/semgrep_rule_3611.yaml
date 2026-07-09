@@ -1,0 +1,37 @@
+rules:
+  - id: cwe-200-linkinfo-missing-open-basedir-check
+    message: "Missing open_basedir check in linkinfo function may allow access to files outside allowed directories."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              PHP_FUNCTION(linkinfo)
+              {
+                  ...
+                  char *link;
+                  ...
+                  if (zend_parse_parameters(..., "p", &link, ...) == FAILURE) {
+                      return;
+                  }
+                  ...
+                  VCWD_STAT(link, ...);
+                  ...
+              }
+          - pattern: |
+              PHP_FUNCTION(linkinfo)
+              {
+                  ...
+                  char *link;
+                  ...
+                  if (zend_parse_parameters(..., "p", &link, ...) == FAILURE) {
+                      return;
+                  }
+                  ...
+                  ret = VCWD_STAT(link, ...);
+                  ...
+              }
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: "linkinfo"
+    fix: ""

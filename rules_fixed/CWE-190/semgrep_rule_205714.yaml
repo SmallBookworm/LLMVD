@@ -1,0 +1,15 @@
+rules:
+  - id: exiv2-webp-integer-overflow
+    message: "Potential integer overflow in WebPImage::decodeChunks when computing (filesize - io_->tell()). If io_->tell() > filesize, this results in a large positive value due to unsigned underflow, leading to excessive allocation."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          enforce($SIZE <= ($FILESIZE - io_->tell()), ...);
+    metavariable-patterns:
+      - metavariable: "$FILESIZE"
+        pattern-either:
+          - pattern: uint64_t $X
+          - pattern: uint32_t $X
+    fix-regex:
+      enabled: false

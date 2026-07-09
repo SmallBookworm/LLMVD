@@ -1,0 +1,12 @@
+rules:
+  - id: null_pointer_dereference_imapx_free_capability
+    message: "Potential NULL pointer dereference in imapx_free_capability due to missing NULL check before use."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      imapx_free_capability (is->priv->cinfo);
+      is->priv->cinfo = NULL;
+    pattern-not: |
+      if (is->priv->cinfo)
+        imapx_free_capability (is->priv->cinfo);
+      is->priv->cinfo = NULL;

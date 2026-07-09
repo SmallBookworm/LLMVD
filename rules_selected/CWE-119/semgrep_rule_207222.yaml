@@ -1,0 +1,20 @@
+rules:
+  - id: mbedtls-buffer-overflow-sni
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if( (size_t)(end - p) < ... )
+              {
+                ...
+              }
+          - pattern: |
+              if( (size_t)(end - p) < ... )
+                ...
+    message: "Missing check for pointer wraparound before buffer size comparison. This can lead to heap-based buffer overflow (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2015-5291"
+      references:
+        - https://github.com/ARMmbed/mbedtls/commit/f3e6e4badb35760c9a543ee69b7449cb0cd9784b

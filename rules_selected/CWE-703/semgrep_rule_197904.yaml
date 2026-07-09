@@ -1,0 +1,17 @@
+rules:
+  - id: imagemagick-dcm-memory-leak-cve-2017-12644
+    message: "Memory leak in ReadDCMImage due to missing deallocation of 'data' before early return via ThrowDCMException."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (length > GetBlobSize(image))
+            ThrowDCMException(...);
+      - pattern: |
+          if (~length >= 1)
+            data=(unsigned char *) AcquireQuantumMemory(...);
+          if (data == (unsigned char *) NULL)
+            ThrowDCMException(...);
+    metadata:
+      cwe: "CWE-703"
+      cve: "CVE-2017-12644"

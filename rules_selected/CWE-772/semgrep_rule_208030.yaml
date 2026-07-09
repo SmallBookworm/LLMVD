@@ -1,0 +1,26 @@
+rules:
+  - id: imagemagick-readonejngimage-memory-leak
+    message: "Memory leak in ReadOneJNGImage due to missing cleanup of alpha_image and alpha_image_info in error paths."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (status == MagickFalse)
+                {
+                  alpha_image=DestroyImage(alpha_image);
+                  alpha_image_info=DestroyImageInfo(alpha_image_info);
+                  color_image=DestroyImage(color_image);
+                  return(DestroyImageList(image));
+                }
+          - pattern: |
+              if (status == MagickFalse)
+                {
+                  DestroyJNG(chunk,&color_image,&color_image_info,
+                    &alpha_image,&alpha_image_info);
+                  return(DestroyImageList(image));
+                }
+    metavariable-comparison:
+      metavariable: $status
+      comparison: eq
+      expression: "MagickFalse"

@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2016-4483-unsafe-utf8-serialization
+    message: "Potential out-of-bounds read in xmlBufAttrSerializeTxtContent due to missing null-byte checks when handling non-UTF-8 attribute values."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ((*cur >= 0x80) && ((doc == NULL) || (doc->encoding == NULL))) {
+      - pattern: |
+          } else if ((*cur < 0xF0)) {
+      - pattern: |
+          } else if ((*cur < 0xF8)) {

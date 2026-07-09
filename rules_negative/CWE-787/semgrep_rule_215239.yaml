@@ -1,0 +1,19 @@
+rules:
+  - id: ghostscript-cif-buffer-overflow
+    message: Buffer overflow due to missing space for null terminator in malloc call.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          s = (char *)gs_malloc(..., $LENGTH, sizeof(char), ...);
+          ...
+          strncpy(s, ..., $LENGTH);
+          *(s + $LENGTH) = '\0';
+      - pattern: |
+          s = (char *)gs_malloc(..., $LENGTH, 1, ...);
+          ...
+          strncpy(s, ..., $LENGTH);
+          *(s + $LENGTH) = '\0';
+    metavariable-pattern:
+      $LENGTH:
+        pattern-not: $LENGTH + 1

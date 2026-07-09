@@ -1,0 +1,33 @@
+rules:
+  - id: kpasswd-udp-ping-pong-cve-2002-2443
+    message: "kpasswd service may respond to unvalidated UDP packets, leading to a denial-of-service via ping-pong attack (CVE-2002-2443)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (req->length < 4) {
+                  ...
+                  goto chpwfail;
+              }
+          - pattern: |
+              if (plen != req->length) {
+                  ...
+                  goto chpwfail;
+              }
+          - pattern: |
+              if (vno != 1 && vno != RFC3244_VERSION) {
+                  ...
+                  goto chpwfail;
+              }
+          - pattern: |
+              if (ptr + ap_req.length >= req->data + req->length) {
+                  ...
+                  goto chpwfail;
+              }
+    metavariable-regex:
+      metavariable: $...
+      regex: ".*"
+    fixes:
+      - message: "Ensure all UDP packet validations are properly enforced."
+        lines: 1

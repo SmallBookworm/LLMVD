@@ -1,0 +1,31 @@
+rules:
+  - id: cve-2021-25287-oob-read-j2k
+    message: Out-of-bounds read vulnerability in J2kDecode due to incorrect tile buffer size calculation. Missing validation of per-component widths before buffer allocation.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              tile_width = ...;
+              tile_height = ...;
+              components = ... ? 4 : ...;
+              if ((tile_width > UINT_MAX / components) ||
+                  (tile_height > UINT_MAX / components) ||
+                  (tile_width > UINT_MAX / (tile_height * components)) ||
+                  (tile_height > UINT_MAX / (tile_width * components))) {
+                ...
+              }
+              tile_bytes = tile_width * tile_height * components;
+          - pattern: |
+              tile_width = ...;
+              tile_height = ...;
+              if ((tile_width > UINT_MAX / ...) ||
+                  (tile_height > UINT_MAX / ...) ||
+                  (tile_width > UINT_MAX / (... * ...)) ||
+                  (tile_height > UINT_MAX / (... * ...))) {
+                ...
+              }
+              tile_bytes = tile_width * tile_height * ...;
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2021-25287"

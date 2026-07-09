@@ -1,0 +1,18 @@
+rules:
+  - id: cwe-190-zend-hash-init-integer-overflow
+    message: "Potential integer overflow in _zend_hash_init due to unsafe nTableSize assignment before safety checks. This may lead to uninitialized memory access or arbitrary code execution."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              ht->nTableSize = zend_hash_check_size(...);
+              ...
+              HT_SET_DATA_ADDR(ht, &uninitialized_bucket);
+          - pattern: |
+              ht->nTableSize = zend_hash_check_size(...);
+              ...
+              ht->nTableMask = HT_MIN_MASK;
+    metadata:
+      cwe: ["CWE-190"]
+      cve: "CVE-2017-5340"

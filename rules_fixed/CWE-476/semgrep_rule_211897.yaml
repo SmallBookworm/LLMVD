@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2021-34798-null-dereference
+    message: "Potential NULL pointer dereference when accessing r->method without a NULL check. This may lead to a crash via malformed requests."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (... && r->method_number == M_GET && r->method[0] == ...)
+          - pattern-inside: |
+              ... r->method_number == M_GET && r->method[0] == ...
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2021-34798"

@@ -1,0 +1,23 @@
+rules:
+  - id: ntpd-missing-mode-check
+    message: "NTP server responds to all packets without checking mode, leading to potential DoS via communication loop."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (size != NTP_MSGSIZE_NOAUTH && size != NTP_MSGSIZE) {
+        ...
+      }
+      ...
+      do_sendto(...);
+    pattern-not: |
+      if (size != NTP_MSGSIZE_NOAUTH && size != NTP_MSGSIZE) {
+        ...
+      }
+      ...
+      if ((msg.m_status & MODE_MASK) != MODE_CLIENT
+       && (msg.m_status & MODE_MASK) != MODE_SYM_ACT
+      ) {
+        goto bail;
+      }
+      ...
+      do_sendto(...);

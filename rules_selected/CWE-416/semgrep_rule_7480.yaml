@@ -1,0 +1,17 @@
+rules:
+  - id: use-after-free-webaudio-cve-2018-6060
+    message: "Potential use-after-free vulnerability due to improper handling of handler_ after disposal in AudioNode::Dispose()."
+    severity: ERROR
+    languages: [c]
+    cwe: ["CWE-416"]
+    pattern-either:
+      - pattern: |
+          if (context()->HasRealtimeConstraint()) {
+            context()->GetDeferredTaskHandler().AddRenderingOrphanHandler(std::move(handler_));
+          } else {
+            if (context()->ContextState() == BaseAudioContext::kRunning) {
+              context()->GetDeferredTaskHandler().AddRenderingOrphanHandler(std::move(handler_));
+            }
+          }
+    metadata:
+      cve: "CVE-2018-6060"

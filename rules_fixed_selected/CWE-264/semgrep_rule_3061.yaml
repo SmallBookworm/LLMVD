@@ -1,0 +1,32 @@
+rules:
+  - id: missing_inode_owner_or_capable_check
+    message: Missing authorization check via inode_owner_or_capable() before setting encryption policy, which may allow unauthorized users to set policies on others' directories.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              int fscrypt_process_policy(struct inode *inode, const struct fscrypt_policy *policy)
+              {
+                  ...
+                  if (!inode_has_encryption_context(inode)) { ... }
+                  ...
+              }
+          - pattern: |
+              int fscrypt_process_policy(struct inode *inode, const struct fscrypt_policy *policy)
+              {
+                  ...
+                  if (policy->version != 0) { ... }
+                  ...
+              }
+    pattern-not: |
+      int fscrypt_process_policy(struct inode *inode, const struct fscrypt_policy *policy)
+      {
+          ...
+          if (!inode_owner_or_capable(inode))
+              return -EACCES;
+          ...
+      }
+    fix-regex:
+      regex: ""
+      replacement: ""

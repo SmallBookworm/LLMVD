@@ -1,0 +1,32 @@
+rules:
+  - id: capstone-x86-out-of-bounds-read
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while (first <= last) {
+                if (insn_regs_intel_sorted[mid].insn < id) {
+                  ...
+                } else if (insn_regs_intel_sorted[mid].insn == id) {
+                  ...
+                } else {
+                  ...
+                }
+                mid = (first + last) / 2;
+              }
+          - pattern: |
+              while (first <= last) {
+                mid = (first + last) / 2;
+                if (insn_regs_intel_sorted[mid].insn < id) {
+                  ...
+                } else if (insn_regs_intel_sorted[mid].insn == id) {
+                  ...
+                } else {
+                  ...
+                }
+              }
+    message: "Missing bounds check before binary search may lead to out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2016-7151"

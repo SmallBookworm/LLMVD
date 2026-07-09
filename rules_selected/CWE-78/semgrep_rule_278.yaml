@@ -1,0 +1,13 @@
+rules:
+  - id: kde-plasma-shell-injection
+    patterns:
+      - pattern: |
+          $MX.expandMacros($EXEC);
+          ...
+          KRun::runCommand($EXEC, ...);
+    message: "Shell command injection vulnerability due to unquoted macro expansion. Use expandMacrosShellQuote instead."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-78"
+      cve: "CVE-2018-6791"

@@ -1,0 +1,28 @@
+rules:
+  - id: cve-2013-4150-virtio-net-oob-write
+    message: "Out-of-bounds write vulnerability in virtio_net_load due to missing validation of curr_queues against max_queues (CVE-2013-4150, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (n->max_queues > 1) {
+              ...
+              n->curr_queues = qemu_get_be16(f);
+              for (...; ...; ...) {
+                  n->vqs[...].tx_waiting = qemu_get_be32(f);
+              }
+          }
+      - pattern: |
+          if (n->max_queues > 1) {
+              ...
+              n->curr_queues = qemu_get_be16(f);
+              ...
+              for (...; ...; ...) {
+                  n->vqs[...].tx_waiting = qemu_get_be32(f);
+              }
+          }
+    pattern-not: |
+        if (n->curr_queues > n->max_queues) {
+            ...
+            return -1;
+        }

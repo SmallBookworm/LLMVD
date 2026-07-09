@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2017-12193-null-ptr-deref
+    message: "Potential NULL pointer dereference due to incorrect node splitting in assoc_array_insert_into_terminal_node (CVE-2017-12193, CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          new_n0->slots[edit->segment_cache[0]] = assoc_array_node_to_ptr(new_n0);
+      - pattern: |
+          edit->set[0].ptr = &assoc_array_ptr_to_node(node->back_pointer)->slots[node->parent_slot];
+    metadata:
+      cwe: ["CWE-476"]
+      cve: "CVE-2017-12193"
+      references:
+        - https://github.com/torvalds/linux/commit/ea6789980fdaa610d7eb63602c746bf6ec70cd2b

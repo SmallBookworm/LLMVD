@@ -1,0 +1,29 @@
+rules:
+  - id: cve-2017-13037-buffer-overread
+    message: "Buffer over-read vulnerability in IP timestamp option parsing. Missing bounds check before accessing cp[2] or cp[3]."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              ptr = cp[2] - 1;
+              ...
+              switch (cp[3] & 0xF) {
+                ...
+              }
+          - pattern: |
+              ptr = cp[2] - 1;
+              ...
+              if (... cp[3] ...)
+          - pattern: |
+              for (...; ...; ...) {
+                ...
+                EXTRACT_32BITS(&cp[len + ...])
+                ...
+              }
+    pattern-not-inside: |
+      ND_TCHECK(cp[2]);
+      ...
+      ND_TCHECK(cp[3]);
+      ...
+      ND_TCHECK2(cp[len], hoplen);

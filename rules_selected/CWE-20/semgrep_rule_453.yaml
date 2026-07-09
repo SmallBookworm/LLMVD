@@ -1,0 +1,17 @@
+rules:
+  - id: freetype-missing-return-check-cve-2014-9746
+    message: "Missing return value check for cid_parser_to_fixed_array may lead to uninitialized memory access (CVE-2014-9746)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          (void)cid_parser_to_fixed_array(...);
+      - pattern: |
+          (void)t1_parse_font_matrix(...);
+      - pattern: |
+          (void)t42_parse_font_matrix(...);
+      - pattern: |
+          (void)ps_parser_load_field(...);
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2014-9746"

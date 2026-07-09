@@ -1,0 +1,12 @@
+rules:
+  - id: double-free-in-_zip_dirent_read
+    message: "Double free vulnerability detected in _zip_dirent_read. The buffer may be freed twice if _zip_dirent_process_winzip_aes fails and from_buffer is false."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (!_zip_dirent_process_winzip_aes(..., ...)) {
+        if (!from_buffer) {
+          _zip_buffer_free(buffer);
+        }
+        return -1;
+      }

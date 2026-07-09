@@ -1,0 +1,10 @@
+rules:
+  - id: double-free-cdtext
+    patterns:
+      - pattern-either:
+          - pattern: |
+              cdtext_destroy($OBJ);
+              free($OBJ);
+    message: "Double free vulnerability: 'cdtext_destroy' already frees the object, calling 'free' again leads to undefined behavior (CWE-415)."
+    severity: ERROR
+    languages: [c]

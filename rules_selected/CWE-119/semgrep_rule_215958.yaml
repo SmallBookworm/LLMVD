@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2016-5400-mb86a20s-mask-before-check
+    message: "Masking the return value of mb86a20s_readreg before checking for error (val < 0) hides negative error codes, leading to potential use of invalid data."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          $VAL = mb86a20s_readreg(...) & $MASK;
+          if ($VAL < 0) { ... }
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2016-5400"

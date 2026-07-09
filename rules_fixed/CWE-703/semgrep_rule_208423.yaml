@@ -1,0 +1,17 @@
+rules:
+  - id: qrtr_tun_write_iter_memory_leak
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!copy_from_iter_full(...)) {
+                return -EFAULT;
+              }
+          - pattern: |
+              return ... ? ... : ...;
+            metavariable-pattern:
+              metavariable: $RET
+              pattern: qrtr_endpoint_post(...)
+    message: "Memory leak detected: allocated kbuf is not freed on error or success paths in qrtr_tun_write_iter."
+    severity: ERROR
+    languages: [c]
+    fix: null

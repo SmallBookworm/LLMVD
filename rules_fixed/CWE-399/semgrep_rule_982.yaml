@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2013-4163-ip6_append_data_mtu-missing-pmtu-check
+    message: "ip6_append_data_mtu does not properly handle PMTU settings when appending non-first fragments, potentially causing a kernel BUG and denial of service."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-399"
+      cve: "CVE-2013-4163"
+    pattern-inside: |
+      static void ip6_append_data_mtu(..., struct sk_buff *skb, ...)
+      {
+          ...
+      }
+    pattern-either:
+      - pattern: |
+          if (skb == NULL) {
+              ...
+          } else {
+              *$MTU = dst_mtu(...);
+          }
+      - pattern: |
+          if (skb != NULL) {
+              *$MTU = dst_mtu(...);
+          }

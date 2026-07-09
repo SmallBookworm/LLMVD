@@ -1,0 +1,25 @@
+rules:
+  - id: minetest-inventory-access-control
+    message: "Player can access another player's inventory due to missing ownership validation (CVE-2022-24301, CWE-276)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (ma->from_inv.type == InventoryLocation::PLAYER) {
+            ...
+          }
+          ...
+          if (ma->to_inv.type == InventoryLocation::PLAYER) {
+            ...
+          }
+      - pattern: |
+          bool from_inv_is_current_player =
+            (ma->from_inv.type == InventoryLocation::PLAYER) &&
+            (ma->from_inv.name == player->getName());
+          ...
+          bool to_inv_is_current_player =
+            (ma->to_inv.type == InventoryLocation::PLAYER) &&
+            (ma->to_inv.name == player->getName());
+    metadata:
+      cwe: "CWE-276"
+      cve: "CVE-2022-24301"

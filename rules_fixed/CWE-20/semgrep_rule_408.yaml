@@ -1,0 +1,15 @@
+rules:
+  - id: dv_stype_unchecked_array_access
+    message: "Unvalidated 'stype' value used as array index may lead to out-of-bounds read (CVE-2011-3936)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              ach = ((int[4]){...})[stype];
+          - pattern: |
+              $ARRAY[stype]
+    metavariable-pattern:
+      metavariable: $ARRAY
+      pattern: (int[4]){...}
+    focus-metavariable: stype

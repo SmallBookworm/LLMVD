@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2016-9913-v9fs-cleanup-order
+    patterns:
+      - pattern-either:
+          - pattern: |
+              void v9fs_device_unrealize_common(..., ...)
+              {
+                  ...
+                  g_free(s->ctx.fs_root);
+                  ...
+                  g_free(s->tag);
+                  ...
+              }
+    message: "Incorrect cleanup order in v9fs_device_unrealize_common may cause memory leak (CVE-2016-9913). Free 's->tag' before 's->ctx.fs_root'."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-400"
+      cve: "CVE-2016-9913"

@@ -1,0 +1,16 @@
+rules:
+  - id: aio_integer_overflow
+    patterns:
+      - pattern: |
+          iovec->iov_len = $LEN;
+    message: "Missing length check before assigning to iovec->iov_len may lead to integer overflow (CVE-2015-8830)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-703"
+      cve: "CVE-2015-8830"
+    pattern-not-inside: |
+      if ($LEN > MAX_RW_COUNT)
+          $LEN = MAX_RW_COUNT;
+      ...
+      iovec->iov_len = $LEN;

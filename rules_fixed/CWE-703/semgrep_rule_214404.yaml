@@ -1,0 +1,14 @@
+rules:
+  - id: null_pointer_dereference_bond_ipsec_add_sa
+    message: "Null pointer dereference vulnerability in bond_ipsec_add_sa(). Missing null check for bond->curr_active_slave before dereference."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              slave = rcu_dereference($BOND->curr_active_slave);
+              $XSO->real_dev = slave->dev;
+          - pattern: |
+              slave = rcu_dereference($BOND->curr_active_slave);
+              ... 
+              slave->dev->...

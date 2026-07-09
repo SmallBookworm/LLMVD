@@ -1,0 +1,13 @@
+rules:
+  - id: curl-smtp-buffer-overflow-cve-2018-0500
+    message: "Heap-based buffer overflow in Curl_smtp_escape_eob due to use of data->set.buffer_size instead of UPLOAD_BUFSIZE for scratch buffer allocation."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          malloc(2 * $BUF)
+        where:
+          $BUF <: "data->set.buffer_size"
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2018-0500"

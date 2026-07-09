@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2013-7270-uninitialized-msg_namelen
+    message: "Potential uninitialized memory leak via msg_namelen. The code sets msg_namelen without verifying that msg_name is valid, which may expose kernel memory."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($SAT) {
+                ...
+                $MSG->msg_namelen = sizeof(...);
+              }
+          - pattern: |
+              if ($COND) {
+                ...
+                $MSG->msg_namelen = ...;
+              }
+              ...
+              struct sockaddr_* *$SAT = (struct sockaddr_*)$MSG->msg_name;
+        where:
+          - metavariable: $MSG
+            pattern: "struct msghdr *"
+          - metavariable: $SAT
+            pattern: "struct sockaddr_* *"

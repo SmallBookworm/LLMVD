@@ -1,0 +1,25 @@
+rules:
+  - id: cwe-200-uninitialized-padding
+    message: Uninitialized padding fields in structure may leak kernel memory
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $tcm->$field = ...;
+              ...
+              $tcm->tcm_ifindex = ...;
+            where:
+              - metavariable: field
+                pattern-regex: "tcm_family"
+          - pattern: |
+              $tcm->tcm_family = ...;
+              ...
+              $tcm->tcm_ifindex = ...;
+            where:
+              - metavariable: tcm
+                pattern-not: |
+                  $tcm->tcm__pad1 = 0;
+                  ...
+                  $tcm->tcm__pad2 = 0;
+    fix: ""

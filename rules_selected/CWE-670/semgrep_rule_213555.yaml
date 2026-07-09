@@ -1,0 +1,15 @@
+rules:
+  - id: poppler_embfile_save2_missing_stream_check
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $OBJ.streamReset();
+              while (($C = $OBJ.streamGetChar()) != EOF) {
+                ...
+              }
+    message: "Missing stream check before calling stream methods in EmbFile::save2 may lead to denial of service (CVE-2018-19058)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-670"
+      cve: "CVE-2018-19058"

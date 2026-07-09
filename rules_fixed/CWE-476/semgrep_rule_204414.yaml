@@ -1,0 +1,9 @@
+rules:
+  - id: cwe-476-null-pointer-deref-in-shiftAnchorPosition
+    pattern: |
+      if (hl->marks[...].line == ...)
+    pattern-not: |
+      if (hl && hl->marks && hl->marks[...].line == ...)
+    message: "Potential null pointer dereference. Check that 'hl' and 'hl->marks' are not NULL before accessing 'hl->marks[...].line'."
+    severity: ERROR
+    languages: [c]

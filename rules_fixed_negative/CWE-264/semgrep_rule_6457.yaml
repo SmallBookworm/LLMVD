@@ -1,0 +1,7 @@
+rules:
+  - id: cwe-264-chrome-sop-bypass-cve-2015-6768
+    message: "Use of ASSERT instead of RELEASE_ASSERT may allow Same Origin Policy bypass in release builds."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      ASSERT(!m_frame || m_frame->tree().childCount() == 0);

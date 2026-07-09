@@ -1,0 +1,20 @@
+rules:
+  - id: missing_x509_certificate_verification_gnutls
+    message: "X.509 certificate verification is incomplete. The 'status' from gnutls_certificate_verify_peers2() is not checked, allowing potential man-in-the-middle attacks."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              gnutls_certificate_verify_peers2($SESSION, &$STATUS);
+              if ($RES != 0) {
+                ...
+              }
+          - pattern: |
+              $RES = gnutls_certificate_verify_peers2($SESSION, &$STATUS);
+              if ($RES != 0) {
+                ...
+              }
+    metadata:
+      cwe: "CWE-310"
+      cve: "CVE-2013-4488"

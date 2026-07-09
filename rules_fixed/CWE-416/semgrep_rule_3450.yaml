@@ -1,0 +1,14 @@
+rules:
+  - id: ffmpeg-rmdec-use-after-free
+    message: "Use-after-free vulnerability in realmedia demuxer due to passing dangling 'mime' pointer to ff_rm_read_mdpr_codecdata()."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          ff_rm_read_mdpr_codecdata(..., $mime)
+        where:
+          - metavariable: $mime
+            pattern: mime
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2018-1999013"

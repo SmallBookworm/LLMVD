@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2014-9421-double-free-in-auth_gssapi_unwrap_data
+    message: "Potential double free vulnerability in auth_gssapi_unwrap_data due to improper handling of partial XDR deserialization. This may lead to use-after-free or arbitrary code execution."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (! (*xdr_func)($XDRS, $XDR_PTR)) {
+            ...
+            xdr_free($XDR_FUNC, $XDR_PTR);
+            ...
+            return FALSE;
+          }
+    metadata:
+      cwe: "CWE-703"
+      cve: "CVE-2014-9421"
+      references:
+        - https://github.com/krb5/krb5/commit/a197e92349a4aa2141b5dff12e9dd44c2a2166e3

@@ -1,0 +1,31 @@
+rules:
+  - id: cve-2016-3830-aac-frame-length-check
+    message: "Missing check for ADTS header size overflow in AAC frame length parsing. This can lead to integer underflow and denial of service (CVE-2016-3830)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (inHeader->nFilledLen < aac_frame_length) {
+                ...
+                signalError = true;
+              } else {
+                adtsHeaderSize = (protectionAbsent ? 7 : 9);
+                inBuffer[0] = (UCHAR *)adtsHeader + adtsHeaderSize;
+                inBufferLength[0] = aac_frame_length - adtsHeaderSize;
+                ...
+              }
+          - pattern: |
+              if (inHeader->nFilledLen < aac_frame_length) {
+                ...
+                signalError = true;
+              } else {
+                adtsHeaderSize = (protectionAbsent ? 7 : 9);
+                ...
+                inHeader->nOffset += adtsHeaderSize;
+                inHeader->nFilledLen -= adtsHeaderSize;
+              }
+    metavariable-pattern:
+      protectionAbsent: $protectionAbsent
+      aac_frame_length: $aac_frame_length
+      adtsHeaderSize: $adtsHeaderSize

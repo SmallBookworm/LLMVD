@@ -1,0 +1,25 @@
+rules:
+  - id: missing_cap_net_raw_check_appletalk
+    message: "Missing CAP_NET_RAW capability check when creating raw AF_APPLETALK sockets. This allows unprivileged users to create raw sockets, leading to a privilege escalation vulnerability (CVE-2019-17054)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (sock->type != SOCK_RAW && ...)
+            ...
+          ...
+          sk_alloc(...);
+      - pattern: |
+          if (sock->type != SOCK_RAW && ...)
+            ...
+          ...
+          sock_init_data(...);
+    pattern-not: |
+      if (sock->type == SOCK_RAW && !kern && !capable(CAP_NET_RAW))
+        goto ...;
+    fix-regex:
+      regex: ""
+      replacement: ""
+    metadata:
+      cwe: "CWE-276"
+      cve: "CVE-2019-17054"

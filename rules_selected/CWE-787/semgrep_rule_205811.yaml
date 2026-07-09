@@ -1,0 +1,40 @@
+rules:
+  - id: xgmac_buffer_overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((bd.buffer1_size & 0xfff) > 2048) {
+                  ...
+              }
+              if ((bd.buffer2_size & 0xfff) != 0) {
+                  ...
+              }
+              if (len >= sizeof(frame)) {
+                  ...
+              }
+          - pattern: |
+              if ((bd.buffer1_size & 0xfff) > 2048) {
+                  ...
+              }
+              if ((bd.buffer2_size & 0xfff) != 0) {
+                  ...
+              }
+              if (frame_size + len >= sizeof(frame)) {
+                  ...
+              }
+    pattern-not: |
+      if ((bd.buffer1_size & 0xfff) > 2048) {
+          ...
+          break;
+      }
+      if ((bd.buffer2_size & 0xfff) != 0) {
+          ...
+          break;
+      }
+      if (frame_size + len >= sizeof(frame)) {
+          ...
+          break;
+      }
+    message: "Missing break statements after buffer size checks in xgmac_enet_send() may lead to buffer overflow (CWE-787)."
+    severity: ERROR
+    languages: [c]

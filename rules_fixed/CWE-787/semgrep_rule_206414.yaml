@@ -1,0 +1,14 @@
+rules:
+  - id: ext4_block_bitmap_oob_write
+    message: "Out-of-bounds write possible in ext4_init_block_bitmap due to missing block group bounds check. This could lead to memory corruption (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!flex_bg || ext4_block_in_group(...))
+            ext4_set_bit(...);
+      - pattern: |
+          if (!ext4_has_feature_flex_bg(...))
+            dummy_statement();
+          if (!flex_bg || ext4_block_in_group(...))
+            ext4_set_bit(...);

@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2016-2105-evp-encode-update-overflow
+    message: "Potential integer overflow in EVP_EncodeUpdate leading to heap corruption (CVE-2016-2105)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((ctx->num + $INL) < ctx->length) {
+                ...
+              }
+          - pattern: |
+              if (($INL + ctx->num) < ctx->length) {
+                ...
+              }
+    metadata:
+      cwe: "CWE-189"
+      cve: "CVE-2016-2105"

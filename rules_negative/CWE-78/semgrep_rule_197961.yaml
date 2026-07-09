@@ -1,0 +1,6 @@
+rules:
+  - id: xrootd-ldap-library-preload
+    message: "Detected preload of libXrdSecgsiGMAPLDAP.so which may lead to shell command injection (CVE-2017-1000215, CWE-78)."
+    severity: HIGH
+    languages: [c]
+    pattern: 'const char *libs[] = {..., "libXrdSecgsiGMAPLDAP.so", ...};'

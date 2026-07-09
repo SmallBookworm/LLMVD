@@ -1,0 +1,28 @@
+rules:
+  - id: cwe-369-divide-by-zero-gif-dimensions
+    message: "Missing validation of image dimensions may lead to divide-by-zero (CWE-369)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $WIDTH = (int)iw_get_ui16le(...);
+          $HEIGHT = (int)iw_get_ui16le(...);
+          ...
+          $TOTAL = (size_t)$WIDTH * (size_t)$HEIGHT;
+      - pattern: |
+          $WIDTH = (int)iw_get_ui16le(...);
+          $HEIGHT = (int)iw_get_ui16le(...);
+          ...
+          ... = (size_t)$WIDTH * (size_t)$HEIGHT;
+    metavariable-patterns:
+      - metavariable: "$WIDTH"
+        language: c
+        pattern: "rctx->image_width"
+      - metavariable: "$HEIGHT"
+        language: c
+        pattern: "rctx->image_height"
+    pattern-not-inside: |
+      if ($WIDTH < 1 || $HEIGHT < 1) {
+        ...
+        goto ...;
+      }

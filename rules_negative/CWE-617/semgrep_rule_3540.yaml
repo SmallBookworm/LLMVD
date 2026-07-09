@@ -1,0 +1,11 @@
+rules:
+  - id: ovs-rule-insert-assertion-vulnerability
+    message: "Assertion failure vulnerability in ofproto_rule_insert__: rule state check uses RULE_INITIALIZED instead of RULE_INSERTED, leading to crash during bundle revert (CVE-2018-17205)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          ovs_assert($RULE->state == RULE_INITIALIZED);
+    metadata:
+      cwe: ["CWE-617"]
+      cve: "CVE-2018-17205"

@@ -1,0 +1,25 @@
+rules:
+  - id: imagemagick-sun-buffer-overflow-cve-2015-8957
+    message: "Potential buffer overflow in SUN image reader due to missing colormap allocation for RMT_NONE case."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (sun_info.depth < 24)
+            {
+              ...
+              if (sun_info.maptype == RMT_NONE)
+                image->colors=...;
+              if (sun_info.maptype == RMT_EQUAL_RGB)
+                image->colors=...;
+            }
+      - pattern: |
+          if (sun_info.depth < 24)
+            {
+              ...
+              image->storage_class=PseudoClass;
+              ...
+            }
+    metavariable-regex:
+      metavariable: $...
+      regex: "(?!.*AcquireImageColormap\\(image,image->colors,exception\\))"

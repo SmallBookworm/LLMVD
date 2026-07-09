@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2013-4514-buffer-overflow
+    message: "Buffer overflow vulnerability in memcpy usage. The length parameter from user input (wrqu->data.length) is used without validation against the destination buffer size, potentially leading to buffer overflow (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          memcpy($DST, $SRC, $WRQU->data.length);
+      - pattern: |
+          memcpy($DST, $SRC, $LENGTH);
+          ...
+          $LENGTH = $WRQU->data.length;
+    metavariable-pattern:
+      metavariable: $DST
+      pattern: lp->StationName
+    focus-metavariable: $WRQU

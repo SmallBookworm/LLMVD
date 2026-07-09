@@ -1,0 +1,19 @@
+rules:
+  - id: kvm-ndata-oob-write
+    patterns:
+      - pattern-either:
+          - pattern: |
+              vcpu->run->internal.data[vcpu->run->internal.ndata++] = ...
+          - pattern-inside: |
+              vcpu->run->internal.data[... $INDEX ...] = ...
+            patterns:
+              - pattern: $INDEX
+              - metavariable-comparison:
+                  metavariable: $INDEX
+                  comparison: contains(vcpu->run->internal.ndata)
+    message: "Use of user-controllable vcpu->run->internal.ndata as an array index may lead to out-of-bounds write (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2021-3501"

@@ -1,0 +1,38 @@
+rules:
+  - id: openjpeg-divide-by-zero-pi-iterator
+    message: Division by zero or undefined shift may occur due to missing bounds check on rpx/rpy before bit-shift operations.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (...)
+              {
+                ...
+                $rpx = ...;
+                $rpy = ...;
+                ...
+                if (!((... % (OPJ_INT32)($comp->dx << $rpx)) ...))
+                ...
+              }
+          - pattern: |
+              if (...)
+              {
+                ...
+                $rpx = ...;
+                $rpy = ...;
+                ...
+                if (!((... % (OPJ_INT32)($comp->dy << $rpy)) ...))
+                ...
+              }
+    pattern-not-inside: |
+      if (... >= 31 || (($comp->dx << ...) >> ...) != $comp->dx ||
+          ... >= 31 || (($comp->dy << ...) >> ...) != $comp->dy)
+      {
+        continue;
+      }
+    metavariable-pattern:
+      - metavariable: $rpx
+        pattern: "res->pdx + levelno"
+      - metavariable: $rpy
+        pattern: "res->pdy + levelno"

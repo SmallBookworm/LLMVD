@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2019-11930-invalid-free
+    message: "Invalid free() usage detected. Memory allocated with req::calloc_noptrs must be freed with req::free, not free()."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (... && *$PTR) {
+                free(*$PTR);
+                ...
+              }
+          - pattern: |
+              if ($PTR && *$PTR) {
+                free(*$PTR);
+                ...
+              }
+    metavariable-pattern:
+      metavariable: $PTR
+      pattern: return_list
+    fix-regex:
+      regex: 'free\(\*\$PTR\)'
+      replacement: 'req::free(*$PTR)'
+      enabled: false

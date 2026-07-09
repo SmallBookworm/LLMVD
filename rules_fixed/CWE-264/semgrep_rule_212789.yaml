@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2011-0989-use-after-free-thread-cleanup
+    message: Potential use-after-free vulnerability due to improper cleanup order of thread members. The field should be set to NULL before freeing to prevent access to freed memory.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      pattern-either:
+        - pattern: |
+            if ($OBJ->$FIELD) {
+                DeleteCriticalSection($OBJ->$FIELD);
+                g_free($OBJ->$FIELD);
+                $OBJ->$FIELD = NULL;
+            }
+        - pattern: |
+            if ($OBJ->$FIELD) {
+                g_free($OBJ->$FIELD);
+            }
+    metavariable-pattern:
+      metavariable: $FIELD
+      pattern: (synch_cs|name)

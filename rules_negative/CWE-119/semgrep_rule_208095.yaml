@@ -1,0 +1,20 @@
+rules:
+  - id: quagga-bgp-vpnv4-buffer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (prefixlen < 88)
+                { ... }
+              ...
+              memcpy (&p.u.prefix, pnt + 11, psize - 11);
+          - pattern: |
+              if (prefixlen < 88)
+                { ... }
+              ...
+              memcpy (&p.u.prefix, pnt + $OFFSET, psize - $OFFSET);
+    message: "Unbounded memcpy in bgp_nlri_parse_vpnv4 may lead to stack-based buffer overflow (CWE-119, CVE-2016-2342). Missing upper-bound check on prefixlen before memcpy."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2016-2342"

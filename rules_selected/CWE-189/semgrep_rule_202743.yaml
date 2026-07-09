@@ -1,0 +1,15 @@
+rules:
+  - id: libevent_evbuffer_integer_overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              size_t need = $BUF->misalign + $BUF->off + $DATLEN;
+          - pattern: |
+              while ($LENGTH < $NEED)
+                $LENGTH <<= 1;
+    message: "Potential integer overflow in evbuffer_expand leading to heap-based buffer overflow or infinite loop (CVE-2014-6272)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-189"
+      confidence: HIGH

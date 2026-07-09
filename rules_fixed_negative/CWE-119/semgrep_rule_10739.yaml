@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2018-7584-buffer-underread
+    message: "Stack-based buffer under-read in HTTP response parsing may lead to out-of-bounds read (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (tmp_line[tmp_line_len - 1] == '\n') {
+              --tmp_line_len;
+              if (tmp_line[tmp_line_len - 1] == '\r') {
+                  --tmp_line_len;
+              }
+          }
+      - pattern: |
+          if (tmp_line[tmp_line_len - 1] == '\n') {
+              --tmp_line_len;
+              if (tmp_line_len >= 1 && tmp_line[tmp_line_len - 1] == '\r') {
+                  --tmp_line_len;
+              }
+          }
+    metavariable-comparison:
+      metavariable: tmp_line_len
+      comparison: "> 0"

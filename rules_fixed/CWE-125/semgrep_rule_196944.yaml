@@ -1,0 +1,27 @@
+rules:
+  - id: cwe-125-out-of-bounds-read-mng-move
+    message: "Out-of-bounds read vulnerability in MNG MOVE chunk processing. Array index 'i' is used without proper bounds checking against MNG_MAX_OBJECTS."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (i=(ssize_t) first_object; i <= (ssize_t) last_object; i++)
+              {
+                if (mng_info->exists[i] && !mng_info->frozen[i] &&
+                    (p-chunk) < (ssize_t) (length-8))
+                  {
+                    ...
+                  }
+              }
+          - pattern: |
+              for (i=(int) first_object; i <= (int) last_object; i++)
+              {
+                if (mng_info->exists[i] && !mng_info->frozen[i])
+                  {
+                    ...
+                  }
+              }
+    fix-regex:
+      regex: 'for \\(i=(?:\\(ssize_t\\)|\\(int\\)) first_object; i <= (?:\\(ssize_t\\)|\\(int\\)) last_object; i\\+\\+\\)\\s*\\{\\s*if \\(mng_info->exists\\[i\\] && !mng_info->frozen\\[i\\]'
+      replacement: 'for (i=(ssize_t) first_object; i <= (ssize_t) last_object; i++)\n{\n  if ((i < 0) || (i >= MNG_MAX_OBJECTS))\n    continue;\n  if (mng_info->exists[i] && !mng_info->frozen[i]'

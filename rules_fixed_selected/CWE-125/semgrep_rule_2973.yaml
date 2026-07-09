@@ -1,0 +1,16 @@
+rules:
+  - id: tnef-type-confusion-cve-2017-6309
+    message: "Missing type check before accessing MAPI attributes may lead to out-of-bounds read/write (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (a->name == MAPI_BODY_HTML)
+          {
+            ...
+          }
+      - pattern: |
+          if (a->name == MAPI_RTF_COMPRESSED)
+          {
+            ...
+          }

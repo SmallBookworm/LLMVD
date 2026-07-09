@@ -1,0 +1,24 @@
+rules:
+  - id: freerdp-out-of-bounds-read-update-read-icon-info
+    message: |
+      Missing bounds check before reading icon data may lead to out-of-bounds read (CWE-125).
+      Ensure Stream_GetRemainingLength is checked before each Stream_Read call.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (Stream_GetRemainingLength($S) < $ICONINFO->cbBitsMask + $ICONINFO->cbBitsColor)
+              return FALSE;
+          ...
+          Stream_Read($S, $ICONINFO->bitsMask, $ICONINFO->cbBitsMask);
+      - pattern: |
+          if (Stream_GetRemainingLength($S) < $ICONINFO->cbBitsMask + $ICONINFO->cbBitsColor)
+              return FALSE;
+          ...
+          if ($ICONINFO->colorTable)
+              Stream_Read($S, $ICONINFO->colorTable, $ICONINFO->cbColorTable);
+      - pattern: |
+          if (Stream_GetRemainingLength($S) < $ICONINFO->cbBitsMask + $ICONINFO->cbBitsColor)
+              return FALSE;
+          ...
+          Stream_Read($S, $ICONINFO->bitsColor, $ICONINFO->cbBitsColor);

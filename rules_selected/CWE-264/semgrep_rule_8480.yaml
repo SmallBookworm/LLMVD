@@ -1,0 +1,22 @@
+rules:
+  - id: unvalidated_template_id
+    message: "Unvalidated template ID may lead to privilege escalation (CVE-2016-2449)"
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (!mRequestTemplateCache[templateId].isEmpty()) {
+        *request = mRequestTemplateCache[templateId];
+        return OK;
+      }
+    metavariable-pattern:
+      templateId: { type: "int" }
+    pattern-not: |
+      if (templateId <= 0 || templateId >= CAMERA3_TEMPLATE_COUNT) {
+        ...
+        return BAD_VALUE;
+      }
+      ...
+      if (!mRequestTemplateCache[templateId].isEmpty()) {
+        *request = mRequestTemplateCache[templateId];
+        return OK;
+      }

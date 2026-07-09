@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2019-5482-tftp-heap-buffer-overflow
+    message: "Potential heap buffer overflow in TFTP handler due to insufficient buffer allocation when blksize < TFTP_BLKSIZE_DEFAULT. See CVE-2019-5482."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!state->rpacket.data) {
+                state->rpacket.data = calloc(1, blksize + 2 + 2);
+                ...
+              }
+          - pattern: |
+              if (!state->spacket.data) {
+                state->spacket.data = calloc(1, blksize + 2 + 2);
+                ...
+              }
+    metavariable-regex:
+      metavariable: blksize
+      regex: "blksize"
+    focus-metavariable: blksize

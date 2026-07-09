@@ -1,0 +1,19 @@
+rules:
+  - id: mwifiex_pcie_alloc_cmdrsp_buf_memory_leak
+    message: Memory leak in mwifiex_pcie_alloc_cmdrsp_buf. If mwifiex_map_pci_memory fails, the allocated skb is not freed.
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (mwifiex_map_pci_memory(...)) 
+        return -1;
+    pattern-not: |
+      if (mwifiex_map_pci_memory(...)) {
+        kfree_skb(...);
+        return -1;
+      }
+    fix-regex:
+      regex: ''
+      replacement: ''
+    metadata:
+      cwe: "CWE-401"
+      cve: "CVE-2019-19056"

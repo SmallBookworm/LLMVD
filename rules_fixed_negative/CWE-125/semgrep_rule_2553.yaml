@@ -1,0 +1,17 @@
+rules:
+  - id: cwe-125-lldp-oid-buffer-overread
+    message: "Buffer over-read vulnerability in LLDP OID parsing due to insufficient bounds check (CVE-2017-13027)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (tlen < oid_len) {
+                return 0;
+              }
+    metavariable-pattern:
+      metavariable: oid_len
+      pattern: $OID_LEN
+    fix-regex:
+      regex: ""
+      replacement: ""

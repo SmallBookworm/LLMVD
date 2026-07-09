@@ -1,0 +1,34 @@
+rules:
+  - id: cve-2014-3191-use-after-free
+    message: "Potential use-after-free vulnerability due to missing updateWidgetPositionsIfNeeded() call before compositor operations."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          void FrameView::updateLayoutAndStyleForPainting()
+          {
+              ...
+              updateWidgetPositionsIfNeeded();
+              ...
+              if (RenderView* view = renderView()) {
+                  ...
+                  view->compositor()->updateIfNeededRecursive();
+                  ...
+              }
+              ...
+          }
+      - pattern-either:
+          - pattern: |
+              void FrameView::updateLayoutAndStyleForPainting()
+              {
+                  ...
+                  if (RenderView* view = renderView()) {
+                      ...
+                      view->compositor()->updateIfNeededRecursive();
+                      ...
+                  }
+                  ...
+              }
+    metadata:
+      cwe: ["CWE-416"]
+      cve: "CVE-2014-3191"

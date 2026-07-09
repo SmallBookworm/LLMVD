@@ -1,0 +1,16 @@
+rules:
+  - id: gnutls-timing-side-channel-cve-2012-0390
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (length < 0)
+                length = 0;
+          - pattern: |
+              if (length < 0)
+                { ... }
+    message: "Potential timing side-channel vulnerability due to inconsistent handling of invalid record lengths. Fixed versions set length to ciphertext.size - tag_size to avoid timing leaks."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-310"
+      cve: "CVE-2012-0390"

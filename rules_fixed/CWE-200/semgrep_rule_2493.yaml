@@ -1,0 +1,43 @@
+rules:
+  - id: acpi_ns_evaluate_operand_cache_leak
+    message: "Missing cleanup of Info->ReturnObject on error path in acpi_ns_evaluate() may cause operand cache leak, leading to information disclosure (CVE-2017-13695)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (ACPI_FAILURE (Status))
+              {
+                  Info->ReturnObject = NULL;
+                  goto Cleanup;
+              }
+          - pattern: |
+              if (ACPI_FAILURE(Status))
+              {
+                  Info->ReturnObject = NULL;
+                  goto Cleanup;
+              }
+      - metavariable-pattern:
+          metavariable: Status
+          pattern: $STATUS
+      - pattern-not-inside: |
+          if (ACPI_FAILURE(Status)) 
+          {
+              /* If ReturnObject exists, delete it */
+              if (Info->ReturnObject) 
+              {
+                  AcpiUtRemoveReference (Info->ReturnObject);
+                  Info->ReturnObject = NULL;
+              }
+          }
+      - pattern-inside: |
+          AcpiNsEvaluate (...)
+          {
+            ...
+            if (ACPI_FAILURE (Status))
+            {
+                Info->ReturnObject = NULL;
+                goto Cleanup;
+            }
+            ...
+          }

@@ -1,0 +1,33 @@
+rules:
+  - id: squid-snmp-memory-leak-cve-2018-19132
+    message: "Memory leak in SNMP packet handling: snmp_free_pdu(PDU) is missing in the denial path, leading to a potential DoS (CVE-2018-19132)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (Community) {
+            ...
+            if (... && ...) {
+              ...
+            } else {
+              ...
+              // missing snmp_free_pdu(PDU);
+            }
+            xfree(Community);
+          } else {
+            ...
+            snmp_free_pdu(PDU);
+          }
+      - pattern: |
+          if (Community) {
+            ...
+            if (... && ...) {
+              ...
+            } else {
+              debugs(..., "WARNING: SNMP agent query DENIED from : " << ...);
+            }
+            xfree(Community);
+          }
+    metavariable-pattern:
+      metavariable: $PDU
+      pattern: PDU

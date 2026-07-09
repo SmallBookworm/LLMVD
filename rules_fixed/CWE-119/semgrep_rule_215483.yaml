@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2009-1897-null-deref-tun-chr-poll
+    message: "NULL pointer dereference in tun_chr_poll due to use of 'tun->sk' before NULL check on 'tun'."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              struct tun_struct *tun = __tun_get(...);
+              struct sock *sk = tun->sk;
+              ...
+              if (!tun) return ...;
+          - pattern: |
+              struct tun_struct *tun = __tun_get(...);
+              $STMTS...;
+              if (!tun) return ...;
+            metavariable-pattern:
+              - pattern-inside: $STMTS...
+              - pattern: tun->sk
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2009-1897"

@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2016-3878-zero-mb-decode
+    message: "Potential denial of service due to mishandling of zero MBs decoding. Missing check for zero total MBs coded before error slice skip."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          if (ps_dec->u4_first_slice_in_pic && (ps_dec->u2_total_mbs_coded == 0))
+              prev_slice_err = 1;
+      - pattern-either:
+          - pattern: |
+              if (ps_dec->u4_first_slice_in_pic && (ps_dec->u4_pic_buf_got == 0))
+                  prev_slice_err = 1;
+              else
+                  prev_slice_err = 2;
+              ...
+              ret1 = ih264d_mark_err_slice_skip(..., prev_slice_err);
+    metadata:
+      cwe: "CWE-284"
+      cve: "CVE-2016-3878"

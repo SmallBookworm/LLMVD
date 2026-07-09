@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2018-9422-use-after-free-futex
+    message: "Potential use-after-free in get_futex_key due to improper handling of inode reference counting. The WARN_ON_ONCE on atomic_inc_not_zero may mask a recoverable race condition that could lead to UAF (CWE-416)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (WARN_ON_ONCE(!atomic_inc_not_zero(&inode->i_count))) {
+            ...
+            goto again;
+          }
+    metadata:
+      cwe: ["CWE-416"]
+      cve: "CVE-2018-9422"
+      references:
+        - https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=48fb6f4db940e92cfb16cd878cddd59ea6120d06

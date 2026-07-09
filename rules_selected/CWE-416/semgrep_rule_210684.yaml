@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2020-7053-use-after-free-i915
+    message: "Potential use-after-free vulnerability due to improper locking when removing from context_idr. The context should be removed under a dedicated mutex (context_idr_lock) before being used or released."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          ctx = i915_gem_context_lookup($FILE_PRIV, $CTX_ID);
+          ...
+          idr_remove(&$FILE_PRIV->context_idr, $CTX->user_handle);
+      - pattern: |
+          idr_remove(&$FILE_PRIV->context_idr, $CTX->user_handle);
+          ...
+          i915_gem_context_put($CTX);
+    metadata:
+      cwe: ["CWE-416"]
+      cve: "CVE-2020-7053"

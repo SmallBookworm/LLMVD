@@ -1,0 +1,8 @@
+rules:
+  - id: cve-2007-4573-ia32-ptrace-register-zero-extension
+    message: "Missing zero-extension of 32-bit register values in IA32 ptrace emulation may lead to out-of-bounds system call table access (CVE-2007-4573)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (test_tsk_thread_flag($CHILD, TIF_IA32))
+        $VALUE &= 0xffffffff;

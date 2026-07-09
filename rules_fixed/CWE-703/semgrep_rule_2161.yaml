@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2016-2384-double-free
+    message: "Double free vulnerability in snd_usbmidi_create: 'umidi' is freed manually after being registered with rawmidi, which will cause a double-free on error paths because snd_usbmidi_free() is called automatically during teardown."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (err < 0) {
+                kfree(umidi);
+                return err;
+              }
+          - pattern: |
+              if (err < 0) {
+                snd_usbmidi_free(umidi);
+                return err;
+              }
+    metavariable-pattern:
+      metavariable: umidi
+      pattern: $X
+    focus-metavariable: umidi

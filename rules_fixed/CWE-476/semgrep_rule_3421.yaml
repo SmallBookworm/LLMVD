@@ -1,0 +1,37 @@
+rules:
+  - id: cve-2015-4054-null-pointer-dereference
+    message: "Password packet handled before startup packet; missing check for 'client->auth_user' may lead to NULL pointer dereference (CVE-2015-4054, CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      case 'p':
+          ...
+          if ($AUTH_CHECK) {
+              ...
+          }
+          ...
+          $FUNC($CLIENT, $PASSWD);
+    patterns:
+      - pattern-inside: |
+          case 'p':
+            ...
+      - pattern-either:
+          - pattern: |
+              if ($AUTH_CHECK) {
+                  ...
+              }
+              ...
+              $FUNC($CLIENT, $PASSWD);
+          - pattern: |
+              ...
+              if (!check_client_passwd($CLIENT, $PASSWD)) {
+                  ...
+              }
+      - pattern-not: |
+          if (!$CLIENT->auth_user) {
+              ...
+              return false;
+          }
+    metavariable-pattern:
+      metavariable: $CLIENT
+      pattern: PgSocket *

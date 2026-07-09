@@ -1,0 +1,21 @@
+rules:
+  - id: cirrus_vga_buffer_overflow_cve_2014_8106
+    message: "Potential heap-based buffer overflow in Cirrus VGA emulator due to missing width check against CIRRUS_BLTBUFSIZE."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          if ($WIDTH > CIRRUS_BLTBUFSIZE) {
+              return true;
+          }
+      - pattern-either:
+          - pattern: |
+              if (blit_region_is_unsafe(..., $PITCH, $ADDR)) {
+                  return true;
+              }
+          - pattern: |
+              if (blit_region_is_unsafe(...)) {
+                  return true;
+              }
+    metavariable-pattern:
+      $WIDTH: "s->cirrus_blt_width"

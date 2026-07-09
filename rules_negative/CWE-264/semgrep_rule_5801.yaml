@@ -1,0 +1,14 @@
+rules:
+  - id: cwe-264-chrome-shared-memory-permissions
+    message: "Shared memory file created with weak permissions, allowing other users to access sensitive data. Use owner-only permissions (S_IRUSR | S_IWUSR) and avoid world-writable directories without proper ownership checks."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              file_util::OpenFile($PATH, "w+x")
+          - pattern: |
+              file_util::OpenFile($PATH, "a+")
+    metadata:
+      cwe: ["CWE-264"]
+      cve: "CVE-2013-2905"

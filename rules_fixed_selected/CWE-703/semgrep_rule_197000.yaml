@@ -1,0 +1,24 @@
+rules:
+  - id: csync2_ssl_required_hello_vulnerability
+    message: "HELLO command does not properly fail when SSL is required but not used."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!csync_conn_usessl) {
+            ...
+            cmd_error = conn_response(CR_ERR_SSL_EXPECTED);
+          }
+      - pattern: |
+          if (!csync_conn_usessl) {
+            ...
+            cmd_error = conn_response(CR_ERR_SSL_EXPECTED);
+            ...
+          }
+    pattern-not: |
+      if (!csync_conn_usessl) {
+        ...
+        cmd_error = conn_response(CR_ERR_SSL_EXPECTED);
+        peer = NULL;
+        ...
+      }

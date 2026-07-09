@@ -1,0 +1,12 @@
+rules:
+  - id: perf_untrusted_search_path
+    message: "Untrusted search path vulnerability: perf reads './config' from current working directory, which may lead to arbitrary file overwrite or unexpected behavior."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern: |
+          repo_config = perf_pathdup("config");
+          if (!access(repo_config, R_OK)) {
+            ...
+          }
+          free(repo_config);

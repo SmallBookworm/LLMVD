@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2021-40562-division-by-zero
+    message: "Potential division by zero in frame rate calculation leading to segmentation fault (CVE-2021-40562)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (!ctx->timescale) {
+        ctx->cur_fps.num = 2 * sps->vui.time_scale;
+        ctx->cur_fps.den = 2 * sps->vui.num_units_in_tick * DeltaTfiDivisorIdx;
+      }
+    fix-regex:
+      regex: 'if \(!ctx->timescale\) \{'
+      replacement: 'if (!ctx->timescale && sps->vui.time_scale && sps->vui.num_units_in_tick) {'

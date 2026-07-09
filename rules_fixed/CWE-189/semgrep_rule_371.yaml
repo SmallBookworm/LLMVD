@@ -1,0 +1,27 @@
+rules:
+  - id: cve-2016-2181-dtls-replay-protection-bypass
+    message: "DTLS replay protection bypass vulnerability (CVE-2016-2181). The code processes buffered records without validating the MAC before updating the anti-replay window, allowing an attacker to cause denial of service by spoofing records with large sequence numbers."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while (pqueue_peek(...)) {
+                  dtls1_get_unprocessed_record($s);
+                  if (!dtls1_process_record($s))
+                      return ...;
+                  if (dtls1_buffer_record(..., SSL3_RECORD_get_seq_num($s->rlayer.rrec)) < 0)
+                      return ...;
+              }
+          - pattern: |
+              while (pqueue_peek(...)) {
+                  dtls1_get_unprocessed_record($s);
+                  ...
+                  if (dtls1_buffer_record(..., SSL3_RECORD_get_seq_num($s->rlayer.rrec)) < 0)
+                      return ...;
+              }
+    metavariable-regex:
+      metavariable: $s
+      regex: s
+    fix-regex:
+      enabled: false

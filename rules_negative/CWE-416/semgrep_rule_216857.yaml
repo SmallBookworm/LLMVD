@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2021-22940-use-after-free-http2-rst-stream
+    message: "Potential use-after-free vulnerability in HTTP/2 RST_STREAM handling. Streams with NGHTTP2_CANCEL should be added to the pending list unconditionally to avoid memory corruption."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (session_->is_in_scope() &&
+                  !is_writable() && is_reading()) {
+                session_->AddPendingRstStream(...);
+                return;
+              }
+          - pattern: |
+              if (session_->is_in_scope() && !is_writable() && is_reading())
+                session_->AddPendingRstStream(...);
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2021-22940"
+      references:
+        - https://github.com/nodejs/node/commit/a3c33d4ce78f74d1cf1765704af5b427aa3840a6
+        - https://nvd.nist.gov/vuln/detail/CVE-2021-22930

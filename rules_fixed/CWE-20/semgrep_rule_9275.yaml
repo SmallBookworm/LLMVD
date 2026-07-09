@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2014-1874-empty-security-context
+    message: "Empty security context (scontext_len == 0) can cause kernel BUG. Validate scontext_len before processing."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          if (!ss_initialized) { ... }
+          ...
+          $scontext2 = kmalloc(scontext_len + 1, ...);
+      - pattern-not: |
+          if (!scontext_len)
+              return -EINVAL;
+          if (!ss_initialized) { ... }
+          ...
+          $scontext2 = kmalloc(scontext_len + 1, ...);

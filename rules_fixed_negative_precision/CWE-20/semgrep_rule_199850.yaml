@@ -1,0 +1,12 @@
+rules:
+  - id: capnp-32bit-bounds-check-elision
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $FROM >= $PTR.begin() && $TO <= $PTR.end() && $FROM <= $TO
+    message: "Potential pointer arithmetic overflow leading to elided bounds check in 32-bit builds. Use offset-based comparison instead."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2017-7892"

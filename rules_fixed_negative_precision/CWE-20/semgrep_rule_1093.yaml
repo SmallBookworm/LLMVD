@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2013-0290-msg-peek-zero-len
+    patterns:
+      - pattern: |
+          if (flags & MSG_PEEK) {
+            if (*off >= skb->len) {
+              *off -= skb->len;
+              continue;
+            }
+            ...
+          }
+    message: "Missing check for zero-length skb in MSG_PEEK handling may cause infinite loop (CVE-2013-0290, CWE-20)."
+    severity: ERROR
+    languages: [c]

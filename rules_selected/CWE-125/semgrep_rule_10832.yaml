@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2018-19843-buffer-overread
+    message: "Potential buffer over-read in x86.nz assembler due to unsafe array access (CVE-2018-19843)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          SEG_REG_PREFIXES[op->operands[1].regs[0]]
+      - pattern: |
+          op->operands[1].regs[0] >= X86R_R8
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2018-19843"

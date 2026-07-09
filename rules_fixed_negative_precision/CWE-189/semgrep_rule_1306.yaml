@@ -1,0 +1,12 @@
+rules:
+  - id: bpf_jit_off_by_one_cond_jump
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (filter[i].jf)
+                  t_offset += is_near(f_offset) ? 2 : 6;
+          - pattern: |
+              t_offset += is_near(f_offset) ? 2 : 6;
+    message: "Off-by-one error in BPF JIT compiler: conditional jump target miscalculated due to incorrect long jump size (6 instead of 5 bytes). This can lead to denial of service or privilege escalation (CVE-2014-2889, CWE-189)."
+    severity: ERROR
+    languages: [c]

@@ -1,0 +1,10 @@
+rules:
+  - id: jbig2_decode_text_region_return_code_ignored
+    message: "Return code from jbig2_decode_text_region is ignored, potentially leading to NULL pointer dereference (CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      jbig2_decode_text_region(...);
+    patterns:
+      - pattern: |
+          jbig2_decode_text_region(...);

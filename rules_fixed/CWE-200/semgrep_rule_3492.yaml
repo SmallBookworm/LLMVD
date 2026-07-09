@@ -1,0 +1,15 @@
+rules:
+  - id: crypto_user_uninitialized_memory_leak
+    message: "Use of strlcpy may leave structure fields uninitialized, leading to leaking sensitive kernel memory to userspace. Use strncpy instead to ensure full initialization."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: strlcpy($DST, $SRC, sizeof($DST));
+          - pattern: strlcpy($DST, $SRC, $SIZE);
+    metavariable-pattern:
+      $DST: 
+        pattern-inside: struct crypto_user_alg *$UALG; ... $UALG->$FIELD
+      $SIZE:
+        pattern-not: sizeof($DST)
+    fix: ""

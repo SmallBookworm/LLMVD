@@ -1,0 +1,23 @@
+rules:
+  - id: null_pointer_dereference_gpac_sfcommandbuffer
+    message: "Potential null pointer dereference due to missing initialization of 'bufferSize' when 'buffer' is freed in SFCOMMANDBUFFER handling."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (sfcb->buffer) {
+        gf_free(sfcb->buffer);
+        sfcb->buffer = NULL;
+      }
+      ...
+      sfcb->bufferSize = ...;
+    pattern-not: |
+      if (sfcb->buffer) {
+        gf_free(sfcb->buffer);
+        sfcb->buffer = NULL;
+        sfcb->bufferSize = 0;
+      }
+      ...
+      sfcb->bufferSize = ...;
+    fix-regex:
+      regex: ""
+      replacement: ""

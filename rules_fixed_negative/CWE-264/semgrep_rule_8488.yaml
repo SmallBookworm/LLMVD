@@ -1,0 +1,14 @@
+rules:
+  - id: uninitialized_memory_read_omx
+    message: "Uninitialized memory may be read due to use of malloc without initialization. Use calloc or memset to initialize allocated memory."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          void *params = malloc(...);
+          ...
+          data.read(params, ...);
+      - pattern: |
+          void *params = malloc(...);
+          ...
+          $DATA.read(params, ...);

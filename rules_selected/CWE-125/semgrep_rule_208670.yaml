@@ -1,0 +1,29 @@
+rules:
+  - id: cwe-125-libsoup-ntlm-buffer-overread
+    message: |
+      Heap-based buffer over-read in soup_ntlm_parse_challenge due to insufficient length validation
+      before memcpy. This may lead to information disclosure or crash (CWE-125).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (clen < NTLM_CHALLENGE_DOMAIN_STRING_OFFSET ||
+              clen < NTLM_CHALLENGE_NONCE_OFFSET + NTLM_CHALLENGE_NONCE_LENGTH) {
+            ...
+          }
+          ...
+          memcpy (&domain, chall + NTLM_CHALLENGE_DOMAIN_STRING_OFFSET, sizeof (domain));
+          ...
+          if (clen < domain.length + domain.offset) {
+            ...
+          }
+      - pattern: |
+          memcpy (&domain, chall + NTLM_CHALLENGE_DOMAIN_STRING_OFFSET, sizeof (domain));
+          domain.length = GUINT16_FROM_LE (domain.length);
+          domain.offset = GUINT16_FROM_LE (domain.offset);
+          if (clen < domain.length + domain.offset) {
+            ...
+          }
+    metadata:
+      cwe: ["CWE-125"]
+      cve: "CVE-2019-17266"

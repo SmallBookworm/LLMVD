@@ -1,0 +1,22 @@
+rules:
+  - id: netfilter_missing_jumpstack_size_check
+    message: Missing jumpstack size check before writing to jumpstack may lead to NULL pointer dereference (CVE-2018-1065, CWE-476).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (table_base + v != $NEXT_ENTRY &&
+              !(...)) {
+            jumpstack[stackidx++] = ...;
+          }
+      - pattern: |
+          if (table_base + v != $NEXT_ENTRY &&
+              ...) {
+            jumpstack[stackidx++] = ...;
+          }
+    metavariable-pattern:
+      metavariable: NEXT_ENTRY
+      pattern: ip?t?_next_entry(...)
+    fix-regex:
+      regex: ""
+      replacement: ""

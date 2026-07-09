@@ -1,0 +1,17 @@
+rules:
+  - id: suricata-ipv6-truncated-extension-header-invalid-event
+    message: "Missing use of ENGINE_SET_INVALID_EVENT for truncated IPv6 extension headers, which may lead to evasion via malformed packets (CVE-2019-1010251)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($COND) {
+                ENGINE_SET_EVENT($P, IPV6_TRUNC_EXTHDR);
+                ...
+              }
+          - pattern: |
+              if ($COND) {
+                ENGINE_SET_EVENT($P, IPV6_EXTHDR_INVALID_OPTLEN);
+                ...
+              }

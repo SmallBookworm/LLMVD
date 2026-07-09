@@ -1,0 +1,7 @@
+rules:
+  - id: cwe-125-out-of-bounds-read-typed-ast
+    message: Potential out-of-bounds read due to missing bounds check before accessing CHILD(n, i). This could lead to a crash when parsing malicious Python source code.
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (TYPE(CHILD(n, i)) == COMMA)

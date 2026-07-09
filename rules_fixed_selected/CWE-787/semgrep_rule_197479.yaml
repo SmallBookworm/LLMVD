@@ -1,0 +1,17 @@
+rules:
+  - id: hevc_sps_id_negative_check_missing
+    message: "Missing negative check for sps_id may lead to out-of-bounds write (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (pps->sps_id >= 16) {
+          ...
+          }
+      - pattern: |
+          if (pps->sps_id >= $N) {
+          ...
+          }
+    metavariable-pattern:
+      $N: 
+        pattern-regex: "1[6-9]|[2-9][0-9]|[1-9][0-9]{2,}"

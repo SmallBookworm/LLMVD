@@ -1,0 +1,32 @@
+rules:
+  - id: cve-2016-1840-heap-buffer-overflow
+    message: "Heap-based buffer overflow in xmlFAParseCharRange due to unconditional NEXTL(len) call after error-prone parsing. This may lead to out-of-bounds memory access (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (end < start) {
+              ERROR(...);
+          } else {
+              xmlRegAtomAddRange(...);
+          }
+          return;
+      - pattern: |
+          if (end < start) {
+              ERROR(...);
+          } else {
+              xmlRegAtomAddRange(...);
+          }
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: xmlFAParseCharRange
+    pattern-inside: |
+      xmlFAParseCharRange(...) {
+        ...
+        if (end < start) {
+            ...
+        } else {
+            xmlRegAtomAddRange(...);
+        }
+        ...
+      }

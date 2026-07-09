@@ -1,0 +1,18 @@
+rules:
+  - id: insecure_condump_extension_check
+    message: "Missing file extension validation in Con_Dump_f allows writing arbitrary files, potentially leading to sandbox escape (CVE-2017-6903)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          Q_strncpyz($FILENAME, ..., ...);
+          COM_DefaultExtension($FILENAME, ..., ".txt");
+          ...
+          FS_FOpenFileWrite($FILENAME);
+      - pattern: |
+          COM_DefaultExtension($FILENAME, ..., ".txt");
+          ...
+          FS_FOpenFileWrite($FILENAME);
+    metavariable-regex:
+      metavariable: $FILENAME
+      regex: 'filename'

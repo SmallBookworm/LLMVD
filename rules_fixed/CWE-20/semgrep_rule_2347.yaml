@@ -1,0 +1,26 @@
+rules:
+  - id: kvm_irqfd_missing_gsi_check
+    message: "Missing validation of gsi against KVM_MAX_IRQ_ROUTES may lead to denial of service (CVE-2017-1000252)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ($FLAGS & ~(KVM_IRQFD_FLAG_DEASSIGN | KVM_IRQFD_FLAG_RESAMPLE))
+            return -EINVAL;
+          if ($FLAGS & KVM_IRQFD_FLAG_DEASSIGN)
+            return kvm_irqfd_deassign($KVM, $ARGS);
+          return kvm_irqfd_assign($KVM, $ARGS);
+      - pattern: |
+          if ($FLAGS & ~(KVM_IRQFD_FLAG_DEASSIGN | KVM_IRQFD_FLAG_RESAMPLE))
+            return -EINVAL;
+          ...
+          if ($FLAGS & KVM_IRQFD_FLAG_DEASSIGN)
+            return kvm_irqfd_deassign($KVM, $ARGS);
+          return kvm_irqfd_assign($KVM, $ARGS)
+    metavariable-patterns:
+      - metavariable: $FLAGS
+        pattern: args->flags
+      - metavariable: $ARGS
+        pattern: args
+      - metavariable: $KVM
+        pattern: kvm

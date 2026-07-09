@@ -1,0 +1,26 @@
+rules:
+  - id: ccs_injection_zero_master_key
+    message: "Detected missing check for zero-length master key in ChangeCipherSpec processing. This may lead to CCS Injection vulnerability (CVE-2014-0224)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (s->session == NULL)
+              {
+              ...
+              }
+          - pattern: |
+              if (s->session == NULL || ...)
+              {
+              ...
+              SSLerr(...);
+              return (0);
+              }
+    pattern-not: |
+      if (s->session == NULL || s->session->master_key_length == 0)
+      {
+      ...
+      SSLerr(...);
+      return (0);
+      }

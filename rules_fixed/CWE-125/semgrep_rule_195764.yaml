@@ -1,0 +1,28 @@
+rules:
+  - id: tflite_minimum_maximum_out_of_bounds_read
+    message: "Missing check for empty input tensors in TFLite Minimum/Maximum operator may lead to out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (NumElements($INPUT1) == 0 ||
+              NumElements($INPUT2) == 0) {
+            return kTfLiteOk;
+          }
+      - pattern-not: |
+          if (NumElements($INPUT1) == 0 ||
+              NumElements($INPUT2) == 0) {
+            return kTfLiteOk;
+          }
+    pattern-not-inside: |
+      TfLiteStatus Eval(TfLiteContext* $CONTEXT, TfLiteNode* $NODE) {
+        ...
+        if (NumElements($INPUT1) == 0 ||
+            NumElements($INPUT2) == 0) {
+          return kTfLiteOk;
+        }
+        ...
+      }
+    metadata:
+      cwe: ["CWE-125"]
+      cve: ["CVE-2021-29590"]

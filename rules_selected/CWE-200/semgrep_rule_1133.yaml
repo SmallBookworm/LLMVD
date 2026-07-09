@@ -1,0 +1,26 @@
+rules:
+  - id: ip_vs_get_timeout_uninit_struct
+    message: "Uninitialized structure 'ip_vs_timeout_user' may leak kernel stack memory via IP_VS_SO_GET_TIMEOUT"
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              struct ip_vs_timeout_user $T;
+              __ip_vs_get_timeouts(..., &$T);
+          - pattern: |
+              struct ip_vs_timeout_user $T;
+              ...;
+              __ip_vs_get_timeouts(..., &$T);
+    metavariable-pattern:
+      $T:
+        pattern-not: |
+          memset(&$T, 0, sizeof($T));
+        pattern-not-inside: |
+          {
+            ...
+            memset(&$T, 0, sizeof($T));
+            ...
+            __ip_vs_get_timeouts(..., &$T);
+            ...
+          }

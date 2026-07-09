@@ -1,0 +1,10 @@
+rules:
+  - id: evp_encryptupdate_integer_overflow
+    message: "Potential integer overflow in EVP_EncryptUpdate leading to heap corruption (CVE-2016-2106)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (i + inl < bl) {
+    metadata:
+      cwe: "CWE-189"
+      cve: "CVE-2016-2106"

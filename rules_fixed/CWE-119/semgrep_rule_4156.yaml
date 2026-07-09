@@ -1,0 +1,35 @@
+rules:
+  - id: cve-2018-8799-out-of-bounds-read
+    message: "Missing bounds check on in_len before use in rdp_in_unistr may lead to out-of-bounds read (CVE-2018-8799)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          rdp_in_unistr(..., int in_len, ..., ...)
+          {
+              ...
+              if (*string == NULL)
+              {
+                  *string = xmalloc(in_len * 2);
+                  ...
+              }
+              ...
+          }
+      - pattern: |
+          rdp_in_unistr(..., int in_len, ..., ...)
+          {
+              ...
+              ibl = in_len;
+              ...
+          }
+    metavariable-pattern:
+      metavariable: in_len
+      pattern-not: |
+          if ((in_len < 0) || ((uint32)in_len >= (RD_UINT32_MAX / 2)))
+          {
+              ...
+              abort();
+          }
+    fix-regex:
+      regex: ""
+      replacement: ""

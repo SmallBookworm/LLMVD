@@ -1,0 +1,27 @@
+rules:
+  - id: csp_javascript_url_bypass
+    message: "Missing Content Security Policy check for javascript: URLs may allow CSP bypass (CVE-2019-5803)"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (dom_window_->IsInsecureScriptAccess(..., $COMPLETED_URL))
+            return;
+          ...
+          $dom_window_->GetFrame()->ScheduleNavigation(..., $COMPLETED_URL, ...);
+      - pattern: |
+          if (dom_window_->IsInsecureScriptAccess(..., $COMPLETED_URL))
+            return;
+          ...
+          V8DOMActivityLogger* ...;
+          ...
+          $dom_window_->GetFrame()->ScheduleNavigation(..., $COMPLETED_URL, ...);
+    metavariable-pattern:
+      $COMPLETED_URL:
+        patterns:
+          - pattern-either:
+              - pattern: $COMPLETED_URL.ProtocolIsJavaScript()
+          - metavariable-regex:
+              regexp: '^[a-zA-Z_][a-zA-Z0-9_]*$'
+              metavariable: $COMPLETED_URL
+        language: c

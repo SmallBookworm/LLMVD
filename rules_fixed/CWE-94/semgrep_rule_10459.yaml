@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2013-6399-virtio-queue-sel-check
+    message: "Missing bounds check on vdev->queue_sel before use as array index. This can lead to buffer overruns and arbitrary code execution via crafted savevm images."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: qemu_get_be16s(..., &vdev->queue_sel);
+              - pattern-inside: |
+                  ...
+                  vdev->vq[vdev->queue_sel]...
+          - patterns:
+              - pattern: qemu_get_be16s(..., &vdev->queue_sel);
+              - pattern-inside: |
+                  ...
+                  ...vdev->vq[...vdev->queue_sel...]
+    metavariable-regex:
+      metavariable: vdev
+      regex: "vdev"

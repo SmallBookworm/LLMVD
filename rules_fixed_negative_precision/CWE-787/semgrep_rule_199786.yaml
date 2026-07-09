@@ -1,0 +1,38 @@
+rules:
+  - id: weechat-cve-2020-8955
+    message: "Potential buffer overflow in irc_mode_channel_update due to missing chanmode_found guard (CVE-2020-8955, CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (pos[0] == $CHANMODE)
+          {
+              $CHANMODE_FOUND = 1;
+              if ($SET_FLAG == '+')
+              {
+                  ...
+              }
+          }
+      - pattern: |
+          if (pos[0] == $CHANMODE)
+          {
+              if ($SET_FLAG == '+')
+              {
+                  ...
+              }
+          }
+    metavariable-pattern:
+      metavariable: $CHANMODE_FOUND
+      pattern: chanmode_found
+    pattern-not-inside: |
+      if (pos[0] == $CHANMODE)
+      {
+          if (!$CHANMODE_FOUND)
+          {
+              $CHANMODE_FOUND = 1;
+              if ($SET_FLAG == '+')
+              {
+                  ...
+              }
+          }
+      }

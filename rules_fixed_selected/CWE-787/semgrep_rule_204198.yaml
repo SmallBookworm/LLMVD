@@ -1,0 +1,34 @@
+rules:
+  - id: cve-2018-16375-missing-height-width-check
+    message: Missing check for header_info.height and header_info.width may lead to heap-based buffer overflow (CWE-787, CVE-2018-16375).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          read_pnm_header(..., &header_info);
+          ...
+          if (!header_info.ok) { ... }
+          ...
+          $W = header_info.width;
+          $H = header_info.height;
+      - pattern: |
+          read_pnm_header(..., &header_info);
+          ...
+          if (!header_info.ok) { ... }
+          ...
+          w = header_info.width;
+          h = header_info.height;
+    metavariable-patterns:
+      - metavariable: "$W"
+        pattern: "w"
+      - metavariable: "$H"
+        pattern: "h"
+    pattern-not: |
+      read_pnm_header(..., &header_info);
+      ...
+      if (!header_info.ok) { ... }
+      ...
+      if (header_info.height != 0 && header_info.width > INT_MAX / header_info.height) { ... }
+      ...
+      w = header_info.width;
+      h = header_info.height;

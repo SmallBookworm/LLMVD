@@ -1,0 +1,30 @@
+rules:
+  - id: cve-2018-15863-null-deref-no-op-modmask
+    message: "Potential NULL pointer dereference due to missing check for expr->action.args before use. This could lead to a crash when parsing a crafted keymap file."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (expr->expr.op == EXPR_ACTION_DECL) {
+                  ...
+                  if (!LookupString(..., ..., ...)) {
+                      ...
+                      return false;
+                  }
+                  expr = expr->action.args;
+              }
+          - pattern: |
+              if (expr->expr.op == EXPR_ACTION_DECL) {
+                  ...
+                  if (!LookupString(..., ..., ...)) {
+                      ...
+                  }
+                  expr = expr->action.args;
+              }
+    metavariable-pattern:
+      metavariable: expr
+      pattern: expr
+    fix-regex:
+      regex: ""
+      replacement: ""

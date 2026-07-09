@@ -1,0 +1,18 @@
+rules:
+  - id: insufficient_type_check_before_cast
+    patterns:
+      - pattern-either:
+          - pattern: |
+              assert($OBJ->instanceof($CLASS));
+              ...
+              Native::data<$T>($OBJ.get());
+          - pattern: |
+              assert($OBJ->instanceof($CLASS));
+              ...
+              Native::data<$T>($OBJ);
+    message: "Insufficient type check before casting input data. Use explicit conditional check instead of assert to prevent type confusion vulnerabilities."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-345"
+      cve: "CVE-2016-1000004"

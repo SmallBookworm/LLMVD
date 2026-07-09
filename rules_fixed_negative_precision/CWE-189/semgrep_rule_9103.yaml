@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2009-3607-integer-overflow
+    message: |
+      Potential integer overflow leading to heap-based buffer overflow in 
+      create_surface_from_thumbnail_data. The expression '4 * width * height' 
+      may overflow, resulting in insufficient memory allocation.
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      g_malloc (4 * $WIDTH * $HEIGHT)

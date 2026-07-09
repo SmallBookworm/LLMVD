@@ -1,0 +1,10 @@
+rules:
+  - id: cwe-284-incorrect-credentials-passing
+    message: "Use of effective UID/GID (euid/egid) instead of real UID/GID (uid/gid) in credentials passing may lead to privilege escalation (CWE-284, CVE-2013-1979)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          scm->creds.uid = cred ? cred->euid : INVALID_UID;
+      - pattern: |
+          scm->creds.gid = cred ? cred->egid : INVALID_GID;

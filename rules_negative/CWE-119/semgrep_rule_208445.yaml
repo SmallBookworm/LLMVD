@@ -1,0 +1,13 @@
+rules:
+  - id: claws_mail_jis_conversion_buffer_overflow
+    patterns:
+      - pattern: |
+          while (*in != '\0' && (out - outbuf) > outlen - 3) {
+            ...
+          }
+    message: "Stack-based buffer overflow due to incorrect loop condition in Japanese character set conversion. Use '<' instead of '>' to prevent writing beyond buffer bounds."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2015-8614"

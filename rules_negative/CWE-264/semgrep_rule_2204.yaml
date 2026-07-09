@@ -1,0 +1,41 @@
+rules:
+  - id: cve-2015-8966-oabi-fcntl64-ofd-missing-set_fs-restore
+    message: "Missing set_fs(fs) restoration for F_OFD_* commands in sys_oabi_fcntl64 may lead to privilege escalation (CVE-2015-8966)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          switch (cmd) {
+          case F_OFD_GETLK:
+          case F_OFD_SETLK:
+          case F_OFD_SETLKW:
+          ...
+          set_fs(KERNEL_DS);
+          }
+          ...
+          switch (cmd) {
+          case F_GETLK64:
+          ...
+          case F_SETLK64:
+          case F_SETLKW64:
+              set_fs(fs);
+          }
+      - pattern: |
+          switch (cmd) {
+          case F_OFD_GETLK:
+          case F_OFD_SETLK:
+          case F_OFD_SETLKW:
+          ...
+          set_fs(KERNEL_DS);
+          }
+          ...
+          ret = sys_fcntl64(...);
+          ...
+          switch (cmd) {
+          case F_SETLK64:
+          case F_SETLKW64:
+              set_fs(fs);
+          }
+    metadata:
+      cwe: ["CWE-264"]
+      cve: "CVE-2015-8966"

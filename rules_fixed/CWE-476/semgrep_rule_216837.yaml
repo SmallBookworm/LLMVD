@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2021-3449-null-ptr-deref
+    message: "Potential NULL pointer dereference due to missing reset of peer_sigalgslen during TLS renegotiation (CVE-2021-3449)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              OPENSSL_free(s->s3->tmp.peer_sigalgs);
+              s->s3->tmp.peer_sigalgs = NULL;
+          - pattern: |
+              OPENSSL_free(s->s3->tmp.peer_cert_sigalgs);
+              s->s3->tmp.peer_cert_sigalgs = NULL;
+    metavariable-regex:
+      metavariable: s
+      regex: "^[a-zA-Z_][a-zA-Z0-9_]*$"
+    comment: "Detects usage of the old-style reset of peer signature algorithm arrays without resetting their lengths, which can lead to a NULL pointer dereference in OpenSSL (CVE-2021-3449)."

@@ -1,0 +1,32 @@
+rules:
+  - id: qemu-fdc-eot-buffer-overflow
+    message: "Potential heap buffer overflow due to missing validation of EOT (end-of-track) value against sector count. This may lead to out-of-bounds memory access (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (fdctrl->fifo[5] == 0) {
+              ...
+          } else {
+              ...
+              tmp = (fdctrl->fifo[6] - ks + 1);
+              ...
+              if (fdctrl->fifo[0] & 0x80)
+                  tmp += fdctrl->fifo[6];
+              ...
+          }
+      - pattern: |
+          tmp = (fdctrl->fifo[6] - ks + 1);
+          ...
+          if (fdctrl->fifo[0] & 0x80)
+              tmp += fdctrl->fifo[6];
+    metavariable-pattern:
+      metavariable: tmp
+      patterns:
+        - pattern-not: |
+            if (tmp < 0) {
+                ...
+                return;
+            }
+    fix-regex:
+      enabled: false

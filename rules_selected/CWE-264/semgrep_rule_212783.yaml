@@ -1,0 +1,26 @@
+rules:
+  - id: unchecked-setuid
+    patterns:
+      - pattern: setuid(...)
+      - pattern-not: |
+          if (setuid(...) == -1) {
+            ...
+          }
+      - pattern-not: |
+          if ((setuid(...) == -1) && (errno == EAGAIN)) {
+            ...
+          }
+      - pattern-not: |
+          if (setuid(...) < 0) {
+            ...
+          }
+      - pattern-not: |
+          if (setuid(...) != 0) {
+            ...
+          }
+    message: "Return value of setuid() is not checked. This could lead to privilege escalation if the process fails to drop privileges."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-264"
+      cve: "CVE-2013-6825"

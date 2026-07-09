@@ -1,0 +1,14 @@
+rules:
+  - id: cwe-125-buffer-overread-libgxps
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $BYTES_READ = archive_read_data($ARCHIVE, $BUFFER, $COUNT);
+              if ($BYTES_READ == 0 && ...) { ... }
+          - pattern: |
+              $BYTES_READ = archive_read_data($ARCHIVE, $BUFFER, $COUNT);
+              ...
+              return $BYTES_READ;
+    message: "Missing error check for archive_read_data return value may lead to heap-based buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]

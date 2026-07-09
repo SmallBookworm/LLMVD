@@ -1,0 +1,47 @@
+rules:
+  - id: cwe-703-jasper-mct-domain-check-missing
+    message: Missing check that all image components have the same domain before applying RCT/ICT transform. This can lead to assertion failures or denial of service (CVE-2016-9389).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          switch (...->mctid) {
+          case JPC_MCT_RCT:
+              ...
+              jpc_irct(...);
+              break;
+          ...
+          }
+      - pattern: |
+          switch (...->mctid) {
+          case JPC_MCT_ICT:
+              ...
+              jpc_iict(...);
+              break;
+          ...
+          }
+    patterns:
+      - pattern-not-inside: |
+          switch (...->mctid) {
+          case JPC_MCT_RCT:
+              ...
+              if (!jas_image_cmpt_domains_same(...)) {
+                  ...
+                  return ...;
+              }
+              jpc_irct(...);
+              break;
+          ...
+          }
+      - pattern-not-inside: |
+          switch (...->mctid) {
+          case JPC_MCT_ICT:
+              ...
+              if (!jas_image_cmpt_domains_same(...)) {
+                  ...
+                  return ...;
+              }
+              jpc_iict(...);
+              break;
+          ...
+          }

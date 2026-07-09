@@ -1,0 +1,12 @@
+rules:
+  - id: appcache_refcounting_vulnerability
+    message: "Potential use-after-free due to incorrect refcounting in AppCacheGroup::RemoveCache. CancelUpdate() must be called after setting newest_complete_cache_ to nullptr to avoid premature deletion."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (cache == newest_complete_cache_) {
+        CancelUpdate();
+        AppCache* tmp_cache = newest_complete_cache_;
+        newest_complete_cache_ = nullptr;
+        ...
+      }

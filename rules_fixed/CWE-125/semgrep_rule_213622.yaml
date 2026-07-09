@@ -1,0 +1,7 @@
+rules:
+  - id: cwe-125-out-of-bounds-read-in-handle_keywordonly_args
+    message: "Potential out-of-bounds read due to missing bounds check before accessing CHILD(n, i). This may lead to a crash or information disclosure (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (TYPE(CHILD(n, i)) == COMMA)

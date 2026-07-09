@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2007-6417-missing-clear-highpage
+    message: "Missing clear_highpage call before SetPageUptodate may expose uninitialized kernel memory (CVE-2007-6417, CWE-200)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          flush_dcache_page($FILEPAGE);
+          SetPageUptodate($FILEPAGE);
+      - pattern: |
+          SetPageUptodate($FILEPAGE);
+          flush_dcache_page($FILEPAGE);
+    metavariable-pattern:
+      $FILEPAGE: "struct page *"
+    pattern-not-inside: |
+      clear_highpage($FILEPAGE);
+      ...
+      (flush_dcache_page($FILEPAGE); SetPageUptodate($FILEPAGE); | SetPageUptodate($FILEPAGE); flush_dcache_page($FILEPAGE);)

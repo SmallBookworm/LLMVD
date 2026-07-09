@@ -1,0 +1,26 @@
+rules:
+  - id: cve-2015-5706-use-after-free-path_openat
+    message: "Use-after-free vulnerability due to double path_cleanup() in path_openat when handling O_TMPFILE. This may lead to double fput() and potential exploitation."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (unlikely($FILE->f_flags & __O_TMPFILE)) {
+                  ...
+                  goto out;
+              }
+              ...
+              out:
+              path_cleanup($ND);
+          - pattern: |
+              if (unlikely($X & __O_TMPFILE)) {
+                  ...
+                  goto out;
+              }
+              ...
+              out:
+              path_cleanup($Y);
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2015-5706"

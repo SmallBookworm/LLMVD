@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2020-8265-use-after-free-tls
+    message: "Use-after-free vulnerability in TLS implementation due to raw pointer usage for WriteWrap. Use std::unique_ptr to manage ownership."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              int $FUNC($CLASS::DoWrite(WriteWrap* $REQ_WRAP, ...) {
+                ...
+                $REQ_WRAP->Done(...);
+                ...
+              }
+          - pattern: |
+              int $FUNC($CLASS::DoWrite(WriteWrap* $REQ_WRAP, ...) {
+                ...
+                queue_.emplace(... ? $REQ_WRAP : ...);
+                ...
+              }
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2020-8265"

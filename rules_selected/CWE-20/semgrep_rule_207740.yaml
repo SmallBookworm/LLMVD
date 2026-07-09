@@ -1,0 +1,15 @@
+rules:
+  - id: htcondor-cve-2014-8126
+    message: "Use of unvalidated MAIL configuration parameter may lead to arbitrary code execution via command injection."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if ( (Mailer = param("MAIL")) == NULL ) {
+        ...
+        return NULL;
+      }
+      ...
+      final_args[arg_index++] = Mailer;
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2014-8126"

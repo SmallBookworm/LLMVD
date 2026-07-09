@@ -1,0 +1,17 @@
+rules:
+  - id: cwe-125-type-confusion-pdfium
+    message: "Missing bounds check may lead to out-of-bounds read due to type confusion (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $FEATURE_FLAGS.gpu_memory_buffer_formats.Add($FORMAT);
+      - pattern: |
+          $FEATURE_FLAGS->gpu_memory_buffer_formats.Add($FORMAT);
+    metavariable-pattern:
+      metavariable: $FEATURE_FLAGS
+      pattern-not: |
+        if ($COND)
+          return;
+        ...
+        $FEATURE_FLAGS.gpu_memory_buffer_formats.Add($FORMAT);

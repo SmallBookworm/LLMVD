@@ -1,0 +1,15 @@
+rules:
+  - id: virtio_net_fraglist_buffer_overflow
+    message: "Use of NETIF_F_FRAGLIST in virtio_net can lead to buffer overflow (CVE-2015-5156)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $$dev->hw_features |= ... | NETIF_F_FRAGLIST | ...
+      - pattern: |
+          $$dev->features |= ... | NETIF_F_FRAGLIST | ...
+    metadata:
+      cwe: ["CWE-119"]
+      references:
+        - https://github.com/torvalds/linux/commit/48900cb6af4282fa0fb6ff4d72a81aa3dadb5c39
+        - CVE-2015-5156

@@ -1,0 +1,11 @@
+rules:
+  - id: qemu-xlnx-ethernetlite-buffer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              memcpy(&s->regs[rxbase + R_RX_BUF0], buf, size);
+          - pattern: |
+              memcpy(&s->regs[... + R_RX_BUF0], ..., size);
+    message: "Heap-based buffer overflow in xlnx.xps-ethernetlite .receive callback due to missing size check before memcpy. This may lead to arbitrary code execution (CVE-2016-7161, CWE-119)."
+    severity: ERROR
+    languages: [c]

@@ -1,0 +1,16 @@
+rules:
+  - id: agp_integer_overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((pg_start + mem->page_count) > num_entries)
+                  return -EINVAL;
+          - pattern: |
+              if (((pg_start + mem->page_count) > num_entries) || ...)
+                  return -EINVAL;
+    message: "Missing integer overflow check in AGP memory insertion may lead to buffer overflow (CVE-2011-1745, CWE-190)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-190"
+      cve: "CVE-2011-1745"

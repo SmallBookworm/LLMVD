@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2014-8884-buffer-overflow
+    message: |
+      Missing bounds check on cmd->msg_len before memcpy may lead to stack-based buffer overflow.
+      Ensure cmd->msg_len is checked against buffer size before copying.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              memcpy(&b[4], cmd->msg, cmd->msg_len);
+          - pattern: |
+              memcpy(b + 4, cmd->msg, cmd->msg_len);
+    metavariable-pattern:
+      b: 
+        pattern: $BUF
+        language: c
+    focus-metavariable: $BUF

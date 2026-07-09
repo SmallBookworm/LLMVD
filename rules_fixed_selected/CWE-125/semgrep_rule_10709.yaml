@@ -1,0 +1,9 @@
+rules:
+  - id: cwe-125-out-of-bounds-read-dex-method-class-id
+    message: "Out-of-bounds read vulnerability due to improper bounds check on bin->methods[i].class_id. The condition 'bin->methods[i].class_id > bin->header.types_size - 1' may allow access beyond the valid range of bin->types array."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (bin->methods[$I].class_id > bin->header.types_size - 1) {
+        ...
+      }

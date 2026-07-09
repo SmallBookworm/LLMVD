@@ -1,0 +1,43 @@
+rules:
+  - id: openjpeg-cve-2019-12973
+    message: "Missing validation of written pixel count may lead to excessive iteration and denial of service (CVE-2019-12973)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while (... < height) {
+                ...
+                for (...; ...; ...) {
+                  ...
+                  *pix = ...;
+                }
+                ...
+              }
+              return OPJ_TRUE;
+          - pattern: |
+              while (... < height) {
+                ...
+                for (...; ...; ...) {
+                  ...
+                  *pix = ...;
+                }
+                ...
+              }
+              if (...) { ... }
+              return OPJ_TRUE;
+      - pattern-not: |
+          while (... < height) {
+            ...
+            for (...; ...; ...) {
+              ...
+              *pix = ...;
+              written++;
+            }
+            ...
+          }
+          if (written != ...) { ... }
+          return OPJ_TRUE;
+    metavariable-pattern:
+      metavariable: written
+      pattern: "written"

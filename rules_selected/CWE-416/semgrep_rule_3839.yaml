@@ -1,0 +1,24 @@
+rules:
+  - id: hns_nic_net_xmit_hw_use_after_free
+    message: "Use-after-free vulnerability in hns_nic_net_xmit_hw: skb may be freed and then used again if NETDEV_TX_OK is returned after dev_kfree_skb_any."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              int hns_nic_net_xmit_hw(..., struct sk_buff *skb, ...) {
+                ...
+                dev_kfree_skb_any(skb);
+                return NETDEV_TX_OK;
+                ...
+              }
+          - pattern: |
+              int hns_nic_net_xmit_hw(...) {
+                ...
+                dev_kfree_skb_any(skb);
+                return NETDEV_TX_OK;
+                ...
+              }
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2017-18218"

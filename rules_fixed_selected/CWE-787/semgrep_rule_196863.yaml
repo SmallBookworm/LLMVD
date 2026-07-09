@@ -1,0 +1,17 @@
+rules:
+  - id: imagemagick-jpeg-writeprofile-exif-overflow
+    message: "Buffer overflow vulnerability in WriteProfile function when handling EXIF profiles larger than 65533 bytes (CVE-2016-10052, CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (LocaleCompare(name,"EXIF") == 0)
+            for (...; ...; ...)
+            {
+              ...
+              jpeg_write_marker(..., GetStringInfoDatum(profile)+i, ...);
+            }
+      - pattern: |
+          if (LocaleCompare(name,"EXIF") == 0)
+            for (...; ...; ...)
+              jpeg_write_marker(..., GetStringInfoDatum(profile)+i, ...);

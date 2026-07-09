@@ -1,0 +1,33 @@
+rules:
+  - id: tensorflow-self-recursive-function-check-missing
+    message: Missing validation for self-recursive functions in FunctionDefLibrary, which may lead to stack overflow (CVE-2022-23591).
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (graph_def.has_library()) {
+                ...
+                for (const auto& function : library.function()) {
+                  ...
+                  for (const auto& node : function.node_def()) {
+                    TF_RETURN_IF_ERROR(ValidateNode(node));
+                  }
+                  ...
+                }
+                ...
+              }
+          - pattern: |
+              if (graph_def.has_library()) {
+                ...
+                for (const auto& function : graph_def.library().function()) {
+                  ...
+                  for (const auto& node : function.node_def()) {
+                    TF_RETURN_IF_ERROR(ValidateNode(node));
+                  }
+                  ...
+                }
+                ...
+              }
+    pattern-not: |
+      TF_RETURN_IF_ERROR(ValidateFunctionNotRecursive(function))

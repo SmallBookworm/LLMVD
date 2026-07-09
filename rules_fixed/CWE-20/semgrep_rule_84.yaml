@@ -1,0 +1,20 @@
+rules:
+  - id: dbus_header_byteswap_missing_byte_order_update
+    message: "Missing update of byte order in message data may lead to inconsistent state and potential security issues (CVE-2011-2200)."
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ($HEADER->byte_order == $NEW_ORDER)
+            return;
+          ...
+          _dbus_marshal_byteswap(..., &$HEADER->data, ...);
+          $HEADER->byte_order = $NEW_ORDER;
+      - pattern: |
+          if ($HEADER->byte_order == $NEW_ORDER)
+            return;
+          _dbus_marshal_byteswap(..., &$HEADER->data, ...);
+          $HEADER->byte_order = $NEW_ORDER;
+    metavariable-pattern:
+      $HEADER: { type: "DBusHeader *" }
+    fix: ""

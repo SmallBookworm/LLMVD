@@ -1,0 +1,27 @@
+rules:
+  - id: chrony-integer-overflow-packet-length
+    message: |
+      Integer overflow vulnerability in packet length calculation. 
+      Missing validation of item count before multiplication may lead to buffer overflow.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($STATUS == htons(STT_SUCCESS)) {
+                return (offsetof($BASE, $MEMBER) +
+                        $COUNT * sizeof($TYPE));
+              }
+          - pattern: |
+              if ($COUNT > $MAX)
+                return 0;
+              if ($STATUS == htons(STT_SUCCESS)) {
+                return (offsetof($BASE, $MEMBER) +
+                        $COUNT * sizeof($TYPE));
+              }
+    pattern-not: |
+      if ($COUNT > $MAX)
+        return 0;
+      ...
+      return (offsetof($BASE, $MEMBER) +
+              $COUNT * sizeof($TYPE));

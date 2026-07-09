@@ -1,0 +1,17 @@
+rules:
+  - id: cwe-125-buffer-overread-lookup_bytestring
+    message: "Buffer over-read vulnerability in lookup_bytestring due to missing length check before memcmp."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              memcmp((const char *)$BS, (const char *)($TP->$E_BS), $NLEN) == 0
+          - pattern: |
+              memcmp((const char *)$BS, (const char *)$TP->$E_BS, $NLEN) == 0
+    metavariable-pattern:
+      metavariable: $E_BS
+      pattern-not:
+        regex: $TP->bs_nbytes == $NLEN
+    fix-regex:
+      enabled: false

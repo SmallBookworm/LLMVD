@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2017-5508-buffer-overflow
+    message: "Heap-based buffer overflow in TIFF pixel buffer allocation due to insufficient size calculation. This could lead to memory corruption or denial of service."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          $TIFF_PIXELS = (unsigned char *) AcquireMagickMemory(TIFFScanlineSize($tiff) + sizeof(uint32));
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2017-5508"
+      references:
+        - https://github.com/ImageMagick/ImageMagick/commit/c073a7712d82476b5fbee74856c46b88af9c3175

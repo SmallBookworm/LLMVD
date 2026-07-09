@@ -1,0 +1,13 @@
+rules:
+  - id: heap_memory_corruption_suffix_assignment
+    message: "Direct assignment of string literal to control->suffix may lead to heap memory corruption when later deallocated. Use strdup() instead."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      $CONTROL->$SUFFIX = ".lrz";
+    metavariable-pattern:
+      metavariable: $CONTROL
+      pattern: rzip_control *
+    fix-regex:
+      regex: '(".lrz")'
+      replacement: 'strdup($1)'

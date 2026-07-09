@@ -1,0 +1,21 @@
+rules:
+  - id: tensorflow_dataset_to_tfrecord_type_check_missing
+    message: "Missing type check for dataset elements in ToTFRecordOp may lead to heap buffer overflow (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          writer->WriteRecord(components[0].scalar<tstring>()());
+      - pattern: |
+          TF_RETURN_IF_ERROR(
+              writer->WriteRecord(components[0].scalar<tstring>()()));
+    metavariable-pattern:
+      metavariable: components
+      pattern: |
+        std::vector<Tensor> components;
+    pattern-not-inside: |
+      if (dt != DT_STRING) {
+        return errors::InvalidArgument(...);
+      }
+      ...
+      writer->WriteRecord(components[0].scalar<tstring>()());

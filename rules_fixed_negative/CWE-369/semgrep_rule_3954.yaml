@@ -1,0 +1,11 @@
+rules:
+  - id: imagemagick-divide-by-zero-meanshift
+    message: "Potential divide-by-zero vulnerability in MeanShiftImage due to unsafe division by 'count'. Use PerceptibleReciprocal to avoid division by zero."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          gamma = 1.0 / $COUNT;
+    metadata:
+      cwe: "CWE-369"
+      cve: "CVE-2019-14981"

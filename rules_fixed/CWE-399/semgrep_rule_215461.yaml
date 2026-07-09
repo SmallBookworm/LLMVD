@@ -1,0 +1,13 @@
+rules:
+  - id: ext4_isize_i_size_high_unchecked
+    message: "Use of i_size_high without checking if inode is a regular file may lead to denial of service (CVE-2009-0747)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              ((loff_t)le32_to_cpu($RAW_INODE->i_size_high) << 32) | le32_to_cpu($RAW_INODE->i_size_lo)
+    metavariable-pattern:
+      $RAW_INODE:
+        type: "struct ext4_inode *"
+    fix: ""

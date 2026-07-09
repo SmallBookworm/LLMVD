@@ -1,0 +1,32 @@
+rules:
+  - id: cwe-772-rsyslog-msgdup-missing-null-check
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if((pOld->msgFlags & NEEDS_DNSRESOL)) {
+                  ...
+                  if(localRet != RS_RET_OK) {
+                      ...
+                      pNew->msgFlags &= ~NEEDS_DNSRESOL;
+                  }
+              }
+          - pattern: |
+              if((pOld->msgFlags & NEEDS_DNSRESOL) == 1) {
+                  ...
+                  if(localRet != RS_RET_OK) {
+                      ...
+                      pNew->msgFlags &= ~NEEDS_DNSRESOL;
+                  }
+              }
+    pattern-not: |
+      if((pOld->msgFlags & NEEDS_DNSRESOL)) {
+          ...
+          if(localRet != RS_RET_OK) {
+              ...
+              pNew->msgFlags &= ~NEEDS_DNSRESOL;
+              pNew->rcvFrom.pRcvFrom = NULL;
+          }
+      }
+    message: "Missing null assignment to pNew->rcvFrom.pRcvFrom after clearing NEEDS_DNSRESOL flag may cause use-after-free or memory leak (CWE-772)."
+    severity: ERROR
+    languages: [c]

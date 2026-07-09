@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2019-12155-null-dereference
+    message: "NULL pointer dereference vulnerability in interface_release_resource due to missing check for ext.info"
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (ext.group_id == $GROUP_ID) {
+        ...
+        ext.info->$FIELD;
+      }
+    pattern-not: |
+      if (!ext.info) {
+        return;
+      }
+      if (ext.group_id == $GROUP_ID) {
+        ...
+        ext.info->$FIELD;
+      }

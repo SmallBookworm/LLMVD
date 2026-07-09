@@ -1,0 +1,18 @@
+rules:
+  - id: iowarrior_missing_endpoint_check
+    message: "Missing check for bNumEndpoints < 1 may lead to NULL pointer dereference (CVE-2016-2188)"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $iface_desc = $interface->cur_altsetting;
+          ...
+          for (...; ... < $iface_desc->desc.bNumEndpoints; ...) { ... }
+      - pattern: |
+          $iface_desc = $interface->cur_altsetting;
+          ...
+          $x = usb_endpoint_maxp($dev->int_in_endpoint);
+    metavariable-pattern:
+      metavariable: $iface_desc
+      patterns:
+        - pattern: struct usb_host_interface *

@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2013-6649-use-after-free
+    message: "Potential use-after-free vulnerability due to missing check for empty object bounding box before painting SVG foreground."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (childPaintInfo.phase == PaintPhaseForeground) {
+            ...
+          }
+      - pattern: |
+          if (childPaintInfo.phase == PaintPhaseForeground && ... && !m_objectBoundingBox.isEmpty()) {
+            ...
+          }
+    metavariable-pattern:
+      metavariable: $COND
+      pattern-not: |
+        childPaintInfo.phase == PaintPhaseForeground && ... && !m_objectBoundingBox.isEmpty()

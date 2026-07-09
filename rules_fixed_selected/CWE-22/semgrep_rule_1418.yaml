@@ -1,0 +1,19 @@
+rules:
+  - id: radvd-directory-traversal
+    patterns:
+      - pattern-either:
+          - pattern: |
+              fopen(..., "w")
+          - pattern: |
+              snprintf($SPATH, ..., $VAR, $IFACE)
+    pattern-not-inside: |
+      if (strstr($NAME, "..") || strchr($NAME, '/'))
+        return ...;
+      ...
+      fopen(..., "w")
+    message: "Potential directory traversal vulnerability due to missing validation of interface name for '..' or '/' characters before file operations."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-22"
+      cve: "CVE-2011-3602"

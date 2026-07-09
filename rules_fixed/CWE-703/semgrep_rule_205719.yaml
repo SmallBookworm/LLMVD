@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2015-8789-use-after-free-ebml
+    message: "Use-after-free vulnerability in EbmlMaster::Read due to incorrect propagation of upper level elements after an infinite-sized element. This may lead to double-free or use-after-free conditions."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (DeleteElement)
+                delete ElementLevelA;
+              break;
+          - pattern: |
+              delete ElementLevelA;
+              break;
+    metavariable-pattern:
+      metavariable: ElementLevelA
+      pattern: EbmlElement *
+    fix-regex: null

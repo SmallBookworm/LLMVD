@@ -1,0 +1,16 @@
+rules:
+  - id: imagemagick-art-memory-leak
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (count != (ssize_t) length)
+                ThrowReaderException(...);
+          - pattern: |
+              if (count != (ssize_t) length)
+                ThrowBinaryException(...);
+    message: "Missing call to DestroyQuantumInfo before ThrowReaderException may cause memory leak (CVE-2017-9143)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-772"
+      cve: "CVE-2017-9143"

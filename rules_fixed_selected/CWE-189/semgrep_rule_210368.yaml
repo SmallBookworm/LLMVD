@@ -1,0 +1,28 @@
+rules:
+  - id: gnutls-server-name-zero-len
+    message: "Potential buffer overflow due to missing zero-length server name check in TLS extension parsing (CVE-2008-1948, CWE-189)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          while (... > 0)
+          {
+            ...
+            DECR_LENGTH_RET(..., len, ...);
+            server_names++;
+            ...
+          }
+      - pattern: |
+          while (data_size > 0)
+          {
+            ...
+            len = _gnutls_read_uint16(...);
+            ...
+            DECR_LENGTH_RET(data_size, len, ...);
+            server_names++;
+            ...
+          }
+    metavariable-pattern:
+      metavariable: len
+      pattern: len
+    focus-metavariable: len

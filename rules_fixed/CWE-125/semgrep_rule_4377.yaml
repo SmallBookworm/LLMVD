@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2017-7277-out-of-bounds-read-timestamping-opt-stats
+    message: "Potential out-of-bounds read due to unsafe access of skb->data when SOF_TIMESTAMPING_OPT_STATS is checked only via sk->sk_tsflags. This can lead to disclosure of kernel memory or denial of service (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (skb_is_err_queue(skb) && skb->len &&
+              (sk->sk_tsflags & SOF_TIMESTAMPING_OPT_STATS))
+              put_cmsg(msg, SOL_SOCKET, SCM_TIMESTAMPING_OPT_STATS,
+                       skb->len, skb->data);
+    metadata:
+      cwe: ["CWE-125"]
+      cve: "CVE-2017-7277"
+      references:
+        - https://github.com/torvalds/linux/commit/4ef1b2869447411ad3ef91ad7d4891a83c1a509a

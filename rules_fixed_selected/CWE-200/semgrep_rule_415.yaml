@@ -1,0 +1,22 @@
+rules:
+  - id: cachebleed-vulnerable-mod-exp-ctime-copy
+    message: "Detected vulnerable MOD_EXP_CTIME_COPY_FROM_PREBUF implementation susceptible to CacheBleed (CVE-2016-0702). The function does not use constant-time memory access, leaking RSA key material via cache timing."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for ($I = 0, $J = $IDX; $I < $TOP * sizeof $B->$D[0]; $I++, $J += $WIDTH) {
+                  (($T *)$B->$D)[$I] = $BUF[$J];
+              }
+          - pattern: |
+              for ($I = 0, $J = $IDX; $I < $TOP * sizeof($B->$D[0]); $I++, $J += $WIDTH) {
+                  (($T *)$B->$D)[$I] = $BUF[$J];
+              }
+    metavariable-pattern:
+      metavariable: $T
+      pattern: "unsigned char"
+    fix-regex:
+      regex: .*
+      replacement: ''
+      enabled: false

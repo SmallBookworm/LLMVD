@@ -1,0 +1,14 @@
+rules:
+  - id: w3m-negative-array-index
+    message: "Missing bounds check on array index from HTML attribute may lead to heap buffer overflow (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (parsedtag_get_value(..., ATTR_TEXTAREANUMBER, &i)) {
+            ... textarea_str[i];
+          }
+      - pattern: |
+          if (parsedtag_get_value(..., ATTR_SELECTNUMBER, &i)) {
+            ... select_option[i] ...;
+          }

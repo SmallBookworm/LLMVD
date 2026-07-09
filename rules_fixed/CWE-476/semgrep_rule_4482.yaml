@@ -1,0 +1,10 @@
+rules:
+  - id: null_pointer_dereference_GetOutboundPinholeTimeout
+    message: "NULL pointer dereference vulnerability due to missing check for 'rem_port' before use."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (!int_port || !ext_port || !protocol)
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2019-12109"

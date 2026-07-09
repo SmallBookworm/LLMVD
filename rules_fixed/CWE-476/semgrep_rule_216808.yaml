@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2020-1971-general-name-cmp-ediparty
+    message: "EDIPARTYNAME comparison in GENERAL_NAME_cmp uses incorrect field 'd.other', leading to NULL pointer dereference (CVE-2020-1971)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              switch ($A->type) {
+                ...
+                case GEN_EDIPARTY:
+                  ... = ASN1_TYPE_cmp($A->d.edipartyName, $B->d.edipartyName);
+                  ...
+              }
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2020-1971"

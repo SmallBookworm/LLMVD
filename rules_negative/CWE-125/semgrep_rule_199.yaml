@@ -1,0 +1,8 @@
+rules:
+  - id: freetype-kern-table-length-check
+    message: "Insufficient minimum table length check in kerning table parsing may lead to out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if ( length <= 6 )
+        break;

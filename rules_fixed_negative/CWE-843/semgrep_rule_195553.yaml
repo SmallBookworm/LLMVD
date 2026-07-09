@@ -1,0 +1,17 @@
+rules:
+  - id: cwe-843-bento4-compressor-name-type
+    message: "Use of 'char' for compressor_name may lead to sign extension issues causing buffer underflow (CWE-843). Use unsigned type (e.g., AP4_UI08) instead."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          char compressor_name[33];
+          ...
+          int name_length = compressor_name[0];
+      - pattern: |
+          char compressor_name[33];
+          ...
+          $X name_length = compressor_name[0];
+    metadata:
+      cwe: ["CWE-843"]
+      cve: "CVE-2017-14639"

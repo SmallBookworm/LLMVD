@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2018-6178-missing-elide-behavior
+    message: "Missing call to SetElideBehavior on label_ may allow UI spoofing via malicious extension (CVE-2018-6178)."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      $LABEL = CreateLabel(...);
+      AddChildView($LABEL);
+    pattern-not: |
+      $LABEL = CreateLabel(...);
+      $LABEL->SetElideBehavior(...);
+      AddChildView($LABEL);

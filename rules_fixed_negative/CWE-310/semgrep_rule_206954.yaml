@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2014-0102-keyring-cycle-detect
+    patterns:
+      - pattern-either:
+          - pattern: |
+              BUG_ON($KEY != $CTX->match_data);
+          - pattern: |
+              BUG_ON($CTX->match_data != $KEY);
+    message: "Use of BUG_ON in keyring_detect_cycle_iterator may cause denial of service. Replace with proper key comparison to avoid OOPS (CVE-2014-0102)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-310"
+      confidence: HIGH
+      references:
+        - "https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=979e0d74651ba5aa533277f2a6423d0f982fb6f6"
+        - "https://nvd.nist.gov/vuln/detail/CVE-2014-0102"

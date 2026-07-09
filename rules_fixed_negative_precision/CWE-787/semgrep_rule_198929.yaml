@@ -1,0 +1,10 @@
+rules:
+  - id: dovecot-str_unescape-oob-write
+    message: "Unsafe call to str_unescape() may lead to out-of-bounds write (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          str_unescape(str + ...)
+      - pattern: |
+          str_unescape(... + parser->str_first_escape - 1)

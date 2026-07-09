@@ -1,0 +1,13 @@
+rules:
+  - id: gzip-huft-build-undersized-buffer
+    message: "Potential undersized buffer allocation in huft_build may lead to denial of service or arbitrary code execution (CVE-2009-2624)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      malloc (2 * sizeof *q)
+    fix-regex:
+      regex: ''
+      replacement: ''
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2009-2624"

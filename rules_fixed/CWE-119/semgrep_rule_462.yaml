@@ -1,0 +1,14 @@
+rules:
+  - id: cwe-119-fgetwln-off-by-one
+    message: Off-by-one heap buffer overflow in fgetwln due to incorrect bounds check (wused > fb->len instead of wused >= fb->len)
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (!fb->len || wused > fb->len) {
+      }
+    fix-regex:
+      regex: 'wused > fb->len'
+      replacement: 'wused >= fb->len'
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2016-2090"

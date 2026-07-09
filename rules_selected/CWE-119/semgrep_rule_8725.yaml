@@ -1,0 +1,18 @@
+rules:
+  - id: android_utf16_to_utf8_buffer_overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              std::string $S;
+              $S.resize($LEN);
+              utf16_to_utf8(..., &*$S.begin());
+          - pattern: |
+              std::string $S;
+              $S.resize($LEN);
+              utf16_to_utf8(..., &*$S.begin(), $LEN);
+    message: "Potential heap-based buffer overflow due to missing null-termination space in utf16_to_utf8 conversion. Ensure buffer is resized to include space for null terminator."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2016-3861"

@@ -1,0 +1,13 @@
+rules:
+  - id: cwe-200-netlink-padding-not-cleared
+    patterns:
+      - pattern: |
+          $rta = (struct rtattr *)skb_put($skb, RTA_ALIGN($size));
+          $rta->rta_type = $attrtype;
+          $rta->rta_len = $size;
+    message: "Padding in netlink message not cleared; may leak kernel memory (CWE-200)."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2005-4881"

@@ -1,0 +1,14 @@
+rules:
+  - id: ffmpeg-vqa-out-of-bounds-init
+    message: "Potential heap-based buffer overflow due to missing video dimension validation in vqa_decode_init. Use ff_set_dimensions instead of av_image_check_size to safely set dimensions."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          if ((ret = av_image_check_size(...)) < 0) {
+              ...
+              return ret;
+          }
+    metavariable-regex:
+      metavariable: $...
+      regex: "s->width, s->height"

@@ -1,0 +1,20 @@
+rules:
+  - id: mwifiex_buffer_overflow
+    message: "Missing length check before memcpy() may lead to buffer overflow (CVE-2020-12653, CWE-269)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          memcpy($DST, $SRC, le16_to_cpu($HEADER->header.len));
+        pattern-not-inside: |
+          if (le16_to_cpu($HEADER->header.len) > $MAX_LEN) {
+            ...
+          }
+          memcpy($DST, $SRC, le16_to_cpu($HEADER->header.len));
+      - pattern: |
+          memcpy($DST, $SRC, le16_to_cpu($LEN));
+        pattern-not-inside: |
+          if (le16_to_cpu($LEN) > $MAX_LEN) {
+            ...
+          }
+          memcpy($DST, $SRC, le16_to_cpu($LEN));

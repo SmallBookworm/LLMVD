@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2016-8677-tiff-reader-quantum-info-null-check
+    message: "Missing null check for quantum_info before calling DestroyQuantumInfo may lead to memory corruption (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          quantum_info=DestroyQuantumInfo(quantum_info);
+      - pattern-not: |
+          if (quantum_info != (QuantumInfo *) NULL)
+            quantum_info=DestroyQuantumInfo(quantum_info);
+    mode: search

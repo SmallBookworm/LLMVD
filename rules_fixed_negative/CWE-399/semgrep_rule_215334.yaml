@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2008-2136-missing-kfree_skb
+    message: "Missing kfree_skb() on pskb_may_pull() failure may cause memory leak (CVE-2008-2136)"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!pskb_may_pull($SKB, ...))
+              goto $LABEL;
+          ...
+          $LABEL:
+              return 0;
+      - pattern: |
+          if (!pskb_may_pull($SKB, ...))
+              goto $LABEL;
+          ...
+          $LABEL:
+              return ...;
+    metavariable-pattern:
+      $SKB: "skb"

@@ -1,0 +1,7 @@
+rules:
+  - id: xfs_direct_io_delalloc_bug
+    message: "Detected vulnerable pattern where direct I/O encounters delalloc blocks and triggers BUG_ON, leading to potential system crash (CVE-2016-10741, CWE-362)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      BUG_ON(direct && imap.br_startblock == DELAYSTARTBLOCK);

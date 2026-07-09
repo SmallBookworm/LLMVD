@@ -1,0 +1,16 @@
+rules:
+  - id: avr_op_analyze_out_of_bounds_read
+    message: "Potential heap-based out-of-bounds read in avr_op_analyze due to unsafe buffer access"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              avr_op_analyze(..., buf + ..., len - ...);
+              r_strbuf_fini(&next_op.esil);
+          - pattern: |
+              avr_op_analyze(..., buf + op->size, len - op->size, ...);
+              r_strbuf_fini(&next_op.esil);
+    metadata:
+      cwe: ["CWE-125"]
+      cve: "CVE-2018-11377"

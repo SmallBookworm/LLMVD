@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2021-3682-usbredir-free-misuse
+    message: "Freeing 'data' instead of 'free_on_destroy' may lead to use-after-free or arbitrary code execution (CVE-2021-3682)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      free(data);
+    pattern-inside: |
+      static int bufp_alloc(..., uint8_t *data, ..., void *free_on_destroy)
+      {
+        ...
+        if (...bufpq_dropping_packets) {
+          if (...bufpq_size > ...bufpq_target_size) {
+            ...
+          }
+        }
+        ...
+      }
+    metavariable-regex:
+      metavariable: $func
+      regex: bufp_alloc

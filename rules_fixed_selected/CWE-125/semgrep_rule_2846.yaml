@@ -1,0 +1,20 @@
+rules:
+  - id: cwe-125-double-fetch-saa7164
+    message: "Potential out-of-bounds read due to double fetch vulnerability in saa7164_bus_get. The function reads msg->seqno after a prior copy from untrusted memory without revalidating bounds."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((msg_tmp.id != msg->id) || (msg_tmp.command != msg->command) ||
+                  (msg_tmp.controlselector != msg->controlselector) ||
+                  (msg_tmp.seqno != msg->seqno) || (msg_tmp.size != msg->size)) {
+                ...
+              }
+          - pattern: |
+              if ((msg_tmp.id != msg->id) || ... || (msg_tmp.seqno != msg->seqno) || ...)
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2017-8831"
+      references:
+        - https://github.com/stoth68000/media-tree/commit/354dd3924a2e43806774953de536257548b5002c

@@ -1,0 +1,10 @@
+rules:
+  - id: cwe-20-chrome-extension-tabs-dos
+    message: "Use of notifySyncRequired() may lead to denial of service or unspecified impact. Use notifyFlushRequired() instead."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: $OBJ->notifySyncRequired(...)
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2013-0837"

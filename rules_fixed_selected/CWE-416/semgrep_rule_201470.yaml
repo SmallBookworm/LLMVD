@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2019-25045-use-after-free-xfrm
+    message: Use of IPSEC_PROTO_ANY in xfrm_state_flush may lead to use-after-free (CVE-2019-25045).
+    severity: ERROR
+    languages: [c]
+    pattern: xfrm_state_flush(..., IPSEC_PROTO_ANY, ...)
+    metadata:
+      cwe: "CWE-416"
+      references:
+        - https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=dbb2483b2a46fbaf833cfb5deb5ed9cace9c7399
+        - https://nvd.nist.gov/vuln/detail/CVE-2019-25045

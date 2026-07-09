@@ -1,0 +1,18 @@
+rules:
+  - id: cloop_block_size_validation_missing
+    patterns:
+      - pattern-either:
+          - pattern: |
+              s->block_size = be32_to_cpu(...);
+              ...
+              g_malloc(s->block_size);
+          - pattern: |
+              s->block_size = be32_to_cpu(...);
+              ...
+              s->uncompressed_block = g_malloc(s->block_size);
+    message: "Missing validation of 'block_size' before memory allocation. This may lead to integer overflows, buffer overflows, or excessive memory allocation (CVE-2014-0144)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2014-0144"

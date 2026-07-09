@@ -1,0 +1,27 @@
+rules:
+  - id: imagemagick-pcx-memory-leak-cve-2018-18016
+    message: "Memory leak in WritePCXImage: 'pcx_colormap' is not freed when AcquireQuantumMemory fails for 'pixel_info'."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          pcx_colormap = (unsigned char *) AcquireQuantumMemory(...);
+          if (pcx_colormap == (unsigned char *) NULL)
+            ThrowWriterException(...);
+          ...
+          pixel_info = AcquireVirtualMemory(...);
+          if (pixel_info == (MemoryInfo *) NULL)
+            {
+              ...;
+              ThrowWriterException(ResourceLimitError, "MemoryAllocationFailed");
+            }
+      - pattern: |
+          pcx_colormap = (unsigned char *) AcquireQuantumMemory(...);
+          if (pcx_colormap == (unsigned char *) NULL)
+            ThrowWriterException(...);
+          ...
+          pixel_info = AcquireVirtualMemory(...);
+          if (pixel_info == (MemoryInfo *) NULL)
+            {
+              ThrowWriterException(ResourceLimitError, "MemoryAllocationFailed");
+            }

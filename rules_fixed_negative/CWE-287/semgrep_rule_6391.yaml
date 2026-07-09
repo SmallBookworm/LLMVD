@@ -1,0 +1,14 @@
+rules:
+  - id: improper_form_removal_handling
+    message: "Improper handling of form removal may lead to use-after-free or unexpected behavior (CWE-287)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ($E != $F)
+              setForm(0);
+      - pattern: |
+          if ($E != $F)
+              setForm(NULL);
+    metavariable-pattern:
+      $E: "toHTMLElement(this)->highestAncestor()"

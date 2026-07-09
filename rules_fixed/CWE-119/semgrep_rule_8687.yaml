@@ -1,0 +1,8 @@
+rules:
+  - id: libxml2-port-buffer-overflow
+    patterns:
+      - pattern: |
+          $$uri->port = $port & INT_MAX;
+    message: "Use of INT_MAX instead of USHRT_MAX when assigning port value may lead to buffer overflow (CWE-119, CVE-2017-7376)."
+    severity: ERROR
+    languages: [c]

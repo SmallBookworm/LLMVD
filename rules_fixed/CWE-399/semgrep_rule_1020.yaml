@@ -1,0 +1,29 @@
+rules:
+  - id: cve-2013-2635-uninitialized-mac-buffer
+    message: "Uninitialized mac buffer in ifla_vf_info may leak kernel stack memory. Missing memset(ivi.mac, 0, sizeof(ivi.mac)) before use."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              struct ifla_vf_info $IVI;
+              ...
+              if (dev->netdev_ops->ndo_get_vf_config(..., &$IVI))
+                ...
+              memcpy(..., $IVI.mac, ...);
+          - pattern: |
+              struct ifla_vf_info $IVI;
+              $IVI.spoofchk = ...;
+              ...
+              if (dev->netdev_ops->ndo_get_vf_config(..., &$IVI))
+                ...
+              memcpy(..., $IVI.mac, ...);
+    metavariable-pattern:
+      - metavariable: $IVI
+        patterns:
+          - pattern-not: |
+              memset($IVI.mac, 0, sizeof($IVI.mac));
+              ...
+              if (dev->netdev_ops->ndo_get_vf_config(..., &$IVI))
+                ...
+              memcpy(..., $IVI.mac, ...);

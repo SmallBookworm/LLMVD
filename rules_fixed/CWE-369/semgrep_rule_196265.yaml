@@ -1,0 +1,28 @@
+rules:
+  - id: tflite-space-to-batch-nd-division-by-zero
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: |
+                  for ($INIT; $COND; $UPDATE) {
+                    ...
+                    final_dim_size % block_shape[$INDEX]
+                    ...
+                    final_dim_size / block_shape[$INDEX]
+                    ...
+                  }
+          - patterns:
+              - pattern: |
+                  for ($INIT; $COND; $UPDATE) {
+                    ...
+                    ... / block_shape[$INDEX]
+                    ...
+                    final_dim_size % block_shape[$INDEX]
+                    ...
+                  }
+    message: "Potential division by zero in SpaceToBatchNd operator. Ensure block_shape[...] is not zero before division or modulo."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-369"
+      cve: "CVE-2021-29597"

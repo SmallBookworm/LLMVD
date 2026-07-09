@@ -1,0 +1,14 @@
+rules:
+  - id: nbd-modern-negotiation-in-root-process
+    patterns:
+      - pattern: |
+          client = negotiate(..., NEG_INIT | NEG_MODERN);
+          ...
+          handle_connection(..., client);
+    message: "Modern-style negotiation performed in root process may lead to denial of service (CVE-2013-7441)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: ["CWE-399"]
+      vulnerability: "Denial of Service"
+      fix_recommendation: "Move negotiation logic into a child process as done in the fixed version."

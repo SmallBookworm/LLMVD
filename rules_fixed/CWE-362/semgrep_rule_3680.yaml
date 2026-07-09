@@ -1,0 +1,16 @@
+rules:
+  - id: cwe-362-double-fetch-vboxguest
+    message: "Double fetch of user data detected. The header is copied from user space twice, which can lead to a race condition and potential buffer over-access (CWE-362)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (copy_from_user(&$$hdr, (void *)$$arg, sizeof($$hdr)))
+            ...
+          ...
+          if (copy_from_user($$buf, (void *)$$arg, $$hdr.size_in)) {
+            ...
+          }
+    metadata:
+      cwe: ["CWE-362"]
+      cve: "CVE-2018-12633"

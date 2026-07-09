@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2020-6019-integer-overflow-check
+    message: "Potential integer overflow in packet size validation. Use 'cbStatsMsgIn > pPktEnd - pIn' instead of 'pIn + cbStatsMsgIn > pPktEnd' to avoid overflow."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if ( pIn + $CBSTATSMSG > pPktEnd )
+      {
+        ...
+      }

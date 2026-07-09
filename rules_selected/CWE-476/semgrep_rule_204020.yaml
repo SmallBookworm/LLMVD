@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2016-9441-null-pointer-deref
+    message: "Potential null pointer dereference due to missing null check on tbl->tables[id].ptr before use. This may lead to a denial of service (CVE-2016-9441)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (id >= 0 && id < $TBL->ntable) {
+            ...
+            struct table *t = $TBL->tables[id].ptr;
+            ...
+          }
+      - pattern: |
+          if (id >= 0 && id < $TBL->ntable && $TBL->tables[id].ptr) {
+            ...
+            struct table *t = $TBL->tables[id].ptr;
+            ...
+          }
+    pattern-not: |
+      if (id >= 0 && id < $TBL->ntable && $TBL->tables[id].ptr) {
+        ...
+        struct table *t = $TBL->tables[id].ptr;
+        ...
+      }

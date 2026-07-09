@@ -1,0 +1,16 @@
+rules:
+  - id: irda_buffer_overflow_check_missing
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $name_len = $fp[$n++];
+              memcpy($name, $fp + $n, $name_len);
+          - pattern: |
+              $attr_len = $fp[$n++];
+              memcpy($attr, $fp + $n, $attr_len);
+    message: "Missing length validation before memcpy may lead to stack-based buffer overflow (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2011-1180"

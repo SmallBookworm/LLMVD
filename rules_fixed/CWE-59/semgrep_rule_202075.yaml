@@ -1,0 +1,15 @@
+rules:
+  - id: abrt_symlink_vulnerability_cwe-59
+    message: "Use of arbitrary root directory in rpm_get_package_nvr or rpm_get_component may lead to symlink attacks (CWE-59)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: rpm_get_package_nvr(..., $ROOTDIR)
+            metavariable-pattern:
+              metavariable: $ROOTDIR
+              pattern-not: "NULL"
+          - pattern: rpm_get_component(..., $ROOTDIR)
+            metavariable-pattern:
+              metavariable: $ROOTDIR
+              pattern-not: "NULL"

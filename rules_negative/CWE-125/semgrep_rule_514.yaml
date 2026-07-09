@@ -1,0 +1,18 @@
+rules:
+  - id: cwe-125-t1-get-private-dict-buffer-overread
+    message: "Buffer over-read vulnerability in T1_Get_Private_Dict due to missing bounds check before 'goto Again'."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              cur = limit;
+              limit = ...;
+              goto Again;
+          - pattern: |
+              cur   = limit;
+              limit = ...;
+              goto Again;
+    metavariable-pattern:
+      metavariable: $limit
+      pattern: parser->base_dict + parser->base_len

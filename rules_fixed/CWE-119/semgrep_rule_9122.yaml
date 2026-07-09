@@ -1,0 +1,28 @@
+rules:
+  - id: cwe-119-grep-bmexec_trans-oob-read
+    message: "Potential out-of-bounds heap read in bmexec_trans due to missing bounds check after memchr_kwset call (CVE-2015-1345)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          tp = memchr_kwset(...);
+          if (!tp)
+            return -1;
+          tp++;
+          if (ep <= tp)
+            break;
+      - pattern: |
+          tp = memchr_kwset(...);
+          if (!tp)
+            return -1;
+          tp++;
+          ...
+          $S
+    pattern-not-inside: |
+      tp = memchr_kwset(...);
+      if (!tp)
+        return -1;
+      tp++;
+      if (ep <= tp)
+        break;
+      ...

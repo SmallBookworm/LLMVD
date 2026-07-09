@@ -1,0 +1,17 @@
+rules:
+  - id: integer-overflow-calloc-check
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!$PTR || !$PTR->$FIELD || $PTR->$FIELD < 0)
+                return;
+              ...
+              $PTR->$ELEM = xcalloc($PTR->$FIELD, sizeof(...));
+          - pattern: |
+              if (!$PTR || !$PTR->$FIELD || $PTR->$FIELD < 0)
+                return;
+              ...
+              $PTR->$ELEM = calloc($PTR->$FIELD, sizeof(...));
+    message: "Missing upper bound check on $PTR->$FIELD before allocation may lead to integer overflow (CWE-190)."
+    severity: WARNING
+    languages: [c]

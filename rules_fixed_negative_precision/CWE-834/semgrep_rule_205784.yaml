@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2017-11188-dpx-loop-eof-check
+    message: "Missing EOF check in loop reading DPX image data may cause CPU exhaustion (CVE-2017-11188)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for ( ; offset < (MagickOffsetType) dpx.file.image_offset; offset++)
+                (void) ReadBlobByte(image);
+          - pattern: |
+              for ( ; offset < data_offset; offset++)
+                (void) ReadBlobByte(image);
+    metadata:
+      cwe: "CWE-834"
+      cve: "CVE-2017-11188"

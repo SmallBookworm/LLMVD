@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2013-0836-use-after-free-jpeg-decoder
+    message: "Potential use-after-free vulnerability in JPEG decoder. After outputScanlines() fails, the object may be deleted, but code continues to access member variables like m_info.output_scanline."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!m_decoder->outputScanlines()) {
+              ...
+              if (!m_info.output_scanline)
+                  m_info.output_scanline = 0xffffff;
+              return false;
+          }
+      - pattern: |
+          if (!m_decoder->outputScanlines()) {
+              ...
+              return false;
+          }
+    metavariable-pattern:
+      metavariable: m_decoder
+      pattern: $OBJ
+    focus-metavariable: m_decoder

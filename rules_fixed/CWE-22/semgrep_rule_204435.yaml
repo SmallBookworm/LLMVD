@@ -1,0 +1,35 @@
+rules:
+  - id: mutt-imap-directory-traversal
+    message: "Potential directory traversal vulnerability due to missing validation of '..' in mailbox path."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (strstr($MBOX, "/../") || (strcmp($MBOX, "..") == 0) || (strncmp($MBOX, "../", 3) == 0))
+                return NULL;
+              ...
+              $LEN = strlen($MBOX);
+              if (($LEN > 3) && (strcmp($MBOX + $LEN - 3, "/..") == 0))
+                return NULL;
+          - pattern-not: |
+              if (strstr($MBOX, "/../") || (strcmp($MBOX, "..") == 0) || (strncmp($MBOX, "../", 3) == 0))
+                return NULL;
+              ...
+              $LEN = strlen($MBOX);
+              if (($LEN > 3) && (strcmp($MBOX + $LEN - 3, "/..") == 0))
+                return NULL;
+    pattern-not-inside: |
+      header_cache_t* imap_hcache_open (IMAP_DATA* idata, const char* path)
+      {
+        ...
+        if (strstr(mbox, "/../") || (strcmp(mbox, "..") == 0) || (strncmp(mbox, "../", 3) == 0))
+          return NULL;
+        ...
+        $LEN = strlen(mbox);
+        if (($LEN > 3) && (strcmp(mbox + $LEN - 3, "/..") == 0))
+          return NULL;
+        ...
+      }
+    fix-regex:
+      regex: ""

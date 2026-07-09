@@ -1,0 +1,18 @@
+rules:
+  - id: qemu_e1000_buffer_overflow
+    message: "Buffer overflow vulnerability in e1000_receive: oversized packets not properly discarded when SBP and LPE flags are disabled (CVE-2012-6075, CWE-120)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (size > MAXIMUM_ETHERNET_VLAN_SIZE
+              && !(...->mac_reg[RCTL] & E1000_RCTL_LPE)
+              && !(...->mac_reg[RCTL] & E1000_RCTL_SBP)) {
+              return size;
+          }
+      - pattern: |
+          if (size > MAXIMUM_ETHERNET_VLAN_SIZE
+              && !(...->mac_reg[RCTL] & E1000_RCTL_SBP)
+              && !(...->mac_reg[RCTL] & E1000_RCTL_LPE)) {
+              return size;
+          }

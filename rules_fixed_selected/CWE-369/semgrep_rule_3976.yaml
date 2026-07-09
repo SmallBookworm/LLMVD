@@ -1,0 +1,14 @@
+rules:
+  - id: imagemagick-division-by-zero-remove-duplicate-layers
+    message: Division by zero vulnerability in RemoveDuplicateLayers due to unchecked division by ticks_per_second.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              time = curr->delay * 1000 / curr->ticks_per_second;
+          - pattern: |
+              time += next->delay * 1000 / next->ticks_per_second;
+    metadata:
+      cwe: "CWE-369"
+      cve: "CVE-2019-13454"

@@ -1,0 +1,9 @@
+rules:
+  - id: cve-2018-14466-buffer-overread
+    patterns:
+      - pattern-either:
+          - pattern: EXTRACT_32BITS(&rxh->serviceId)
+          - pattern: EXTRACT_32BITS(&(...).serviceId)
+    message: "Buffer over-read vulnerability (CWE-125, CVE-2018-14466): reading 32 bits from the 'serviceId' field which is only 16 bits wide."
+    severity: ERROR
+    languages: [c]

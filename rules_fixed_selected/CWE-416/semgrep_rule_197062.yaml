@@ -1,0 +1,13 @@
+rules:
+  - id: cwe-416-use-after-free-gpac-audio-sample-entry
+    message: "Potential use-after-free vulnerability due to unsafe gf_isom_box_del call in audio_sample_entry_Read. The fix introduces a check on 'use_dump_mode' before deletion to prevent UAF."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (ptr->esd) {
+          gf_isom_box_del((GF_Box *)ptr->esd);
+          ptr->esd = NULL;
+      }
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2020-11558"

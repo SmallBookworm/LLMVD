@@ -1,0 +1,14 @@
+rules:
+  - id: ffmpeg-mms-out-of-bounds-read-cve-2018-1999010
+    message: "Missing chunksize validation for ff_asf_head1_guid may lead to out-of-bounds read (CVE-2018-1999010, CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!memcmp(p, ff_asf_head1_guid, sizeof(ff_asf_guid))) {
+              chunksize = 46;
+          }
+      - pattern: |
+          } else if (!memcmp(p, ff_asf_head1_guid, sizeof(ff_asf_guid))) {
+              chunksize = 46;
+          }

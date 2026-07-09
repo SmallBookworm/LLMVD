@@ -1,0 +1,8 @@
+rules:
+  - id: tflite-hashtable-division-by-zero
+    message: "Potential division by zero in TFLite hashtable lookup due to missing check for zero-sized dimension."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      const int num_rows = SizeOfDimension(..., 0);
+      const int row_bytes = ...->bytes / num_rows;

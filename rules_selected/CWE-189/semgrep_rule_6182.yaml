@@ -1,0 +1,13 @@
+rules:
+  - id: cwe-189-uninitialized-integer-use
+    message: "Potential use of uninitialized integer value leading to undefined behavior (CWE-189)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          unsigned long identifier = resource ? resource->identifier() : std::numeric_limits<unsigned long>::max();
+      - pattern: |
+          ResourceError error = resource ? resource->resourceError() : ResourceError();
+    metadata:
+      cwe: ["CWE-189"]
+      cve: "CVE-2014-7909"

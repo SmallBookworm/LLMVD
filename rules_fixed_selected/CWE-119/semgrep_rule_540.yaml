@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2016-9601-jbig2-loop-index
+    message: "Loop index 'j' used in cleanup may underflow, leading to heap-based buffer overflow (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          for (j = i - 1; j >= 0; --j) {
+              jbig2_image_release(..., GSPLANES[j]);
+          }
+      - pattern: |
+          for (j = i - 1; j >= 0; j--) {
+              jbig2_image_release(..., GSPLANES[j]);
+          }

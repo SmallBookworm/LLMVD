@@ -1,0 +1,21 @@
+rules:
+  - id: xpmdec-color-string-buffer-overflow
+    message: "Potential stack-based buffer overflow in color_string_to_rgba due to missing length validation before strncpy."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          char color_name[100];
+          ...
+          strncpy(color_name, $P, $LEN);
+          color_name[$LEN] = '\0';
+      - pattern: |
+          char color_name[100];
+          ...
+          if (*$P != '#') {
+              strncpy(color_name, $P, $LEN);
+              color_name[$LEN] = '\0';
+          }
+    metavariable-pattern:
+      metavariable: $LEN
+      pattern-not: FFMIN(FFMAX($LEN, 0), sizeof(color_name) - 1)

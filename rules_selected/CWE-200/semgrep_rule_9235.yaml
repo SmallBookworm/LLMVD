@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2013-3226
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (sk->sk_state == BT_CONNECT2 &&
+                  test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
+                ...
+                release_sock(sk);
+                return 0;
+              }
+    message: "Missing msg_namelen initialization in sco_sock_recvmsg may lead to kernel stack information leak (CVE-2013-3226)."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2013-3226"

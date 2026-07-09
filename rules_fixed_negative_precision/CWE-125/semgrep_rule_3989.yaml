@@ -1,0 +1,14 @@
+rules:
+  - id: imagemagick-adaptive-threshold-height-zero-check
+    message: "Missing check for zero height in AdaptiveThresholdImage may lead to heap-based buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (width == 0)
+        return(...);
+    pattern-not: |
+      if ((width == 0) || (height == 0))
+        return(...);
+    fix-regex:
+      regex: 'if $$(width == 0$$)\n\s*return$$([^;]+$$);'
+      replacement: 'if ((width == 0) || (height == 0))\n    return(\2);'

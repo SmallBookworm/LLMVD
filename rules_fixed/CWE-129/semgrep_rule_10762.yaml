@@ -1,0 +1,38 @@
+rules:
+  - id: ffmpeg-eac3-frame-type-oob-access
+    message: "Potential out-of-bounds array access in handle_eac3 due to missing validation of substreamid for non-independent E-AC3 frames."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (hdr->frame_type == EAC3_FRAME_TYPE_INDEPENDENT) {
+            ...
+          }
+          info->substream[hdr->substreamid]...
+      - pattern: |
+          if (hdr->frame_type == EAC3_FRAME_TYPE_INDEPENDENT) {
+            ...
+          } else if (...) {
+            ...
+          }
+          info->substream[hdr->substreamid]...
+    metavariable-pattern:
+      metavariable: hdr
+      pattern: $HDR
+    mode: taint
+    patterns:
+      - pattern-sources:
+          - pattern-either:
+              - pattern: |
+                  if (hdr->frame_type == EAC3_FRAME_TYPE_INDEPENDENT) {
+                    ...
+                  }
+              - pattern: |
+                  if (hdr->frame_type == EAC3_FRAME_TYPE_INDEPENDENT) {
+                    ...
+                  } else if (...) {
+                    ...
+                  }
+        pattern-sinks:
+          - patterns:
+              - pattern: info->substream[hdr->substreamid]

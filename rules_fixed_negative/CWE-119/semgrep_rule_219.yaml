@@ -1,0 +1,17 @@
+rules:
+  - id: haproxy-h2-frame-length-check-cve-2018-10184
+    message: "Incoming H2 frame length is checked against max_frame_size (h2c->mfs) instead of bufsize, which may lead to heap overflow (CVE-2018-10184)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((int)$HDR.len < 0 || (int)$HDR.len > $H2C->mfs) {
+                ...
+              }
+          - pattern: |
+              if ((int)$HDR.len < 0 || (int)$HDR.len > h2c->mfs) {
+                ...
+              }
+    metavariable-pattern:
+      $H2C: { type: "struct h2c *" }

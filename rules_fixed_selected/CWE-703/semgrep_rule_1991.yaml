@@ -1,0 +1,29 @@
+rules:
+  - id: tipc_nl_publ_dump_missing_sock_check
+    message: "Missing check for attrs[TIPC_NLA_SOCK] before nla_parse_nested may lead to NULL pointer dereference (CVE-2016-4951)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!tsk_portid) {
+              ...
+              err = tipc_nlmsg_parse(..., &attrs);
+              if (err)
+                  return err;
+              err = nla_parse_nested(..., attrs[TIPC_NLA_SOCK], ...);
+              ...
+          }
+      - pattern: |
+          if (!tsk_portid) {
+              ...
+              tipc_nlmsg_parse(..., &attrs);
+              ...
+              nla_parse_nested(..., attrs[TIPC_NLA_SOCK], ...);
+              ...
+          }
+    metavariable-pattern:
+      metavariable: attrs
+      pattern: attrs
+    fix-regex:
+      regex: ""
+      replacement: ""

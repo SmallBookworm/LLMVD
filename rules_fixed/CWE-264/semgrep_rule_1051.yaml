@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2013-1957-mnt_readonly-bypass
+    message: "Missing CL_UNPRIVILEGED check may allow bypass of MNT_READONLY restriction."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          mnt->mnt.mnt_flags = old->mnt.mnt_flags & ~MNT_WRITE_HOLD;
+          ...
+          if ((flag & CL_UNPRIVILEGED) && (mnt->mnt.mnt_flags & MNT_READONLY))
+              mnt->mnt.mnt_flags |= MNT_LOCK_READONLY;
+      - pattern-not: |
+          mnt->mnt.mnt_flags = old->mnt.mnt_flags & ~MNT_WRITE_HOLD;
+          ...
+          if ((flag & CL_UNPRIVILEGED) && (mnt->mnt.mnt_flags & MNT_READONLY))
+              mnt->mnt.mnt_flags |= MNT_LOCK_READONLY;

@@ -1,0 +1,19 @@
+rules:
+  - id: cwe-125-out-of-bounds-read-chrome-v8
+    message: Potential out-of-bounds read due to unsafe container access. Use validated lookup instead of direct containment checks.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!element || (!base::Contains(..., *element) &&
+                               !base::Contains(..., *element))) {
+                return false;
+              }
+          - pattern: |
+              if (!element || (!base::Contains(..., *element) &&
+                               !base::Contains(..., *element)))
+                return false;
+    metadata:
+      cwe: ["CWE-125"]
+      cve: "CVE-2017-5053"

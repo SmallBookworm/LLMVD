@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2011-2798-missing-scheme-isolation
+    message: Missing isolation registration for internal URL schemes (chrome-devtools, chrome-internal), which may allow unauthorized access or scripting.
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          WebString chrome_ui_scheme(...);
+          WebSecurityPolicy::registerURLSchemeAsDisplayIsolated(chrome_ui_scheme);
+          ...
+          WebString extension_scheme(...);
+          WebSecurityPolicy::registerURLSchemeAsSecure(extension_scheme);
+      - pattern: |
+          WebSecurityPolicy::registerURLSchemeAsDisplayIsolated(...);
+          ...
+          WebSecurityPolicy::registerURLSchemeAsSecure(...);
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern-not-inside: |
+        WebString dev_tools_scheme(...);
+        WebSecurityPolicy::registerURLSchemeAsDisplayIsolated(dev_tools_scheme);
+        ...
+        WebString internal_scheme(...);
+        WebSecurityPolicy::registerURLSchemeAsDisplayIsolated(internal_scheme);

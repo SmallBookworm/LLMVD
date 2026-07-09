@@ -1,0 +1,26 @@
+rules:
+  - id: cwe-125-out-of-bounds-read-qtdemux
+    message: "Potential out-of-bounds read due to missing bounds check on tag length before use. This could lead to a denial of service (CVE-2016-10199)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((type >> 24) == 0xa9) {
+                  ...
+                  str_len = QT_UINT16(...);
+                  ...
+                  len = str_len + 8 + 4;
+                  ...
+              }
+          - pattern: |
+              if ((type >> 24) == 0xa9 && ...) {
+                  ...
+                  str_len = QT_UINT16(...);
+                  ...
+                  len = str_len + 8 + 4;
+                  ...
+              }
+    metadata:
+      cwe: ["CWE-125"]
+      cve: "CVE-2016-10199"

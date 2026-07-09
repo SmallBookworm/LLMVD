@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2018-6046-devtools-sanitization-bypass
+    message: "Missing validation for single quote in fragment may lead to cross-origin data leak (CVE-2018-6046)"
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern: |
+          if (url.has_ref())
+             fragment = '#' + url.ref();
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2018-6046"

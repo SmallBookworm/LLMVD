@@ -1,0 +1,29 @@
+rules:
+  - id: cve-2017-9619-glyph-index-check-missing
+    message: Missing glyph index validation may lead to out-of-bounds access (CWE-119).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (pfont->FontType != ft_TrueType)
+          {
+              pstr->size = strlen((char*)pstr->data);
+              return 0;
+          }
+          else
+          {
+              return gs_throw1(-1, "glyph index %lu out of range", (ulong)glyph);
+          }
+      - pattern: |
+          if (pfont->FontType != ft_TrueType)
+          {
+              pstr->size = strlen((char*)pstr->data);
+              return 0;
+          }
+          return gs_throw1(-1, "glyph index %lu out of range", (ulong)glyph);
+    metavariable-pattern:
+      metavariable: glyph
+      pattern-not: |
+        if (glyph >= GS_MIN_GLYPH_INDEX) {
+            ...
+        }

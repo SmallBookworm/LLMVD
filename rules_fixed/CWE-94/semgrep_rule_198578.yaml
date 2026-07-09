@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2013-4495-command-injection
+    message: |
+      Detected potential command injection via unvalidated user input passed to popen().
+      The 'mailto' or 'mailfrom' variables may contain shell metacharacters that are
+      directly interpolated into a shell command string, allowing arbitrary command execution.
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      sprintf($CMD, "%s -f %s %s", $X, $MAILFROM, $MAILTO);
+      ... popen($CMD, $Y);

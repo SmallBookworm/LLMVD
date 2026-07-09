@@ -1,0 +1,17 @@
+rules:
+  - id: bluetooth_hci_info_leak
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: struct sockaddr_hci *$haddr = ...;
+              - pattern: $haddr->hci_family = ...;
+              - pattern: $haddr->hci_dev = ...;
+              - pattern: return ...;
+          - patterns:
+              - pattern: $haddr->hci_family = ...;
+              - pattern: $haddr->hci_dev = ...;
+              - pattern: return ...;
+    pattern-not: $haddr->hci_channel = ...;
+    message: "Missing initialization of 'hci_channel' in struct sockaddr_hci may leak kernel stack memory (CVE-2012-6544)."
+    severity: WARNING
+    languages: [c]

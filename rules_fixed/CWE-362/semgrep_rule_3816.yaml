@@ -1,0 +1,37 @@
+rules:
+  - id: cwe-362-f2fs-add_free_nid-race-condition
+    message: "Race condition in add_free_nid: NAT cache lookup and free NID list insertion are not atomic, potentially allowing duplicate allocation of the same NID."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (build) {
+            ...
+            ne = __lookup_nat_cache(..., $NID);
+            if (ne && (...)) {
+              return false;
+            }
+          }
+          ...
+          spin_lock(&$LOCK);
+          ... = __insert_nid_to_list(..., FREE_NID_LIST, ...);
+          spin_unlock(&$LOCK);
+      - pattern: |
+          if (build) {
+            ...
+            ne = __lookup_nat_cache(..., $NID);
+            if (ne && (...)) {
+              return ...;
+            }
+          }
+          ...
+          spin_lock(&$LOCK);
+          ... = __insert_nid_to_list(..., FREE_NID_LIST, ...);
+          spin_unlock(&$LOCK);
+    metavariable-pattern:
+      - metavariable: $NID
+        patterns:
+          - pattern-inside: nid_t $NID
+      - metavariable: $LOCK
+        patterns:
+          - pattern-inside: spinlock_t $LOCK;

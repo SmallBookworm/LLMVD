@@ -1,0 +1,16 @@
+rules:
+  - id: ffmpeg_extra_data_padding_missing
+    message: "Missing padding for FFmpeg extradata buffer may lead to out-of-bounds read (CWE-119)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $CTX->extradata = (uint8_t*)av_malloc($SIZE);
+          memcpy($CTX->extradata, $DATA, $SIZE);
+      - pattern: |
+          $CTX->extradata = av_malloc($SIZE);
+          memcpy($CTX->extradata, $DATA, $SIZE);
+    metavariable-pattern:
+      metavariable: $CTX
+      pattern: "codec_context_"
+    focus-metavariable: $CTX

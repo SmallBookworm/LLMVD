@@ -1,0 +1,17 @@
+rules:
+  - id: kvm_assign_device_missing_permission_check
+    message: "Missing permission check for PCI device assignment. This may allow unprivileged users to assign PCI devices and cause a denial of service."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          dev = pci_get_domain_bus_and_slot(...);
+          if (!dev) { ... }
+          if (pci_enable_device(dev)) { ... }
+      - pattern: |
+          dev = pci_get_domain_bus_and_slot(...);
+          if (!dev) { ... }
+          r = pci_request_regions(...);
+    metavariable-regex:
+      - metavariable: dev
+        regex: dev

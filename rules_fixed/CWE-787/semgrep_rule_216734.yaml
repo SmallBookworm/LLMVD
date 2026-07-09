@@ -1,0 +1,15 @@
+rules:
+  - id: cwe-787-dovecot-str_unescape-oob-write
+    message: "Potential out-of-bounds write in str_unescape due to incorrect offset calculation. This may lead to remote code execution (CVE-2019-11500)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          (void)str_unescape(str + $OFFSET);
+      - pattern: |
+          str_unescape(str + $OFFSET);
+    metavariable-pattern:
+      $OFFSET:
+        pattern: |
+          parser->str_first_escape - 1
+    fix: ""

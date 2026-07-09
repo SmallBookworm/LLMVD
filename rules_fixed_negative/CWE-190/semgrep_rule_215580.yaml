@@ -1,0 +1,23 @@
+rules:
+  - id: ethtool_grxclsrlall_integer_overflow
+    message: "Potential integer overflow in ethtool_get_rxnfc when allocating buffer for ETHTOOL_GRXCLSRLALL command. Missing upper bound check on info.rule_cnt before multiplication may lead to buffer overflow."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (info.cmd == ETHTOOL_GRXCLSRLALL) {
+                if (info.rule_cnt > 0) {
+                  $BUF = kmalloc(info.rule_cnt * sizeof(u32), ...);
+                }
+              }
+          - pattern: |
+              if (info.cmd == ETHTOOL_GRXCLSRLALL) {
+                if (info.rule_cnt > 0) {
+                  $BUF = kmalloc(info.rule_cnt * sizeof(u32), ...);
+                  if (!$BUF) return ...;
+                }
+              }
+    metavariable-regex:
+      metavariable: $BUF
+      regex: "rule_buf"

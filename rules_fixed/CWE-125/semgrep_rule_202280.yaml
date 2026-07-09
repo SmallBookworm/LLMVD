@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2020-25667-out-of-bounds-read-strstr
+    message: "Potential out-of-bounds read in strstr() due to unsafe string handling on raw profile data. Use StringInfo to ensure proper bounds."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((TIFFGetField(..., TIFFTAG_XMLPACKET, ..., $profile) == 1)
+                  && ($profile != (unsigned char *)NULL)) {
+                ...
+                strstr((char *)$profile, "dc:format=\"image/dng\"")
+                ...
+              }
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2020-25667"

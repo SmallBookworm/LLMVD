@@ -1,0 +1,31 @@
+rules:
+  - id: polarssl-elliptic-curves-downgrade
+    message: "Missing check for duplicate elliptic curves extension may allow downgrade attacks (CVE-2014-8627)."
+    severity: HIGH
+    languages: [c]
+    pattern: |
+      if( ssl->handshake->curves != NULL )
+      {
+          ...
+          return( POLARSSL_ERR_SSL_BAD_HS_CLIENT_HELLO );
+      }
+    pattern-not-inside: |
+      if( ssl->handshake->curves != NULL )
+      {
+          ...
+          return( POLARSSL_ERR_SSL_BAD_HS_CLIENT_HELLO );
+      }
+    pattern-inside: |
+      static int ssl_parse_supported_elliptic_curves(...)
+      {
+          ...
+          $CURVES_CHECK
+          ...
+      }
+    metavariable-pattern:
+      $CURVES_CHECK: |
+        if( ssl->handshake->curves != NULL )
+        {
+            ...
+            return( POLARSSL_ERR_SSL_BAD_HS_CLIENT_HELLO );
+        }

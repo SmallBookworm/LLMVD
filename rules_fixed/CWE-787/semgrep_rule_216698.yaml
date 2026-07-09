@@ -1,0 +1,20 @@
+rules:
+  - id: tiff2pdf-heap-buffer-overflow-cve-2017-11335
+    message: Heap-based buffer overflow in tiff2pdf when handling PlanarConfig=Contig images in RAW mode. Ensure planar configuration is not PLANARCONFIG_SEPARATE before enabling T2P_TRANSCODE_RAW.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          if (t2p->pdf_nopassthrough == 0) {
+          ...
+          t2p->pdf_transcode = T2P_TRANSCODE_RAW;
+          ...
+          }
+    fix-regex:
+      regex: 'if \(t2p->pdf_nopassthrough == 0\) \{'
+      replacement: 'if (t2p->pdf_nopassthrough == 0 && t2p->tiff_planar != PLANARCONFIG_SEPARATE) {'
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2017-11335"
+      references:
+        - https://github.com/vadz/libtiff/commit/69bfeec247899776b1b396651adb47436e5f1556

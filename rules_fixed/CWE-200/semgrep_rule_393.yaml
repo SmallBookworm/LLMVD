@@ -1,0 +1,27 @@
+rules:
+  - id: libgcrypt-cve-2017-0379
+    message: "Missing input validation for Curve25519 points may lead to secret key disclosure via side-channel attacks (CVE-2017-0379)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!(flags & PUBKEY_FLAG_DJB_TWEAK)
+                  && !_gcry_mpi_ec_curve_point(...))
+                {
+                  ...
+                }
+          - pattern: |
+              if ((flags & PUBKEY_FLAG_DJB_TWEAK))
+                {
+                  /* For X25519, by its definition, validation should not be done. */
+                  ...
+                }
+              else if (!_gcry_mpi_ec_curve_point(...))
+                {
+                  ...
+                }
+    metavariable-pattern:
+      metavariable: $FLAGS
+      pattern: flags
+    mode: search

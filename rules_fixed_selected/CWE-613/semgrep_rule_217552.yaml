@@ -1,0 +1,18 @@
+rules:
+  - id: missing-pam-acct-mgmt-check
+    message: "Missing pam_acct_mgmt() call after pam_authenticate() may allow expired accounts to authenticate (CWE-613)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          pam_authenticate($AUTH_HANDLE, ...);
+          ...
+          pam_end($AUTH_HANDLE, ...);
+      - pattern: |
+          $STATUS = pam_authenticate($AUTH_HANDLE, ...);
+          if ($STATUS != PAM_SUCCESS) { ... }
+          ...
+          pam_end($AUTH_HANDLE, ...);
+    metavariable-regex:
+      metavariable: $AUTH_HANDLE
+      regex: pam_handle_t\s*\*

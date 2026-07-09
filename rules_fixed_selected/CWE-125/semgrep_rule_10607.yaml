@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2018-10017-out-of-bounds-read
+    message: "Potential out-of-bounds read due to missing bounds check on pattern index before accessing Patterns array."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          while($PAT >= Patterns.Size()) {
+            ...
+            $PAT = ... ? orderList[$IDX] : orderList.GetInvalidPatIndex();
+            ...
+            if ((!Patterns.IsValidPat($PAT)) && ...) {
+              ...
+            }
+          }
+          ...
+          Patterns[$PAT];
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2018-10017"

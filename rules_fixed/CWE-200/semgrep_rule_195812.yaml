@@ -1,0 +1,17 @@
+rules:
+  - id: wolfssl-signature-no-verify
+    message: "wc_SignatureGenerateHash does not verify the generated signature, which may allow fault injection attacks (CVE-2019-19962)."
+    severity: HIGH
+    languages: [c]
+    pattern: |
+      wc_SignatureGenerateHash(
+        ...,
+        $hash_data, $hash_len,
+        $sig, $sig_len,
+        $key, $key_len,
+        $rng
+      )
+    fix-regex:
+      regex: ""
+      replacement: ""
+      count: 0

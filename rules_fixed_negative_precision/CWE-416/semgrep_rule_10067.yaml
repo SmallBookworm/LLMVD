@@ -1,0 +1,21 @@
+rules:
+  - id: use-after-free-pdfium-cve-2017-15411
+    message: "Potential use-after-free due to unsafe string handling in mode parsing. This may lead to heap corruption as seen in CVE-2017-15411."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (mode == switches::kMemlogModeAll)
+            return Mode::kAll;
+      - pattern: |
+          if (mode == switches::kMemlogModeMinimal)
+            return Mode::kMinimal;
+      - pattern: |
+          if (mode == switches::kMemlogModeBrowser)
+            return Mode::kBrowser;
+      - pattern: |
+          if (mode == switches::kMemlogModeGpu)
+            return Mode::kGpu;
+      - pattern: |
+          if (mode == switches::kMemlogModeRendererSampling)
+            return Mode::kRendererSampling;

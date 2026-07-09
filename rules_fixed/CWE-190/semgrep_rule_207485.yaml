@@ -1,0 +1,20 @@
+rules:
+  - id: gimp-psd-integer-overflow
+    message: "Potential integer overflow in PSD channel data allocation due to missing size validation. This may lead to heap-based buffer overflow (CVE-2009-3909)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          readline_len = (channel->columns * bps >> 3);
+          ...
+          g_malloc(readline_len * channel->rows);
+      - pattern: |
+          if (bps == 1)
+            readline_len = ((channel->columns + 7) >> 3);
+          else
+            readline_len = (channel->columns * bps >> 3);
+          ...
+          g_malloc(readline_len * channel->rows);
+    metadata:
+      cwe: "CWE-190"
+      cve: "CVE-2009-3909"

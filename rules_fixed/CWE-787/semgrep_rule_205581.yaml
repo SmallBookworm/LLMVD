@@ -1,0 +1,24 @@
+rules:
+  - id: cwe-787-stack-buffer-overflow-airserv-ng
+    message: |
+      Stack-based buffer overflow vulnerability detected. The variable 'len' is used to read into a fixed-size buffer 'packet[1024]'
+      without proper bounds checking. This can lead to arbitrary code execution. Ensure 'len' is validated before use.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              len = ntohl(...);
+              ...
+              read(..., packet, len);
+          - pattern: |
+              len = ntohl(...);
+              ...
+              if (... && i==0)
+              {
+                  ...
+                  read(..., packet, len);
+              }
+    metavariable-regex:
+      - metavariable: len
+        regex: len

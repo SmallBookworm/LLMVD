@@ -1,0 +1,33 @@
+rules:
+  - id: imagemagick-psd-dos-cve-2017-14174
+    message: "Potential DoS due to missing EOF check in loop processing layer blending ranges. Crafted PSD files may cause excessive CPU consumption."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for ($J = 0; $J < (ssize_t) $LENGTH; $J += 8)
+              {
+                $... 
+                ReadBlobLong($IMAGE);
+                ReadBlobLong($IMAGE);
+                if (EOFBlob($IMAGE) != MagickFalse)
+                  {
+                    $...
+                    ThrowBinaryException(...);
+                  }
+                $...
+              }
+          - pattern: |
+              for ($J = 0; $J < (ssize_t) $LENGTH; $J += 8)
+              {
+                $...
+                ReadBlobLong($IMAGE);
+                ReadBlobLong($IMAGE);
+                $...
+              }
+    metavariable-pattern:
+      metavariable: LENGTH
+      patterns:
+        - pattern-not:
+            pattern: DiscardBlobBytes(...)

@@ -1,0 +1,18 @@
+rules:
+  - id: imagemagick-writepdbimage-buffer-overflow
+    message: Buffer overflow vulnerability in WritePDBImage due to missing quantum depth initialization.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          quantum_info=AcquireQuantumInfo(...);
+          ...
+          ExportQuantumPixels(...,quantum_info,...);
+      - pattern: |
+          quantum_info=AcquireQuantumInfo(...);
+          ...
+          (void) ExportQuantumPixels(...,quantum_info,...);
+    metavariable-pattern:
+      metavariable: quantum_info
+      pattern-not: |
+        SetQuantumDepth(..., quantum_info, ...);

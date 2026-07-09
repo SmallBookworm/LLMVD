@@ -1,0 +1,16 @@
+rules:
+  - id: cwe-125-out-of-bounds-read-imagemagick
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while (len--)
+                (void) WriteBlobByte(ofile, (unsigned char) token[next++]);
+          - pattern: |
+              while (len--)
+                (void) WriteBlobByte(..., (unsigned char) token[next++]);
+    message: "Potential out-of-bounds read due to missing bounds check in loop condition (CWE-125). Use 'len-- > 0' instead."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2016-7524"

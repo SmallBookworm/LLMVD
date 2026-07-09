@@ -1,0 +1,13 @@
+rules:
+  - id: cwe-200-chrome-extension-schema-unfrozen
+    message: "Schema object is not deeply frozen, potentially allowing modification and sensitive data exposure (CWE-200)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $V8_SCHEMA->SetIntegrityLevel($CONTEXT, v8::IntegrityLevel::kFrozen);
+      - pattern: |
+          v8::Local<v8::Object>::Cast(...)->SetIntegrityLevel(..., v8::IntegrityLevel::kFrozen);
+    metadata:
+      cwe: ["CWE-200"]
+      cve: "CVE-2016-1698"

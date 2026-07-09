@@ -1,0 +1,13 @@
+rules:
+  - id: excessive_recursion_limit
+    message: Recursion level limit is hardcoded to 20, which may lead to denial of service. Use MAX_RECURSION_LEVEL constant instead.
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern: |
+          if (recursion_level >= 20) {
+              ...
+          }
+    metadata:
+      cwe: "CWE-399"
+      cve: "CVE-2014-8117"

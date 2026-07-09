@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2018-6159-timing-allow-origin-service-worker-bypass
+    message: "Use of response.Url() instead of the original URL when fetched via Service Worker may lead to information disclosure (CVE-2018-6159)."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      SecurityOrigin::Create(response.Url())
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2018-6159"

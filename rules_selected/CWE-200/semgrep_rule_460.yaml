@@ -1,0 +1,38 @@
+rules:
+  - id: libgcrypt-ecdsa-missing-blinding
+    message: "ECDSA signing implementation is missing blinding, making it vulnerable to side-channel attacks (CVE-2018-0495)."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              _gcry_ecc_ecdsa_sign(..., ECC_secret_key *skey, ..., int flags, int hashalgo)
+              {
+                ...
+                gcry_mpi_t k, dr, sum, k_1, x;
+                ...
+                mpi_mulm (dr, skey->d, r, skey->E.n);
+                ...
+              }
+          - pattern: |
+              _gcry_ecc_ecdsa_sign(..., ECC_secret_key *skey, ..., int flags, int hashalgo)
+              {
+                ...
+                gcry_mpi_t k, dr, sum, k_1, x;
+                ...
+                mpi_invm (k_1, k, skey->E.n);
+                ...
+              }
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern: _gcry_ecc_ecdsa_sign
+    pattern-not-inside: |
+      _gcry_ecc_ecdsa_sign(..., ECC_secret_key *skey, ..., int flags, int hashalgo)
+      {
+        ...
+        gcry_mpi_t b;
+        gcry_mpi_t bi;
+        ...
+        while (!mpi_invm (bi, b, skey->E.n));
+        ...
+      }

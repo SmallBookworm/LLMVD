@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2013-4544-vmxnet3-queue-validation
+    message: "Missing validation of TX/RX queue numbers and interrupt indices from guest-controlled configuration. This may lead to denial of service or arbitrary code execution (CVE-2013-4544)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              s->txq_num = VMXNET3_READ_DRV_SHARED8(..., ...);
+              s->rxq_num = VMXNET3_READ_DRV_SHARED8(..., ...);
+              ...
+              for (i = 0; i < s->txq_num; i++) { ... }
+          - pattern: |
+              s->txq_num = VMXNET3_READ_DRV_SHARED8(..., ...);
+              s->rxq_num = VMXNET3_READ_DRV_SHARED8(..., ...);
+              ...
+              for (i = 0; i < s->rxq_num; i++) { ... }
+      - pattern-not: vmxnet3_validate_queues(s);
+    metavariable-regex:
+      metavariable: $...
+      regex: .*

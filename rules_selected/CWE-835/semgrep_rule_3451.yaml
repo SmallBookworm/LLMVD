@@ -1,0 +1,47 @@
+rules:
+  - id: ffmpeg-pva-infinite-loop
+    message: "Missing EOF check before retrying in PVA demuxer may cause infinite loop (CVE-2018-1999012)"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (pes_signal != 1 || pes_header_data_length == 0) {
+              ...
+              goto recover;
+          }
+      - pattern: |
+          if (pes_signal != 1 || pes_header_data_length == 0) {
+              ...
+              avio_skip(...);
+              if (!read_packet)
+                  return ...;
+              goto recover;
+          }
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern-inside: |
+        static int read_part_of_packet(...) {
+          ...
+          recover:
+            ...
+            if (streamid == PVA_AUDIO_PAYLOAD) {
+              ...
+              if (!pvactx->continue_pes) {
+                ...
+                pes_signal = ...;
+                pes_header_data_length = ...;
+                ...
+                if (pes_signal != 1 || pes_header_data_length == 0) {
+                  ...
+                  goto recover;
+                }
+                ...
+              }
+              ...
+            }
+            ...
+        }
+    pattern-not: |
+      if (avio_feof(pb)) {
+          return AVERROR_EOF;
+      }

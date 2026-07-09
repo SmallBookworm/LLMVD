@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2013-6420-asn1-time-parsing
+    message: "Potential memory corruption due to insufficient validation of ASN1_UTCTIME input in asn1_time_to_time_t (CVE-2013-6420, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (timestr->length < 13) {
+            ...
+          }
+      - pattern: |
+          strbuf = estrdup((char *)timestr->data);
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2013-6420"

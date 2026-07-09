@@ -1,0 +1,12 @@
+rules:
+  - id: cwe-59-symbolic-link-following
+    message: "Symbolic links are followed when opening files, which may lead to symlink following vulnerabilities (CWE-59)."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      safe_open($FILENAME, O_RDONLY | $FLAGS, 0)
+    pattern-not: |
+      safe_open($FILENAME, (O_RDONLY | $FLAGS) | O_NOFOLLOW, 0)
+    fix-regex:
+      regex: 'safe_open\((.*?), (O_RDONLY \| .*?), 0\)'
+      replacement: 'safe_open(\1, (\2) | O_NOFOLLOW, 0)'

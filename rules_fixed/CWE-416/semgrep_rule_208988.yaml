@@ -1,0 +1,24 @@
+rules:
+  - id: vim-use-after-free-autocmd
+    message: "Potential use-after-free vulnerability. The pointer 'wp' may be used after being freed by autocommands."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          apply_autocmds(...);
+          if (!win_valid($WP)) {
+              return;
+          }
+          ...
+          $WP->$FIELD
+      - pattern: |
+          apply_autocmds(...);
+          ...
+          $WP->$FIELD
+          ...
+          if (!win_valid($WP)) {
+              return;
+          }
+    metavariable-pattern:
+      metavariable: $WP
+      pattern: wp

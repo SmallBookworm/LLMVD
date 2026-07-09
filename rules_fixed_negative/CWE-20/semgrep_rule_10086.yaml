@@ -1,0 +1,22 @@
+rules:
+  - id: unsafe_redirect_handling
+    message: "Unsafe redirect handling may lead to domain spoofing due to missing error page display and potential use-after-free."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!ChildProcessSecurityPolicyImpl::GetInstance()->CanRedirectToURL(...)) {
+                ...
+                navigation_handle_->set_net_error_code(net::ERR_UNSAFE_REDIRECT);
+                frame_tree_node_->ResetNavigationRequest(...);
+                return;
+              }
+          - pattern: |
+              if (!browser_initiated_ && source_site_instance() &&
+                  !ChildProcessSecurityPolicyImpl::GetInstance()->CanRequestURL(...)) {
+                ...
+                navigation_handle_->set_net_error_code(net::ERR_UNSAFE_REDIRECT);
+                frame_tree_node_->ResetNavigationRequest(...);
+                return;
+              }

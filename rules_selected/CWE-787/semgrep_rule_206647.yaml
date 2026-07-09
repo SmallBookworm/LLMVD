@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2020-11100-hpack-headroom-check
+    message: "Missing check for buffer wrapping before using headroom may lead to out-of-bounds write (CVE-2020-11100, CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (headroom >= $SIZE) {
+            ...
+          }
+      - pattern: |
+          if ($HEADROOM_VAR >= $SIZE) {
+            ...
+          }
+    pattern-not-inside: |
+      if (prev == dht->front && headroom >= $SIZE) {
+        ...
+      }
+    metavariable-regex:
+      metavariable: $SIZE
+      regex: "name\\.len \\+ value\\.len"

@@ -1,0 +1,14 @@
+rules:
+  - id: cloop_integer_overflow
+    message: "Integer overflow possible in offsets_size calculation leading to buffer overflow (CVE-2014-0143)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $N_BLOCKS = be32_to_cpu($N_BLOCKS);
+          ...
+          offsets_size = $N_BLOCKS * sizeof(uint64_t);
+          g_malloc(offsets_size);
+    metadata:
+      cwe: "CWE-190"
+      cve: "CVE-2014-0143"

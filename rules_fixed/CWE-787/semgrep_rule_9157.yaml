@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2016-10328-out-of-bounds-write
+    message: "Potential out-of-bounds write due to missing stack overflow check before writing to parser->top in cff_parser_run."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ( (FT_UInt)( parser->top - parser->stack ) >= parser->stackSize )
+                goto Stack_Overflow;
+              ...
+              *parser->top = ...;
+          - pattern: |
+              *parser->top = ...;
+              ...
+              if ( (FT_UInt)( parser->top - parser->stack ) >= parser->stackSize )
+                goto Stack_Overflow;

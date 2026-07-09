@@ -1,0 +1,14 @@
+rules:
+  - id: cwe-703-misaligned-load
+    message: "Detected potential load of misaligned address for 'float' or 'double' types which may cause undefined behavior."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              *(float *) $PTR
+          - pattern: |
+              *(double *) $PTR
+    metadata:
+      cwe: "CWE-703"
+      cve: "CVE-2022-32547"

@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2014-3668-xmlrpc-date-parsing-buffer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              XMLRPC_IS_NUMBER(text[$I])
+          - pattern: |
+              XMLRPC_IS_NUMBER(text[$I + 4])
+          - pattern: |
+              XMLRPC_IS_NUMBER(text[$I + 6])
+          - pattern: |
+              XMLRPC_IS_NUMBER(text[$I + 9])
+          - pattern: |
+              XMLRPC_IS_NUMBER(text[$I + 12])
+          - pattern: |
+              XMLRPC_IS_NUMBER(text[$I + 15])
+    message: "Potential buffer overflow due to unsafe index usage in XMLRPC date parsing. Missing bounds check on text array access."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2014-3668"

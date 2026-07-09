@@ -1,0 +1,26 @@
+rules:
+  - id: imagemagick-pcd-memory-leak-cve-2018-14435
+    message: "Missing memory cleanup in error path may cause memory leak (CVE-2018-14435, CWE-772)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          ThrowBinaryException(CorruptImageError, ..., ...);
+      - pattern: |
+          ThrowBinaryException(ResourceLimitError, ..., ...);
+    metavariable-pattern:
+      metavariable: $EXCEPTION
+      pattern-either:
+        - pattern: CorruptImageError
+        - pattern: ResourceLimitError
+    pattern-not-inside: |
+      for (...; ...; ...)
+        pcd_table[...] = (PCDTable *) RelinquishMagickMemory(pcd_table[...]);
+      ...
+      buffer = (unsigned char *) RelinquishMagickMemory(buffer);
+      ...
+      ThrowBinaryException($EXCEPTION, ..., ...);
+    fix-regex:
+      regex: 'ThrowBinaryException\(\$EXCEPTION,.*?\);'
+      replacement: 'RelinquishMagickMemory(buffer);\n  ThrowBinaryException($EXCEPTION, ...);'
+      count: 1

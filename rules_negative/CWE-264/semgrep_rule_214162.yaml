@@ -1,0 +1,20 @@
+rules:
+  - id: cwe-264-grub-integer-underflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (key == '\b')
+                {
+                  cur_len--;
+                  ...
+                }
+          - pattern: |
+              if (key == '\b')
+                {
+                  cur_len--;
+                  ...
+                  continue;
+                }
+    message: "Integer underflow vulnerability in backspace handling may lead to out-of-bounds memory access (CVE-2015-8370)."
+    severity: ERROR
+    languages: [c]

@@ -1,0 +1,14 @@
+rules:
+  - id: integer-overflow-in-layer-resize
+    patterns:
+      - pattern-either:
+          - pattern: |
+              malloc($X * $Y * sizeof(...))
+          - pattern: |
+              malloc($X * $Y * $SIZEOF)
+    message: "Potential integer overflow in malloc size calculation. Multiplication of user-controlled values $X and $Y may wrap around, leading to undersized allocation and buffer overflow."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-190"
+      cve: "CVE-2018-1000524"

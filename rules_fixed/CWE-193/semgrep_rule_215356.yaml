@@ -1,0 +1,10 @@
+rules:
+  - id: cwe-193-off-by-one-iov_iter_advance
+    message: "Off-by-one error in iov_iter_advance due to incorrect condition order; may cause out-of-bounds access."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      while ($BYTES || unlikely(!$IOV->iov_len && $I->count))
+    metadata:
+      cwe: "CWE-193"
+      cve: "CVE-2008-3535"

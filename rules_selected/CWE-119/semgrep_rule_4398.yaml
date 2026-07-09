@@ -1,0 +1,16 @@
+rules:
+  - id: gdImageFillToBorder-negative-color
+    message: "Potential stack consumption vulnerability due to missing validation of negative color value in gdImageFillToBorder"
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      gdImageFillToBorder(..., int border, int color)
+      {
+        ...
+        if (border < 0) {
+          return;
+        }
+        ...
+        gdImageSetPixel(..., color);
+        ...
+      }

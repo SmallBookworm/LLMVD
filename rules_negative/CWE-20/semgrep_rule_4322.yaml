@@ -1,0 +1,11 @@
+rules:
+  - id: kvm-vmx-bug-on-out-of-bounds-irq
+    message: "Out-of-bounds guest_irq access may cause denial of service via BUG_ON. Use bounds check and warning instead."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          BUG_ON($X >= $Y->nr_rt_entries);
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2017-1000252"

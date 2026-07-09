@@ -1,0 +1,14 @@
+rules:
+  - id: imagemagick-dps-memory-leak-cve-2019-16709
+    message: "Memory leak in ReadDPSImage due to missing DestroyImageList on OpenBlob failure"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          image=AcquireImage(...);
+          status=OpenBlob(...);
+          if (status == MagickFalse)
+            return((Image *) NULL);
+    metadata:
+      cwe: "CWE-401"
+      cve: "CVE-2019-16709"

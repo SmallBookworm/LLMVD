@@ -1,0 +1,21 @@
+rules:
+  - id: cwe-125-out-of-bounds-read-kstrdup
+    message: "Potential out-of-bounds read due to missing check for embedded null bytes before using 'len' on kstrdup'd buffer. See CVE-2020-13143."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $name = kstrdup($page, ...);
+              ...
+              $name[$len - 1] = ...;
+          - pattern: |
+              $name = kstrdup($page, ...);
+              ...
+              if ($name[$len - 1] == '\n') { ... }
+    metavariable-regex:
+      - metavariable: $len
+        regex: "len"
+    fix-regex:
+      # Not providing autofix per guidelines
+      enabled: false

@@ -1,0 +1,8 @@
+rules:
+  - id: cve-2014-3191-use-after-free
+    message: "Use-after-free vulnerability due to immediate widget position update. Use setNeedsUpdateWidgetPositions() instead."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          frameView->updateWidgetPositions();

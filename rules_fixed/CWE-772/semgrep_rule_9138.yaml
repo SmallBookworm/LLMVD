@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2017-6386-memory-leak
+    message: Memory leak in vrend_create_vertex_elements_state due to missing FREE on early return when num_elements > PIPE_MAX_ATTRIBS.
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (num_elements > PIPE_MAX_ATTRIBS)
+         return EINVAL;
+      ... 
+      $V = CALLOC_STRUCT(...);

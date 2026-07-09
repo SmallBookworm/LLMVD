@@ -1,0 +1,21 @@
+rules:
+  - id: cwe-125-bz2-output-readimpl-returns-minus-one
+    message: "readImpl returns -1 on error, which may cause out-of-bounds read in stream functions like stream_get_line. Should return 0 instead."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          $FUNC(...) {
+            ...
+            return -1;
+            ...
+          }
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern: (function-declarator (function-name) (parameter-list) (return-type "int64_t"))
+    pattern-inside: |
+      int64_t $CLASS::readImpl(char* $BUF, int64_t $LEN) {
+        ...
+        return -1;
+        ...
+      }

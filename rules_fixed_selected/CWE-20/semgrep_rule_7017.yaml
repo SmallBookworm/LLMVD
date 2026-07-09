@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2016-1654-uninitialized-site-for-cookies
+    message: "Uninitialized or improperly initialized 'site_for_cookies' may lead to invalid read (CWE-20)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          const GURL& site_for_cookies =
+              ancestors_are_same_site
+                  ? ($X)
+                  : GURL::EmptyGURL();
+      - pattern: |
+          const GURL& site_for_cookies =
+              ancestors_are_same_site
+                  ? ($X)
+                  : $Y;
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2016-1654"

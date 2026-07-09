@@ -1,0 +1,7 @@
+rules:
+  - id: cve-2021-3416-rtl8139-loopback-infinite-loop
+    message: "Potential infinite loop in RTL8139 loopback mode leading to DoS (CVE-2021-3416). Use qemu_receive_packet instead of rtl8139_do_receive to prevent reentrancy issues."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      rtl8139_do_receive(qemu_get_queue(...), ..., ..., ...)

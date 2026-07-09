@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2011-3050-use-after-free-css-first-letter
+    message: Potential use-after-free vulnerability related to CSS :first-letter pseudo-element handling. Ensure observer is added only after view initialization is complete.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          BookmarkModel* $$bm = $profile->GetBookmarkModel();
+          if (!$$bm->IsLoaded())
+            $$bm->AddObserver($this);
+    metadata:
+      cwe: "CWE-399"
+      cve: "CVE-2011-3050"

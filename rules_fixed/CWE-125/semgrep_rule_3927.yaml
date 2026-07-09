@@ -1,0 +1,14 @@
+rules:
+  - id: cifs_smb2_negotiate_vals_ops_mismatch
+    message: "Inconsistent update of 'ops' and 'vals' in SMB2_negotiate may lead to out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          ses->server->ops = &smb21_operations;
+          ...
+          ses->server->vals != &smb21_values
+      - pattern: |
+          ses->server->ops = &smb311_operations;
+          ...
+          ses->server->vals != &smb311_values

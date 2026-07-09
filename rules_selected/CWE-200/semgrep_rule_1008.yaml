@@ -1,0 +1,26 @@
+rules:
+  - id: cve-2013-3224-bluetooth-info-leak
+    message: "Uninitialized msg_namelen may leak kernel stack memory in bt_sock_recvmsg. Ensure msg_namelen is set before early return on shutdown."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!skb) {
+                  if (sk->sk_shutdown & RCV_SHUTDOWN)
+                      return 0;
+                  ...
+              }
+              ...
+              msg->msg_namelen = 0;
+          - pattern: |
+              if (!skb) {
+                  if (sk->sk_shutdown & RCV_SHUTDOWN)
+                      return 0;
+                  return ...;
+              }
+              ...
+              msg->msg_namelen = 0;
+    metavariable-regex:
+      metavariable: $func
+      regex: bt_sock_recvmsg

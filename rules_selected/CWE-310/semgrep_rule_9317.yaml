@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2014-8275-openssl-asn1-verify
+    message: "Detected vulnerable ASN1_item_verify implementation missing proper error handling for EVP_DigestVerifyUpdate, which may allow bypassing certificate blacklist checks (CVE-2014-8275)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      ret = EVP_DigestVerifyUpdate(&ctx, buf_in, inl);
+      ...
+      if (!ret)
+        {
+        ...
+        goto err;
+        }
+      ret = -1;

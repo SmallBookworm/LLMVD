@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2017-8086-memory-leak
+    patterns:
+      - pattern-either:
+          - pattern: |
+              orig_value = g_malloc(...);
+              ...
+              if (xattr_len < 0) {
+                return -1;
+              }
+          - pattern: |
+              orig_value = g_malloc(...);
+              ...
+              if (xattr_len < 0)
+                return -1;
+    message: "Memory leak: 'orig_value' allocated with g_malloc is not freed on error path (CVE-2017-8086, CWE-772)."
+    severity: ERROR
+    languages: [c]

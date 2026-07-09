@@ -1,0 +1,29 @@
+rules:
+  - id: cve-2016-7414-phar-signature-verification
+    message: "Missing signature length validation before memcmp in phar_verify_signature may lead to out-of-bounds memory access (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          PHP_SHA512Init(...);
+          ...
+          if (memcmp(digest, sig, sizeof(digest))) { ... }
+      - pattern: |
+          PHP_SHA256Init(...);
+          ...
+          if (memcmp(digest, sig, sizeof(digest))) { ... }
+      - pattern: |
+          PHP_SHA1Init(...);
+          ...
+          if (memcmp(digest, sig, sizeof(digest))) { ... }
+      - pattern: |
+          PHP_MD5Init(...);
+          ...
+          if (memcmp(digest, sig, sizeof(digest))) { ... }
+    pattern-not-inside: |
+      if (sig_len < sizeof($DIGEST)) {
+        ...
+        return FAILURE;
+      }
+      ...
+      if (memcmp($DIGEST, sig, sizeof($DIGEST))) { ... }

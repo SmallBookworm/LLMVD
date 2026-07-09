@@ -1,0 +1,25 @@
+rules:
+  - id: openldap-ldap_X509dn2bv-missing-rdn-end-check
+    message: Missing check for rdn_end exceeding dn_end in X.509 DN parsing may lead to out-of-bounds access and denial of service (CVE-2020-36229).
+    severity: ERROR
+    languages: [c]
+    pattern-not: |
+      for ( ... ; tag == LBER_SEQUENCE; ... ) {
+        ...
+        if ( rdn_end > dn_end )
+          return LDAP_DECODING_ERROR;
+        ...
+        tag = ber_skip_tag( ber, &len );
+        ber_skip_data( ber, len );
+        ...
+      }
+    pattern: |
+      for ( ... ; tag == LBER_SEQUENCE; ... ) {
+        ...
+        tag = ber_skip_tag( ber, &len );
+        ber_skip_data( ber, len );
+        ...
+      }
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: ldap_X509dn2bv

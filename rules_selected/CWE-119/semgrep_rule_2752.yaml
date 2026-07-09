@@ -1,0 +1,13 @@
+rules:
+  - id: variable_size_stack_array_ext2
+    message: "Use of variable-length stack array 'buf' can lead to excessive stack consumption (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          char buf[EXT2_BLOCK_SIZE(...)];
+      - pattern: |
+          char buf[...];
+    metavariable-pattern:
+      metavariable: $SIZE
+      pattern: EXT2_BLOCK_SIZE(...)

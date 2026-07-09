@@ -1,0 +1,10 @@
+rules:
+  - id: imagemagick-off-by-one-read-cve-2019-10131
+    message: "Potential off-by-one read vulnerability due to insufficient buffer allocation. Memory should be allocated with +1 to accommodate null termination when used as a string."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      AcquireQuantumMemory((size_t) count, sizeof(*str))
+    fix-regex:
+      regex: 'AcquireQuantumMemory$$(size_t$$ count, sizeof$$\*str$$)'
+      replacement: 'AcquireQuantumMemory((size_t) count + 1, sizeof(*str))'

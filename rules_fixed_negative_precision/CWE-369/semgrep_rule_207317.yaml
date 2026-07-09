@@ -1,0 +1,20 @@
+rules:
+  - id: imagemagick-divide-by-zero-implodeimage
+    patterns:
+      - pattern-either:
+          - pattern: |
+              scale.y = (double) $A / (double) $B;
+          - pattern: |
+              scale.x = (double) $A / (double) $B;
+          - pattern: |
+              pow(sin(MagickPI * sqrt((double) distance) / radius / 2), -amount)
+          - pattern: |
+              factor * delta.x / scale.x
+          - pattern: |
+              factor * delta.y / scale.y
+    message: "Division by zero possible. Use PerceptibleReciprocal() to prevent undefined behavior."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-369"
+      cve: "CVE-2021-20244"

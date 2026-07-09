@@ -1,0 +1,7 @@
+rules:
+  - id: cve-2017-5206-allow-debuggers
+    message: "Use of '--allow-debuggers' argument disables seccomp sandboxing, allowing potential sandbox escapes (CVE-2017-5206)."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      strcmp(argv[...], "--allow-debuggers") == 0

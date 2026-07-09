@@ -1,0 +1,7 @@
+rules:
+  - id: wireshark-memory-leak-tvb-get-bits-array
+    message: "Memory leak detected: tvb_get_bits_array is called without a valid memory scope, leading to potential memory leaks (CWE-401)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      tvb_get_bits_array(NULL, ...)

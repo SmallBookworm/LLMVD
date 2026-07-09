@@ -1,0 +1,32 @@
+rules:
+  - id: unchecked-setuid
+    message: "The return value of setuid() is not checked. This could lead to privilege escalation if the process fails to drop privileges."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern: |
+          setuid(...);
+      - pattern-not: |
+          if (setuid(...) == -1) { ... }
+      - pattern-not: |
+          if (setuid(...) < 0) { ... }
+      - pattern-not: |
+          if (setuid(...) != 0) { ... }
+      - pattern-not: |
+          if ((setuid(...) == -1) && ...) { ... }
+      - pattern-not: |
+          if ((setuid(...) < 0) && ...) { ... }
+      - pattern-not: |
+          if ((setuid(...) != 0) && ...) { ... }
+      - pattern-not-inside: |
+          int $X = setuid(...);
+          ...
+          if ($X == -1) { ... }
+      - pattern-not-inside: |
+          int $X = setuid(...);
+          ...
+          if ($X < 0) { ... }
+      - pattern-not-inside: |
+          int $X = setuid(...);
+          ...
+          if ($X != 0) { ... }

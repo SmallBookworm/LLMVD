@@ -1,0 +1,14 @@
+rules:
+  - id: cwe-362-race-condition-mime-check
+    message: "Potential race condition due to unsafe access of m_resource without null check before use in MIME type validation."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (m_isExternalScript && m_resource && ...)
+          - pattern: |
+              if (m_isExternalScript && (!m_resource || !m_resource->mimeTypeAllowedByNosniff()))
+    metadata:
+      cwe: "CWE-362"
+      cve: "CVE-2013-0893"

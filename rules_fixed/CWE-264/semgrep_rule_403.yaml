@@ -1,0 +1,37 @@
+rules:
+  - id: gnash-cookie-file-permissions
+    message: "Cookie file created in /tmp without secure permissions (CWE-264). Missing chmod to restrict access."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - patterns:
+        - pattern: |
+            std::ofstream cookiefile;
+            ...
+            std::stringstream ss;
+            ss << "/tmp/gnash-cookies." << getpid();
+            cookiefile.open(ss.str().c_str(), ...);
+            ...
+            cookiefile.close();
+        - metavariable-pattern:
+            metavariable: ss
+            pattern: 'ss'
+        - pattern-not: |
+            ...
+            chmod(ss.str().c_str(), 0600);
+            ...
+      - patterns:
+        - pattern: |
+            std::stringstream ss;
+            ss << "/tmp/gnash-cookies." << getpid();
+            ...
+            std::ofstream cookiefile(ss.str().c_str(), ...);
+            ...
+            cookiefile.close();
+        - metavariable-pattern:
+            metavariable: ss
+            pattern: 'ss'
+        - pattern-not: |
+            ...
+            chmod(ss.str().c_str(), 0600);
+            ...

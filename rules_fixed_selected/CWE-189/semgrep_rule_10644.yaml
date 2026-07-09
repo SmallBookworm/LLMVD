@@ -1,0 +1,16 @@
+rules:
+  - id: integer-overflow-in-calloc
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($LB && $N > GC_SIZE_MAX / $LB)
+                return NULL;
+          - pattern: |
+              if ($N > GC_SIZE_MAX / $LB && $LB)
+                return NULL;
+    message: "Potential integer overflow in calloc due to missing fast overflow check. This may lead to allocating less memory than expected, resulting in buffer overflows."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-189"
+      cve: "CVE-2012-2673"

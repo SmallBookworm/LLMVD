@@ -1,0 +1,16 @@
+rules:
+  - id: fat12_off_by_two_error
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (cluster != fs->clusters - 1)
+                  get_fat(..., cluster + 1, ...);
+          - pattern: |
+              if (cluster != $X - 1)
+                  get_fat(..., cluster + 1, ...);
+    message: "Potential off-by-two error in FAT12 handling. The condition should compare against 'fs->clusters + 1' to avoid invalid memory access or filesystem corruption."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-189"
+      cve: "CVE-2015-8872"

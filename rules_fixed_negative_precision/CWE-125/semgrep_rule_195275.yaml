@@ -1,0 +1,16 @@
+rules:
+  - id: qrtr-oob-read-missing-size-check
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (len != ALIGN(size, 4) + hdrlen)
+                  goto err;
+          - pattern: |
+              if (len != ALIGN(size, 4) + hdrlen)
+                  ...
+    message: "Missing check for zero 'size' before using it in alignment calculation may lead to out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2021-3743"

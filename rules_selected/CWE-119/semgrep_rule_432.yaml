@@ -1,0 +1,25 @@
+rules:
+  - id: cve-2014-0195-dtls-fragment-validation
+    message: "Missing validation of message length consistency in DTLS fragment reassembly may lead to buffer overflow (CVE-2014-0195)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (item == NULL)
+              {
+                  ...
+              }
+              else
+                  frag = (hm_fragment*) item->data;
+          - pattern: |
+              if (item == NULL)
+              {
+                  ...
+              }
+              else
+                  { frag = (hm_fragment*) item->data; }
+    metavariable-pattern:
+      metavariable: item
+      pattern: pqueue_find(...)
+    focus-metavariable: item

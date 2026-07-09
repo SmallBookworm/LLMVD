@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2020-4032-integer-cast-oob-read
+    message: "Potential out-of-bounds read due to incorrect calculation of 'diff' which may lead to unsafe stream seeking. This matches the vulnerable pattern in FreeRDP < 2.1.2 (CVE-2020-4032)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              diff = start - end;
+              ...
+              Stream_Seek(s, diff);
+          - pattern: |
+              $DIFF = $START - $END;
+              ...
+              Stream_Seek($S, $DIFF);
+    metadata:
+      cwe: "CWE-703"
+      cve: "CVE-2020-4032"
+      references:
+        - https://github.com/FreeRDP/FreeRDP/commit/e7bffa64ef5ed70bac94f823e2b95262642f5296

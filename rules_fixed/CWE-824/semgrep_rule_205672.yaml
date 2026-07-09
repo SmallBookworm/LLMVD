@@ -1,0 +1,8 @@
+rules:
+  - id: cwe-824-uninitialized-pointer-phar
+    message: "Uninitialized pointer dereference vulnerability in phar_make_dirstream due to missing keylen zero check (CWE-824, CVE-2016-4343)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (keylen <= (uint)dirlen) {
+        if (keylen < (uint)dirlen || !strncmp(str_key, dir, dirlen)) {

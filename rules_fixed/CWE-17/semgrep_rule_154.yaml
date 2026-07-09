@@ -1,0 +1,30 @@
+rules:
+  - id: cve-2015-0287-asn1-item-ex-d2i-missing-initialization
+    message: "ASN1_item_ex_d2i does not reinitialize CHOICE and ADB data structures, which may lead to memory corruption (CVE-2015-0287)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          case ASN1_ITYPE_CHOICE:
+            ...
+            if (!*pval && !ASN1_item_ex_new(pval, it)) {
+              ...
+            }
+      - pattern: |
+          switch ($x) {
+            case ASN1_ITYPE_SEQUENCE:
+            case ASN1_ITYPE_NDEF_SEQUENCE:
+              ...
+              if (!*pval && !ASN1_item_ex_new(pval, it)) {
+                ...
+              }
+              ...
+              for (...; ...; ...) {
+                if (tt->flags & ASN1_TFLG_ADB_MASK) {
+                  ...
+                }
+              }
+          }
+    metavariable-pattern:
+      metavariable: $it
+      pattern: $it

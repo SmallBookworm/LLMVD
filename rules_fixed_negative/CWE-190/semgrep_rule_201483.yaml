@@ -1,0 +1,9 @@
+rules:
+  - id: alarmtimer_integer_overflow
+    message: "Use of ktime_add() may cause integer overflow; use ktime_add_safe() instead."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      ktime_add($NOW, $EXP)
+    fix: |
+      ktime_add_safe($NOW, $EXP)

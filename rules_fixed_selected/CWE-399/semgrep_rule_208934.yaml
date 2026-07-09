@@ -1,0 +1,15 @@
+rules:
+  - id: gdimage_free_mismatch
+    message: "Memory allocated with gdImageCreateTrueColor is freed with gdFree instead of gdImageDestroy, leading to potential memory leaks or denial of service."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              gdFree($TMP_IM);
+          - pattern: |
+              gdFree(tmp_im);
+    metavariable-pattern:
+      $TMP_IM:
+        pattern: gdImageCreateTrueColor(...)
+    fix: ""

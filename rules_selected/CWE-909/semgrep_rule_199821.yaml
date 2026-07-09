@@ -1,0 +1,26 @@
+rules:
+  - id: nfs_atomic_open_directory_flag_check
+    message: "Missing check for O_DIRECTORY flag when opening a regular file may return uninitialized file descriptor. Expected ENOTDIR error."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ((open_flags & O_DIRECTORY)) {
+            ...
+            goto no_open;
+          }
+          ...
+          no_open:
+          res = nfs_lookup(..., lookup_flags);
+          ...
+          return finish_no_open(..., res);
+      - pattern: |
+          no_open:
+          res = nfs_lookup(..., lookup_flags);
+          ...
+          if (IS_ERR(res))
+            return PTR_ERR(res);
+          return finish_no_open(..., res);
+    metavariable-regex:
+      metavariable: res
+      regex: res

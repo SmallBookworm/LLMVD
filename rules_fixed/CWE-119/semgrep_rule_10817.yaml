@@ -1,0 +1,16 @@
+rules:
+  - id: wasm_dis_buffer_overflow
+    message: "Potential buffer overflow in wasm_dis due to unsafe snprintf usage in BRTABLE case"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          snprintf (op->txt, R_ASM_BUFSIZE, "%s %d ", ..., $$count);
+          for (...; ...; ...) {
+              int optxtlen = strlen (op->txt);
+              snprintf (op->txt + optxtlen, R_ASM_BUFSIZE - optxtlen, "%d ", ...);
+          }
+          snprintf (op->txt + strlen (op->txt), R_ASM_BUFSIZE, "%d", ...);
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2018-11378"

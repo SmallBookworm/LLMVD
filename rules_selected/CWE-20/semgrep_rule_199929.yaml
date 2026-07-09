@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2015-7691-ntp-crypto-xmit-bounds-check
+    message: "Insecure bounds check in crypto_xmit may lead to denial of service via crafted autokey packets (CVE-2015-7691)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          vallen = ntohl(ep->vallen);
+          if (vallen == 0 || vallen > MAXHOSTNAME ||
+              len - VALUE_LEN < vallen) {
+            ...
+          }
+      - pattern: |
+          vallen = ntohl(ep->vallen);
+          if (vallen == 0 || vallen >= MAXHOSTNAME + 1 ||
+              len - VALUE_LEN < vallen) {
+            ...
+          }

@@ -1,0 +1,25 @@
+rules:
+  - id: polarssl-x509-name-downgrade
+    message: "Improper handling of X.509 name parsing may allow signature algorithm downgrade attacks (CVE-2014-8627)."
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          do
+          {
+              ...
+              if( *p != end )
+              {
+                  ...
+              }
+          }
+          while( *p != end );
+      - pattern: |
+          if( *p != end_set )
+              return( POLARSSL_ERR_X509_FEATURE_UNAVAILABLE );
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern: x509_get_name
+    pattern-not-inside: |
+      if( *p != $END )
+          return( POLARSSL_ERR_X509_FEATURE_UNAVAILABLE );

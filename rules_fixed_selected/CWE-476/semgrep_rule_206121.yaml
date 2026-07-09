@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2019-20054-null-pointer-deref
+    message: "NULL pointer dereference in drop_sysctl_table when header->parent is NULL and start_unregistering is called."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (parent)
+            put_links($HEADER);
+          start_unregistering($HEADER);
+      - pattern: |
+          if ($PARENT)
+            put_links($HEADER);
+          start_unregistering($HEADER);
+    metavariable-pattern:
+      $HEADER: "struct ctl_table_header *"
+      $PARENT: "struct ctl_dir *"

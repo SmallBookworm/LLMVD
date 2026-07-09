@@ -1,0 +1,27 @@
+rules:
+  - id: cve-2017-14174-psd-loop-no-eof-check
+    message: "Loop over unbounded 'length' without EOF check may cause DoS via excessive CPU consumption."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for ($COND; $I < (ssize_t) length; $INC)
+              {
+                ...
+                ReadBlobLong(...);
+                ReadBlobLong(...);
+                ...
+              }
+          - pattern: |
+              for ($COND; $I < (ssize_t) length; $INC += 8)
+              {
+                ...
+                ReadBlobLong(...);
+                ReadBlobLong(...);
+                ...
+              }
+    metavariable-pattern:
+      metavariable: length
+      pattern: (MagickSizeType) ...
+    focus-metavariable: length

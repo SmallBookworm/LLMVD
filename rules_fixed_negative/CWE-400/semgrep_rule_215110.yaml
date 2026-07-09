@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2016-8610-handshake-loop-check
+    message: Missing limit on handshake warning messages may lead to denial of service (CVE-2016-8610).
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-not: session->internals.handshake_suspicious_loops = 0;
+      - pattern-either:
+          - pattern: session->internals.handshake_large_loops = 0;
+    metadata:
+      cwe: "CWE-400"
+      cve: "CVE-2016-8610"

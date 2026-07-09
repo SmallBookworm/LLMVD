@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2016-5166-file-url-download
+    message: "Potential exposure to SMB relay attacks via unvalidated file:// URL in download implementation (CVE-2016-5166, CWE-200)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          GURL(ConvertJavaStringToUTF8(...))
+      - pattern: |
+          info.manifest_url = GURL(ConvertJavaStringToUTF8(...));
+    metadata:
+      cwe: ["CWE-200"]
+      cve: "CVE-2016-5166"

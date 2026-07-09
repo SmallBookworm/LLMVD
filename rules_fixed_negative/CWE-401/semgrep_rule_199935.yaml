@@ -1,0 +1,36 @@
+rules:
+  - id: sja1105_memory_leak
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $BUF = kcalloc(...);
+              ...
+              if ($COND1) {
+                ...
+                return $ERR1;
+              }
+              ...
+              if ($COND2) {
+                ...
+                return $ERR2;
+              }
+          - pattern: |
+              $BUF = kcalloc(...);
+              ...
+              if ($COND1) {
+                ...
+                return $ERR1;
+              }
+              ...
+              if ($COND2) {
+                ...
+                return $ERR2;
+              }
+              ...
+              kfree($BUF);
+    message: "Memory leak detected: 'config_buf' is not freed on error paths in sja1105_static_config_upload. This may lead to denial of service via memory exhaustion (CWE-401)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-401"
+      cve: "CVE-2019-18807"

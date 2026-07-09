@@ -1,0 +1,17 @@
+rules:
+  - id: evm_removexattr_null_check_missing
+    message: "Missing NULL check before calling inode->i_op->removexattr may cause NULL pointer dereference (CVE-2013-0313)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (... == -ENODATA) {
+            ... = $inode->i_op->removexattr(...);
+          }
+      - pattern: |
+          else if (... == -ENODATA) {
+            ... = $inode->i_op->removexattr(...);
+          }
+    metavariable-pattern:
+      metavariable: $inode
+      pattern: struct inode *

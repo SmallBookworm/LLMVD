@@ -1,0 +1,10 @@
+rules:
+  - id: cwe-190-integer-overflow-stack-check
+    patterns:
+      - pattern-either:
+          - pattern: |
+              uint32_t count = (uint32_t)((size_t)STACK_BASE - (size_t)&ptr);
+              return 1000000 - count;
+    message: "Potential integer overflow in stack size calculation leading to denial of service (CWE-190)."
+    severity: ERROR
+    languages: [c]

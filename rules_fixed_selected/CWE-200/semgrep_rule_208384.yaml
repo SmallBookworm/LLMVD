@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2021-22876-auto-referer-leak
+    message: "Potential exposure of credentials in HTTP Referer header due to missing credential stripping in auto-referer logic (CVE-2021-22876)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (data->set.http_auto_referer) {
+                ...
+                data->state.referer = strdup(data->state.url);
+                ...
+              }
+          - pattern: |
+              if(data->set.http_auto_referer) {
+                ...
+                data->state.referer = strdup(data->state.url);
+                ...
+              }
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2021-22876"

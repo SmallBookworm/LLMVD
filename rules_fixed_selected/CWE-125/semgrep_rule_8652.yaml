@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2018-9505-out-of-bounds-read
+    message: "Missing bounds check before reading mdl_id from packet data may lead to out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          p = (uint8_t*)(p_pkt + 1) + p_pkt->offset;
+          ...
+          BE_STREAM_TO_UINT16(evt_data.hdr.mdl_id, p);
+      - pattern: |
+          p = (uint8_t*)(p_pkt + 1) + p_pkt->offset;
+          ...
+          evt_data.hdr.op_code = *p++;
+          BE_STREAM_TO_UINT16(evt_data.hdr.mdl_id, p);
+    metavariable-pattern:
+      p_pkt: { type: "BT_HDR*" }

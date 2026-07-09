@@ -1,0 +1,26 @@
+rules:
+  - id: cve-2015-5296-missing-signing-check
+    message: Missing check for session->smb2->should_sign when determining SMB2 security mode, which may allow encrypted-to-unencrypted downgrade attacks.
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              uint8_t $FUNC(...){
+                ...
+                if ($CONN->mandatory_signing) {
+                  $SECURITY_MODE |= SMB2_NEGOTIATE_SIGNING_REQUIRED;
+                }
+                ...
+                return $SECURITY_MODE;
+              }
+          - pattern: |
+              $SECURITY_MODE = SMB2_NEGOTIATE_SIGNING_ENABLED;
+              if ($CONN->mandatory_signing) {
+                $SECURITY_MODE |= SMB2_NEGOTIATE_SIGNING_REQUIRED;
+              }
+              return $SECURITY_MODE;
+    pattern-not: |
+      if ($SESSION->smb2->should_sign) {
+        $SECURITY_MODE |= SMB2_NEGOTIATE_SIGNING_REQUIRED;
+      }

@@ -1,0 +1,27 @@
+rules:
+  - id: cwe-125-buffer-overread-ip_printroute
+    message: "Buffer over-read vulnerability in ip_printroute due to missing bounds checks before accessing cp[len]."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          for (...; ...; ...) {
+            ND_PRINT(..., ipaddr_string(..., &cp[len]));
+            ...
+          }
+      - pattern: |
+          ptr = cp[2] - 1;
+          ...
+          for (...; ...; ...) {
+            ND_PRINT(..., ipaddr_string(..., &cp[len]));
+            ...
+          }
+    pattern-not-inside: |
+      for (...; ...; ...) {
+        ND_TCHECK2(cp[len], 4);
+        ND_PRINT(..., ipaddr_string(..., &cp[len]));
+        ...
+      }
+    metavariable-regex:
+      metavariable: len
+      regex: "len"

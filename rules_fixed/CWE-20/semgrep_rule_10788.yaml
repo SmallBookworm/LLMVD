@@ -1,0 +1,11 @@
+rules:
+  - id: cwe-20-variable-reuse-rpcapd
+    message: "Reusing the input parameter 'plen' to calculate reply payload length may lead to incorrect message length handling and potential security issues (CWE-20). Use a separate local variable for reply length."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      plen += ...
+    pattern-not: |
+      uint32_t replylen = 0;
+      ...
+      replylen += ...

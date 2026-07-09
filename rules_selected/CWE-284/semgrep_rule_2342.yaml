@@ -1,0 +1,25 @@
+rules:
+  - id: netlink_dst_pid_validation_missing
+    message: "Missing validation of dst_pid in netlink_sendmsg may allow non-root processes to spoof Netlink messages (CVE-2012-6689)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (msg->msg_namelen) {
+              ...
+              dst_pid = addr->nl_pid;
+              ...
+              if (dst_group && !netlink_capable(...))
+                  goto out;
+          }
+      - pattern: |
+          if (msg->msg_namelen) {
+              ...
+              dst_pid = addr->nl_pid;
+              ...
+              if (dst_group && !netlink_capable(...))
+                  return ...;
+          }
+    metavariable-pattern:
+      metavariable: dst_pid
+      pattern: addr->nl_pid

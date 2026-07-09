@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2014-7145-null-ptr-deref
+    message: "Potential NULL pointer dereference in tcon_error_exit when tcon is NULL but accessed unconditionally."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (rsp->hdr.Status == STATUS_BAD_NETWORK_NAME) {
+        ...
+        tcon->bad_network_name = true;
+      }
+    metadata:
+      cwe: "CWE-399"
+      cve: "CVE-2014-7145"

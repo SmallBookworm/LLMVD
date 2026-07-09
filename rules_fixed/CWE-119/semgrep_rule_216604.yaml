@@ -1,0 +1,16 @@
+rules:
+  - id: v8-zone-new-overflow
+    message: "Potential buffer overflow in Zone::New due to missing underflow/overflow check before allocation"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($SIZE > $LIMIT - $POSITION) {
+                ...
+              }
+    metavariable-patterns:
+      - metavariable: $LIMIT
+        pattern: limit_
+      - metavariable: $POSITION
+        pattern: position_

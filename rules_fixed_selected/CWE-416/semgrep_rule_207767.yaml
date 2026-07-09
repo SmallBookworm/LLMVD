@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2019-19952-use-after-free
+    message: "Use-after-free vulnerability in MngInfoDiscardObject due to invalid free (CWE-416)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          MngInfoDiscardObject($MNG_INFO, $I);
+      - pattern: |
+          for (...; ...; ...)
+          {
+            ...
+            MngInfoDiscardObject($MNG_INFO, $I);
+            ...
+          }
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2019-19952"
+      references:
+        - https://github.com/ImageMagick/ImageMagick/commit/916d7bbd2c66a286d379dbd94bc6035c8fab937c

@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2019-15937-buffer-overflow
+    message: "Unbounded memcpy using a network-provided length may lead to buffer overflow (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $RLEN = ntohl(...);
+          ...
+          memcpy($DST, $SRC, $RLEN);
+      - pattern: |
+          $RLEN = ntohl(net_read_uint32(...));
+          ...
+          memcpy($DST, $SRC, $RLEN);
+    metavariable-regex:
+      metavariable: $RLEN
+      regex: rlen

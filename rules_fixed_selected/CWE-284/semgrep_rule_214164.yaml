@@ -1,0 +1,26 @@
+rules:
+  - id: cve-2018-12615-uninitialized-gidset
+    message: "Uninitialized gidset used in setgroups() may lead to privilege escalation (CVE-2018-12615, CWE-284)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (ngroups <= NGROUPS_MAX) {
+              ...
+              gidset.reset(new gid_t[ngroups]);
+              if (setgroups(ngroups, gidset.get()) == -1) {
+                  ...
+              }
+          }
+      - pattern: |
+          if (ngroups <= NGROUPS_MAX) {
+              ...
+              gidset.reset(new gid_t[ngroups]);
+              ...
+              if (setgroups(ngroups, gidset.get()) == -1) {
+                  ...
+              }
+          }
+    metavariable-pattern:
+      metavariable: gidset
+      pattern: boost::scoped_array<gid_t>

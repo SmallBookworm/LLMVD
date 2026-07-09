@@ -1,0 +1,15 @@
+rules:
+  - id: smb_buffer_overread_cve_2018_16451
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (strcmp((const char *)(data1 + 2), "\\MAILSLOT\\BROWSE") == 0) {
+                ...
+              }
+          - pattern: |
+              if (strcmp((const char *)(data1 + 2), "\\PIPE\\LANMAN") == 0) {
+                ...
+              }
+    message: "Missing bounds check before strcmp may lead to buffer over-read (CWE-125, CVE-2018-16451)."
+    severity: ERROR
+    languages: [c]

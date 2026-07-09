@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2017-0819-hevc-decoder-slice-index-underflow
+    message: "Potential underflow of slice index when handling ignored slices. This may lead to incorrect state management or memory corruption (CWE-682)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if(IHEVCD_IGNORE_SLICE == ret)
+      {
+        ps_codec->s_parse.i4_cur_slice_idx = MAX(0, (ps_codec->s_parse.i4_cur_slice_idx - 1));
+        ...
+      }

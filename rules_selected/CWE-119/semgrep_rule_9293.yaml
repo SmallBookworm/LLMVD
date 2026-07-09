@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2015-4036-vhost-scsi-tpgt-validation
+    message: "Insufficient validation of tpgt value may lead to array index out-of-bounds (CWE-119). tpgt should be validated against VHOST_SCSI_MAX_TARGET (256) and parsed as u16."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (kstrtoul($NAME + 5, 10, &$TPGT) || $TPGT > UINT_MAX)
+            return ERR_PTR(-EINVAL);
+      - pattern: |
+          unsigned long $TPGT;
+          ...
+          if (kstrtoul($NAME + 5, 10, &$TPGT) || $TPGT > UINT_MAX)
+            return ERR_PTR(-EINVAL);
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2015-4036"

@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2019-5804-command-line-switch-parsing
+    message: "Command-line switch parsing is vulnerable to domain spoofing due to lack of terminator check (CVE-2019-5804)."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (size_t i = 1; i < $ARRAY.size(); ++i) {
+                const std::wstring& arg = $ARRAY[i];
+                if (arg.compare(0, $SWITCH_WITH_EQUAL.size(), $SWITCH_WITH_EQUAL) == 0)
+                  return arg.substr($SWITCH_WITH_EQUAL.size());
+              }
+          - pattern: |
+              for (size_t i = 1; i < $ARRAY.size(); ++i) {
+                if ($ARG.compare(0, $SWITCH_WITH_EQUAL.size(), $SWITCH_WITH_EQUAL) == 0)
+                  return $ARG.substr($SWITCH_WITH_EQUAL.size());
+              }
+    metadata:
+      cwe: ["CWE-77"]
+      cve: "CVE-2019-5804"

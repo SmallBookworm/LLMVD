@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2017-5108-type-confusion-pdfium
+    message: "Missing null check for doc.GetFrame() may lead to type confusion or use-after-free in PDFium."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          if (!doc.GetFrame())
+            return false;
+      - pattern-either:
+          - pattern: |
+              Document& doc = ...;
+              ...
+              if (doc.IsSandboxed(...)) { ... }
+          - pattern: |
+              Document& doc = ...;
+              ...
+              if (!doc.IsInMainFrame() && ...) { ... }
+    metavariable-pattern:
+      metavariable: doc
+      pattern: "Document"

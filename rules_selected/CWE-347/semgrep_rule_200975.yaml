@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2018-15587-missing-security-bar-placement
+    message: "Missing call to mail_parser_move_security_before_headers may allow OpenPGP signature spoofing (CVE-2018-15587, CWE-347)."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      while (!g_queue_is_empty (&mail_part_queue)) {
+        ... 
+      }
+    pattern-not: |
+      mail_parser_move_security_before_headers (&mail_part_queue);
+      while (!g_queue_is_empty (&mail_part_queue)) {
+        ... 
+      }

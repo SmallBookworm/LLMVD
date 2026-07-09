@@ -1,0 +1,22 @@
+rules:
+  - id: unchecked-fputc-return
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (...; ...; ...)
+                (void) fputc(..., ...);
+          - pattern: |
+              while (...) {
+                ...
+                (void) fputc(..., ...);
+                ...
+              }
+          - pattern: |
+              do {
+                ...
+                (void) fputc(..., ...);
+                ...
+              } while (...);
+    message: "The return value of 'fputc' is cast to void and not checked. This can lead to silent write failures and potential denial of service (CWE-20)."
+    severity: ERROR
+    languages: [c]

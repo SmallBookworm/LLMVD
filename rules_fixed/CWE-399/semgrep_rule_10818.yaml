@@ -1,0 +1,17 @@
+rules:
+  - id: virglrenderer-context-create-memory-leak
+    message: "Memory leak in vrend_renderer_context_create_internal: context is not checked for prior existence before allocation, leading to potential memory leak (CVE-2016-10163)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      dec_ctx[handle] = dctx;
+    pattern-not: |
+      if (dec_ctx[handle]) {
+        return;
+      }
+    metavariable-pattern:
+      metavariable: dctx
+      pattern: malloc(...)
+    paths:
+      include:
+        - "vrend_decode.c"

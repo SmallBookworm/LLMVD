@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2017-14039-heap-buffer-overflow
+    message: "Potential heap-based buffer overflow in opj_t2_encode_packet due to missing length checks before writing SOP/EPH markers."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (tcp->csty & J2K_CP_CSTY_SOP) {
+              c[0] = 255;
+              c[1] = 145;
+              ...
+          }
+      - pattern: |
+          if (tcp->csty & J2K_CP_CSTY_EPH) {
+              c[0] = 255;
+              c[1] = 146;
+              ...
+          }
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2017-14039"

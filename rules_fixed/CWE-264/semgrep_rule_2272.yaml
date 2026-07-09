@@ -1,0 +1,35 @@
+rules:
+  - id: cve-2015-8539-negative-key-update-check-missing
+    message: Missing check for KEY_FLAG_NEGATIVE before accessing key payload in update function. This can lead to use-after-free or kernel panic when updating a negatively instantiated key.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              int $FUNC(struct key *key, struct key_preparsed_payload *prep) {
+                  ... 
+                  $TYPE *$PAYLOAD = key->payload.data[0];
+                  ...
+                  if (... && !test_bit(KEY_FLAG_NEGATIVE, &key->flags)) { ... }
+                  ...
+              }
+          - pattern: |
+              int $FUNC(struct key *key, struct key_preparsed_payload *prep) {
+                  ... 
+                  $TYPE *$PAYLOAD = key->payload.data[0];
+                  ...
+                  if (test_bit(KEY_FLAG_NEGATIVE, &key->flags)) { return -ENOKEY; }
+                  ...
+              }
+      - pattern-not: |
+          int $FUNC(struct key *key, struct key_preparsed_payload *prep) {
+              ...
+              if (test_bit(KEY_FLAG_NEGATIVE, &key->flags))
+                  return -ENOKEY;
+              ...
+              $TYPE *$PAYLOAD = key->payload.data[0];
+              ...
+          }
+    metadata:
+      cwe: ["CWE-264"]
+      cve: "CVE-2015-8539"

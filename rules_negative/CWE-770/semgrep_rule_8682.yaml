@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2017-13189-libavc-null-check-missing
+    message: "Missing null check for 'dec_hdl' before calling 'ih264d_free_static_bufs' may lead to use-after-free or invalid free (CWE-770)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if ((IV_FAIL == ret) && (NULL != dec_hdl))
+      {
+          ih264d_free_static_bufs(dec_hdl);
+          ...
+      }

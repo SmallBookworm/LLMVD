@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2012-2876-buffer-overflow-sse2
+    message: Potential buffer overflow due to unsafe UI interaction pattern associated with SSE2 optimization in Chrome (CVE-2012-2876).
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              ASSERT_NO_FATAL_FAILURE(ui_test_utils::ClickOnView(...));
+          - pattern: |
+              ASSERT_TRUE(ui_test_utils::IsViewFocused(...));
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2012-2876"

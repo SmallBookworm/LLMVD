@@ -1,0 +1,25 @@
+rules:
+  - id: openssh-use_login-pam-env-privilege-escalation
+    message: "When UseLogin is enabled, PAM environment variables are unconditionally copied, which may allow local privilege escalation via crafted environment variables (e.g., LD_PRELOAD)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (options.use_pam) {
+                ...
+                fetch_pam_environment();
+                ...
+              }
+          - pattern: |
+              if (options.use_pam) {
+                ...
+                copy_environment(...);
+                ...
+              }
+    metavariable-pattern:
+      metavariable: $BODY
+      pattern-not: |
+        if (options.use_pam && !options.use_login) {
+          ...
+        }

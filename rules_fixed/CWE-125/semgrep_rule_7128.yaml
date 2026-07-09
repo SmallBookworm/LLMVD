@@ -1,0 +1,13 @@
+rules:
+  - id: cwe-125-use-after-free-blink
+    message: "Potential out-of-bounds memory read due to use-after-free in Blink (CVE-2017-5056)."
+    severity: ERROR
+    languages: [c++]
+    pattern-either:
+      - pattern: |
+          void InputEngine::ProcessText(const std::string& message, ...)
+      - pattern: |
+          void InputEngine::ProcessText(const char* message, ...)
+    metadata:
+      cwe: ["CWE-125"]
+      cve: "CVE-2017-5056"

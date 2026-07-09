@@ -1,0 +1,23 @@
+rules:
+  - id: libpng-row-factor-integer-overflow
+    message: "Potential integer overflow in row_factor calculation leading to divide-by-zero (CVE-2018-13785, CWE-190)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          size_t row_factor =
+            ($WIDTH * $CHANNELS * ($BIT_DEPTH > 8 ? 2 : 1)
+             + 1 + ($INTERLACED ? 6 : 0));
+      - pattern: |
+          size_t row_factor =
+            ($WIDTH * $CHANNELS * ($BIT_DEPTH > 8 ? 2 : 1)
+            + 1 + ($INTERLACED ? 6 : 0));
+    metavariable-patterns:
+      - metavariable: "$WIDTH"
+        pattern: "png_ptr->width"
+      - metavariable: "$CHANNELS"
+        pattern: "png_ptr->channels"
+      - metavariable: "$BIT_DEPTH"
+        pattern: "png_ptr->bit_depth"
+      - metavariable: "$INTERLACED"
+        pattern: "png_ptr->interlaced"

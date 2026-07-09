@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2016-10907-out-of-bounds-write
+    message: "Out-of-bounds write due to off-by-one error in devnr bounds check. Use '>=' instead of '>' to prevent writing beyond array limits."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          if (devnr > AD5755_NUM_CHANNELS) {
+          ...
+          }
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2016-10907"

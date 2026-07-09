@@ -1,0 +1,11 @@
+rules:
+  - id: imagemagick-histogram-integer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: (int) $A->red - (int) $B->red
+          - pattern: (int) $A->green - (int) $B->green
+          - pattern: (int) $A->blue - (int) $B->blue
+          - pattern: (int) $A->count - (int) $B->count
+    message: "Integer overflow possible in HistogramCompare due to unsafe subtraction of pixel values or count. Use ssize_t cast to prevent overflow (CWE-190)."
+    severity: WARNING
+    languages: [c]

@@ -1,0 +1,43 @@
+rules:
+  - id: ipmitool-cve-2020-5208-buffer-overflow
+    message: |
+      Buffer overflow vulnerability in ipmi_get_channel_cipher_suites due to missing upper bound check on rsp->data_len.
+      This may lead to remote code execution if ipmitool is run as a privileged user.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (rsp->ccode || rsp->data_len < 1) {
+              ...
+              }
+          - pattern: |
+              if (rsp->ccode
+                  || rsp->data_len < 1
+                  || rsp->data_len > sizeof(uint8_t) + MAX_CIPHER_SUITE_DATA_LEN)
+              {
+              ...
+              }
+      - metavariable-pattern:
+          metavariable: $COND
+          patterns:
+            - pattern-not: |
+                if (rsp->ccode
+                    || rsp->data_len < 1
+                    || rsp->data_len > sizeof(uint8_t) + MAX_CIPHER_SUITE_DATA_LEN)
+                {
+                ...
+                }
+      - pattern-inside: |
+          do {
+          ...
+          rsp = ...;
+          if (!rsp) { ... }
+          if ($COND) {
+            ...
+            return -1;
+          }
+          ...
+          memcpy(..., rsp->data + 1, rsp->data_len - 1);
+          ...
+          } while (...);

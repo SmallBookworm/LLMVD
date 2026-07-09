@@ -1,0 +1,41 @@
+rules:
+  - id: cve-2016-2548-slave-timer-list-unlink-missing
+    message: "Missing list_del_init calls for ack_list and active_list in slave timer path may lead to use-after-free (CVE-2016-2548)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (timeri->flags & SNDRV_TIMER_IFLG_SLAVE) {
+                  if (!keep_flag) {
+                      spin_lock_irqsave(&slave_active_lock, flags);
+                      timeri->flags &= ~SNDRV_TIMER_IFLG_RUNNING;
+                      ...
+                      spin_unlock_irqrestore(&slave_active_lock, flags);
+                  }
+                  goto __end;
+              }
+          - pattern: |
+              if (timeri->flags & SNDRV_TIMER_IFLG_SLAVE) {
+                  if (!keep_flag) {
+                      spin_lock_irqsave(&slave_active_lock, flags);
+                      ...;
+                      spin_unlock_irqrestore(&slave_active_lock, flags);
+                  }
+                  goto __end;
+              }
+    pattern-not: |
+        if (timeri->flags & SNDRV_TIMER_IFLG_SLAVE) {
+            if (!keep_flag) {
+                spin_lock_irqsave(&slave_active_lock, flags);
+                ...;
+                list_del_init(&timeri->ack_list);
+                list_del_init(&timeri->active_list);
+                ...;
+                spin_unlock_irqrestore(&slave_active_lock, flags);
+            }
+            goto __end;
+        }
+    metavariable-regex:
+      metavariable: $...
+      regex: ".*"

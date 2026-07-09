@@ -1,0 +1,18 @@
+rules:
+  - id: imagemagick-inline-memory-leak
+    message: "Memory leak in WriteINLINEImage due to missing cleanup of write_info before throwing exception (CWE-401, CVE-2017-12666)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (($magick_info == (const MagickInfo *) NULL) ||
+              (GetMagickMimeType($magick_info) == (const char *) NULL)) {
+            ThrowWriterException($...);
+          }
+      - pattern: |
+          if (($magick_info == (const MagickInfo *) NULL) ||
+              (GetMagickMimeType($magick_info) == (const char *) NULL))
+            ThrowWriterException($...);
+    metavariable-regex:
+      metavariable: $magick_info
+      regex: magick_info

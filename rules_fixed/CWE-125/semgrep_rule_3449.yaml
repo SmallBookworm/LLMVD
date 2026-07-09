@@ -1,0 +1,46 @@
+rules:
+  - id: ffmpeg-out-of-bounds-read-quant-matrix
+    message: "Missing bounds check before reading quantization matrix may lead to out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (get_bits1($GB)) {
+              /* intra_quantiser_matrix */
+              for ($i = 0; $i < 64; $i++) {
+                  ...
+              }
+          }
+      - pattern: |
+          if (get_bits1($GB)) {
+              /* non_intra_quantiser_matrix */
+              for ($i = 0; $i < 64; $i++) {
+                  ...
+              }
+          }
+      - pattern: |
+          if (get_bits1($GB)) {
+              /* chroma_intra_quantiser_matrix */
+              for ($i = 0; $i < 64; $i++) {
+                  ...
+              }
+          }
+      - pattern: |
+          if (get_bits1($GB)) {
+              /* chroma_non_intra_quantiser_matrix */
+              for ($i = 0; $i < 64; $i++) {
+                  ...
+              }
+          }
+    pattern-not-inside: |
+        if (get_bits1($GB)) {
+            if (get_bits_left($GB) < 64*8)
+                return ...;
+            ...
+            for (...; ... < 64; ...) {
+                ...
+            }
+        }
+    metavariable-regex:
+      metavariable: $GB
+      regex: ".*gb.*"

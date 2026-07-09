@@ -1,0 +1,14 @@
+rules:
+  - id: mutt-imap-subscribe-command-injection
+    message: "Unquoted mailbox path in imap_subscribe may lead to command injection via backticks."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              snprintf($MBOX, sizeof($MBOX), "%smailboxes \"%s\"", $SUBSCRIBE ? "" : "un", $PATH);
+          - pattern: |
+              snprintf($MBOX, sizeof($MBOX), "%smailboxes %s", $SUBSCRIBE ? "" : "un", $PATH)
+    metadata:
+      cwe: "CWE-77"
+      cve: "CVE-2018-14354"

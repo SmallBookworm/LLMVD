@@ -1,0 +1,15 @@
+rules:
+  - id: vhost_set_log_fd_missing_log_file_update
+    message: "Missing assignment to d->log_file in VHOST_SET_LOG_FD ioctl may cause memory leak (CVE-2015-6252)"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (eventfp != d->log_file) {
+            ...
+            d->log_ctx = ...;
+          }
+    metavariable-pattern:
+      metavariable: d
+      patterns:
+        - pattern: $d

@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2016-9433-out-of-bounds-array-access
+    message: "Potential out-of-bounds array access in ISO2022 parsing due to missing bounds check before array indexing."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          cs94_gmap[WC_CCS_INDEX($CCS) - WC_F_ISO_BASE]
+      - pattern: |
+          cs94w_gmap[WC_CCS_INDEX($CCS) - WC_F_ISO_BASE]
+      - pattern: |
+          cs96_gmap[WC_CCS_INDEX($CCS) - WC_F_ISO_BASE]
+      - pattern: |
+          cs96w_gmap[WC_CCS_INDEX($CCS) - WC_F_ISO_BASE]
+      - pattern: |
+          cs942_gmap[WC_CCS_INDEX($CCS) - WC_F_ISO_BASE]
+    metavariable-pattern:
+      metavariable: $CCS
+      patterns:
+        - pattern-not: |
+            (WC_CCS_INDEX($CCS) >= WC_F_ISO_BASE) ? ... : ...
+    fix-regex:
+      enabled: false

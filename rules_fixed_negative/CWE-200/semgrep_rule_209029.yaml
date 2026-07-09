@@ -1,0 +1,16 @@
+rules:
+  - id: cifs-utils-verbose-cred-leak
+    message: "Verbose logging of unparseable credential lines may leak sensitive information containing '=' characters."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (parsed_info->verboseflag)
+                fprintf(stderr, "Credential formatted incorrectly: %s\n", temp_val ? temp_val : "(null)");
+          - pattern: |
+              if (parsed_info->verboseflag)
+                fprintf(stderr, "Credential formatted incorrectly: %s\n", ...);
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2022-29869"

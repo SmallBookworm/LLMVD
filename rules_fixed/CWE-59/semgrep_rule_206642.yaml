@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2010-0788-mtab-symlink-check-missing
+    message: Missing validation of device name and mountpoint for problematic characters (e.g., newlines, tabs) before updating mtab. This can lead to symlink attacks (CWE-59).
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          addmntent($FILE, &$MNTENT);
+      - pattern: |
+          $MNTENT.mnt_fsname = $DEV_NAME;
+          ...
+          $MNTENT.mnt_dir = $MOUNTPOINT;
+          ...
+          addmntent($FILE, &$MNTENT);
+    metavariable-patterns:
+      - metavariable: $DEV_NAME
+        pattern-not: |
+          check_mtab(..., $DEV_NAME, ...);
+      - metavariable: $MOUNTPOINT
+        pattern-not: |
+          check_mtab(..., ..., $MOUNTPOINT);

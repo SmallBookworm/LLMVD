@@ -1,0 +1,53 @@
+rules:
+  - id: exiv2-webp-out-of-bounds-read
+    message: "Missing bounds check before accessing payload.pData_ may lead to out-of-bounds read (CVE-2021-29463)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (equalsWebPTag(chunkId, WEBP_CHUNK_HEADER_VP8X) && !has_size) {
+              ...
+              memcpy(..., &payload.pData_[4], ...);
+              ...
+          }
+      - pattern: |
+          if (equalsWebPTag(chunkId, WEBP_CHUNK_HEADER_VP8) && !has_size) {
+              ...
+              memcpy(..., &payload.pData_[6], ...);
+              ...
+          }
+      - pattern: |
+          if (equalsWebPTag(chunkId, WEBP_CHUNK_HEADER_VP8L) && !has_alpha) {
+              ...
+              if ((payload.pData_[4] & ...) == ...) {
+                  ...
+              }
+          }
+      - pattern: |
+          if (equalsWebPTag(chunkId, WEBP_CHUNK_HEADER_VP8L) && !has_size) {
+              ...
+              memcpy(..., &payload.pData_[1], ...);
+              ...
+          }
+      - pattern: |
+          if (equalsWebPTag(chunkId, WEBP_CHUNK_HEADER_ANMF) && !has_alpha) {
+              ...
+              if ((payload.pData_[5] & 0x2) == 0x2) {
+                  ...
+              }
+          }
+      - pattern: |
+          if (equalsWebPTag(chunkId, WEBP_CHUNK_HEADER_ANMF) && !has_size) {
+              ...
+              memcpy(..., &payload.pData_[6], ...);
+              ...
+          }
+    metavariable-regex:
+      - metavariable: WEBP_CHUNK_HEADER_VP8X
+        regex: '"VP8X"'
+      - metavariable: WEBP_CHUNK_HEADER_VP8
+        regex: '"VP8 "'
+      - metavariable: WEBP_CHUNK_HEADER_VP8L
+        regex: '"VP8L"'
+      - metavariable: WEBP_CHUNK_HEADER_ANMF
+        regex: '"ANMF"'

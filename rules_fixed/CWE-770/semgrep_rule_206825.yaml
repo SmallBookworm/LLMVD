@@ -1,0 +1,48 @@
+rules:
+  - id: systemd-journald-unlimited-fields
+    message: "Unlimited number of fields in journal entry may lead to excessive memory allocation (CVE-2018-16865, CWE-770)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          while (*remaining > 0) {
+              ...
+              if (IN_SET(*p, '.', '#')) {
+                  ...
+                  continue;
+              }
+              ...
+              if (!GREEDY_REALLOC(...)) {
+                  ...
+                  break;
+              }
+              ...
+          }
+      - pattern: |
+          while (*remaining > 0) {
+              ...
+              if (IN_SET(*p, '.', '#')) {
+                  ...
+                  continue;
+              }
+              ...
+              q = memchr(p, '=', e - p);
+              ...
+          }
+    pattern-not-inside: |
+      while (*remaining > 0) {
+          ...
+          if (IN_SET(*p, '.', '#')) {
+              ...
+              continue;
+          }
+
+          if (n > ENTRY_FIELD_COUNT_MAX) {
+              ...
+              goto finish;
+          }
+          ...
+      }
+    fix-regex:
+      regex: ""
+      replacement: ""

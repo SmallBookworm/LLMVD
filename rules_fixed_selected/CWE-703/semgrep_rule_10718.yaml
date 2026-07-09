@@ -1,0 +1,19 @@
+rules:
+  - id: ext4_uninitialized_timer
+    message: "Uninitialized timer s_err_report may cause kernel panic when mod_timer is called during mount error handling."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (es->s_error_count)
+              mod_timer(&sbi->s_err_report, ...);
+      - pattern: |
+          __save_error_info(...);
+    metavariable-pattern:
+      sbi: 
+        pattern: struct ext4_sb_info *
+    pattern-not-inside: |
+      init_timer(&sbi->s_err_report);
+      ...
+      if (es->s_error_count)
+          mod_timer(&sbi->s_err_report, ...);

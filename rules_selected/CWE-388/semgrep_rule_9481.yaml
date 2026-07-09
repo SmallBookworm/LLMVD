@@ -1,0 +1,20 @@
+rules:
+  - id: vc4_get_bcl_missing_errno_on_overflow
+    message: "Missing error code assignment on overflow check may lead to denial of service (CVE-2017-5577)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (... || ... || ... || ... || ...) {
+              DRM_ERROR("overflow in exec arguments\n");
+              goto fail;
+          }
+      - pattern: |
+          if (... || ... || ... || ... || ...) {
+              DRM_ERROR("overflow in exec arguments\n");
+              ...
+              goto fail;
+          }
+    metavariable-regex:
+      metavariable: $...
+      regex: ".*"

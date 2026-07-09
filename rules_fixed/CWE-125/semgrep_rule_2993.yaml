@@ -1,0 +1,27 @@
+rules:
+  - id: cve-2017-5847-out-of-bounds-read-asf-demux
+    message: "Missing bounds check before reading DWORD or BOOL extended content descriptors may lead to out-of-bounds heap read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          case ASF_DEMUX_DATA_TYPE_DWORD: {
+            ...
+            GST_READ_UINT32_LE($VALUE);
+          }
+      - pattern: |
+          case ASF_DEMUX_DATA_TYPE_BOOL: {
+            ...
+            GST_READ_UINT32_LE($VALUE);
+          }
+    metavariable-pattern:
+      $VALUE:
+        patterns:
+          - pattern-not: |
+              if ($LEN < 4) {
+                break;
+              }
+          - pattern-inside: |
+              ... 
+              GST_READ_UINT32_LE($VALUE);
+              ...

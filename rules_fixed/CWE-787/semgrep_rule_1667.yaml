@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2016-9755-nf_ct_frag6_gather-error-return
+    message: "nf_ct_frag6_gather returns -EINVAL on error instead of 0, which may lead to out-of-bounds write (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (ipv6_hdr(skb)->payload_len == 0) {
+              ...
+              return -EINVAL;
+          }
+      - pattern: |
+          if (find_prev_fhdr(skb, ..., ..., ...) < 0)
+              return -EINVAL;
+    metadata:
+      cwe: ["CWE-787"]
+      cve: "CVE-2016-9755"

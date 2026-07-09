@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2019-15924-null-ptr-deref
+    message: "Missing NULL check after alloc_workqueue may lead to NULL pointer dereference (CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $WQ = alloc_workqueue(...);
+          ...
+          if (!...) { ... }
+          ...
+          return ...;
+      - pattern: |
+          $WQ = alloc_workqueue(...);
+          ...
+          return ...;
+    pattern-not-inside: |
+        $WQ = alloc_workqueue(...);
+        if (!$WQ)
+            return -ENOMEM;
+        ...
+    metavariable-pattern:
+      metavariable: $WQ
+      pattern: fm10k_workqueue

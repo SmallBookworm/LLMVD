@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2014-0205-futex-wait-key-refcount
+    message: "Potential use-after-free due to incorrect futex key reference counting in futex_wait. Missing put_futex_key call after unqueue_me may lead to resource leak or double-free."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!unqueue_me(&q))
+            goto out_put_key;
+          ...
+          out_put_key:
+          put_futex_key(..., &q.key);
+      - pattern: |
+          if (!signal_pending(current)) {
+            put_futex_key(..., &q.key);
+            goto retry;
+          }
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2014-0205"

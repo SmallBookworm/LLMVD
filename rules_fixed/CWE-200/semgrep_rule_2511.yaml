@@ -1,0 +1,23 @@
+rules:
+  - id: imagemagick-uninitialized-data-readmatimage
+    message: "Use of uninitialized data in ReadMATImage may lead to information disclosure (CVE-2017-13143, CWE-200)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $BImgBuff = (unsigned char *) AcquireQuantumMemory(...);
+          ...
+          if (ReadBlob($..., (unsigned char *)$BImgBuff) != $...)
+      - pattern: |
+          $BImgBuff = (unsigned char *) AcquireQuantumMemory(...);
+          ...
+          ReadBlobDoublesXXX($..., (double *)$BImgBuff);
+      - pattern: |
+          $BImgBuff = (unsigned char *) AcquireQuantumMemory(...);
+          ...
+          ReadBlobFloatsXXX($..., (float *)$BImgBuff);
+    metavariable-pattern:
+      metavariable: $BImgBuff
+      patterns:
+        - pattern-not: |
+            (void) ResetMagickMemory($BImgBuff, 0, ...)

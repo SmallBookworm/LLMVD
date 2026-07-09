@@ -1,0 +1,12 @@
+rules:
+  - id: openldap-vrfilter-double-free
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if( op->o_vrFilter != NULL) vrFilter_free( op, op->o_vrFilter );
+    message: "Missing null assignment after vrFilter_free may lead to double-free (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: ["CWE-125"]
+      cve: "CVE-2020-36223"

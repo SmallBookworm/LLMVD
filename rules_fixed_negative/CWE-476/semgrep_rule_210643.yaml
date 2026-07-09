@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2018-19935-imap-mail-null-deref
+    message: "Passing a NULL message to _php_imap_mail may cause a NULL pointer dereference. When message_len is 0, message should not be set to NULL."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!message_len) {
+              ...
+              message = NULL;
+              ...
+          }
+      - pattern: |
+          if (!message_len) {
+              message = NULL;
+          }

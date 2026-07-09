@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2016-4478-buffer-overflow
+    message: "Potential buffer overflow due to unsafe memcpy with fixed size. Use strncpy or ensure source length is bounded."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          memcpy($OUTBUFFER, $SRC, XMLRPC_BUFSIZE);
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2016-4478"

@@ -1,0 +1,25 @@
+rules:
+  - id: double-free-libssh2-session
+    message: "Double free vulnerability due to missing NULL assignment after libssh2_session_free."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (...) {
+                libssh2_session_free($SESSION);
+                return luaL_error(...);
+              }
+          - pattern: |
+              if (...) {
+                libssh2_session_free($SESSION);
+                ...
+                return luaL_error(...);
+              }
+    pattern-not: |
+      if (...) {
+        libssh2_session_free($SESSION);
+        $SESSION = NULL;
+        ...
+        return luaL_error(...);
+      }

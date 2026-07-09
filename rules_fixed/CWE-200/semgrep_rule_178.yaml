@@ -1,0 +1,46 @@
+rules:
+  - id: haproxy-cache-authorization-header-missing-check
+    message: "Missing check for 'Authorization' header in cacheability logic may lead to information disclosure (CVE-2018-11469)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          while (... && ...) {
+              ...
+              val = http_header_match2(..., ..., "Pragma", ...);
+              ...
+              val = http_header_match2(..., ..., "Cache-control", ...);
+              ...
+          }
+    metavariable-pattern:
+      metavariable: $BODY
+      patterns:
+        - pattern-either:
+            - pattern: |
+                val = http_header_match2($PTR, $END, "Pragma", 6);
+                ...
+                val = http_header_match2($PTR2, $END2, "Cache-control", 13);
+            - pattern: |
+                val = http_header_match2($PTR, $END, "Cache-control", 13);
+                ...
+                val = http_header_match2($PTR2, $END2, "Pragma", 6)
+        - pattern-not: |
+            while (... && ...) {
+                ...
+                val = http_header_match2(..., ..., "Authorization", ...);
+                if (val) {
+                    ...
+                    continue;
+                }
+                ...
+            }
+    pattern-inside: |
+      void check_request_for_cacheability(...) {
+          ...
+          while (...) {
+              ...
+              $BODY
+              ...
+          }
+          ...
+      }

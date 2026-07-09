@@ -1,0 +1,17 @@
+rules:
+  - id: gs_usb_stack_dma_buffer
+    message: "Stack-allocated buffer used in USB DMA transfer, which may cause memory corruption when CONFIG_VMAP_STACK is enabled."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          struct gs_host_config $HCONF = {...};
+          ...
+          usb_control_msg(..., &$HCONF, ...);
+      - pattern: |
+          struct gs_device_config $DCONF;
+          ...
+          usb_control_msg(..., &$DCONF, ...);
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2017-8066"

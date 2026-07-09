@@ -1,0 +1,19 @@
+rules:
+  - id: cwe-362-int3-ist-stack-misuse
+    message: "Potential race condition due to improper handling of #BP (int3) exceptions with IST. The debug exception may be delivered after a privilege level change, leading to unexpected kernel behavior."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          ist_enter($REGS);
+          ...
+          debug_stack_usage_inc();
+          ...
+          debug_stack_usage_dec();
+          ...
+          ist_exit($REGS);
+    metadata:
+      cwe: ["CWE-362"]
+      cve: "CVE-2018-8897"
+      references:
+        - https://github.com/torvalds/linux/commit/d8ba61ba58c88d5207c1ba2f7d9a2280e7d03be9

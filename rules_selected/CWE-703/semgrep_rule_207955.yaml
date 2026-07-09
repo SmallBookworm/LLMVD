@@ -1,0 +1,21 @@
+rules:
+  - id: sqlite-generated-column-colused-bitmask
+    message: "Generated columns may omit bits from colUsed bitmask, leading to potential denial of service or other impacts (CVE-2019-19317)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if( pExpr->iColumn>=0 && pMatch!=0 ){
+        int n = pExpr->iColumn;
+        ...
+        pMatch->colUsed |= ((Bitmask)1)<<n;
+      }
+    pattern-not: |
+      if( pExpr->iColumn>=0 && pMatch!=0 ){
+        int n = pExpr->iColumn;
+        ...
+        if( pExpr->y.pTab->tabFlags & TF_HasGenerated ){
+          Column *pCol = pExpr->y.pTab->aCol + pExpr->iColumn;
+          if( pCol->colFlags & COLFLAG_GENERATED ) n = BMS-1;
+        }
+        pMatch->colUsed |= ((Bitmask)1)<<n;
+      }

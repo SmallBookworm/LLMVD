@@ -1,0 +1,26 @@
+rules:
+  - id: cwe-190-mruby-op-getupvar-integer-overflow
+    message: |
+      Integer overflow in OP_GETUPVAR may lead to out-of-bounds read and use-after-free.
+      Ensure bounds check is performed before accessing the environment stack.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              CASE(OP_GETUPVAR) {
+                ...
+                struct REnv *e = uvenv(mrb, c);
+                if (!e) {
+                  *regs_a = mrb_nil_value();
+                }
+                else {
+                  *regs_a = e->stack[b];
+                }
+                ...
+              }
+    metadata:
+      cwe: "CWE-190"
+      cve: "CVE-2018-10191"
+      references:
+        - https://github.com/mruby/mruby/commit/1905091634a6a2925c911484434448e568330626

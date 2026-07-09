@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2015-6564-use-after-free
+    message: Use-after-free vulnerability in mm_answer_pam_free_ctx. sshpam_ctxt is used after being freed. Ensure it is set to NULL after free and not used afterward.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              return (sshpam_authok == sshpam_ctxt);
+          - pattern: |
+              return ($X == sshpam_ctxt);
+    metavariable-pattern:
+      metavariable: $X
+      pattern: sshpam_authok

@@ -1,0 +1,14 @@
+rules:
+  - id: use-after-free-devm-alloc-in-usb-probe
+    message: "Use of devm_k*alloc in USB probe function may lead to use-after-free on device disconnect. Manual allocation with k*alloc and explicit kfree is required."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $RADIO = devm_kzalloc(...);
+          - pattern: |
+              $RADIO->buffer = devm_kmalloc(...);
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2019-15211"

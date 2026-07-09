@@ -1,0 +1,40 @@
+rules:
+  - id: cve-2014-0076-openssl-ecdsa-flush-reload
+    message: "Detected Montgomery ladder implementation missing constant-time swaps, vulnerable to FLUSH+RELOAD side-channel attack (CVE-2014-0076)."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (word & mask)
+                {
+                ...
+                }
+              else
+                {
+                ...
+                }
+          - pattern: |
+              for (...; ...; ...)
+                {
+                ...
+                while (mask)
+                  {
+                  if (word & mask) { ... } else { ... }
+                  ...
+                  }
+                }
+    metavariable-pattern:
+      metavariable: $BODY
+      pattern-either:
+        - pattern: |
+            if (word & mask)
+              {
+              if (!gf2m_Madd(..., x1, z1, x2, z2, ...)) goto err;
+              if (!gf2m_Mdouble(..., x2, z2, ...)) goto err;
+              }
+            else
+              {
+              if (!gf2m_Madd(..., x2, z2, x1, z1, ...)) goto err;
+              if (!gf2m_Mdouble(..., x1, z1, ...)) goto err;
+              }

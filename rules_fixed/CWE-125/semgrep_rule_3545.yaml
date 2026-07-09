@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2018-16842-buffer-overread
+    message: "Heap-based buffer over-read in voutf due to incorrect length adjustment (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          len -= cut;
+      - pattern: |
+          $LEN -= $CUT;
+    metavariable-pattern:
+      metavariable: $LEN
+      pattern: len
+    metavariable-pattern:
+      metavariable: $CUT
+      pattern: cut
+    focus-metavariable: $LEN

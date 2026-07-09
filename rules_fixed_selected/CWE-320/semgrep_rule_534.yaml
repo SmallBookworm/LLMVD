@@ -1,0 +1,17 @@
+rules:
+  - id: weak-entropy-in-xdmcp-key-generation
+    patterns:
+      - pattern-either:
+          - pattern: |
+              srandom ((int)getpid() ^ time(...));
+              ...
+              random ();
+              random ();
+          - pattern: |
+              srandom (getpid() ^ time(...));
+              ...
+              random ();
+              random ();
+    message: "Use of weak entropy source (PID and time) for cryptographic key generation. This can lead to predictable session keys (CWE-320, CVE-2017-2625)."
+    severity: HIGH
+    languages: [c]

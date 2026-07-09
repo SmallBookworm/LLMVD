@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2019-16994-sit-init-net-memory-leak
+    message: Memory leak in sit_init_net() when register_netdev() fails. Missing free_netdev() call before returning from error label 'err_reg_dev'.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              err = register_netdev(...);
+              if (err)
+                goto err_reg_dev;
+              ...
+              err_reg_dev:
+              ipip6_dev_free($DEV);
+          - pattern: |
+              if (register_netdev(...) != 0)
+                goto err_reg_dev;
+              ...
+              err_reg_dev:
+              ipip6_dev_free($DEV);
+    metavariable-pattern:
+      $DEV: "sitn->fb_tunnel_dev"

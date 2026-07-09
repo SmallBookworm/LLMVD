@@ -1,0 +1,12 @@
+rules:
+  - id: exiv2-null-ptr-deref-cve-2019-13114
+    message: Potential NULL pointer dereference due to unchecked strchr return value. This may lead to denial of service (CVE-2019-13114).
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: atoi(strchr(...))
+          - pattern: $X = atoi(strchr(...))
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2019-13114"

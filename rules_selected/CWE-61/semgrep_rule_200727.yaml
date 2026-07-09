@@ -1,0 +1,17 @@
+rules:
+  - id: insecure-libarchive-extraction-flags
+    message: Missing ARCHIVE_EXTRACT_SECURE_SYMLINKS flag may allow symlink-based directory traversal during archive extraction.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $RESULT = ARCHIVE_EXTRACT_TIME;
+          $RESULT |= ARCHIVE_EXTRACT_SECURE_NODOTDOT;
+      - pattern: |
+          return ARCHIVE_EXTRACT_TIME
+                 | ARCHIVE_EXTRACT_SECURE_NODOTDOT;
+    pattern-not: |
+      $X | ARCHIVE_EXTRACT_SECURE_SYMLINKS
+    metavariable-regex:
+      metavariable: $X
+      regex: .*ARCHIVE_EXTRACT_SECURE_NODOTDOT.*

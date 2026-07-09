@@ -1,0 +1,13 @@
+rules:
+  - id: lzo1x_decompress_safe_integer_overflow
+    message: "Potential integer overflow in lzo1x_decompress_safe due to missing bounds checking. This could lead to memory corruption (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: NEED_IP($X)
+      - pattern: NEED_OP($X)
+      - pattern: HAVE_IP($X)
+      - pattern: HAVE_OP($X)
+    metavariable-pattern:
+      $X:
+        pattern-not: $Y, $_

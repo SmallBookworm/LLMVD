@@ -1,0 +1,15 @@
+rules:
+  - id: missing-x-frame-options-header
+    patterns:
+      - pattern-not: |
+          header(Http::HEADER_X_FRAME_OPTIONS, ...);
+      - pattern-inside: |
+          Http::Response $FUNC(...) {
+            ...
+            clear();
+            ...
+            return response();
+          }
+    message: "Missing X-Frame-Options header may lead to clickjacking (CWE-20, CVE-2017-6504)."
+    severity: WARNING
+    languages: [c]

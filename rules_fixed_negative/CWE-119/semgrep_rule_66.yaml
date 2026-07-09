@@ -1,0 +1,15 @@
+rules:
+  - id: cwe-119-stack-buffer-overflow-pdfseparate
+    message: |
+      Use of sprintf without bounds checking may lead to stack-based buffer overflow.
+      Prefer snprintf with explicit buffer size to prevent overflows.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          sprintf($BUF, $FORMAT, ...);
+    metavariable-pattern:
+      $BUF:
+        pattern-either:
+          - pattern: pathName
+    fix: ""

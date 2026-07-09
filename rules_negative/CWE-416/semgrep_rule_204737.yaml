@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2019-15890-use-after-free
+    message: "Use-after-free vulnerability in ip_reass due to incorrect order of ip_deq and m_free"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          m_free(dtom($SLIRP, $Q->ipf_prev));
+          ip_deq($Q->ipf_prev);
+      - pattern: |
+          m_free(dtom($SLIRP, $X));
+          ip_deq($X);
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2019-15890"

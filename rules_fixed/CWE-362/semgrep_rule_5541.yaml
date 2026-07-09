@@ -1,0 +1,27 @@
+rules:
+  - id: cwe-362-race-condition-harfbuzz-initialization
+    message: "Missing initialization of padding-related members in HarfBuzzShaperBase constructor may lead to a race condition (CWE-362)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              HarfBuzzShaperBase::HarfBuzzShaperBase(...) : m_letterSpacing(...)
+            { ... }
+          - pattern: |
+              HarfBuzzShaperBase::HarfBuzzShaperBase(...) : m_wordSpacingAdjustment(...), m_letterSpacing(...)
+            { ... }
+      - metavariable-pattern:
+          metavariable: $CTOR
+          pattern: |
+            HarfBuzzShaperBase::HarfBuzzShaperBase(...)
+      - pattern-not-inside: |
+          HarfBuzzShaperBase::HarfBuzzShaperBase(...) : 
+            ..., 
+            m_normalizedBufferLength(0), 
+            ..., 
+            m_padding(0), 
+            m_padPerWordBreak(0), 
+            m_padError(0), 
+            ... 
+          { ... }

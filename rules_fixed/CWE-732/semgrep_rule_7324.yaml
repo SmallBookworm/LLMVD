@@ -1,0 +1,26 @@
+rules:
+  - id: cve-2018-18349-local-resource-navigation
+    message: "Missing security origin check before navigating to a URL may allow access to local resources."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      void RemoteFrame::ScheduleNavigation(..., const KURL& url, ...) {
+        ...
+        $REQ(...) = FrameLoadRequest(..., ResourceRequest(url));
+        ...
+        Navigate($REQ, ...);
+        ...
+      }
+    metavariable-patterns:
+      - metavariable: $FUNC
+        pattern: RemoteFrame::ScheduleNavigation
+    patterns:
+      - pattern-not: |
+          void RemoteFrame::ScheduleNavigation(..., const KURL& url, ...) {
+            ...
+            if (!...->CanDisplay(url)) {
+              ...
+              return;
+            }
+            ...
+          }

@@ -1,0 +1,25 @@
+rules:
+  - id: splice_unlock_page_error
+    message: "Potential kernel BUG due to unlock_page() on a page not locked after add_to_page_cache_lru() failure."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (unlikely($RET))
+              goto out;
+          ...
+          out:
+          page_cache_release($PAGE);
+          unlock_page($PAGE);
+      - pattern: |
+          if (unlikely($RET))
+              goto out;
+          ...
+          out:
+          unlock_page($PAGE);
+          page_cache_release($PAGE);
+    metavariable-regex:
+      - metavariable: $RET
+        regex: ret
+      - metavariable: $PAGE
+        regex: page

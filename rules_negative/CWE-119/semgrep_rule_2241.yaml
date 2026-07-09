@@ -1,0 +1,17 @@
+rules:
+  - id: libtiff-nextdecode-out-of-bounds-write
+    message: "Potential out-of-bounds write in NeXTDecode due to missing scanline bounds check in run-length decoding loop."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (;;) {
+                  ...
+                  while (n-- > 0 && npixels < imagewidth)
+                      SETPIXEL(op, grey);
+                  ...
+              }
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2015-8784"

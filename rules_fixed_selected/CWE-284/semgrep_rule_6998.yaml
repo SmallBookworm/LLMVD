@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2016-1697-frame-navigation-sop-bypass
+    message: "Missing FrameNavigationDisabler around detachDocumentLoader may allow SOP bypass during DocumentLoader detach."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          detachDocumentLoader($LOADER);
+      - pattern: |
+          if ($COND) {
+            ...
+            detachDocumentLoader($LOADER);
+            ...
+          }
+    metavariable-pattern:
+      $LOADER: m_provisionalDocumentLoader
+    pattern-not-inside: |
+      if ($LOADER) {
+        FrameNavigationDisabler $DISABLER(*$FRAME);
+        detachDocumentLoader($LOADER);
+      }

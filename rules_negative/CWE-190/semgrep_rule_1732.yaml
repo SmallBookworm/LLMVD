@@ -1,0 +1,7 @@
+rules:
+  - id: gdImageWebpCtx-integer-overflow
+    message: "Potential integer overflow in gdImageWebpCtx leading to heap-based buffer overflow (CVE-2016-7568, CWE-190)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      gdMalloc(gdImageSX($IM) * 4 * gdImageSY($IM))

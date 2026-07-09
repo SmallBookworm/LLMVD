@@ -1,0 +1,19 @@
+rules:
+  - id: ghostscript-stack-overflow-cve-2018-16542
+    message: |
+      Insufficient stack-size checking during error handling may lead to interpreter crash.
+      This pattern is associated with CVE-2018-16542 (CWE-388).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!GS_ERROR_IS_INTERRUPT($CODE)) {
+              *++osp = *$PERROR_OBJECT;
+              errorexec_find($I_CTX_P, osp);
+          }
+      - pattern: |
+          if (!GS_ERROR_IS_INTERRUPT($CODE)) {
+              /* Replace the error object if within an oparray or .errorexec. */
+              *++osp = *$PERROR_OBJECT;
+              errorexec_find($I_CTX_P, osp);
+          }

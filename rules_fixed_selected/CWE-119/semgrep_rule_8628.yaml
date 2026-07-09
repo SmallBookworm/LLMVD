@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2017-0542-buffer-overread
+    message: Buffer overread vulnerability due to insufficient bounds checking before reading 8 extra bytes. This could lead to memory corruption (CWE-119).
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      buflen = MIN(buflen, buf_size);
+    fix: |
+      buflen = MIN(buflen, buf_size - 8);
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2017-0542"

@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2011-4594-null-deref-sendmsg
+    message: "Potential NULL pointer dereference in __sys_sendmsg due to missing msg_sys->msg_name check before memcmp/memcpy. This can lead to denial of service (CVE-2011-4594, CWE-476)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          !memcmp(..., $MSG->msg_name, ...)
+      - pattern: |
+          memcpy(..., $MSG->msg_name, ...)
+    metavariable-pattern:
+      $MSG:
+        patterns:
+          - pattern: msg_sys
+    regex: .*

@@ -1,0 +1,14 @@
+rules:
+  - id: imagemagick-rgf-exception-handling
+    message: "Missing exception handling in WriteRGFImage may lead to assertion failure (CVE-2016-7540)"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          OpenBlob($image_info, $image, WriteBinaryBlobMode, $$exception)
+      - pattern: |
+          GetVirtualPixels($$image, $x, $y, $columns, $rows, $$exception)
+    metavariable-pattern:
+      metavariable: $$exception
+      patterns:
+        - pattern-not: "&$image->exception"

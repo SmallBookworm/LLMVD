@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2011-3906-out-of-bounds-read
+    message: "Missing device scale factor adjustment may lead to out-of-bounds read (CWE-119)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: |
+                  $WINDOW_INFO.windowSize = $MAIN_FRAME->view()->visibleContentRect($INCLUDE_SCROLLBARS).size();
+              - pattern: if (!...->settings()->applyPageScaleFactorInCompositor())
+                within: true
+              - pattern: $WINDOW_INFO.windowSize.scale(...)
+                negate: true
+          - pattern: |
+              $WINDOW_INFO.windowSize = $MAIN_FRAME->view()->visibleContentRect($INCLUDE_SCROLLBARS).size();
+              // ... missing scale adjustment ...

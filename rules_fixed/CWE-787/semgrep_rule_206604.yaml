@@ -1,0 +1,22 @@
+rules:
+  - id: systemd-bus-message-validation-missing
+    message: "Missing validation for invalid D-Bus messages may lead to denial of service (CWE-787, CVE-2019-6454)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if ($R < 0) {
+        free($B);
+        return $R;
+      }
+    pattern-not: |
+      if ($R == -EBADMSG)
+        ...
+      else if ($R < 0) {
+        free($B);
+        return $R;
+      }
+    metavariable-regex:
+      - metavariable: $R
+        regex: r
+      - metavariable: $B
+        regex: b

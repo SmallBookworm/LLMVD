@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2012-0957-uname-stack-leak
+    message: "Potential kernel stack memory leak via UNAME26 personality in override_release due to unsafe snprintf and copy_to_user usage."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              char buf[...];
+              ...
+              snprintf(buf, len, ...);
+              copy_to_user(..., buf, len);
+          - pattern: |
+              char buf[...];
+              ...
+              snprintf(buf, $LEN, ...);
+              copy_to_user(..., buf, $LEN);
+    metavariable-regex:
+      - metavariable: $LEN
+        regex: "len"
+    fix-regex:
+      enabled: false

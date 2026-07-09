@@ -1,0 +1,22 @@
+rules:
+  - id: gnupg-infinite-loop-uncompress
+    message: "Potential infinite loop in do_uncompress due to unbounded 0xFF byte injection for algo==1. CVE-2014-4617"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (nread < count && zfx->algo == 1) {
+                *(zfx->inbuf + n) = 0xFF;
+                ...
+                n++;
+              }
+          - pattern: |
+              if (nread < count && zfx->algo == 1) {
+                *(zfx->inbuf + n) = 0xFF;
+                zfx->algo1hack = 1;
+                n++;
+              }
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2014-4617"

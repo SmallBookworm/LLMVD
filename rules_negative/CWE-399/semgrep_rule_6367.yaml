@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2013-6663-use-after-free-svgimage
+    message: "Potential use-after-free in SVGImage::setContainerSize due to renderer access after resize which may destroy the renderer."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              RenderSVGRoot* $RENDERER = toRenderSVGRoot($ROOT_ELEMENT->renderer());
+              if (!$RENDERER)
+                  return;
+              ... 
+              $VIEW->resize(...);
+              ...
+              $RENDERER->setContainerSize(...);
+    metadata:
+      cwe: "CWE-399"
+      cve: "CVE-2013-6663"

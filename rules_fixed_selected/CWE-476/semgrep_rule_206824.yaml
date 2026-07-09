@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2018-19607-null-ptr-deref
+    message: "Potential NULL pointer dereference due to incorrect loop bound in SensKeyNameList iteration (CVE-2018-19607, CWE-476)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while (strcmp(sensKeys->keys[idx++], md_st->key().c_str()) != 0 && idx < cnt) {}
+          - pattern: |
+              while (strcmp(sensKeys->keys[$IDX++], md_st->key().c_str()) != 0 && $IDX < $CNT) {}
+    metavariable-pattern:
+      $CNT:
+        pattern-not: sensKeys->count

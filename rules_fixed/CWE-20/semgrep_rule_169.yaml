@@ -1,0 +1,16 @@
+rules:
+  - id: smb4k-mount-helper-command-validation-missing
+    message: "Missing validation of the mount command executable allows potential privilege escalation via untrusted input."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              command << entry["mh_command"].toString();
+          - pattern: |
+              command << entry["mh_command"].toString();
+              ...
+              command << entry["mh_options"].toStringList();
+      - metavariable-pattern:
+          metavariable: entry
+          pattern: $ENTRY

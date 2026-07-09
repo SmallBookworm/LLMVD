@@ -1,0 +1,29 @@
+rules:
+  - id: technisat-usb2-oob-read
+    message: "Out-of-bounds read in technisat_usb2_get_ir due to missing buffer bounds check before dereferencing pointer."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while (1) {
+                  ...
+                  $B++;
+                  if (*$B == 0xff) {
+                      ...
+                      break;
+                  }
+              }
+          - pattern: |
+              for (...; ...; ...) {
+                  ...
+                  if (*$B == 0xff) {
+                      ...
+                      break;
+                  }
+                  ...
+                  $B++;
+              }
+    metavariable-pattern:
+      $B: "pointer to buffer element"
+    fix: ""

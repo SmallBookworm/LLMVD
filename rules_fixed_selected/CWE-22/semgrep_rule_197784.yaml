@@ -1,0 +1,16 @@
+rules:
+  - id: cwe-22-heap-buffer-overread-compressed-rtf
+    message: Potential heap-based buffer over-read in DecompressRTF due to missing input bounds check in loop condition.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while (out < (comp_Prebuf.size + uncompressedSize)) {
+                ...
+                flags = (flagCount++ % 8 == 0) ? src[in++] : flags >> 1;
+                ...
+              }
+    metadata:
+      cwe: "CWE-22"
+      cve: "CVE-2017-6802"

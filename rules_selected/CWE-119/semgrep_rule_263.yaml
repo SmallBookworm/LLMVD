@@ -1,0 +1,16 @@
+rules:
+  - id: freetype-ins_iup-buffer-overflow
+    message: "Heap-based buffer overflow in Ins_IUP due to missing bounds check on end_point. This may lead to arbitrary code execution or denial of service."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ( CUR.pts.n_points <= end_point )
+                end_point = CUR.pts.n_points;
+          - pattern: |
+              if (CUR.pts.n_points <= end_point)
+                end_point = CUR.pts.n_points;
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2010-2520"

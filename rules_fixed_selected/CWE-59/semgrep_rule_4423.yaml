@@ -1,0 +1,10 @@
+rules:
+  - id: cwe-59-fopen-no-excl
+    patterns:
+      - pattern: fopen($DEST, "w")
+    message: 'fopen() called with "w" mode without O_EXCL equivalent, which may allow symlink attacks (CWE-59). Use "wx" mode to prevent overwriting existing files.'
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-59"
+      cve: "CVE-2015-3315"

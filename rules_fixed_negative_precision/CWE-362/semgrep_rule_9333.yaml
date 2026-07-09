@@ -1,0 +1,10 @@
+rules:
+  - id: cwe-362-environ-read-race-condition
+    message: "Race condition in environ_read: accessing /proc/<PID>/environ before env_end is set may lead to reading uninitialized memory."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      if (!mm)
+        return 0;
+      ...
+      env_end = mm->env_end;

@@ -1,0 +1,10 @@
+rules:
+  - id: insecure_temp_file_creation_ctdb
+    patterns:
+      - pattern: 'const char *lock_path = "/tmp/.ctdb_socket_lock";'
+    message: "Insecure temporary file creation in /tmp directory. Use a secure, private directory instead (e.g., under VARDIR)."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-264"
+      cve: "CVE-2013-4159"

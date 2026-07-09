@@ -1,0 +1,7 @@
+rules:
+  - id: f2fs_wait_discard_bios_missing_umount_flag
+    message: "f2fs_wait_discard_bios is called without the required 'umount' flag, which may lead to a reference count mismatch and trigger a BUG() during discard command cleanup."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      f2fs_wait_discard_bios(..., $UMOUNT_FLAG)

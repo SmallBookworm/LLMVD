@@ -1,0 +1,15 @@
+rules:
+  - id: i740fb-pixclock-divide-by-zero
+    message: "Missing check for zero 'pixclock' value may lead to divide-by-zero vulnerability (CWE-369)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (!var->pixclock)
+        return -EINVAL;
+    pattern-not-inside: |
+      static int i740fb_check_var(struct fb_var_screeninfo *var, struct fb_info *info)
+      {
+          if (!var->pixclock)
+            return -EINVAL;
+          ...
+      }

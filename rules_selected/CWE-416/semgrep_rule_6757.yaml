@@ -1,0 +1,19 @@
+rules:
+  - id: use-after-free-focus-element-check
+    message: "Potential use-after-free due to missing early return after focused_element_ reassignment check. This may lead to unsafe access if focused_element_ is modified by side effects."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (focused_element_ != new_focused_element) {
+            focus_change_blocked = true;
+            goto SetFocusedElementDone;
+          }
+      - pattern: |
+          if (focused_element_ != new_focused_element) {
+            focus_change_blocked = true;
+            goto $LABEL;
+          }
+    metadata:
+      cwe: ["CWE-416"]
+      cve: "CVE-2016-5170"

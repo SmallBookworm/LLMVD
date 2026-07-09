@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2015-7497-heap-buffer-overflow
+    message: "Potential heap-based buffer overflow in xmlDictComputeFastQKey due to negative offset in array indexing."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (len > 10) {
+                  value += name[len - (plen + 1 + 1)];
+                  ...
+              }
+          - pattern: |
+              if (len > 10) {
+                  value += name[len - (plen + 2)];
+                  ...
+              }

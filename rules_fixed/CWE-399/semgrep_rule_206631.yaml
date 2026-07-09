@@ -1,0 +1,14 @@
+rules:
+  - id: avahi_zero_source_port_assertion_failure
+    message: "Source port validation missing; zero port may trigger assertion failure (CVE-2008-5081)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (originates_from_local_legacy_unicast_socket(..., $PORT))
+    pattern-not: |
+      if ($PORT <= 0) {
+        ...
+        return;
+      }
+      ...
+      if (originates_from_local_legacy_unicast_socket(..., $PORT))

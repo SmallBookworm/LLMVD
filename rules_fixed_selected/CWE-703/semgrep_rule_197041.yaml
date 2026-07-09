@@ -1,0 +1,17 @@
+rules:
+  - id: off_by_one_overflow_rtl_433
+    message: "Potential off-by-one buffer overflow due to missing bounds check on extracted data length."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (offset >= bitbuffer->bits_per_row[0] - $SIZE)
+                  return ...;
+          - pattern: |
+              int num_bits = bitbuffer->bits_per_row[0] - offset;
+              ...
+              extract_bytes_uart(..., num_bits, ...);
+    metadata:
+      cwe: "CWE-703"
+      cve: "CVE-2022-25051"

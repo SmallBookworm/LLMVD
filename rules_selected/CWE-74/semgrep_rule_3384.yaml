@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2016-3695-einj-missing-securelevel-check
+    message: "Missing securelevel check in einj_error_inject allows unprivileged users to inject hardware errors, leading to denial of service."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      static int einj_error_inject(...) {
+        ...
+        if (flags && (flags & ~(SETWA_FLAGS_APICID|SETWA_FLAGS_MEM|SETWA_FLAGS_PCIE_SBDF)))
+          return -EINVAL;
+        ...
+      }
+    pattern-not: |
+      static int einj_error_inject(...) {
+        ...
+        if (get_securelevel() > 0)
+          return -EPERM;
+        ...
+      }

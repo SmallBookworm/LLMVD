@@ -1,0 +1,17 @@
+rules:
+  - id: upnp_unhandled_post_write
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (Instr && Instr->IsVirtualFile) {
+                  ...
+              } else {
+                  Fp = fopen(filename, "wb");
+                  ...
+              }
+    message: "Unhandled POST requests may write to arbitrary files in the webroot. This can lead to unauthorized file creation (CWE-284)."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-284"
+      cve: "CVE-2016-6255"

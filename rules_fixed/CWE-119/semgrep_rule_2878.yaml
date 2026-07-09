@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2017-8061-dma-on-stack
+    message: "Passing stack-allocated buffer to usb_cypress_writemem may cause DMA on stack, leading to memory corruption or DoS."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $T $VAR;
+          ...
+          usb_cypress_writemem(..., &$VAR, ...);
+      - pattern: |
+          $T $VAR = ...;
+          ...
+          usb_cypress_writemem(..., &$VAR, ...);
+    metavariable-pattern:
+      metavariable: $T
+      pattern: "u8"

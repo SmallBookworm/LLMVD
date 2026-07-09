@@ -1,0 +1,32 @@
+rules:
+  - id: cve-2017-8890-double-free-mc-list
+    message: "Missing initialization of mc_list to NULL in inet_csk_clone_lock may lead to double free (CWE-415)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          struct sock *inet_csk_clone_lock(...) {
+            ...
+            struct sock *newsk = sk_clone_lock(...);
+            ...
+            if (newsk) {
+              ...
+              inet_sk(newsk)->inet_sport = ...;
+              ...
+              sock_reset_flag(newsk, SOCK_RCU_FREE);
+              ...
+              security_inet_csk_clone(newsk, ...);
+            }
+            ...
+          }
+      - pattern: |
+          if (newsk) {
+            ...
+            inet_sk(newsk)->inet_sport = ...;
+            ...
+            sock_reset_flag(newsk, SOCK_RCU_FREE);
+            ...
+            security_inet_csk_clone(newsk, ...);
+          }
+    pattern-not: |
+      inet_sk(newsk)->mc_list = NULL;

@@ -1,0 +1,19 @@
+rules:
+  - id: libsixel-gif-lzw-code-size-check-missing
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: $lzw_cs = gif_get8($s);
+              - pattern: $clear = 1 << $lzw_cs;
+          - patterns:
+              - pattern: $lzw_cs = gif_get8($s);
+              - pattern-inside: |
+                  $lzw_cs = gif_get8($s);
+                  ...
+                  $codesize = $lzw_cs + 1;
+    message: "Missing validation of LZW code size may lead to stack buffer overflow (CVE-2020-21050)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-703"
+      cve: "CVE-2020-21050"

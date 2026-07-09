@@ -1,0 +1,26 @@
+rules:
+  - id: use-after-free-gf_m2ts_process_pat
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (number==0) {
+                  ...
+              } else {
+                  ...
+                  ts->ess[pmt->pid] = (GF_M2TS_ES *)pmt;
+                  ...
+              }
+          - pattern: |
+              if (number==0) {
+                  ...
+              } else {
+                  GF_SAFEALLOC(...);
+                  ...
+                  ts->ess[...->pid] = ...;
+              }
+    message: "Potential use-after-free vulnerability due to missing validation before assigning to ts->ess[pid]. Fixed version checks 'if (!pid)' and 'if (!ts->ess[pid])' before allocation and assignment."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2019-20628"

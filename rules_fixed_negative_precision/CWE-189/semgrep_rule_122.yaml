@@ -1,0 +1,16 @@
+rules:
+  - id: freetype_integer_overflow_cff_charset_load
+    message: "Integer overflow vulnerability in CFF charset loading may lead to arbitrary code execution (CVE-2009-0946, CWE-189)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          for ($INIT; $COND; $INC) {
+            charset->sids[...] = FT_GET_USHORT();
+          }
+      - pattern: |
+          charset->sids[...] = FT_GET_USHORT();
+    metavariable-pattern:
+      metavariable: $VAR
+      pattern: FT_GET_USHORT()
+    focus-metavariable: $VAR

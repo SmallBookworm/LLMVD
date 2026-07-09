@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2018-0739-asn1-recursion
+    message: "Detected ASN.1 parsing function without recursion depth limit, which may lead to stack exhaustion (CVE-2018-0739, CWE-400)."
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          static int asn1_template_ex_d2i(ASN1_VALUE **pval,
+                                          const unsigned char **in, long len,
+                                          const ASN1_TEMPLATE *tt, char opt,
+                                          ASN1_TLC *ctx);
+      - pattern: |
+          static int asn1_template_noexp_d2i(ASN1_VALUE **val,
+                                             const unsigned char **in, long len,
+                                             const ASN1_TEMPLATE *tt, char opt,
+                                             ASN1_TLC *ctx);
+    metadata:
+      cwe: "CWE-400"
+      cve: "CVE-2018-0739"
+      references:
+        - https://github.com/openssl/openssl/commit/2ac4c6f7b2b2af20c0e2b0ba05367e454cd11b33

@@ -1,0 +1,18 @@
+rules:
+  - id: cwe-119-mbfl-strcut-integer-overflow
+    message: "Integer overflow vulnerability in mbfl_strcut may lead to buffer over-read or memory corruption (CVE-2016-4073)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (from + length >= string->len) {
+                length = string->len - from;
+              }
+          - pattern: |
+              if ((start - string->val) + length >= (int)string->len) {
+                end = string->val + string->len;
+              }
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2016-4073"

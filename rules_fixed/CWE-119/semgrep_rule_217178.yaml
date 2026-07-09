@@ -1,0 +1,54 @@
+rules:
+  - id: cve-2017-0028-scripting-engine-memory-corruption
+    message: "Potential memory corruption vulnerability due to improper handling of 'async' identifier in async arrow functions (CVE-2017-0028, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - patterns:
+        - pattern: |
+            if (pid == wellKnownPropertyPids.async &&
+                m_scriptContext->GetConfig()->IsES7AsyncAndAwaitEnabled())
+            {
+                isAsyncExpr = true;
+            }
+        - pattern-inside: |
+            ...
+        - pattern: |
+            if (isAsyncExpr && !m_pscan->FHadNewLine())
+            {
+              ...
+              else if (m_token.tk == tkLParen)
+              {
+                ...
+              }
+            }
+      - pattern: |
+          if (isAsyncExpr && !m_pscan->FHadNewLine())
+          {
+            ...
+            else if (m_token.tk == tkLParen)
+            {
+              // Missing savedTopAsyncRef = pid->GetTopRef();
+            }
+          }
+    pattern-not-inside: |
+      PidRefStack *savedTopAsyncRef = nullptr;
+      ...
+      if (isAsyncExpr && !m_pscan->FHadNewLine())
+      {
+        ...
+        else if (m_token.tk == tkLParen)
+        {
+          savedTopAsyncRef = pid->GetTopRef();
+        }
+      }
+      ...
+      if (savedTopAsyncRef != nullptr &&
+          this->m_token.tk == tkDArrow)
+      {
+        for (IdentPtr pid = wellKnownPropertyPids.async; pid->GetTopRef() != savedTopAsyncRef;)
+        {
+          Assert(pid->GetTopRef() != nullptr);
+          pid->RemovePrevPidRef(nullptr);
+        }
+      }

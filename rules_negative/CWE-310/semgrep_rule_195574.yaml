@@ -1,0 +1,14 @@
+rules:
+  - id: mcrypt_create_iv_unseeded_rand
+    message: "Use of unseeded rand() in mcrypt_create_iv reduces cryptographic security. Use f_rand() instead to ensure proper seeding."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              iv[--size] = (char)(255.0 * rand() / RAND_MAX);
+          - pattern: |
+              iv[...] = (char)(... * rand() / RAND_MAX);
+    metadata:
+      cwe: "CWE-310"
+      cve: "CVE-2014-5386"

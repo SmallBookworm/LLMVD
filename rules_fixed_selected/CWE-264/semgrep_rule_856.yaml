@@ -1,0 +1,23 @@
+rules:
+  - id: ecryptfs_uid_check_missing
+    message: "Missing uid ownership check in ecryptfs_mount allows privilege escalation via TOCTOU race condition (CVE-2011-1833)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (path.dentry->d_sb->s_type == &ecryptfs_fs_type) {
+              ...
+          }
+          ecryptfs_set_superblock_lower(...);
+      - pattern: |
+          if (path.dentry->d_sb->s_type == &ecryptfs_fs_type) {
+              ...
+          }
+          ... 
+          ecryptfs_set_superblock_lower(...);
+    metavariable-pattern:
+      metavariable: $BODY
+      pattern-not: |
+          if ($CHECK && path.dentry->d_inode->i_uid != current_uid()) {
+              ...
+          }

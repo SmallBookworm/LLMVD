@@ -1,0 +1,27 @@
+rules:
+  - id: openjpeg-divide-by-zero-pi-cprl-pcrl-rpcl
+    message: Division by zero or undefined shift may occur due to unchecked shift amount in pi.c. This can lead to denial of service via crafted J2K files.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!((... % (OPJ_INT32)(... << $RPX) == 0) || ...)) {
+                ...
+              }
+          - pattern: |
+              if (!((... % (OPJ_INT32)(... << $RPY) == 0) || ...)) {
+                ...
+              }
+      - metavariable-pattern:
+          metavariable: $RPX
+          pattern-not: |
+            if (... >= 31 || ((... << ...) >> ...) != ...) {
+              continue;
+            }
+      - metavariable-pattern:
+          metavariable: $RPY
+          pattern-not: |
+            if (... >= 31 || ((... << ...) >> ...) != ...) {
+              continue;
+            }

@@ -1,0 +1,11 @@
+rules:
+  - id: cwe-787-pdfdoc-markobject-stack-overflow
+    message: "Potential stack overflow due to missing 'alreadyMarkedDicts' parameter in recursive markObject call (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          markObject(&obj1, xRef, countRef, numOffset, oldRefNum, newRefNum);
+    metadata:
+      cwe: ["CWE-787"]
+      cve: ["CVE-2019-9903"]

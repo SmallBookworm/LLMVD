@@ -1,0 +1,13 @@
+rules:
+  - id: cwe-345-dns-predictable-id-port
+    message: "DNS implementation uses predictable ID fields and source ports, making it vulnerable to cache poisoning attacks (CWE-345, CVE-2014-4883)."
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          static struct udp_pcb *dns_pcb;
+      - pattern: |
+          static u8_t dns_seqno;
+    metadata:
+      cwe: ["CWE-345"]
+      cve: "CVE-2014-4883"

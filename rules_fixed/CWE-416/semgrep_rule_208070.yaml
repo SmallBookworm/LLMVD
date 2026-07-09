@@ -1,0 +1,43 @@
+rules:
+  - id: vim-use-after-free-nfa-mark
+    patterns:
+      - pattern-either:
+          - pattern: |
+              case NFA_MARK:
+                ...
+                pos_T *pos = getmark_buf(...);
+                ...
+                if (pos != NULL && pos->lnum > 0)
+                {
+                  ...
+                  (rex.input - rex.line)
+                  ...
+                }
+          - pattern: |
+              case NFA_MARK_GT:
+                ...
+                pos_T *pos = getmark_buf(...);
+                ...
+                if (pos != NULL && pos->lnum > 0)
+                {
+                  ...
+                  (rex.input - rex.line)
+                  ...
+                }
+          - pattern: |
+              case NFA_MARK_LT:
+                ...
+                pos_T *pos = getmark_buf(...);
+                ...
+                if (pos != NULL && pos->lnum > 0)
+                {
+                  ...
+                  (rex.input - rex.line)
+                  ...
+                }
+    message: "Potential use-after-free vulnerability when using regexp with a mark. The line buffer may have been freed; get it again with reg_getline() before using rex.input."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2021-3974"

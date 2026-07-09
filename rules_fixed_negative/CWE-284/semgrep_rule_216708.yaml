@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2017-15365-wsrep-ddl-replication-order
+    message: "Potential privilege escalation due to DDL replication occurring before ACL checks. WSREP_TO_ISOLATION_BEGIN is called before access control validation, allowing authenticated users to bypass intended restrictions."
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (WSREP($THD))
+          {
+            $THD->lex->sql_command = SQLCOM_DROP_EVENT;
+            WSREP_TO_ISOLATION_BEGIN(...);
+          }

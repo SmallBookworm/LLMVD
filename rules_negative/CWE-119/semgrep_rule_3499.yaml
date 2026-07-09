@@ -1,0 +1,20 @@
+rules:
+  - id: heap_buffer_overflow_extract_status_code
+    patterns:
+      - pattern-either:
+          - pattern: |
+              buf_code = (char *)MALLOC(10);
+              ...
+              strncat(buf_code, begin, inc);
+          - pattern: |
+              char *buf_code;
+              ...
+              buf_code = (char *)MALLOC(10);
+              ...
+              strncat(buf_code, begin, inc);
+    message: "Potential heap-based buffer overflow in extract_status_code due to unbounded strncat into a fixed-size buffer."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2018-19115"

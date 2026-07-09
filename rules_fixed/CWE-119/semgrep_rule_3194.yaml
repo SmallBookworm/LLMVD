@@ -1,0 +1,27 @@
+rules:
+  - id: cve-2016-10066-buffer-overflow-viff
+    message: "Potential buffer overflow in ReadVIFFImage due to missing image extent validation before pixel processing."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          image->columns=...;
+          image->rows=...;
+          ...
+          number_pixels=(MagickSizeType) ...*...;
+          ...
+          pixels=(unsigned char *) AcquireQuantumMemory(...);
+      - pattern: |
+          image->columns=...;
+          image->rows=...;
+          ...
+          if (image_info->ping != MagickFalse) ... 
+          ...
+          pixels=(unsigned char *) AcquireQuantumMemory(...);
+    metavariable-pattern:
+      metavariable: image
+      pattern: Image
+    fixes:
+      - regex: .*
+        replacement: ""
+        count: 0

@@ -1,0 +1,20 @@
+rules:
+  - id: libsass-handle-error-oob-read
+    message: Out-of-bounds read vulnerability in handle_error due to unsafe UTF-8 navigation when searching for line boundaries.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          while ($PTR && *$PTR && $LINES != 0) {
+            if (*$PTR == '\n') --$LINES;
+            utf8::unchecked::next($PTR);
+          }
+      - pattern: |
+          while ($PTR && *$PTR && *$PTR != '\n') {
+            if (*$PTR == '\n') break;
+            if (*$PTR == '\r') break;
+            utf8::unchecked::next($PTR);
+          }
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2018-11698"

@@ -1,0 +1,18 @@
+rules:
+  - id: insecure_cryptographically_random_values
+    patterns:
+      - pattern-either:
+          - pattern: |
+              void $FUNC(..., unsigned char* buffer, size_t length) {
+                ...
+              }
+          - pattern: |
+              void $FUNC(...) {
+                ...
+              }
+    message: "Function 'cryptographicallyRandomValues' is defined without using a secure random number generator like base::RandBytes, which may lead to cryptographic weaknesses (CWE-310)."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-310"
+      cve: "CVE-2016-1618"

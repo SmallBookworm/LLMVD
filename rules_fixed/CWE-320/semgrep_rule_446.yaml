@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2018-0734-dsa-timing-vulnerability
+    message: "DSA signing is vulnerable to timing side-channel attack (CVE-2018-0734). The preallocation bit length for constant-time exponentiation is insufficient."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern: |
+          q_bits = BN_num_bits($Q);
+          ...
+          BN_set_bit(&$K, q_bits)
+    metavariable-pattern:
+      $Q: dsa->q
+      $K:
+        any-of:
+          - k
+          - l
+          - m
+    fix: ""

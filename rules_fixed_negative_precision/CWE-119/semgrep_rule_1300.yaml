@@ -1,0 +1,18 @@
+rules:
+  - id: pppd-getword-integer-overflow
+    message: "Integer overflow in getword function may lead to heap-based buffer overflow (CVE-2014-3158). The length variable 'len' is incremented even after exceeding MAXWORDLEN, which can wrap around and bypass the bounds check."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (len < MAXWORDLEN - 1)
+                  word[len] = ...;
+              ++len;
+          - pattern: |
+              if (len < MAXWORDLEN - 1)
+                  word[len] = ...;
+              len++;
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2014-3158"

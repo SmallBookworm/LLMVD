@@ -1,0 +1,15 @@
+rules:
+  - id: oniguruma-integer-overflow-cve-2019-19012
+    message: "Potential integer overflow leading to out-of-bounds read in Oniguruma's search_in_range function (CVE-2019-19012)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          sch_range = (UChar* )range + reg->dist_max;
+      - pattern: |
+          sch_range += reg->dist_max;
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2019-19012"
+      references:
+        - https://github.com/kkos/oniguruma/commit/778a43dd56925ed58bbe26e3a7bb8202d72c3f3f

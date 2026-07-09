@@ -1,0 +1,15 @@
+rules:
+  - id: nsv_read_chunk_av_get_packet_check
+    message: "av_get_packet() return value is not checked, which may lead to NULL pointer dereference (CWE-476)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              av_get_packet($PB, $PKT, $SIZE);
+              ... 
+              $PKT->data
+          - pattern: |
+              av_get_packet($PB, $PKT, $SIZE);
+              ... 
+              $PKT->stream_index

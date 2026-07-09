@@ -1,0 +1,20 @@
+rules:
+  - id: quic_stream_sequencer_buffer_oob_write
+    message: "Potential out-of-bounds write in QuicStreamSequencerBuffer::OnStreamData due to missing gap validation."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              std::list<Gap>::iterator current_gap = gaps_.begin();
+              while (current_gap != gaps_.end() && current_gap->end_offset <= offset) {
+                ++current_gap;
+              }
+              DCHECK(current_gap != gaps_.end());
+          - pattern: |
+              std::list<Gap>::iterator current_gap = gaps_.begin();
+              while (current_gap != gaps_.end() && current_gap->end_offset <= offset) {
+                ++current_gap;
+              }
+              if (offset + size > total_bytes_read_ + max_buffer_capacity_bytes_) {
+              }

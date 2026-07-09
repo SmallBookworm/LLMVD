@@ -1,0 +1,11 @@
+rules:
+  - id: cotp-heap-buffer-overflow
+    message: "Potential heap buffer overflow due to missing validation of packetSize before use in readFromSocket. This can lead to integer underflow and memory corruption (CWE-122)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      readBytes = readFromSocket(..., ..., self->packetSize - bufPos);
+    pattern-not: |
+      if (self->packetSize <= bufPos)
+          goto ...;
+      readBytes = readFromSocket(..., ..., self->packetSize - bufPos);

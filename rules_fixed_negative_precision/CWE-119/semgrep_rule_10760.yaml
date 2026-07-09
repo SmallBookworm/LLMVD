@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2013-1788-poppler-dash-array-bounds-check
+    message: Missing bounds check on lineDashStartIdx may lead to out-of-bounds memory access.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while (lineDashStartPhase >= state->lineDash[lineDashStartIdx]) {
+                ...
+                ++lineDashStartIdx;
+              }
+          - pattern: |
+              while ($PHASE >= state->lineDash[$IDX]) {
+                ...
+                ++$IDX;
+              }
+    metavariable-pattern:
+      metavariable: $IDX
+      pattern: lineDashStartIdx

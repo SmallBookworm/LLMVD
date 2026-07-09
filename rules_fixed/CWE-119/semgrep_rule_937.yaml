@@ -1,0 +1,32 @@
+rules:
+  - id: cve-2013-4514-buffer-overflow-station-name
+    message: |
+      Buffer overflow vulnerability in station name handling. The code uses memcpy() without validating that the source length is within the destination buffer bounds.
+      This can lead to memory corruption (CWE-119). Fixed version uses strlcpy() with a bounded length.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - patterns:
+          - pattern: |
+              memcpy((void *)$DEST, (void *)&$SRC, (size_t)$LEN);
+          - metavariable-comparison:
+              metavariable: $DEST
+              comparison: $DEST == "lp->StationName"
+          - metavariable-comparison:
+              metavariable: $SRC
+              comparison: $SRC == "pLtv->u.u8[2]"
+          - metavariable-comparison:
+              metavariable: $LEN
+              comparison: $LEN == "pLtv->u.u16[0]"
+      - patterns:
+          - pattern: |
+              memcpy($DEST, &$SRC, (size_t)$LEN);
+          - metavariable-comparison:
+              metavariable: $DEST
+              comparison: $DEST == "lp->StationName"
+          - metavariable-comparison:
+              metavariable: $SRC
+              comparison: $SRC == "pLtv->u.u8[2]"
+          - metavariable-comparison:
+              metavariable: $LEN
+              comparison: $LEN == "pLtv->u.u16[0]"

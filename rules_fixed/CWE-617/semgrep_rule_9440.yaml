@@ -1,0 +1,38 @@
+rules:
+  - id: cve-2017-12168-arm64-kvm-pmu-BUG
+    message: "Vulnerable pattern detected: use of BUG() in access_pmu_evcntr may lead to host OS crash (CVE-2017-12168, CWE-617)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ($COND) {
+            $STMTS
+          } else {
+            BUG();
+          }
+      - pattern: |
+          if ($COND1) {
+            $STMTS1
+          } else if ($COND2) {
+            $STMTS2
+          } else {
+            BUG();
+          }
+    metavariable-regex:
+      metavariable: $COND
+      regex: ".*"
+    metavariable-regex:
+      metavariable: $STMTS
+      regex: ".*"
+    metavariable-regex:
+      metavariable: $COND1
+      regex: ".*"
+    metavariable-regex:
+      metavariable: $COND2
+      regex: ".*"
+    metavariable-regex:
+      metavariable: $STMTS1
+      regex: ".*"
+    metavariable-regex:
+      metavariable: $STMTS2
+      regex: ".*"

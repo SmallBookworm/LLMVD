@@ -1,0 +1,23 @@
+rules:
+  - id: cwe-200-uninitialized-addr-len
+    message: "Updating *addr_len before verifying that sockaddr is filled may leak uninitialized kernel stack memory to user space."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($ADDR_LEN)
+                  *$ADDR_LEN = sizeof(...);
+              ...
+              if ($SOCKADDR) {
+                  ...
+              }
+          - pattern: |
+              *$ADDR_LEN = sizeof(...);
+              ...
+              if ($SOCKADDR) {
+                  ...
+              }
+    metavariable-pattern:
+      $ADDR_LEN: "int *"
+      $SOCKADDR: "struct sockaddr*"

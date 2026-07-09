@@ -1,0 +1,15 @@
+rules:
+  - id: imagemagick-wpg-cpu-exhaustion
+    message: "Missing validation of RecordLength against blob size may lead to CPU exhaustion via large loop (CVE-2017-14341)."
+    severity: HIGH
+    languages: [c]
+    cwe: ["CWE-400"]
+    pattern-either:
+      - pattern: |
+          Rd_WP_DWORD($IMAGE, &$REC.RecordLength);
+          if (EOFBlob($IMAGE))
+            break;
+      - pattern: |
+          Rd_WP_DWORD($IMAGE, &$REC.RecordLength);
+          if(EOFBlob($IMAGE))
+            break;

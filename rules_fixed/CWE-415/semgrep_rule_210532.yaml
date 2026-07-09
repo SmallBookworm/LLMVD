@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2017-6362-double-free
+    message: "Potential double free vulnerability due to unchecked call to gdImagePngCtxEx. If the function fails, gdDPExtractData may return invalid data leading to double-free in error paths."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              gdImagePngCtxEx($IM, $OUT, $ARG);
+              $RV = gdDPExtractData($OUT, $SIZE);
+          - patterns:
+              - pattern: gdImagePngCtxEx(...);
+              - pattern: ... = gdDPExtractData(...);
+    metadata:
+      cwe: "CWE-415"
+      cve: "CVE-2017-6362"

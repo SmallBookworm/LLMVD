@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2014-8160-generic-conntrack-bypass
+    message: "Generic conntrack entry creation without protocol validation may allow bypass of access restrictions (CVE-2014-8160)."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern: |
+          static bool generic_new(struct nf_conn *ct, const struct sk_buff *skb,
+          			unsigned int dataoff, unsigned int *timeouts)
+          {
+          	return true;
+          }
+    metadata:
+      cwe: "CWE-254"
+      cve: "CVE-2014-8160"

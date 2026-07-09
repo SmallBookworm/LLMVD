@@ -1,0 +1,14 @@
+rules:
+  - id: wasm_dis_buffer_overread
+    message: "Potential stack-based buffer over-read in wasm_dis due to unsafe snprintf usage with strlen in loop condition"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          for (...; ... && strlen ($STR) < $SIZE; ...) {
+            snprintf ($STR + strlen ($STR), $SIZE, ...);
+          }
+      - pattern: |
+          for (...; ... && strlen ($STR) < R_ASM_BUFSIZE; ...) {
+            snprintf ($STR + strlen ($STR), R_ASM_BUFSIZE, ...);
+          }

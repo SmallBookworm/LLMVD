@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2018-5848-unsigned-integer-overflow
+    message: "Missing unsigned integer overflow check before allocation in wmi_set_ie may lead to buffer overflow (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          u16 len = sizeof(...) + $IE_LEN;
+          ...;
+          $CMD = kzalloc(len, ...);
+      - pattern: |
+          u16 len = sizeof(struct wmi_set_appie_cmd) + $IE_LEN;
+          ...;
+          $CMD = kzalloc(len, ...);
+    metavariable-pattern:
+      metavariable: $IE_LEN
+      pattern: ie_len
+    fix-regex:
+      regex: ""
+      replacement: ""

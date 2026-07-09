@@ -1,0 +1,13 @@
+rules:
+  - id: libvncserver-cursor-integer-overflow
+    message: "Potential integer overflow leading to heap-based buffer overflow in HandleCursorShape due to missing width/height validation."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (width * height == 0)
+        return TRUE;
+      ...
+      malloc(width * height * ...)
+    pattern-not: |
+      if (width >= MAX_CURSOR_SIZE || height >= MAX_CURSOR_SIZE)
+        return FALSE;

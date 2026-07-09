@@ -1,0 +1,13 @@
+rules:
+  - id: openldap-cve-2020-25709-assert
+    message: "Detected assert() call that can lead to denial-of-service via crafted input (CVE-2020-25709, CWE-617)."
+    severity: ERROR
+    languages: [c]
+    pattern: 'assert($X == $Y);'
+    combined:
+      - metavariable-pattern:
+          metavariable: $X
+          pattern: 'tag'
+      - metavariable-pattern:
+          metavariable: $Y
+          pattern: 'LBER_INTEGER'

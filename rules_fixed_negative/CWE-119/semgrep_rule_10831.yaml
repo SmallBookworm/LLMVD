@@ -1,0 +1,11 @@
+rules:
+  - id: dalvik_disassemble_buffer_overflow
+    message: "Use of sprintf without size limit may lead to buffer overflow. Use snprintf instead."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: "sprintf (str, ...)"
+      - pattern: "sprintf (op->buf_asm, ...)"
+    fix-regex:
+      regex: "sprintf"
+      replacement: "snprintf"

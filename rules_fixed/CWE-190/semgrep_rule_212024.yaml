@@ -1,0 +1,15 @@
+rules:
+  - id: openexr-integer-overflow-bytesperdeeplinetable
+    message: "Potential integer overflow in bytesPerDeepLineTable due to missing overflow check before addition to bytesPerLine"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $nBytes += $pixelSize * sampleCount(...);
+          bytesPerLine[...] += $nBytes;
+      - pattern: |
+          bytesPerLine[...] += $nBytes;
+    metavariable-pattern:
+      $nBytes:
+        pattern: $nBytes
+        language: c

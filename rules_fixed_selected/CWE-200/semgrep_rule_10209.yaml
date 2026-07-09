@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2017-13204-information-disclosure
+    message: "Potential information disclosure due to missing resolution change check for mb_adaptive_frame_field_flag (CVE-2017-13204, CWE-200)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if(!u1_frm)
+          {
+              ...
+              ps_seq->u1_mb_aff_flag = ih264d_get_bit_h264(...);
+              ...
+          }
+      - pattern: |
+          if(!u1_frm)
+          {
+              ...
+              ps_seq->u1_mb_aff_flag = (WORD32)ih264d_get_bit_h264(...);
+              ...
+          }

@@ -1,0 +1,25 @@
+rules:
+  - id: imagemagick-readpsimage-memory-leak-cve-2019-13137
+    message: "Memory leak in ReadPSImage due to missing DestroyString call on 'geometry' before returning early."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (flags == NoValue)
+             {
+               (void) ThrowMagickException(...);
+               image=DestroyImage(image);
+               return((Image *) NULL);
+             }
+      - pattern: |
+          if (flags == NoValue)
+             {
+               (void) ThrowMagickException(...);
+               ...;
+               image=DestroyImage(image);
+               return((Image *) NULL);
+             }
+    metavariable-pattern:
+      metavariable: $BODY
+      pattern-not: |
+          geometry=DestroyString(geometry);

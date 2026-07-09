@@ -1,0 +1,22 @@
+rules:
+  - id: ghostscript-okiibm-buffer-overflow
+    message: "Buffer overflow in okiibm_print_page1 due to missing bounds check on x_dpi before indexing graphics_modes_9 array."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              char start_graphics = graphics_modes_9[x_dpi / 60];
+          - pattern: |
+              $VAR = graphics_modes_9[$X / 60];
+    metavariable-pattern:
+      metavariable: $X
+      pattern: pdev->x_pixels_per_inch
+    fix-regex:
+      regex: ""
+      replacement: ""
+    # Ensure the rule does not match the fixed version which includes the bounds check
+    pattern-not: |
+      if (x_dpi / 60 >= sizeof(graphics_modes_9)/sizeof(graphics_modes_9[0])) {
+          return_error(gs_error_rangecheck);
+      }

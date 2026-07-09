@@ -1,0 +1,11 @@
+rules:
+  - id: cwe-190-integer-overflow-unsigned-char-cast
+    message: "Casting 'pixel' (of type Quantum) directly to 'unsigned char' may result in integer overflow or undefined behavior when pixel value exceeds representable range of 'unsigned char'."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          (((unsigned char) $PIXEL) & (0x01 << ($SHIFT))) != 0 ? 0 : QuantumRange
+    metavariable-pattern:
+      $PIXEL:
+        pattern-not: (unsigned char)((ssize_t) $PIXEL)

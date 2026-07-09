@@ -1,0 +1,26 @@
+rules:
+  - id: gopro-gpmf-parser-oob-write-cve-2019-15148
+    message: "Potential out-of-bounds write due to missing validation of allocation size before use. This may lead to heap corruption (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (num * $SIZE <= ...)
+          {
+            ...
+            $PTR = (T *)malloc(num * $SIZE);
+            ...
+          }
+      - pattern: |
+          if (num * $SIZE <= ...)
+          {
+            ...
+            $PTR = malloc(num * $SIZE);
+            ...
+          }
+    metavariable-pattern:
+      $SIZE:
+        pattern-either:
+          - pattern: 4
+          - pattern: 8
+          - pattern: 12

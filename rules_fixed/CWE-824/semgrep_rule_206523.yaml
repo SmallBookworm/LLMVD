@@ -1,0 +1,34 @@
+rules:
+  - id: cwe-824-uninitialized-pointer-poppler
+    message: "Uninitialized pointer 'page' may lead to use of uninitialized memory (CWE-824)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - patterns:
+          - pattern: |
+              HtmlOutputDev::HtmlOutputDev(...)
+              {
+                ...
+                page = ...;
+                ...
+              }
+          - pattern-not: |
+              HtmlOutputDev::HtmlOutputDev(...)
+              {
+                ...
+                page = nullptr;
+                ...
+              }
+      - patterns:
+          - pattern: |
+              HtmlOutputDev::HtmlOutputDev(...)
+              {
+                ...
+                $PTR = fopen(...);
+                ...
+                return;
+                ...
+              }
+          - metavariable-pattern:
+              metavariable: $PTR
+              pattern: page

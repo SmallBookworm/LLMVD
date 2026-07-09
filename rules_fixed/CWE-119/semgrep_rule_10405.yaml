@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2016-3142-out-of-bounds-read
+    message: "Out-of-bounds read vulnerability in phar_parse_zipfile due to missing bounds check before memcpy. This can lead to information disclosure or denial of service (CVE-2016-3142)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          if (!memcmp($PTR + 1, "K\\5\\6", 3)) {
+              memcpy((void *)&$LOCATOR, (void *) $PTR, sizeof($LOCATOR));
+          }
+      - pattern-not: |
+          if (($PTR - $BUF) + sizeof($LOCATOR) <= $SIZE && !memcmp($PTR + 1, "K\\5\\6", 3)) {
+              memcpy((void *)&$LOCATOR, (void *) $PTR, sizeof($LOCATOR));
+          }
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2016-3142"

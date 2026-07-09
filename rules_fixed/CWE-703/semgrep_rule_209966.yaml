@@ -1,0 +1,12 @@
+rules:
+  - id: double-free-in-first-line-of-file
+    message: "Double free vulnerability when handling empty guest files. The CLEANUP_FREE macro causes automatic free of 'lines', but an explicit free is also called in the error path."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      CLEANUP_FREE char **lines = NULL;
+      if (lines[0] == NULL) {
+        guestfs___free_string_list(lines);
+        return ...;
+      }
+      return lines[0];

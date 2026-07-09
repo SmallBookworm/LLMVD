@@ -1,0 +1,27 @@
+rules:
+  - id: freerdp-oob-read-irp-write
+    message: "Potential out-of-bounds read due to missing bounds check before using Stream_Pointer with Length. Fixed in FreeRDP 2.1.0."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (Stream_GetRemainingLength($STREAM) < ...)
+                return ...;
+              ...
+              Stream_Read_UINT32($STREAM, $LENGTH);
+              ...
+              Stream_Pointer($STREAM)
+          - pattern: |
+              Stream_Read_UINT32($STREAM, $LENGTH);
+              ...
+              if (Stream_GetRemainingLength($STREAM) < ...)
+                return ...;
+              ...
+              Stream_Pointer($STREAM)
+    metavariable-regex:
+      metavariable: $LENGTH
+      regex: Length
+    fix-regex:
+      regex: ""
+      replacement: ""

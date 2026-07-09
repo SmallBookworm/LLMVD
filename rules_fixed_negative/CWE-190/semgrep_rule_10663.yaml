@@ -1,0 +1,13 @@
+rules:
+  - id: redis_lua_struct_integer_overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (a > (INT_MAX / 10) || a * 10 > (INT_MAX - (**fmt - '0')))
+                luaL_error(...);
+          - pattern: |
+              if (a > (INT_MAX / 10) || a * 10 > (INT_MAX - (*(*fmt) - '0')))
+                luaL_error(...);
+    message: "Potential integer overflow in Lua struct parsing due to flawed bounds check (CWE-190)."
+    severity: ERROR
+    languages: [c]

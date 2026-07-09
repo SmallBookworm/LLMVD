@@ -1,0 +1,12 @@
+rules:
+  - id: cwe-134-format-string-vulnerability
+    patterns:
+      - pattern-either:
+          - pattern: zend_throw_error(_, $message);
+          - pattern: zend_error(E_ERROR, $message);
+    message: "Potential format string vulnerability. Ensure format string is not controlled by user input."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-134"
+      cve: "CVE-2015-8617"

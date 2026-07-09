@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2016-3137-missing-endpoint-check
+    message: Missing check for required interrupt endpoints may lead to NULL pointer dereference.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (interval > 0) {
+            ...
+          } else {
+            ... = port->interrupt_out_urb->interval;
+            ... = port->interrupt_in_urb->interval;
+            ...
+          }
+      - pattern: |
+          ... = port->interrupt_out_urb->interval;
+          ... = port->interrupt_in_urb->interval;
+    metavariable-pattern:
+      metavariable: port
+      pattern: $PORT

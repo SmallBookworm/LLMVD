@@ -1,0 +1,30 @@
+rules:
+  - id: xt_alloc_table_info_integer_overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              struct xt_table_info *xt_alloc_table_info(unsigned int size)
+              {
+                ...
+                size_t sz = sizeof(*info) + size;
+                ...
+                if ((SMP_ALIGN(size) >> PAGE_SHIFT) + 2 > totalram_pages)
+                  return NULL;
+                ...
+              }
+          - pattern: |
+              struct xt_table_info *xt_alloc_table_info(unsigned int size)
+              {
+                ...
+                size_t sz = sizeof(*info) + size;
+                ...
+                if (sz <= (PAGE_SIZE << PAGE_ALLOC_COSTLY_ORDER))
+                  ...;
+                ...
+              }
+    message: "Missing integer overflow check in xt_alloc_table_info may lead to heap corruption (CVE-2016-3135, CWE-189)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: ["CWE-189"]
+      cve: "CVE-2016-3135"

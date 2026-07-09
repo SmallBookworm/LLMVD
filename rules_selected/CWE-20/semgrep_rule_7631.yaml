@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2017-15394-idn-spoofing
+    message: "Potential IDN homograph spoofing vulnerability due to missing host sanitization before processing. This may lead to domain spoofing in permission dialogs."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          if (!host.empty()) {
+            host = base::UTF16ToUTF8(url_formatter::FormatUrlForSecurityDisplay(...));
+          }
+      - pattern-either:
+          - pattern: |
+              std::string host = pattern.host();
+              ...
+              if (pattern.match_subdomains())
+                host = "*." + host;
+          - pattern: |
+              std::string host = pattern.host();
+              ...
+              net::registry_controlled_domains::PermissiveGetHostRegistryLength(host, ...);
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2017-15394"

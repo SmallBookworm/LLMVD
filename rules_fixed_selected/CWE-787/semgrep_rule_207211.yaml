@@ -1,0 +1,18 @@
+rules:
+  - id: cwe-787-olm-pk-decrypt-buffer-overflow
+    message: "Missing input length validation in olm_pk_decrypt may lead to buffer overflow (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          olm::decode_base64(
+              (const uint8_t*)ephemeral_key, ephemeral_key_length,
+              (uint8_t *)ephemeral.public_key
+          );
+      - pattern: |
+          olm::decode_base64((const uint8_t*)mac, olm::encode_base64_length(MAC_LENGTH), raw_mac);
+      - pattern: |
+          olm::decode_base64((const uint8_t *)ciphertext, ciphertext_length, (uint8_t *)ciphertext);
+    metavariable-regex:
+      - metavariable: $FUNC
+        regex: olm_pk_decrypt

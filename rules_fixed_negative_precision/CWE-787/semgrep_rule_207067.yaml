@@ -1,0 +1,11 @@
+rules:
+  - id: poppler-dctstream-buffer-overflow
+    message: "Potential heap-based buffer overflow in DCTStream::getChars due to incorrect bounds check before memcpy."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (nChars < left)
+          left = nChars;
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2020-35702"

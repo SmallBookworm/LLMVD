@@ -1,0 +1,13 @@
+rules:
+  - id: qemu-scsi-mode-select-off-by-one
+    message: "Potential off-by-one read in mode_sense_page() when page == MODE_PAGE_ALLS (0x3f). Ensure page index is validated before accessing mode_sense_valid array."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-not: assert(page < ARRAY_SIZE(mode_sense_valid));
+      - pattern-either:
+          - pattern: |
+              if ((mode_sense_valid[page] & ...) == 0) {
+                ...
+              }
+          - pattern-regex: \bmode_sense_valid\[$(?:[^$$]+?)page[^$$]+?\]

@@ -1,0 +1,19 @@
+rules:
+  - id: csp_form_action_bypass
+    message: "Missing Content Security Policy check for form action may lead to CSP bypass"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (protocolIsJavaScript($ACTION)) {
+            if (!document().contentSecurityPolicy()->allowFormAction($ACTION))
+              return;
+            ...
+          }
+      - pattern: |
+          if (protocolIsJavaScript($ACTION)) {
+            document().frame()->script().executeScriptIfJavaScriptURL($ACTION, ...);
+            return;
+          }
+    metavariable-pattern:
+      $ACTION: submission->action()

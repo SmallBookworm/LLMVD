@@ -1,0 +1,26 @@
+rules:
+  - id: cwe-119-buffer-overflow-environ
+    patterns:
+      - pattern-either:
+          - pattern: |
+              char temp[500];
+              ...
+              for (;;)
+              {
+                temp[$I] = fgetc($FP);
+                ...
+              }
+          - pattern: |
+              char temp[...];
+              ...
+              for (;;)
+              {
+                temp[$I] = fgetc($FP);
+                ...
+              }
+    message: "Potential buffer overflow due to fixed-size stack buffer used to read unbounded input from /proc/pid/environ. Environment variable names longer than the buffer size may cause memory corruption (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2015-2831"

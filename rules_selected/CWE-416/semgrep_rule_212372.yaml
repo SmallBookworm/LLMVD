@@ -1,0 +1,20 @@
+rules:
+  - id: nasm-heap-use-after-free-saa-wbytes
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!subexpr->next) {
+                  eop->val   = subexpr->val;
+                  eop->type  = subexpr->type;
+                  eop->dup  *= subexpr->dup;
+                  nasm_free(subexpr);
+                  ...
+              }
+    message: "Heap use-after-free vulnerability due to improper handling of subexpression buffer. When flattening a single-element subexpression, the original code frees 'subexpr' after copying its contents into 'eop', but if 'subexpr' owns an associated data buffer allocated as part of the same memory block, this leads to a use-after-free when the buffer is later accessed."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2020-24241"
+      references:
+        - https://github.com/netwide-assembler/nasm/commit/6ac6ac57e3d01ea8ed4ea47706eb724b59176461

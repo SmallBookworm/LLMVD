@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2017-13089-negative-chunk-size
+    message: "Missing check for negative chunk size in HTTP chunked transfer decoding may lead to buffer overflow (CVE-2017-13089)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          remaining_chunk_size = strtol(...);
+          ...
+          if (remaining_chunk_size == 0) { ... }
+      - pattern: |
+          remaining_chunk_size = strtol(...);
+          ...
+          contlen = MIN(remaining_chunk_size, ...);
+    metavariable-regex:
+      metavariable: $remaining_chunk_size
+      regex: "remaining_chunk_size"
+    pattern-not: |
+      remaining_chunk_size = strtol(...);
+      ...
+      if (remaining_chunk_size < 0) { return ...; }

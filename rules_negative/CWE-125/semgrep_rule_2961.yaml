@@ -1,0 +1,7 @@
+rules:
+  - id: ettercap-compile-tree-null-check
+    message: "Missing null check for 'tree_root' may lead to out-of-bounds read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      BUG_IF(tree_root == NULL);

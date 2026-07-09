@@ -1,0 +1,30 @@
+rules:
+  - id: cve-2017-6519-avahi-legacy-unicast-check
+    message: "Legacy unicast queries are not checked for on-link source address, leading to potential traffic amplification and information leakage (CVE-2017-6519)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (port != AVAHI_MDNS_PORT) {
+              ...
+              legacy_unicast = 1;
+          }
+          ...
+          if (legacy_unicast)
+              reflect_legacy_unicast_query_packet(...);
+      - pattern: |
+          if (port != AVAHI_MDNS_PORT) {
+              ...
+              legacy_unicast = 1;
+          }
+          ...
+          handle_query_packet(..., legacy_unicast, ...);
+    metavariable-regex:
+      metavariable: legacy_unicast
+      regex: legacy_unicast
+    pattern-not: |
+      if (!is_mdns_mcast_address(dst_address) &&
+          !avahi_interface_address_on_link(..., src_address)) {
+          ...
+          return;
+      }

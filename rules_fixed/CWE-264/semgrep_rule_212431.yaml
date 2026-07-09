@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2011-2768-guard-flag-check
+    message: "Missing check for GiveGuardFlagTo_CVE_2011_2768_VulnerableRelays option may allow vulnerable relays to be assigned guard flag, leaking client anonymity."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (..., is_router_version_good_for_possible_guard(...)) {
+                ...
+              }
+          - pattern: |
+              if (..., (is_router_version_good_for_possible_guard(...))) {
+                ...
+              }
+    metavariable-pattern:
+      metavariable: $COND
+      pattern: is_router_version_good_for_possible_guard(...)
+    pattern-not-inside: |
+      if (... &&
+          (... || is_router_version_good_for_possible_guard(...))) {
+        ...
+      }

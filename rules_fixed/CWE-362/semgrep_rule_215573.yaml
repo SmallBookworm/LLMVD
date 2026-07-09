@@ -1,0 +1,15 @@
+rules:
+  - id: cwe-362-keyring-race-condition
+    message: "Race condition vulnerability in find_keyring_by_name: atomic_inc() used instead of atomic_inc_not_zero(), potentially accessing a freed keyring."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              atomic_inc(&keyring->usage);
+          - pattern: |
+              atomic_inc(&...->usage);
+    metavariable-pattern:
+      metavariable: keyring
+      pattern: 
+        pattern: $X

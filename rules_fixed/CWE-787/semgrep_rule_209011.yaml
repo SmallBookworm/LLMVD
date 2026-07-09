@@ -1,0 +1,25 @@
+rules:
+  - id: cwe-787-bz2-negative-return
+    message: "Potential out-of-bounds write due to unchecked negative return value from BZ2_bzread being cast to size_t."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $RET = BZ2_bzread(...);
+              ...
+              return $RET;
+          - pattern: |
+              $RET = BZ2_bzread(...);
+              ...
+              if ($RET == 0) { ... }
+              ...
+              return $RET;
+    metavariable-regex:
+      metavariable: $RET
+      regex: "ret"
+    fixes:
+      - message: "Ensure the return value from BZ2_bzread is checked for negative values before use."
+        lines: []
+    fix-regex:
+      enabled: false

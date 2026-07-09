@@ -1,0 +1,15 @@
+rules:
+  - id: imagemagick-jng-memory-leak
+    message: "Memory leak in ReadOneJNGImage due to missing cleanup of color_image and color_image_info before throwing exception"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (length > PNG_UINT_31_MAX || count == 0)
+                ThrowReaderException(...);
+          - pattern: |
+              if (length > GetBlobSize(image))
+                ThrowReaderException(...);
+    fix-regex:
+      regex: false

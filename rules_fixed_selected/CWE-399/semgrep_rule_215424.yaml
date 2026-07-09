@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2008-5033-tvaudio-bass-treble-check
+    message: "Missing negation in CHIP_HAS_BASSTREBLE flag check may lead to NULL function pointer dereference (CVE-2008-5033)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (desc->flags & CHIP_HAS_BASSTREBLE)
+                  return -EINVAL;
+    metadata:
+      cwe: "CWE-399"
+      cve: "CVE-2008-5033"

@@ -1,0 +1,9 @@
+rules:
+  - id: cwe-125-bento4-hdlr-atom-buffer-overread
+    message: "Potential heap-based buffer over-read due to incorrect character data type comparison in AP4_HdlrAtom constructor (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (name[0] == name_size-1) {
+      ...
+      }

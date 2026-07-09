@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2020-36224-invalid-pointer-free
+    message: "Invalid pointer free vulnerability in saslAuthzTo processing. Memory allocated with ber_memalloc_x should be freed with ber_memfree_x or slap_sl_free, not ch_free."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              ch_free($PTR);
+          - pattern: |
+              ch_free(...);
+    metavariable-pattern:
+      $PTR:
+        pattern-either:
+          - pattern: ludp->lud_dn
+    focus-metavariable: $PTR

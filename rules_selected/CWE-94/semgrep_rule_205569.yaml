@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2016-2119-samba-guest-session-signing-bypass
+    message: "Guest session allowed despite mandatory signing requirement, leading to potential MITM spoofing (CVE-2016-2119)."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      if (is_guest) {
+          /*
+           * We can't finish the gensec handshake, we don't
+           * have a negotiated session key.
+           *
+           * So just pretend we are completely done.
+           */
+          ...
+      }
+    metadata:
+      cwe: ["CWE-94"]
+      cve: "CVE-2016-2119"

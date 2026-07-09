@@ -1,0 +1,22 @@
+rules:
+  - id: imagemagick-draw-buffer-overflow
+    message: Buffer overflow vulnerability in TraceStrokePolygon due to missing integer overflow check before memory reallocation.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (q >= (ssize_t) (max_strokes - ...)) {
+                max_strokes += ...;
+                path_p = (PointInfo *) ResizeQuantumMemory(path_p, (size_t) max_strokes, sizeof(*path_p));
+                path_q = (PointInfo *) ResizeQuantumMemory(path_q, (size_t) max_strokes, sizeof(*path_q));
+              }
+          - pattern: |
+              if (q >= (ssize_t) (max_strokes - ...)) {
+                max_strokes += ...;
+                path_p = (PointInfo *) ResizeQuantumMemory(path_p, max_strokes, sizeof(*path_p));
+                path_q = (PointInfo *) ResizeQuantumMemory(path_q, max_strokes, sizeof(*path_q));
+              }
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2016-4564"

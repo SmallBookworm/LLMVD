@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2014-9914-use-after-free
+    message: "Use-after-free vulnerability due to unsafe access to sk_dst_cache without proper locking. This may lead to privilege escalation or denial of service (CWE-416)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (! __sk_dst_get($SK) || __sk_dst_check($SK, 0))
+                  return;
+          - pattern: |
+              __sk_dst_set($SK, ...)
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2014-9914"
+      references:
+        - https://github.com/torvalds/linux/commit/9709674e68646cee5a24e3000b3558d25412203a

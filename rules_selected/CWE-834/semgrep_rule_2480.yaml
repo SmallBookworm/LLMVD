@@ -1,0 +1,8 @@
+rules:
+  - id: cine_read_header_missing_eof_check
+    message: "Missing EOF check in loop parsing image offsets may lead to DoS (CVE-2017-14059, CWE-834)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      for (...; ... < st->duration; ...) 
+        av_add_index_entry(..., avio_rl64(...), ..., ..., ..., ...);

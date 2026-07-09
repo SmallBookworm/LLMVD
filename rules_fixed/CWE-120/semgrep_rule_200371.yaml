@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2020-5208-buffer-overflow
+    message: |
+      Buffer overflow vulnerability detected. The length value from response data is used in memcpy without proper validation against buffer boundaries.
+      This may lead to remote code execution if ipmitool is run as a privileged user.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              len = rsp->data[0];
+              memcpy(..., rsp->data + 1, len);
+          - pattern: |
+              $LEN = rsp->data[0];
+              memcpy(..., rsp->data + 1, $LEN)

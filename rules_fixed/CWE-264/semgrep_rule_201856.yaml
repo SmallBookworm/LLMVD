@@ -1,0 +1,25 @@
+rules:
+  - id: gnutls-ocsp-serial-length-check-missing
+    message: "Missing update of cserial.size after gnutls_x509_crt_get_serial() may lead to incorrect OCSP serial number comparison (CVE-2016-7444)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $T = $CSERIAL.size;
+          $RET = gnutls_x509_crt_get_serial(..., $CSERIAL.data, &$T);
+          if ($RET < 0) { ... }
+          if ($RSERIAL.size != $CSERIAL.size || ...)
+      - pattern: |
+          $T = $CSERIAL.size;
+          gnutls_x509_crt_get_serial(..., $CSERIAL.data, &$T);
+          ...
+          if ($RSERIAL.size != $CSERIAL.size || ...)
+    metavariable-regex:
+      - metavariable: $CSERIAL
+        regex: "[a-zA-Z_][a-zA-Z0-9_]*"
+      - metavariable: $RSERIAL
+        regex: "[a-zA-Z_][a-zA-Z0-9_]*"
+      - metavariable: $T
+        regex: "[a-zA-Z_][a-zA-Z0-9_]*"
+      - metavariable: $RET
+        regex: "[a-zA-Z_][a-zA-Z0-9_]*"

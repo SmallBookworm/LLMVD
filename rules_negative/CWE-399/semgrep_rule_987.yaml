@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2013-4127-use-after-free
+    message: Use-after-free vulnerability due to calling vhost_zerocopy_signal_used on a freed ubufs object after vhost_net_ubuf_put_and_wait.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              vhost_net_ubuf_put_and_wait($UBUFS);
+              ...
+              vhost_zerocopy_signal_used(..., ...);
+          - pattern: |
+              if ($COND) {
+                  vhost_net_ubuf_put_and_wait($UBUFS);
+                  ...
+                  vhost_zerocopy_signal_used(..., ...);
+              }
+    metadata:
+      cwe: "CWE-399"
+      cve: "CVE-2013-4127"

@@ -1,0 +1,21 @@
+rules:
+  - id: cwe-20-uninitialized-msg_namelen
+    message: "msg_namelen is set unconditionally, potentially leaking uninitialized kernel memory when msg_name is NULL."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              msg->msg_namelen = ...;
+              ...
+              if ($ADDR != NULL) { ... }
+          - pattern: |
+              if ($ADDR != NULL) { ... }
+              ...
+              msg->msg_namelen = ...;
+    metavariable-patterns:
+      - metavariable: $ADDR
+        patterns:
+          - pattern: msg->msg_name
+    fix-regex:
+      enabled: false

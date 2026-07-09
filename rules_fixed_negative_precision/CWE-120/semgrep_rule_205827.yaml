@@ -1,0 +1,46 @@
+rules:
+  - id: libsolv-testcase-read-buffer-overflow
+    message: "Buffer overflow vulnerability in testcase_read due to missing checks before adding repos or changing system after job creation. This may lead to denial of service (CWE-120, CVE-2021-3200)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!strcmp(pieces[0], "repo") && ...)
+              {
+                ...
+                Repo *repo = repo_create(pool, pieces[1]);
+                ...
+              }
+          - pattern: |
+              if (!strcmp(pieces[0], "system") && ...)
+              {
+                ...
+                pool_setarch(...);
+                ...
+              }
+      - pattern-not: |
+          if (!strcmp(pieces[0], "repo") && ...)
+          {
+            ...
+            if (job && job->count != oldjobsize)
+            {
+              pool_error(...);
+              continue;
+            }
+            ...
+          }
+      - pattern-not: |
+          if (!strcmp(pieces[0], "system") && ...)
+          {
+            ...
+            if (job && job->count != oldjobsize)
+            {
+              pool_error(...);
+              continue;
+            }
+            ...
+          }
+    metavariable-regex:
+      metavariable: $...
+      regex: ".*"

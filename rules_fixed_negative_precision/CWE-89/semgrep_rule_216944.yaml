@@ -1,0 +1,8 @@
+rules:
+  - id: mariadb-cve-2022-27380
+    message: "Potential NULL dereference in my_decimal::operator= due to incorrect maybe_null handling in single-row subqueries (CVE-2022-27380, CWE-89)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (engine->no_tables())
+        maybe_null = engine->may_be_null();

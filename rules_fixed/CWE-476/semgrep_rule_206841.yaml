@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2019-15218-null-deref-smsusb
+    message: "Potential NULL pointer dereference due to missing endpoint validation in smsusb driver. Missing check for dev->in_ep or dev->out_ep before use."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              dev->response_alignment =
+                  le16_to_cpu(dev->udev->ep_in[1]->desc.wMaxPacketSize) -
+                  sizeof(struct sms_msg_hdr);
+          - pattern-inside: |
+              ...
+          - metavariable-comparison:
+              metavariable: dev->udev->ep_in[1]
+              comparison: is-not-null
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2019-15218"

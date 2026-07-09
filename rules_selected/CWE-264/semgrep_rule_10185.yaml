@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2016-2448-nuplayer-buffer-validation
+    patterns:
+      - pattern-either:
+          - pattern: |
+              memcpy($DATA,
+                     (const uint8_t *)mBuffers.editItemAt($ENTRY->mIndex)->pointer()
+                       + $ENTRY->mOffset,
+                     $COPY);
+          - pattern: |
+              memcpy($DATA,
+                     (const uint8_t *)mBuffers.editItemAt($IDX)->pointer()
+                       + $OFF,
+                     $COPY);
+    message: "Missing validation of buffer index and bounds before memcpy. This may lead to privilege escalation as described in CVE-2016-2448."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-264"
+      vulnerability: "CVE-2016-2448"

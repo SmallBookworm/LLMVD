@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2019-19530-use-after-free
+    message: "Missing early refcount increment on control_interface may lead to use-after-free (CWE-416)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          usb_driver_claim_interface(&acm_driver, data_interface, acm);
+          usb_set_intfdata(data_interface, acm);
+          tty_dev = tty_port_register_device(..., &control_interface->dev);
+      - pattern: |
+          usb_driver_claim_interface(&acm_driver, data_interface, acm);
+          usb_set_intfdata(data_interface, acm);
+          ...
+          tty_port_register_device(..., &control_interface->dev);
+    metavariable-pattern:
+      control_interface: { type: "struct usb_interface *" }
+    fix: null

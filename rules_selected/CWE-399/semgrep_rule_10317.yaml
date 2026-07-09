@@ -1,0 +1,32 @@
+rules:
+  - id: cve-2016-9105-v9fs-link-memory-leak
+    message: "Memory leak in v9fs_link: missing put_fid for oldfidp may cause denial of service."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          oldfidp = get_fid(...);
+          if (oldfidp == NULL) {
+              ...
+              goto out;
+          }
+          ...
+          err = v9fs_co_link(..., oldfidp, ..., ...);
+          ...
+          out:
+              put_fid(..., dfidp);
+      - pattern: |
+          oldfidp = get_fid(...);
+          if (oldfidp == NULL) {
+              ...
+              goto out;
+          }
+          ...
+          if (!err) {
+              ...
+          }
+          out:
+              put_fid(..., dfidp);
+    metavariable-regex:
+      metavariable: $...
+      regex: ".*"

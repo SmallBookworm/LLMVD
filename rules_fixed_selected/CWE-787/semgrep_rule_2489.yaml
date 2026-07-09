@@ -1,0 +1,29 @@
+rules:
+  - id: cve-2017-14040-openjpeg-tgatoimage-out-of-bounds-write
+    message: "Potential out-of-bounds write due to missing file size validation before memory allocation in tgatoimage(). This may lead to remote denial of service or other impact (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!((pixel_bit_depth == 24) || (pixel_bit_depth == 32))) {
+            ...
+            return NULL;
+          }
+          ...
+          image = opj_image_create(...);
+      - pattern: |
+          if (!((pixel_bit_depth == 24) || (pixel_bit_depth == 32))) {
+            ...
+            return NULL;
+          }
+          ...
+          for (y = 0; y < image_height; y++) {
+            ...
+            image->comps[...].data[...] = ...;
+          }
+    metavariable-pattern:
+      metavariable: image_height
+      pattern-not: |
+        if (image_height != 0 && image_width > 10000000 / image_height / numcomps) {
+          ...
+        }

@@ -1,0 +1,17 @@
+rules:
+  - id: cwe-74-command-injection-via-system-call
+    patterns:
+      - pattern: |
+          char $BUF[$SIZE];
+          ...
+          strcpy($BUF, ...);
+          ...
+          strcat($BUF, $ARG);
+          ...
+          system($BUF);
+    message: "Potential command injection via unvalidated user input passed to system(). User-controlled data from argv is concatenated into a command string without sanitization, leading to arbitrary command execution (CWE-74)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-74"
+      cve: "CVE-2015-2180"

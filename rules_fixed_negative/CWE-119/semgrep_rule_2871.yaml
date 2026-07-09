@@ -1,0 +1,16 @@
+rules:
+  - id: dvb_usbv2_stack_copy_use_after_free
+    message: "Stack copy of device structure may lead to use-after-free or memory corruption when CONFIG_VMAP_STACK is enabled."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              struct device dev = $D->udev->dev;
+              ...
+              dev_info(&dev, ...);
+    metadata:
+      cwe: ["CWE-119"]
+      references:
+        - https://github.com/torvalds/linux/commit/005145378c9ad7575a01b6ce1ba118fb427f583a
+        - CVE-2017-8064

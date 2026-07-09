@@ -1,0 +1,16 @@
+rules:
+  - id: cwe-20-uninitialized-memory-leak-recvmsg
+    message: "Potential uninitialized memory leak in recvmsg handler. msg_namelen is set before checking if msg_name is valid."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $MSG->msg_namelen = ...;
+              if ($MSG->msg_name) { ... }
+          - pattern: |
+              $MSG->msg_namelen = ...;
+              if ($SIPX) { ... }
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2013-7270"

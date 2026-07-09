@@ -1,0 +1,17 @@
+rules:
+  - id: imagemagick-mat-memory-leak-cve-2017-12667
+    message: "Memory leak vulnerability in ReadMATImage due to missing cleanup of clone_info before throwing exception (CVE-2017-12667, CWE-401)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (strncmp($HDR.identific, "MATLAB", 6))
+            $LABEL: ThrowReaderException($ARG1, $ARG2);
+      - pattern: |
+          if (strncmp($HDR.identific, "MATLAB", 6))
+            goto $LABEL;
+          ...
+          $LABEL: ThrowReaderException($ARG1, $ARG2);
+    metavariable-pattern:
+      metavariable: $LABEL
+      pattern: "MATLAB_KO"

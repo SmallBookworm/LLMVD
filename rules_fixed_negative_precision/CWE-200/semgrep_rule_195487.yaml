@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2014-6229-hashcontext-key-copy
+    message: "Use of strdup on non-NUL-terminated key may lead to information disclosure or key truncation (CWE-200)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          key = ctx->key ? strdup(ctx->key) : nullptr;
+      - pattern: |
+          key = strdup(ctx->key);

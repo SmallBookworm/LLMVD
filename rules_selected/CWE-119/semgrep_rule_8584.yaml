@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2017-0637-libhevc-tile-bounds-check
+    message: "Missing validation of tile column and row counts against computed maximums may lead to buffer overflow (CVE-2017-0637, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if((ps_pps->i1_num_tile_columns < 1) ||
+             (ps_pps->i1_num_tile_columns > ps_sps->i2_pic_wd_in_ctb) ||
+             (ps_pps->i1_num_tile_rows < 1) ||
+             (ps_pps->i1_num_tile_rows > ps_sps->i2_pic_ht_in_ctb))
+            return IHEVCD_INVALID_HEADER;
+      - pattern: |
+          if ((ps_pps->i1_num_tile_columns < 1) ||
+              (ps_pps->i1_num_tile_columns > ps_sps->i2_pic_wd_in_ctb) ||
+              (ps_pps->i1_num_tile_rows < 1) ||
+              (ps_pps->i1_num_tile_rows > ps_sps->i2_pic_ht_in_ctb))
+            return IHEVCD_INVALID_HEADER;

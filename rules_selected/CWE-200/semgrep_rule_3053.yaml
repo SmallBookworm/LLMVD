@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2017-0377-guard-family-check-missing
+    patterns:
+      - pattern-either:
+          - pattern: |
+              return tor_memneq($GUARD->identity, $RST->exclude_id, DIGEST_LEN);
+    message: "Guard selection does not consider the exit relay's family, potentially violating anonymity (CVE-2017-0377)."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-200"
+      confidence: MEDIUM

@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2020-8624-bind-update-policy-subdomain-misinterpretation
+    message: "The 'subdomain' update-policy rule is incorrectly treated as 'zonesub', leading to privilege escalation (CVE-2020-8624)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (mtype == dns_ssumatchtype_subdomain) {
+                usezone = true;
+              }
+    metadata:
+      cwe: ["CWE-269"]
+      cve: "CVE-2020-8624"

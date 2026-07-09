@@ -1,0 +1,20 @@
+rules:
+  - id: minix_zero_zmap_blocks_check
+    message: "Missing check for zero s_zmap_blocks or s_imap_blocks may lead to infinite loop or crash (CVE-2006-6058)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          minix_set_bit(0, sbi->s_zmap[0]->b_data);
+        pattern-not-inside: |
+          if (sbi->s_imap_blocks == 0 || sbi->s_zmap_blocks == 0)
+            goto ...;
+          ...
+          minix_set_bit(0, sbi->s_zmap[0]->b_data);
+      - pattern: |
+          minix_set_bit(0, sbi->s_imap[0]->b_data);
+        pattern-not-inside: |
+          if (sbi->s_imap_blocks == 0 || sbi->s_zmap_blocks == 0)
+            goto ...;
+          ...
+          minix_set_bit(0, sbi->s_imap[0]->b_data);

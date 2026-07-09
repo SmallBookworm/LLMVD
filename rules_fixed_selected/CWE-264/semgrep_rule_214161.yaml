@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2015-8370-grub-integer-underflow
+    message: "Integer underflow vulnerability in backspace handling may lead to out-of-bounds memory overwrite (CVE-2015-8370)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (key == '\b')
+            {
+              cur_len--;
+              ...
+            }
+      - pattern: |
+          if (key == '\b')
+            cur_len--;
+    metadata:
+      cwe: "CWE-264"
+      cve: "CVE-2015-8370"

@@ -1,0 +1,14 @@
+rules:
+  - id: modplug_buffer_overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              memcpy($BUF, $STR, $LEN + 1);
+          - pattern: |
+              memcpy($BUF, $STR, strlen($STR) + 1);
+    message: "Potential buffer overflow in ModPlug_InstrumentName or ModPlug_SampleName due to unbounded memcpy. Strings should be limited to 32 bytes including null terminator."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-120"
+      cve: "CVE-2019-17113"

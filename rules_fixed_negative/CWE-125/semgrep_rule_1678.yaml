@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2016-9539-out-of-bounds-read
+    message: "Out-of-bounds read vulnerability in readContigTilesIntoBuffer due to missing padding for extractContigSamplesShifted32bits. Allocate at least 3 extra bytes and zero-initialize them."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          tilebuf = _TIFFmalloc(tile_buffsize);
+      - pattern: |
+          tilebuf = _TIFFmalloc($X);
+          ...
+          extractContigSamplesShifted32bits(...);
+    metavariable-pattern:
+      metavariable: $X
+      patterns:
+        - pattern-not: $Y + 3
+    fix-regex:
+      regex: ""
+      replacement: ""

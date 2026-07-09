@@ -1,0 +1,8 @@
+rules:
+  - id: cwe-787-fpregs-state-valid-cache
+    message: "Use of this_cpu_read_stable() on fpu_fpregs_owner_ctx may lead to memory corruption due to caching across preemption points. Use this_cpu_read() instead."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          fpu == this_cpu_read_stable(fpu_fpregs_owner_ctx)

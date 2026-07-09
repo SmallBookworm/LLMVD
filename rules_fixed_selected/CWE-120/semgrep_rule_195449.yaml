@@ -1,0 +1,33 @@
+rules:
+  - id: cve-2019-11935-mb-ereg-replace-buffer-overflow
+    message: "Potential buffer overflow in mb_ereg_replace due to insufficient boundary checks when processing replacement string. Upgrade HHVM to a patched version."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while (i < replacement.size()) {
+                ...
+                int fwd = (int)php_mb_mbchar_bytes_ex(p, enc);
+                ...
+                if (n >= 0 && n < regs->num_regs) {
+                  ...
+                } else {
+                  out_buf.append(p, fwd);
+                  ...
+                }
+              }
+          - pattern: |
+              while (i < replacement.size()) {
+                ...
+                int fwd = (int)php_mb_mbchar_bytes_ex(p, enc);
+                ...
+                if (n >= 0 && n < regs->num_regs) {
+                  ...
+                } else if (remaining >= fwd) {
+                  ...
+                }
+              }
+    metavariable-comparison:
+      metavariable: $REPLACEMENT_SIZE_CHECK
+      comparison: "<"

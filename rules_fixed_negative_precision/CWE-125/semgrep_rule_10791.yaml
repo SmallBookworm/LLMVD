@@ -1,0 +1,32 @@
+rules:
+  - id: cwe-125-out-of-bounds-read-ims-pcu
+    message: "Potential out-of-bounds read due to missing validation of CDC union descriptor length. This may lead to denial of service or unspecified impact (CWE-125, CVE-2017-16645)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          while ($BUFLEN > 0) {
+            $UNION_DESC = (struct usb_cdc_union_desc *)$BUF;
+            ...
+            if ($UNION_DESC->bDescriptorType == USB_DT_CS_INTERFACE &&
+                $UNION_DESC->bDescriptorSubType == USB_CDC_UNION_TYPE) {
+              ...
+              return $UNION_DESC;
+            }
+            ...
+          }
+      - pattern: |
+          while ($BUFLEN > 0) {
+            $UNION_DESC = (struct usb_cdc_union_desc *)$BUF;
+            ...
+            $BUFLEN -= $UNION_DESC->bLength;
+            $BUF += $UNION_DESC->bLength;
+            ...
+          }
+    metavariable-regex:
+      - metavariable: $BUF
+        regex: "buf"
+      - metavariable: $BUFLEN
+        regex: "buflen"
+      - metavariable: $UNION_DESC
+        regex: "union_desc"

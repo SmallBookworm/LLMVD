@@ -1,0 +1,14 @@
+rules:
+  - id: imagemagick-use-after-free-cve-2020-25663
+    message: "Potential heap-use-after-free in SetImageAlphaChannel due to ConformPixelInfo() called before GetCacheViewAuthenticPixels(). This may lead to denial of service when processing malicious images."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          ConformPixelInfo($IMAGE, $BACKGROUND_COLOR, $BACKGROUND, $EXCEPTION);
+          ...
+          $Q = GetCacheViewAuthenticPixels($IMAGE_VIEW, ...);
+      - pattern: |
+          ConformPixelInfo($IMAGE, &$BACKGROUND_COLOR, &$BACKGROUND, $EXCEPTION);
+          ...
+          $Q = GetCacheViewAuthenticPixels($IMAGE_VIEW, ...);

@@ -1,0 +1,13 @@
+rules:
+  - id: gemsafe-buffer-overflow-CWE-787
+    message: "Stack-based buffer overflow due to insufficient array size for keyinfo. Fixed by increasing array size from 8 to 9."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          keyinfo kinfo[8]; /* will look for 8 keys */
+      - pattern: |
+          keyinfo kinfo [ 8 ] ;
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2020-26571"

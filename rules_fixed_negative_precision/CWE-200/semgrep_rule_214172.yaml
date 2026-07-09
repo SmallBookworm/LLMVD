@@ -1,0 +1,17 @@
+rules:
+  - id: mwifiex_pcie_init_evt_ring_memory_leak
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (mwifiex_map_pci_memory(...)) {
+                  return -1;
+              }
+          - pattern: |
+              if (mwifiex_map_pci_memory(...))
+                  return -1;
+    message: "Memory leak in mwifiex_pcie_init_evt_ring: allocated skb is not freed on mwifiex_map_pci_memory failure."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2019-19057"

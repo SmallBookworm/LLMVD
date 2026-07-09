@@ -1,0 +1,18 @@
+rules:
+  - id: postgresql_clear_text_password_buffer_overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (ptr[0] == 'p' && conn_status->type == CT) {
+                  ...
+                  GET_ULONG_BE(length, ptr, 1);
+                  strncpy((char*)conn_status->password, (char*)(ptr + 5), length - 4);
+                  conn_status->password[length - 4] = 0;
+                  ...
+              }
+    message: "Potential heap-based buffer overflow in PostgreSQL dissector when handling clear-text password. The length value from the packet is used without proper validation, which may lead to writing beyond the bounds of the password buffer."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2014-6395"

@@ -1,0 +1,15 @@
+rules:
+  - id: imagemagick-viff-memory-leak-cve-2019-13134
+    message: "Memory leak in ReadVIFFImage due to missing status update on AcquireNextImage failure (CVE-2019-13134)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (GetNextImageInList(image) == (Image *) NULL)
+            {
+            image=DestroyImageList(image);
+            return((Image *) NULL);
+            }
+    metadata:
+      cwe: "CWE-399"
+      cve: "CVE-2019-13134"

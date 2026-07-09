@@ -1,0 +1,24 @@
+rules:
+  - id: cwe-200-uninitialized-addr-len
+    message: "Potential disclosure of uninitialized kernel memory via addr_len in recvmsg-like functions. *addr_len is updated even when msg_name (saddr) is not filled, possibly leaking stack contents."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($ADDR_LEN)
+                *$ADDR_LEN = $SIZE;
+            metavariable-pattern:
+              metavariable: ADDR_LEN
+              pattern: addr_len
+          - pattern: |
+              *$ADDR_LEN = $SIZE;
+            metavariable-pattern:
+              metavariable: ADDR_LEN
+              pattern: addr_len
+    pattern-not-inside: |
+      if ($SADDR) {
+        ...
+        *$ADDR_LEN = $SIZE;
+        ...
+      }

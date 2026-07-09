@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2017-8105-out-of-bounds-write
+    message: "Potential out-of-bounds write in t1_decoder_parse_charstrings due to missing bounds check before calling t1_builder_add_point. This may lead to heap-based buffer overflow (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ( idx > 0 && idx < 7 )
+                t1_builder_add_point( ... );
+          - pattern: |
+              if ( idx > 0 && idx < 7 )
+              {
+                ...
+                t1_builder_add_point( ... );
+              }
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2017-8105"

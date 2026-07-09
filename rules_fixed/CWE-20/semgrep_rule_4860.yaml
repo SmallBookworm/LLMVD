@@ -1,0 +1,28 @@
+rules:
+  - id: cve-2011-2822-url-parsing
+    message: "Potential improper URL parsing vulnerability (CVE-2011-2822). Missing check for standard URLs before treating input as a file path."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      GURL URLFixerUpper::FixupRelativeFile(...) {
+        ...
+        bool is_file = true;
+        FilePath full_path;
+        if (!ValidPathForFile(..., &full_path)) { ... }
+        ...
+      }
+    metavariable-pattern:
+      metavariable: $FUNC
+      patterns:
+        - pattern-inside: |
+            GURL URLFixerUpper::FixupRelativeFile(...) {
+              ...
+              bool is_file = true;
+              ...
+              if (!ValidPathForFile(..., &full_path)) { ... }
+              ...
+            }
+        - pattern-not: |
+            GURL gurl(...);
+            if (gurl.is_valid() && gurl.IsStandard())
+              is_file = false;

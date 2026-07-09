@@ -1,0 +1,17 @@
+rules:
+  - id: cwe-125-gmc-mmx-signedness-bug
+    message: "Potential out-of-bounds read due to missing width/height validation in gmc_mmx (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          int need_emu = (unsigned) $IX >= $WIDTH - $W ||
+                         (unsigned) $IY >= $HEIGHT - $H;
+      - pattern: |
+          int need_emu = (unsigned) $IX >= $WIDTH - $W ||
+                         (unsigned) $IY >= $HEIGHT - $H || ...;
+    metavariable-patterns:
+      - metavariable: "$W"
+        pattern: "8"
+      - metavariable: "$H"
+        pattern: "h"

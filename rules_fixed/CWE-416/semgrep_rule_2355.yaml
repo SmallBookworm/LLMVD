@@ -1,0 +1,20 @@
+rules:
+  - id: lynx-html-put-string-use-after-free
+    message: "Potential use-after-free in HTML_put_string due to appending a chunk onto itself. This can lead to memory disclosure (CVE-2017-1000211, CWE-416)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          HTChunkPuts(&$X, $s);
+      - pattern: |
+          HTChunkPuts(& $X, $s);
+    metavariable-pattern:
+      metavariable: $s
+      pattern-either:
+        - pattern: me->title.data
+        - pattern: me->style_block.data
+        - pattern: me->script.data
+        - pattern: me->object.data
+        - pattern: me->textarea.data
+        - pattern: me->option.data
+        - pattern: me->math.data

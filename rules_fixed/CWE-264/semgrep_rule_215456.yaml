@@ -1,0 +1,28 @@
+rules:
+  - id: cve-2009-0676-uninitialized-union-member
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: |
+                  union $U {
+                    ...
+                  } $V;
+              - pattern-inside: |
+                  $V = ...;
+              - pattern-not: |
+                  memset(&$V, 0, sizeof($V));
+          - patterns:
+              - pattern: |
+                  union $U {
+                    ...
+                  } $V;
+              - pattern-inside: |
+                  $V.$F = ...;
+              - pattern-not: |
+                  memset(&$V, 0, sizeof($V));
+    message: "Uninitialized union member may lead to kernel memory disclosure via getsockopt (CVE-2009-0676). Use memset to fully initialize the union."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-264"
+      cve: "CVE-2009-0676"

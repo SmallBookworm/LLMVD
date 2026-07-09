@@ -1,0 +1,22 @@
+rules:
+  - id: cwe-125-out-of-bounds-read-exif-focal-length
+    message: Missing bounds check on entry->data before use in strncmp may lead to out-of-bounds read (CWE-125).
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (entry && entry->data &&
+              !strncmp ((char *)entry->data, "Minolta", 7))
+      - pattern: |
+          if (entry && entry->data) {
+              if (!strncmp ((char *)entry->data, "DiMAGE 7", 8))
+                  ...
+          }
+      - pattern: |
+          if (entry && entry->data) {
+              if (!strncmp ((char *)entry->data, "DiMAGE 5", 8))
+                  ...
+          }
+    metadata:
+      cwe: ["CWE-125"]
+      cve: ["CVE-2020-0182"]

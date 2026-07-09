@@ -1,0 +1,27 @@
+rules:
+  - id: haproxy_buffer_slow_realign_uninitialized_memory
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (buf->i) {
+                ...
+                if (buf->p + buf->i > buf->data + buf->size) {
+                  ...
+                }
+                ...
+                memmove(buf->data, buf->p, block1);
+                ...
+              }
+          - pattern: |
+              if (buf->i) {
+                int block1 = buf->i;
+                ...
+                memmove(buf->data, buf->p, block1);
+                ...
+              }
+    message: "Potential uninitialized memory exposure in buffer_slow_realign due to improper realignment of non-contiguous buffers (CVE-2015-3281)."
+    severity: HIGH
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      vulnerability: "Buffer Over-read / Uninitialized Memory Exposure"

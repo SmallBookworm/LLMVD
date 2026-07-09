@@ -1,0 +1,29 @@
+rules:
+  - id: matio-mat_varreadnextinfo4-missing-null-terminator
+    message: "Missing null terminator after reading variable name may lead to buffer over-read (CWE-703)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          matvar->name = (char*)malloc($SIZE);
+          ...
+          fread(matvar->name, 1, tmp, $STREAM);
+          if (tmp != readresult) {
+            ...
+            return NULL;
+          }
+          ...
+          matvar->internal->datapos = $POS;
+      - pattern: |
+          matvar->name = malloc($SIZE);
+          ...
+          fread(matvar->name, 1, tmp, $STREAM);
+          if (tmp != readresult) {
+            ...
+            return NULL;
+          }
+          ...
+          matvar->internal->datapos = $POS;
+    metavariable-pattern:
+      metavariable: tmp
+      pattern: tmp

@@ -1,0 +1,27 @@
+rules:
+  - id: libmysofa-unbounded-recursion
+    message: "Unbounded recursive function calls may lead to stack exhaustion (CWE-476)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              static int directblockRead(...) {
+              ...
+              err = dataobjectRead(...);
+              ...
+              }
+          - pattern: |
+              static int readOHDRHeaderMessageDatatype(...) {
+              ...
+              }
+      - metavariable-regex:
+          metavariable: $FUNC
+          regex: ^(directblockRead|readOHDRHeaderMessageDatatype)$
+      - pattern-not: |
+          if (reader->recursive_counter >= ...)
+            return ...;
+          else
+            reader->recursive_counter++;
+          ...
+          reader->recursive_counter--;

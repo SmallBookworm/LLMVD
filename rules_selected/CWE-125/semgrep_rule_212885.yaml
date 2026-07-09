@@ -1,0 +1,9 @@
+rules:
+  - id: cwe-125-out-of-bounds-read-setcos
+    message: "Potential out-of-bounds read due to unchecked array access when iACLen is 0 in parse_sec_attr_44"
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      iPinCount = iACLen - 1;
+    fix: |
+      iPinCount = iACLen > 0 ? iACLen - 1 : 0;

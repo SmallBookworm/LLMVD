@@ -1,0 +1,25 @@
+rules:
+  - id: tensorflow-sparse-reshape-missing-validation
+    message: "Missing input validation in SparseReshape may lead to denial of service (CWE-369)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      void Compute(OpKernelContext* context) override {
+        ...
+        ReshapeSparseTensor<...>(context, context->input(0), context->input(1), ...);
+        ...
+      }
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: Compute
+    patterns:
+      - pattern-not: |
+          void Compute(OpKernelContext* context) override {
+            ...
+            OP_REQUIRES(context, TensorShapeUtils::IsMatrix(...), ...);
+            OP_REQUIRES(context, TensorShapeUtils::IsVector(...), ...);
+            OP_REQUIRES(context, ... == ..., ...);
+            ...
+            ReshapeSparseTensor<...>(context, context->input(0), context->input(1), ...);
+            ...
+          }

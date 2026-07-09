@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2015-8865-buffer-overflow
+    message: "Potential buffer overflow due to unsafe memory reallocation based on unbounded level increment. This may lead to memory corruption, denial of service, or arbitrary code execution (CVE-2015-8865)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ($LEVEL >= $MS->c.len) {
+                $LEN = ($MS->c.len += 20) * sizeof(*$MS->c.li);
+                ...
+              }
+          - pattern: |
+              if ($LEVEL >= $MS->c.len) {
+                $MS->c.len += 20;
+                $LEN = $MS->c.len * sizeof(*$MS->c.li);
+                ...
+              }
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2015-8865"

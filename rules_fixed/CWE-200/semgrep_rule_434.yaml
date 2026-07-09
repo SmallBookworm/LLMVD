@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2018-1116-polkit-uid-trust
+    message: "Detected vulnerable pattern in polkit authorization check that trusts client-supplied UID without verifying it matches the actual process owner. This may lead to information disclosure or DoS (CVE-2018-1116, CWE-200)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          polkit_backend_session_monitor_get_user_for_subject(..., $subject, &error);
+      - pattern: |
+          if (!polkit_identity_equal($user_of_caller, $user_of_subject) || $has_details)
+            {
+              ...
+            }
+    metavariable-pattern:
+      metavariable: $subject
+      patterns:
+        - pattern-not: |
+            polkit_backend_session_monitor_get_user_for_subject(..., $subject, &$user_of_subject_matches, ...)

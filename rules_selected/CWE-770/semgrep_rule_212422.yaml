@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2018-7443-tiff-memory-allocation
+    message: "Missing validation of image data size before memory allocation in TIFF reader may lead to denial of service (CWE-770)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          tiff_pixels=(unsigned char *) AcquireMagickMemory(MagickMax(
+            TIFFScanlineSize(tiff), ...));
+      - pattern: |
+          tiff_pixels=(unsigned char *) AcquireMagickMemory(MagickMax(
+            TIFFScanlineSize(tiff), ...));
+    pattern-not: |
+      if (((MagickSizeType) TIFFScanlineSize(tiff)) > GetBlobSize(image))
+        ThrowTIFFException(CorruptImageError,"InsufficientImageDataInFile");
+      tiff_pixels=(unsigned char *) AcquireMagickMemory(MagickMax(
+        TIFFScanlineSize(tiff), ...));

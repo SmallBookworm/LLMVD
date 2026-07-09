@@ -1,0 +1,12 @@
+rules:
+  - id: dpdk-vhost-inflight-queue-oob
+    message: "Missing bounds check for inflight.num_queues may lead to out-of-bounds memory access (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          case VHOST_USER_SET_INFLIGHT_FD:
+              $V = ctx->msg.payload.inflight.num_queues - 1;
+      - pattern: |
+          case VHOST_USER_SET_INFLIGHT_FD:
+              $V = ctx->msg.payload.inflight.num_queues;

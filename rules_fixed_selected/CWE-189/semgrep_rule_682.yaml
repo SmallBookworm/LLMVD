@@ -1,0 +1,25 @@
+rules:
+  - id: cve-2012-0044-drm-mode-dirtyfb-ioctl-integer-overflow
+    message: "Potential integer overflow in drm_mode_dirtyfb_ioctl due to missing validation of num_clips before allocation."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (num_clips && clips_ptr) {
+                  ...
+                  kzalloc(num_clips * sizeof(...), ...);
+                  ...
+              }
+          - pattern: |
+              if (num_clips && clips_ptr) {
+                  ...
+                  kmalloc(num_clips * sizeof(...), ...);
+                  ...
+              }
+    metavariable-pattern:
+      metavariable: num_clips
+      pattern-not: |
+          if (... < 0 || ... > DRM_MODE_FB_DIRTY_MAX_CLIPS) {
+              ...
+          }

@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2015-4643-integer-overflow
+    message: "Integer overflow in ftp_genlist may lead to heap-based buffer overflow (CVE-2015-4643)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (ptr = ...; rcvd; rcvd--, ptr++) {
+                  if (*ptr == '\n' && lastch == '\r') {
+                      lines++;
+                  } else {
+                      size++;
+                  }
+                  ...
+              }
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2015-4643"

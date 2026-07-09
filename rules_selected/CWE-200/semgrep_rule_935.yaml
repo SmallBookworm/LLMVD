@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2013-4515-uninitialized-struct
+    patterns:
+      - pattern-either:
+          - pattern: |
+              struct bcm_driver_info $DEVINFO;
+              ...
+              $DEVINFO.$FIELD = ...;
+          - pattern: |
+              struct bcm_driver_info $DEVINFO;
+              ...
+              copy_to_user(..., &$DEVINFO, ...);
+    message: "Uninitialized struct bcm_driver_info may leak kernel memory. Ensure the structure is fully initialized (e.g., via memset) before copying to user space."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2013-4515"

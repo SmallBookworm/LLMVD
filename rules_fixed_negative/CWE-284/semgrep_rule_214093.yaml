@@ -1,0 +1,22 @@
+rules:
+  - id: curl_negotiate_connection_reuse_vulnerability
+    message: "Negotiate authenticated connections are not properly closed, which may allow connection reuse by other users (CVE-2015-3148)."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (data->state.proxyneg.state == GSS_AUTHSENT ||
+                  data->state.negotiate.state == GSS_AUTHSENT)
+                Curl_cleanup_negotiate(data);
+          - pattern: |
+              if (data->state.proxyneg.state == GSS_AUTHSENT ||
+                  data->state.negotiate.state == GSS_AUTHSENT)
+              {
+                Curl_cleanup_negotiate(data);
+              }
+    metadata:
+      cwe: CWE-284
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: Curl_http_done

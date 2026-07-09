@@ -1,0 +1,24 @@
+rules:
+  - id: yara-heap-buffer-overflow-CVE-2017-11328
+    message: "Heap buffer overflow in yr_object_array_set_item due to insufficient capacity check before writing to array index."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (array->items == NULL)
+              {
+                count = yr_max(64, (index + 1) * 2);
+                ...
+                array->items->objects[index] = ...;
+              }
+          - pattern: |
+              if (index >= array->items->count)
+              {
+                count = array->items->count * 2;
+                ...
+                array->items->objects[index] = ...;
+              }
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2017-11328"

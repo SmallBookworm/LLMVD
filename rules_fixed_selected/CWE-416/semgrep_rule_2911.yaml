@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2017-7487-use-after-free
+    message: "Missing ipxitf_put() call on error path after copy_to_user() failure may lead to use-after-free (CWE-416)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (copy_to_user(...))
+              break;
+          ipxitf_put(...);
+      - pattern: |
+          if (copy_to_user(...)) {
+              ...
+              break;
+          }
+          ipxitf_put(...);
+    metavariable-pattern:
+      metavariable: $IPXIF
+      pattern: ipxif

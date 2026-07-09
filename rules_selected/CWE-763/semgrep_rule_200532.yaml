@@ -1,0 +1,27 @@
+rules:
+  - id: cwe-763-usb-gadget-dev-config-uaf
+    message: "Missing cleanup of dev->config, dev->hs_config, and dev->dev before freeing dev->buf may lead to use-after-free (CWE-763)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (value != 0) {
+              kfree(dev->buf);
+              dev->buf = NULL;
+          }
+      - pattern: |
+          goto fail;
+          ...
+          fail:
+          ...
+          kfree(dev->buf);
+          dev->buf = NULL;
+    pattern-not-inside: |
+      fail:
+          ...
+          dev->config = NULL;
+          dev->hs_config = NULL;
+          dev->dev = NULL;
+          ...
+          kfree(dev->buf);
+          dev->buf = NULL;

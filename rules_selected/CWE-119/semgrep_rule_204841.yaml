@@ -1,0 +1,26 @@
+rules:
+  - id: cve-2015-3214-pit-ioport-read-oob
+    message: "Out-of-bounds read in pit_ioport_read due to missing check for addr == 3 (Mode/Command register). This may lead to arbitrary code execution. See CVE-2015-3214."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              static uint64_t pit_ioport_read(void *opaque, hwaddr addr, unsigned size)
+              {
+                  ...
+                  addr &= 3;
+                  $S = &pit->channels[addr];
+                  ...
+              }
+          - pattern: |
+              static uint64_t pit_ioport_read(void *opaque, hwaddr addr, unsigned size)
+              {
+                  ...
+                  addr &= 3;
+                  PITChannelState *s = &pit->channels[addr];
+                  ...
+              }
+    metavariable-regex:
+      metavariable: $S
+      regex: "s"

@@ -1,0 +1,8 @@
+rules:
+  - id: cve-2018-16839-buffer-overrun-sasl
+    message: "Potential buffer overflow in SASL authentication due to incorrect size check before allocation (CVE-2018-16839)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if((ulen > SIZE_T_MAX/2) || (plen > (SIZE_T_MAX/2 - 2)))
+        return CURLE_OUT_OF_MEMORY;

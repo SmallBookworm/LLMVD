@@ -1,0 +1,40 @@
+rules:
+  - id: hivex_page_bounds_check_missing
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (...; ...; ...) {
+                ...
+                size_t page_size = le32toh(...);
+                ...
+                if (page_size <= sizeof(...) || (page_size & 0x0fff) != 0) {
+                  ...
+                  goto error;
+                }
+                ...
+                for (...; blkoff < off + page_size; ...) {
+                  ...
+                }
+                ...
+              }
+          - pattern: |
+              for (...; ...; ...) {
+                ...
+                if (le32toh(...) <= sizeof(...) || (le32toh(...) & 0x0fff) != 0) {
+                  ...
+                  goto error;
+                }
+                ...
+                for (...; blkoff < off + le32toh(...); ...) {
+                  ...
+                }
+                ...
+              }
+    pattern-not: |
+      if (off + page_size > h->size) {
+        ...
+        goto error;
+      }
+    message: "Missing bounds check for page size against file size may lead to out-of-bounds read/write (CVE-2014-9273, CWE-119)."
+    severity: ERROR
+    languages: [c]

@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2021-3712-asn1-string-not-null-terminated
+    message: "ASN1_STRING data may not be NUL-terminated; using string functions like TEST_str_eq can lead to out-of-bounds reads (CWE-125). Use length-aware comparison (e.g., TEST_mem_eq) instead."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              TEST_str_eq((const char *)$ASN1_STR->data, $EXPECTED)
+          - pattern: |
+              strcmp((const char *)$ASN1_STR->data, $OTHER)
+          - pattern: |
+              strlen((const char *)$ASN1_STR->data)
+          - pattern: |
+              strcpy($DST, (const char *)$ASN1_STR->data)
+          - pattern: |
+              strncpy($DST, (const char *)$ASN1_STR->data, ...)
+          - pattern: |
+              printf("%s", (const char *)$ASN1_STR->data)
+      - metavariable-pattern:
+          metavariable: $ASN1_STR
+          patterns:
+            - pattern: $ASN1_STR->data

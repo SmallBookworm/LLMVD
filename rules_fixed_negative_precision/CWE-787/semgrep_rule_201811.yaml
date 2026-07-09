@@ -1,0 +1,19 @@
+rules:
+  - id: imagemagick-tiff-buffer-overflow-CVE-2021-3610
+    message: "Heap-based buffer overflow in ReadTIFFImage due to insufficient memory allocation for pixel buffer. Upgrade to ImageMagick 7.0.11-14 or later."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          extent = 2 * TIFFStripSize(tiff);
+          ...
+          strip_pixels = (unsigned char *) AcquireQuantumMemory(extent, sizeof(*strip_pixels));
+      - pattern: |
+          extent = 2 * TIFFStripSize(tiff);
+          ...
+          strip_pixels = (unsigned char *) AcquireQuantumMemory(extent, ...);
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2021-3610"
+      references:
+        - https://github.com/ImageMagick/ImageMagick/commit/930ff0d1a9bc42925a7856e9ea53f5fc9f318bf3

@@ -1,0 +1,21 @@
+rules:
+  - id: rtlwifi_p2p_noa_buffer_overflow
+    message: "Missing upper-bound check on noa_num may lead to buffer overflow (CVE-2019-17666, CWE-120)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          noa_num = (noa_len - 2) / 13;
+          ...
+          for (i = 0; i < noa_num; i++) {
+          }
+      - pattern: |
+          noa_num = (noa_len - 2) / 13;
+          ...
+          p2pinfo->noa_num = noa_num;
+          ...
+          for (i = 0; i < noa_num; i++) {
+          }
+    metavariable-regex:
+      metavariable: noa_num
+      regex: "noa_num"

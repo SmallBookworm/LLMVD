@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2018-18357-idn-spoof-checker-missing-confusable
+    message: "Missing confusable character mapping for U+10DE (პ) in IDN spoof checker may allow URL bar spoofing."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern-inside: extra_confusable_mapper_.reset(icu::Transliterator::createFromRules(..., icu::UnicodeString::fromUTF8($STR), ...));
+        pattern: '"[зҙӡვდ] > 3;"'
+      - pattern-inside: extra_confusable_mapper_.reset(icu::Transliterator::createFromRules(..., icu::UnicodeString::fromUTF8($STR), ...));
+        pattern: '"[зҙӡდვ] > 3;"'
+    metavariable-pattern:
+      metavariable: $STR
+      language: generic
+      pattern: '"[зҙӡვდ] > 3;"'

@@ -1,0 +1,30 @@
+rules:
+  - id: cve-2016-3141-use-after-free
+    message: "Use-after-free vulnerability in WDDX deserialization due to missing null check on ent1->data before use."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              wddx_stack_top(..., (void**)&$ent1);
+              ...
+              if (!strcmp($name, EL_BINARY)) {
+                ...
+                call_user_function_ex(..., &$ent1->data, ...);
+                ...
+              }
+          - pattern: |
+              wddx_stack_top(..., (void**)&$ent1);
+              ...
+              if (Z_TYPE_P($ent2->data) == IS_ARRAY || Z_TYPE_P($ent2->data) == IS_OBJECT) {
+                ...
+                zend_symtable_update(..., ..., ..., &$ent1->data, ...);
+                ...
+              }
+          - pattern: |
+              wddx_stack_top(..., (void**)&$ent1);
+              ...
+              add_property_zval(..., ..., $ent1->data);
+    metavariable-pattern:
+      $ent1:
+        pattern: st_entry *

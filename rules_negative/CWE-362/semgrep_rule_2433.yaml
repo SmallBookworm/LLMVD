@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2017-15649-race-condition-fanout-check
+    message: "Race condition in packet_do_bind: po->fanout is checked before acquiring bind_lock, which may lead to use-after-free (CWE-362)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ($PO->fanout)
+              return ...;
+          lock_sock(...);
+          spin_lock(&$PO->bind_lock);
+      - pattern: |
+          if ($PO->fanout)
+              return ...;
+          ...
+          spin_lock(&$PO->bind_lock);
+    metavariable-pattern:
+      $PO:
+        type: "struct packet_sock *"

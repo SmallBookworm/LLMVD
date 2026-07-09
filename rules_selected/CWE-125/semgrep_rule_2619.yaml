@@ -1,0 +1,25 @@
+rules:
+  - id: cwe-125-eigrp-buffer-overread
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (eigrp_tlv_len < sizeof(struct eigrp_tlv_header) ||
+                  eigrp_tlv_len > tlen) {
+                ...
+                return;
+              }
+              ...
+              tlv_tptr=tptr+sizeof(struct eigrp_tlv_header);
+              tlv_tlen=eigrp_tlv_len-sizeof(struct eigrp_tlv_header);
+              ...
+              ND_TCHECK2(*tptr, eigrp_tlv_len);
+          - pattern: |
+              tlv_ptr.$TLV = (const struct $TYPE *)tlv_tptr;
+              ...
+              memcpy(..., &tlv_ptr.$TLV->..., ...);
+    message: "Missing length validation before accessing EIGRP TLV fields may lead to buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2017-12901"

@@ -1,0 +1,27 @@
+rules:
+  - id: cve-2011-1675-missing-signal-blocking
+    message: "Missing signal blocking around umount and mtab update may lead to resource exhaustion or mtab corruption (CVE-2011-1675)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!nomtab &&
+              (umnt_err == 0 || umnt_err == EINVAL || umnt_err == ENOENT)) {
+            ...
+            update_mtab(...);
+          }
+      - pattern: |
+          if (!nomtab &&
+              (umnt_err == 0 || umnt_err == EINVAL || umnt_err == ENOENT)) {
+            ...
+            mnt_update_table(...);
+          }
+    pattern-not-inside: |
+      block_signals(SIG_BLOCK);
+      ...
+      if (!nomtab &&
+          (umnt_err == 0 || umnt_err == EINVAL || umnt_err == ENOENT)) {
+        ...
+      }
+      ...
+      block_signals(SIG_UNBLOCK);

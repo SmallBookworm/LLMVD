@@ -1,0 +1,17 @@
+rules:
+  - id: iptables-restore-buffer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              char param_buffer[1024];
+          - pattern: |
+              param_buffer[param_len++] = ...;
+          - pattern: |
+              if (param_len >= sizeof(param_buffer))
+                  ...
+    message: "Potential buffer overflow in add_param_to_argv due to unsafe use of fixed-size param_buffer. Use structured buffer handling instead."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2019-11360"

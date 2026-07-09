@@ -1,0 +1,17 @@
+rules:
+  - id: hexchat-directory-traversal-cve-2016-2087
+    message: "Unsanitized network name used in file path may lead to directory traversal (CWE-22)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $NET = server_get_network(...);
+          ...
+          g_strdup_printf(..., $NET, ...);
+      - pattern: |
+          char *net = server_get_network(...);
+          ...
+          g_strdup_printf(..., net, ...);
+    metavariable-pattern:
+      metavariable: $NET
+      pattern-not: log_create_filename(...)

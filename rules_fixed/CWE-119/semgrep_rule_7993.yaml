@@ -1,0 +1,28 @@
+rules:
+  - id: cve-2016-1686-missing-composition-clear
+    message: "Missing call to clear composing text after CommitText, which may lead to out-of-bounds read (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!ime_engine_->CommitText(...))
+                ...;
+              // missing composing_text_.clear();
+          - pattern: |
+              if (!ime_engine_->CommitText(..., &error))
+                LOG(...) << ...;
+              // missing composing_text_.clear();
+      - metavariable-pattern:
+          metavariable: $FUNC
+          pattern: |
+            void $FUNC(...) {
+              ...
+              if (!ime_engine_->CommitText(...))
+                ...;
+              ...
+            }
+      - pattern-not: |
+          if (!ime_engine_->CommitText(...))
+            ...;
+          composing_text_.clear();

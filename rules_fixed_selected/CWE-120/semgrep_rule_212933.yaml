@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2019-17133-buffer-overflow-ssid
+    message: "Missing bounds check on SSID length before memcpy() may lead to buffer overflow (CWE-120)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          data->length = ie[1];
+          memcpy(ssid, ie + 2, data->length);
+      - pattern: |
+          data->length = $LEN;
+          memcpy(ssid, $SRC, data->length);
+    metavariable-pattern:
+      $LEN: 
+        pattern-either:
+          - pattern: ie[1]
+          - pattern: wdev->wext.connect.ssid_len
+    fix: ""

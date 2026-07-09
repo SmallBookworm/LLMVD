@@ -1,0 +1,39 @@
+rules:
+  - id: imagemagick-mat-frame-validation
+    message: "Missing validation for Frames value in MAT image reader may lead to denial of service (CVE-2016-10069)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              switch ($X->DimFlag)
+              {
+                ...
+                case 16:
+                  ...
+                  Frames = ReadBlobXXXLong(...);
+                  break;
+                ...
+              }
+          - pattern: |
+              switch (MATLAB_HDR.DimFlag)
+              {
+                ...
+                case 16:
+                  ...
+                  Frames = ReadBlobXXXLong(image2);
+                  break;
+                ...
+              }
+      - pattern-not: |
+          switch ($X->DimFlag)
+          {
+            ...
+            case 16:
+              ...
+              Frames = ReadBlobXXXLong(...);
+              if (Frames == 0)
+                ThrowReaderException(...);
+              break;
+            ...
+          }

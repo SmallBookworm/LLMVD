@@ -1,0 +1,42 @@
+rules:
+  - id: libraw-double-free-legacy-decoder
+    message: "Double free vulnerability in LibRaw::unpack when handling legacy decoder (sRAW/Foveon) images. Memory allocated to imgdata.image may be freed twice if an exception occurs after allocation but before imgdata.image is set to 0."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (decoder_info.decoder_flags & LIBRAW_DECODER_LEGACY)
+                {
+                  ...
+                  imgdata.rawdata.raw_alloc = calloc(...);
+                  imgdata.image = ...;
+                  ...
+                  (this->*load_raw)();
+                  ...
+                  imgdata.image = 0;
+                }
+          - pattern: |
+              if (decoder_info.decoder_flags & LIBRAW_DECODER_LEGACY)
+                {
+                  ...
+                  imgdata.rawdata.raw_alloc = calloc(...);
+                  imgdata.image = ...;
+                  ...
+                  (this->*load_raw)();
+                  ...
+                  imgdata.rawdata.raw_alloc = imgdata.rawdata.color_image = imgdata.image;
+                  imgdata.image = 0;
+                }
+      - pattern-not: |
+          if (decoder_info.decoder_flags & LIBRAW_DECODER_LEGACY)
+            {
+              ...
+              imgdata.rawdata.raw_alloc = 0;
+              imgdata.image = (ushort (*)[4])calloc(...);
+              ...
+              (this->*load_raw)();
+              ...
+              imgdata.rawdata.raw_alloc = imgdata.rawdata.color_image = imgdata.image;
+              imgdata.image = 0;
+            }

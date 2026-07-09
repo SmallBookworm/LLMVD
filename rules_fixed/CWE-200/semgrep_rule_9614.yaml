@@ -1,0 +1,18 @@
+rules:
+  - id: unvalidated_snprintf_return_value
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $TSEND = snprintf($BUFFER, $BUFFERSIZE, ...);
+              ...
+              if ($XML) { free($XML); }
+          - pattern: |
+              $OBJ->tosend = snprintf($OBJ->buffer, $OBJ->buffersize, ...);
+              ...
+              if ($XML) { free($XML); }
+    message: "snprintf return value is not validated, which may lead to information disclosure (CWE-200)."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2019-12107"

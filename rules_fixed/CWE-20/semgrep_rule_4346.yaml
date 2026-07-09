@@ -1,0 +1,25 @@
+rules:
+  - id: cve-2017-12843-sync-command-admin-check
+    message: "SYNC commands (SYNCAPPLY, SYNCGET, SYNCRESTORE) must check isadmin before parsing input to prevent arbitrary file writes."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!strcmp(cmd.s, "Syncapply")) {
+                struct dlist *kl = sync_parseline(...);
+                ...
+              }
+          - pattern: |
+              if (!strcmp(cmd.s, "Syncget")) {
+                struct dlist *kl = sync_parseline(...);
+                ...
+              }
+          - pattern: |
+              if (!strcmp(cmd.s, "Syncrestore")) {
+                struct dlist *kl = sync_parseline(...);
+                ...
+              }
+    metavariable-pattern:
+      metavariable: cmd.s
+      language: c

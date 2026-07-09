@@ -1,0 +1,14 @@
+rules:
+  - id: altivec_unavailable_exception_panic_from_userspace
+    message: "altivec_unavailable_exception may panic on user-triggered Altivec instructions when CONFIG_ALTIVEC is not defined. This can lead to denial of service (CVE-2006-5331)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      #if !defined(CONFIG_ALTIVEC)
+      if (user_mode(...)) {
+        ...
+        return;
+      }
+      #endif
+      ...
+      die(...);

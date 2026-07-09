@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2017-16355-passenger-revision-file-read
+    patterns:
+      - pattern: |
+          inferApplicationInfo($INFO);
+    message: "Potential arbitrary file read via symlinked REVISION file (CVE-2017-16355). The function 'inferApplicationInfo' may read a user-controllable REVISION file, leading to information disclosure when Passenger runs as root."
+    severity: HIGH
+    languages: [c]
+    metadata:
+      cwe: "CWE-61"
+      cve: "CVE-2017-16355"

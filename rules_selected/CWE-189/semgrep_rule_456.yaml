@@ -1,0 +1,25 @@
+rules:
+  - id: imlib2-divide-by-zero-ellipse
+    message: "Potential divide-by-zero vulnerability in ellipse drawing code. Missing guard against zero divisor (dx or dy) before division."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              ... 
+              yy -= ((dy << 16) / dx);
+              ...
+          - pattern: |
+              ... 
+              xx += ((dx << 16) / dy);
+              ...
+    pattern-not-inside: |
+      if ($DIVISOR < 1)
+        $DIVISOR = 1;
+      ...
+      ... / $DIVISOR
+    metavariable-pattern:
+      metavariable: $DIVISOR
+      pattern-either:
+        - pattern: dx
+        - pattern: dy

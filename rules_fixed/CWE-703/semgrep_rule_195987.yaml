@@ -1,0 +1,14 @@
+rules:
+  - id: cve-2022-32200-buffer-overread
+    message: "Potential heap-based buffer over-read in _dwarf_check_string_valid due to missing bounds check before strlen."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          strlen((char *) $PTR)
+      - pattern: |
+          pubnames_like_ptr + strlen((char *) pubnames_like_ptr) + 1
+    metavariable-pattern:
+      metavariable: $PTR
+      pattern-not: |
+          _dwarf_check_string_valid(..., $PTR, ..., $END_PTR, ...)

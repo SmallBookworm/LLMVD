@@ -1,0 +1,13 @@
+rules:
+  - id: h263_missing_image_size_check
+    message: "Missing call to av_image_check_size() before using width and height, which may lead to divide-by-zero (CVE-2015-5479, CWE-189)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      s->mb_width = (s->width + 15) / 16;
+      s->mb_height = (s->height + 15) / 16;
+    pattern-not: |
+      av_image_check_size(s->width, s->height, ...);
+      ...
+      s->mb_width = (s->width + 15) / 16;
+      s->mb_height = (s->height + 15) / 16;

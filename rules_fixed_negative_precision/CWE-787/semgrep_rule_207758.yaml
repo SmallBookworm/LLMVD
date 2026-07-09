@@ -1,0 +1,18 @@
+rules:
+  - id: buffer-overflow-getnumwrongdata
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while (*(curPtr + $COUNT) != *(curPtr + $COUNT + 1) && $MAXNUM > $COUNT) {
+                  ...
+              }
+          - pattern: |
+              while (*($CURPTR + $COUNT) != *($CURPTR + $COUNT + 1) && $MAXNUM > $COUNT) {
+                  ...
+              }
+    message: "Buffer overflow vulnerability due to incorrect bounds check order in GetNumWrongData. Condition should check bounds before dereferencing."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2020-16296"

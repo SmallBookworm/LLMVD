@@ -1,0 +1,21 @@
+rules:
+  - id: postgresql-integer-overflow-cve-2014-0064
+    message: |
+      Integer overflow possible in allocation size calculation. 
+      Missing check against MaxAllocSize before multiplication may lead to buffer overflow.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $TYPE * $VAR = palloc(sizeof($TYPE) * $COUNT);
+          - pattern: |
+              palloc(sizeof($TYPE) * $COUNT);
+    metavariable-regex:
+      metavariable: $COUNT
+      regex: '^[a-zA-Z_][a-zA-Z0-9_]*$'
+    pattern-not-inside: |
+      if ($COUNT > MaxAllocSize / sizeof($TYPE))
+          ereport(...);
+      ...
+      palloc(sizeof($TYPE) * $COUNT);

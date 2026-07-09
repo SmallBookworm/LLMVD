@@ -1,0 +1,41 @@
+rules:
+  - id: systemd-missing-restrictsuidsgid
+    message: "Systemd service uses DynamicUser without RestrictSUIDSGID, which may allow privilege escalation via SUID/SGID binaries after service termination."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              static const struct bus_properties_map $MAP[] = {
+                $HEAD,
+                { "DynamicUser", "b", $A, $B },
+                $TAIL,
+                {}
+              };
+          - pattern: |
+              static const struct bus_properties_map $MAP[] = {
+                $HEAD,
+                { "DynamicUser", "b", $A, $B },
+                $MIDDLE,
+                { "RestrictSUIDSGID", "b", $C, $D },
+                $TAIL,
+                {}
+              };
+      - pattern-not: |
+          static const struct bus_properties_map $MAP[] = {
+            $HEAD,
+            { "DynamicUser", "b", $A, $B },
+            $MIDDLE,
+            { "RestrictSUIDSGID", "b", $C, $D },
+            $TAIL,
+            {}
+          };
+    metavariable-regex:
+      metavariable: $HEAD
+      regex: ".*"
+    metavariable-regex:
+      metavariable: $MIDDLE
+      regex: ".*"
+    metavariable-regex:
+      metavariable: $TAIL
+      regex: ".*"

@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2014-7903-buffer-overflow-condition
+    message: "Potential buffer overflow due to incorrect scroll offset comparison condition (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while ($WAIT_UNTIL_SCROLLED &&
+                     $FRAME_WATCHER->LastMetadata().root_scroll_offset.y() <= 0) {
+                ...
+              }
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2014-7903"

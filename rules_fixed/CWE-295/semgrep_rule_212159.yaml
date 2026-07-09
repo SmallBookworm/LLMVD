@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2018-8050-missing-pagesize-check
+    message: Missing sanity check on af->image_pagesize before malloc may lead to denial of service via corrupt AFF image.
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      malloc(af->image_pagesize)
+    pattern-not-inside: |
+      if (af->image_pagesize <= 0 || af->image_pagesize > 16*1024*1024)
+        return ...;
+      ...
+      malloc(af->image_pagesize)

@@ -1,0 +1,29 @@
+rules:
+  - id: cve-2017-13187-information-disclosure
+    message: "Potential information disclosure due to missing handling of incomplete previous slices. This may lead to uninitialized memory exposure (CWE-200)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if(slice_address > ps_codec->s_parse.i4_next_ctb_indx)
+          {
+              if(ps_codec->i4_pic_present)
+              {
+                 ... 
+                 ps_codec->i4_slice_error = 1;
+                 ...
+                 return ...;
+              }
+              ...
+          }
+      - pattern: |
+          if((!first_slice_in_pic_flag) &&
+             (0 == ps_codec->i4_pic_present))
+          {
+              ...
+              ps_codec->i4_slice_error = 1;
+              ...
+          }
+    metavariable-regex:
+      metavariable: $...
+      regex: ".*"

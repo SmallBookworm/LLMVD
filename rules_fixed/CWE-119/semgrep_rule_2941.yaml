@@ -1,0 +1,37 @@
+rules:
+  - id: cve-2017-6890-buffer-overflow
+    message: "Potential stack-based buffer overflow in foveon_load_camf due to missing bounds check on 'wide' and 'high' before memory allocation."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              void CLASS foveon_load_camf(...) {
+                ...
+                unsigned type, wide, high, ...;
+                ...
+                wide = get4();
+                high = get4();
+                ...
+                if (type == 4) {
+                  ...
+                  meta_data = (char *) malloc(wide*high*3/2);
+                  ...
+                }
+              }
+          - pattern: |
+              void CLASS foveon_load_camf(...) {
+                ...
+                unsigned ..., wide, high, ...;
+                ...
+                wide = get4();
+                high = get4();
+                ...
+                meta_data = (char *) malloc(wide*high*3/2);
+                ...
+              }
+    metavariable-regex:
+      - metavariable: $FUNC
+        regex: "foveon_load_camf"
+    fix-regex:
+      enabled: false

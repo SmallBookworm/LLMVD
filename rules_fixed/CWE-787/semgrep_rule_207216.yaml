@@ -1,0 +1,32 @@
+rules:
+  - id: integer-overflow-in-remap-struct
+    message: Integer overflow possible in remap_struct due to missing overflow check before multiplication.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (d) {
+            ...
+            $X * $ALIGN_WIDTH
+            ...
+          }
+      - pattern: |
+          if (d) {
+            ...
+            if (($X * $ALIGN_WIDTH >= ...) || ...)
+          }
+    pattern-not-inside: |
+      if (d) {
+        ...
+        if ($X * $ALIGN_WIDTH < $X)
+          return -1;
+        ...
+      }
+    metavariable-patterns:
+      - metavariable: $X
+        pattern: ftypes_nr[...]
+      - metavariable: $ALIGN_WIDTH
+        pattern-either:
+          - pattern: ULL_ALIGNMENT_WIDTH
+          - pattern: UL_ALIGNMENT_WIDTH
+          - pattern: U_ALIGNMENT_WIDTH

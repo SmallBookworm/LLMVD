@@ -1,0 +1,20 @@
+rules:
+  - id: imagemagick-jng-writeblob-null-check
+    message: "Missing null check before WriteBlob call may lead to assertion failure (CVE-2017-9142)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (...)
+                (void) WriteBlob(..., length, chunk);
+          - pattern: |
+              (void) WriteBlob(..., length, chunk);
+    metavariable-pattern:
+      metavariable: chunk
+      pattern-not: |
+        if (length != 0)
+          (void) WriteBlob(..., length, chunk);
+    fix-regex:
+      regex: ""
+      replacement: ""

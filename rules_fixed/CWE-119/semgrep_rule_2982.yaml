@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2017-6194-buffer-overflow
+    message: "Heap-based buffer overflow due to incorrect struct size used in calloc. This may lead to OOB write (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          calloc (1, $N * sizeof (ut32))
+      - pattern: |
+          calloc (1, $AMOUNT + 1)
+    metavariable-pattern:
+      metavariable: $N
+      pattern-not: 0
+    fixes:
+      - regex: {}
+    fix-regex:
+      enabled: false

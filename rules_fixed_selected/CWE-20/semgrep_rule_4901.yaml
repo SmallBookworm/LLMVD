@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2011-2785-homepage-url-validation
+    message: "Homepage URL validation is insufficient; only http/https schemes should be allowed (CVE-2011-2785)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!homepage_url_.is_valid()) {
+            ...
+          }
+      - pattern: |
+          if (!homepage_url_.is_valid() || ...) {
+            ...
+          }
+    metavariable-pattern:
+      metavariable: homepage_url_
+      pattern: GURL(...)
+    pattern-not-inside: |
+      if (!homepage_url_.is_valid() ||
+          (!homepage_url_.SchemeIs("http") &&
+           !homepage_url_.SchemeIs("https"))) {
+        ...
+      }

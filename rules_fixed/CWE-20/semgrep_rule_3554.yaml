@@ -1,0 +1,15 @@
+rules:
+  - id: unchecked-fputc
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while (($$...c = $READ(...)) != EOF) {
+                (void) fputc($$...c, $FILE);
+              }
+          - pattern: |
+              while (($$...c = $READ(...)) != EOF) {
+                fputc($$...c, $FILE);
+              }
+    message: "fputc return value is not checked, which may lead to silent write failures and potential denial of service (CWE-20)."
+    severity: WARNING
+    languages: [c]

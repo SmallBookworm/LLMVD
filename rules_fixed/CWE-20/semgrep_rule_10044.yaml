@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2018-6089-missing-service-worker-mode
+    message: "Missing ServiceWorkerMode::kNone setting on WebURLRequest may lead to cross-origin data leak via Service Worker redirection (CVE-2018-6089)."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      blink::WebURLRequest $REQUEST($URL);
+      ...
+      $REQUEST.SetRequestContext(blink::WebURLRequest::kRequestContextObject);
+      ...
+      not $REQUEST.SetServiceWorkerMode(...)

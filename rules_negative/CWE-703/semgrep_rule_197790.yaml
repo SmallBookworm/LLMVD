@@ -1,0 +1,15 @@
+rules:
+  - id: upx-cve-2020-27787
+    message: "Missing null check for DT_SYMTAB before use may lead to segmentation fault (CVE-2020-27787)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          unsigned const v_sym = get_te32(&dynp0[-1+ x_sym].d_val);
+      - pattern: |
+          unsigned const v_sym = get_te32(&dynp0[-1+ x_sym].d_val);
+    metavariable-regex:
+      metavariable: $x_sym
+      regex: "x_sym"
+    pattern-not: |
+      unsigned const v_sym = !x_sym ? 0 : get_te32(&dynp0[-1+ x_sym].d_val);

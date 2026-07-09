@@ -1,0 +1,15 @@
+rules:
+  - id: cve-2021-29613-ctcloss-oob-read
+    message: "Missing validation for max_time (first dimension of inputs) being zero in CTCLoss can lead to OOB read (CVE-2021-29613, CWE-665)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      OP_REQUIRES(ctx, inputs->shape().dims() == 3, ...);
+      ...
+      const int64 max_time = inputs_shape.dim_size(0);
+      const int64 batch_size = inputs_shape.dim_size(1);
+      ...
+      OP_REQUIRES(ctx, batch_size != 0, ...);
+    pattern-not: |
+      const int64 max_time = inputs_shape.dim_size(0);
+      OP_REQUIRES(ctx, max_time != 0, ...);

@@ -1,0 +1,15 @@
+rules:
+  - id: use-after-free-get_netnsid_from_name
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (tb[NETNSA_NSID]) {
+                  free(answer);
+                  return rta_getattr_u32(tb[NETNSA_NSID]);
+              }
+    message: "Use-after-free vulnerability: 'answer' is freed before accessing tb[NETNSA_NSID], which points into the freed memory."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-416"
+      cve: "CVE-2019-20795"

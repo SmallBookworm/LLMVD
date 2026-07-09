@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2012-3236-null-deref-xtension
+    message: "NULL pointer dereference when handling malformed XTENSION header in FITS file. Missing NULL check after fits_decode_card."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (hdulist->used.xtension)
+      {
+        fdat = fits_decode_card (fits_search_card (hdr, "XTENSION"), typ_fstring);
+        strcpy (hdulist->xtension, fdat->fstring);
+      }

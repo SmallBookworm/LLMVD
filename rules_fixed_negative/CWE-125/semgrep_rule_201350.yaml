@@ -1,0 +1,17 @@
+rules:
+  - id: cwe-125-iscsi-buffer-overread
+    message: "Heap-based buffer over-read in iscsi_aio_ioctl_cb due to using max instead of min for memcpy length. This may disclose unrelated process memory."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $SS = ($ACB->ioh->mx_sb_len >= $ACB->ioh->sb_len_wr) ?
+                $ACB->ioh->mx_sb_len : $ACB->ioh->sb_len_wr;
+          memcpy($ACB->ioh->sbp, &$ACB->task->datain.data[2], $SS);
+      - pattern: |
+          $SS = ($ACB->ioh->sb_len_wr <= $ACB->ioh->mx_sb_len) ?
+                $ACB->ioh->mx_sb_len : $ACB->ioh->sb_len_wr;
+          memcpy($ACB->ioh->sbp, &$ACB->task->datain.data[2], $SS);
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2020-11947"

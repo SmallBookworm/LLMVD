@@ -1,0 +1,21 @@
+rules:
+  - id: lha_negative_compsize_check_missing
+    patterns:
+      - pattern-either:
+          - pattern: |
+              lha->compsize = ...;
+              ...
+              lha->compsize -= ...;
+              ...
+              if (sum_calculated != headersum) { ... }
+          - pattern: |
+              lha->compsize = ...;
+              ...
+              lha->compsize -= ...;
+              if (sum_calculated != headersum) { ... }
+    pattern-not: |
+      if (lha->compsize < 0)
+        goto invalid;
+    message: "Missing check for negative lha->compsize may lead to out-of-bounds read (CWE-125, CVE-2017-5601)"
+    severity: ERROR
+    languages: [c]

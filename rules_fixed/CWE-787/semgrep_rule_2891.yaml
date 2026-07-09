@@ -1,0 +1,17 @@
+rules:
+  - id: ffmpeg_decode_zbuf_buffer_overflow
+    message: "Potential out-of-bounds write due to insufficient buffer size in decode_zbuf. Buffer must be at least 2 bytes and avail_out should be buf_size - 1."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          av_bprint_get_buffer(bp, 1, &buf, &buf_size);
+          ...
+          zstream.avail_out = buf_size;
+      - pattern: |
+          av_bprint_get_buffer(bp, 1, &buf, &buf_size);
+          ...
+          if (!buf_size) { ... }
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2017-7866"

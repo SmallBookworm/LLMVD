@@ -1,0 +1,18 @@
+rules:
+  - id: imagemagick-cloneimage-assertion-failure
+    message: "Potential assertion failure in CloneImage leading to denial of service (CVE-2017-9501, CWE-617)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (clone_image->colormap == (PixelPacket *) NULL)
+            {
+              clone_image=DestroyImage(clone_image);
+              ThrowImageException(...);
+            }
+      - pattern: |
+          if (clone_image->colormap == (PixelPacket *) NULL)
+            {
+              clone_image = DestroyImage(clone_image);
+              ThrowImageException(...);
+            }

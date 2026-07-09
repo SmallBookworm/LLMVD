@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2013-0890-buffer-index-overflow
+    message: "Potential buffer overflow due to unsafe cast from int to size_t when indexing into unsafe_resources_."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              int element_index = ...;
+              ...
+              if (element_index >= static_cast<int>(unsafe_resources_.size())) { ... }
+          - pattern: |
+              int $VAR = ...;
+              ...
+              if ($VAR >= static_cast<int>($CONTAINER.size())) { ... }
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2013-0890"

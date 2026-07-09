@@ -1,0 +1,41 @@
+rules:
+  - id: cve-2015-5291-buffer-overflow
+    message: |
+      Heap-based buffer overflow vulnerability in ssl_set_hostname due to missing hostname length validation.
+      This can lead to denial of service or arbitrary code execution via a long hostname in the SNI extension.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              int ssl_set_hostname(..., const char *hostname)
+              {
+                  ...
+                  ssl->hostname_len = strlen(hostname);
+                  ...
+                  if (ssl->hostname_len + 1 == 0) { ... }
+                  ...
+                  ssl->hostname = polarssl_malloc(ssl->hostname_len + 1);
+                  ...
+              }
+          - pattern: |
+              int ssl_set_hostname(..., const char *hostname)
+              {
+                  ...
+                  ssl->hostname_len = strlen(hostname);
+                  ...
+                  if (ssl->hostname_len + 1 == 0) return ...;
+                  ...
+                  ssl->hostname = polarssl_malloc(ssl->hostname_len + 1);
+                  ...
+              }
+    metavariable-regex:
+      metavariable: $FUNC
+      regex: ssl_set_hostname
+    pattern-not: |
+      int ssl_set_hostname(..., const char *hostname)
+      {
+          ...
+          if (ssl->hostname_len > SSL_MAX_HOST_NAME_LEN) { ... }
+          ...
+      }

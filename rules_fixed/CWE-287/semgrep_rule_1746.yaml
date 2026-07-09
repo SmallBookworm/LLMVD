@@ -1,0 +1,36 @@
+rules:
+  - id: cve-2016-7141-nss-client-cert-hijack
+    message: "Missing check for previously loaded PEM certificate may allow TLS authentication hijacking (CVE-2016-7141)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (SECSuccess != NSS_GetClientAuthData(..., $pRetCert, ...) || NULL == *$pRetCert) {
+                ...
+                return SECFailure;
+              }
+              ...
+              $nickname = (*$pRetCert)->nickname;
+              if (NULL == $nickname)
+                $nickname = "[unknown]";
+              if (NULL == *$pRetKey) {
+                ...
+                return SECFailure;
+              }
+          - pattern: |
+              if (SECSuccess != NSS_GetClientAuthData(..., $pRetCert, ...) || NULL == *$pRetCert) {
+                ...
+                return SECFailure;
+              }
+              ...
+              $nickname = (*$pRetCert)->nickname;
+              if (NULL == $nickname)
+                $nickname = "[unknown]";
+              infof(...);
+    metavariable-regex:
+      metavariable: $nickname
+      regex: .*nickname.*
+    fix-regex:
+      regex: ""
+      replacement: ""

@@ -1,0 +1,11 @@
+rules:
+  - id: cwe-362-sock-close-race-condition
+    patterns:
+      - pattern: |
+          sock_release(SOCKET_I(...));
+    message: "Potential race condition between sock_close() and sockfs_setattr() due to missing inode reference handling. Use __sock_release() with inode parameter instead."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-362"
+      cve: "CVE-2018-12232"

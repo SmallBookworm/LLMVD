@@ -1,0 +1,11 @@
+rules:
+  - id: cwe-200-ptrval-leak
+    message: "Potential information leak via '(ptrval)' in debug output before CRNG initialization. Use fixed format with underscores to avoid exposing address information."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern: |
+          string(..., "(ptrval)", ...)
+    metadata:
+      cwe: ["CWE-200"]
+      cve: "CVE-2018-20449"

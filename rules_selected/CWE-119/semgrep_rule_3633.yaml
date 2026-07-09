@@ -1,0 +1,16 @@
+rules:
+  - id: mutt_imap_buffer_overflow
+    message: "Stack-based buffer overflow possible due to missing bounds check when parsing INTERNALDATE or RFC822.SIZE fields."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while (*s && *s != '\"')
+                *ptmp++ = *s++;
+          - pattern: |
+              while (isdigit((unsigned char) *s))
+                *ptmp++ = *s++;
+    metavariable-regex:
+      metavariable: ptmp
+      regex: tmp

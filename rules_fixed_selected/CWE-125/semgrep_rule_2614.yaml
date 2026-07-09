@@ -1,0 +1,8 @@
+rules:
+  - id: cve-2017-12988-telnet-buffer-overread
+    message: Missing bounds check before dereferencing pointer 'p' may lead to buffer over-read (CWE-125).
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (*p != IAC)
+        goto pktend;

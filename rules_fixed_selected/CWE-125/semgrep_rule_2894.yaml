@@ -1,0 +1,17 @@
+rules:
+  - id: cwe-125-buffer-overread-consume-init-expr
+    patterns:
+      - pattern-either:
+          - pattern: |
+              while ($BUF + $I < $MAX && $BUF[$I] != $EOC) {
+                  ...
+              }
+              if ($BUF[$I] != $EOC) {
+                  ...
+              }
+    message: "Potential heap-based buffer over-read (CWE-125). The loop condition ensures $BUF + $I < $MAX, but the subsequent access $BUF[$I] may be out-of-bounds if the loop exits because $BUF + $I >= $MAX."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2017-7854"

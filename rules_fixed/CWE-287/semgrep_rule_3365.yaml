@@ -1,0 +1,35 @@
+rules:
+  - id: cve-2016-7144-unrealircd-sasl-authenticate-validation
+    message: Missing validation of AUTHENTICATE parameter allows certificate fingerprint spoofing (CVE-2016-7144).
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          if (((parv[1])[0] == ':') || strchr(parv[1], ' '))
+          {
+              ...
+              return 0;
+          }
+      - pattern-inside: |
+          CMD_FUNC(m_authenticate)
+          {
+              ...
+              if (!SASL_SERVER || !MyConnect(sptr) || BadPtr(parv[1]) || !CHECKPROTO(sptr, PROTO_SASL))
+                  return 0;
+              ...
+              if (sptr->local->sasl_complete)
+              {
+                  ...
+                  return 0;
+              }
+              ...
+              if (strlen(parv[1]) > 400)
+              {
+                  ...
+                  return 0;
+              }
+              ...
+          }
+    metadata:
+      cwe: ["CWE-287"]
+      cve: "CVE-2016-7144"

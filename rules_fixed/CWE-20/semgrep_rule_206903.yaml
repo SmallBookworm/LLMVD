@@ -1,0 +1,12 @@
+rules:
+  - id: cwe-20-unix-socket-null-byte
+    message: "UNIX socket path is not validated for null bytes, which may lead to connection to an unintended socket (CWE-20)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      rsock_init_unixsock(..., VALUE path, ...)
+      {
+        ...
+        SafeStringValue(path);
+        ...
+      }

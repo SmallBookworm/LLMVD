@@ -1,0 +1,7 @@
+rules:
+  - id: openexr-b44compressor-buffer-overflow
+    message: "Potential buffer overflow due to incorrect buffer size calculation in B44Compressor. This may lead to memory exhaustion (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      new unsigned short [checkArraySize (uiMult (maxScanLineSize, numScanLines), sizeof (unsigned short))]

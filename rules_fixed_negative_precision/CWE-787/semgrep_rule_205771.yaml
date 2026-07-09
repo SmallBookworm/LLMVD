@@ -1,0 +1,11 @@
+rules:
+  - id: cwe-787-stack-buffer-overflow-gps-tracker
+    patterns:
+      - pattern: |
+          recv($SOCK, $BUF + $POS, sizeof($BUF) - 1, 0)
+    message: "Potential stack-based buffer overflow due to unsafe recv() call. The third argument should be 'sizeof($BUF) - $POS - 1' to prevent writing beyond buffer boundaries."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-787"
+      cve: "CVE-2014-8321"

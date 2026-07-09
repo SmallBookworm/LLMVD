@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2011-1758-sssd-krb5-password-caching
+    message: "Password caching during SSS_CMD_RENEW uses credential cache path as password, leading to authentication bypass (CVE-2011-1758)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          switch (pd->cmd) {
+            case SSS_CMD_RENEw:
+              $PASSWORD = ...;
+              ...
+          }
+      - pattern: |
+          switch (pd->cmd) {
+            case SSS_CMD_RENEW:
+              ... memcpy($PASSWORD, pd->authtok, ...);
+              ...
+          }
+    metavariable-pattern:
+      metavariable: $PASSWORD
+      pattern: "password"

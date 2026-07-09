@@ -1,0 +1,28 @@
+rules:
+  - id: sctp_auth_capability_check_missing
+    message: Missing validation of auth_enable and auth_capable before calling sctp_sf_authenticate, which may lead to NULL pointer dereference (CVE-2014-0101).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (chunk->auth_chunk) {
+            ...
+            $RET = sctp_sf_authenticate(...);
+            ...
+          }
+      - pattern: |
+          if (chunk->auth_chunk) {
+            ...
+            sctp_sf_authenticate(...);
+            ...
+          }
+    pattern-not-inside: |
+      if (chunk->auth_chunk) {
+        ...
+        if (!net->sctp.auth_enable || !new_asoc->peer.auth_capable) {
+          ...
+        }
+        ...
+        sctp_sf_authenticate(...);
+        ...
+      }

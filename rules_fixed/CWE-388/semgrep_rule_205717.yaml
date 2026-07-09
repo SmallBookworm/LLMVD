@@ -1,0 +1,14 @@
+rules:
+  - id: efi_call_phys_prolog_missing_null_check
+    message: "Missing null check for return value of efi_call_phys_prolog(), which may lead to use of incomplete page tables."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      $PGD = efi_call_phys_prolog();
+      ...
+      efi_call_phys_epilog($PGD);
+    pattern-not: |
+      $PGD = efi_call_phys_prolog();
+      if (!$PGD) { ... }
+      ...
+      efi_call_phys_epilog($PGD);

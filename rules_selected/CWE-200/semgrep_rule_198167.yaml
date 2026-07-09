@@ -1,0 +1,11 @@
+rules:
+  - id: mongodb_dbshell_insecure_permissions
+    patterns:
+      - pattern: |
+          fopen($FILENAME, "wt")
+    message: "File created with world-readable permissions. Use open() with explicit secure permissions (e.g., S_IRUSR | S_IWUSR) to avoid exposing sensitive history data."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2016-6494"

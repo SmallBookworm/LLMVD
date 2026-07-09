@@ -1,0 +1,16 @@
+rules:
+  - id: qemu-parallels-catalog-size-integer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $CATALOG_SIZE = le32_to_cpu($PH.catalog_entries);
+              $CATALOG_BITMAP = g_malloc($CATALOG_SIZE * 4);
+          - pattern: |
+              $CATALOG_SIZE = le32_to_cpu($PH->catalog_entries);
+              $CATALOG_BITMAP = g_malloc($CATALOG_SIZE * 4);
+    message: "Integer overflow possible when multiplying catalog_size by 4 without bounds check. This may lead to undersized allocation and out-of-bounds access (CVE-2014-0143)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-190"
+      confidence: HIGH

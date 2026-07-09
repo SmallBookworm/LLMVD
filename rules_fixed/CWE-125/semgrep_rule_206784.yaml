@@ -1,0 +1,24 @@
+rules:
+  - id: cwe-125-out-of-bounds-read-bplist
+    message: |
+      Possible out-of-bounds heap read in parse_array_node due to missing bounds check
+      on the pointer before reading reference data. This can lead to denial of service.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (...; ...; ...) {
+                  ...
+                  $index1 = UINT_TO_HOST(($bnode) + $str_j, $ref_size);
+                  ...
+              }
+          - pattern: |
+              for (...; ...; ...) {
+                  ...
+                  $str_j = $j * $bplist->ref_size;
+                  $index1 = UINT_TO_HOST(($bnode) + $str_j, $bplist->ref_size);
+                  ...
+              }
+    metavariable-pattern:
+      $index1: "uint32_t"

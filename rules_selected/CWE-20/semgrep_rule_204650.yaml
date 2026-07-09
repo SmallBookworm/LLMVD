@@ -1,0 +1,20 @@
+rules:
+  - id: squid-uri-path-validation
+    message: "Missing leading slash in URI path may lead to HTTP Request Smuggling (CVE-2020-25097)"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (*src == '?' || *src == '#' || *src == '\0') {
+              $PATH[0] = '/';
+              ...
+          }
+      - pattern: |
+          if (*src != '/') {
+              // path-empty, including the end of the `src` c-string cases
+              $PATH[0] = '/';
+              ...
+          }
+    metavariable-pattern:
+      metavariable: $PATH
+      pattern: urlpath

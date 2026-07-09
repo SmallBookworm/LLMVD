@@ -1,0 +1,30 @@
+rules:
+  - id: mongodb-renamecollectionforapplyops-missing-namespace-validation
+    message: "Missing validation of target namespace format in renameCollectionForApplyOps may lead to denial of service (CVE-2018-20804, CWE-20)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          NamespaceString targetNss = NamespaceString(...);
+          ...
+          if ((...->getReplicationMode() == ...::modeNone) && targetNss.isOplog()) {
+            ...
+          }
+          ...
+          OptionalCollectionUUID targetUUID;
+      - pattern: |
+          NamespaceString targetNss = NamespaceString(...);
+          ...
+          // If the UUID we're targeting already exists, rename from there no matter what.
+          if (!uiNss.isEmpty()) {
+            sourceNss = uiNss;
+          }
+          ...
+          OptionalCollectionUUID targetUUID;
+    pattern-not: |
+      NamespaceString targetNss = NamespaceString(...);
+      ...
+      auto targetStatus = userAllowedWriteNS(targetNss);
+      if (!targetStatus.isOK()) {
+        ...
+      }

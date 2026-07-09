@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2015-2697-strdup-realm
+    message: "Use of strdup() on realm input may cause out-of-bounds read due to null-byte handling. Use k5memdup0() with explicit length instead."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              strdup($REALM)
+    metavariable-pattern:
+      metavariable: $REALM
+      pattern-inside: |
+        build_principal_va(..., const char *$REALM, ...)

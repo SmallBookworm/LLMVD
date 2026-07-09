@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2014-0038-recvmmsg-timeout-cast
+    message: "Unsafe cast of user-provided timeout pointer to kernel pointer in compat_sys_recvmmsg may lead to privilege escalation (CVE-2014-0038)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (COMPAT_USE_64BIT_TIME)
+              return __sys_recvmmsg(..., (struct timespec *) $TIMEOUT);
+    metavariable-pattern:
+      $TIMEOUT: "struct compat_timespec __user *"

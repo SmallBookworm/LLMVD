@@ -1,0 +1,20 @@
+rules:
+  - id: null_pointer_dereference_acl_parser
+    message: "NULL pointer dereference in ACL parser due to missing zero-length field check before dereferencing field[n].start"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          switch (*$FIELD_START) {
+            ...
+          }
+      - pattern: |
+          $S = $FIELD.start;
+          ...;
+          switch (*$S) {
+            ...
+          }
+    metavariable-pattern:
+      metavariable: $FIELD_START
+      pattern: field[$N].start
+    focus-metavariable: $FIELD_START

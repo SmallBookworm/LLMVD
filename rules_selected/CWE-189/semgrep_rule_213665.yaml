@@ -1,0 +1,17 @@
+rules:
+  - id: clamav-recursion-level-crash
+    message: "Missing recursion level tracking in bytecode engine may lead to denial of service (CVE-2011-3627, CWE-189)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          cli_magic_scandesc($FD, $CCTX);
+      - pattern: |
+          res = cli_magic_scandesc($FD, $CCTX);
+    metavariable-pattern:
+      metavariable: $CCTX
+      pattern: $CCTX
+    pattern-not-inside: |
+      $CCTX->recursion++;
+      ... cli_magic_scandesc($FD, $CCTX);
+      ... $CCTX->recursion--;

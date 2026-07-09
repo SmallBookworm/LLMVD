@@ -1,0 +1,21 @@
+rules:
+  - id: tensorflow-tensorsummaryv2-missing-scalar-check
+    message: "Missing validation that 'serialized_summary_metadata' input is a scalar, which may lead to denial of service via CHECK-failure."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              void Compute(OpKernelContext* c) override {
+                ...
+                const Tensor& serialized_summary_metadata_tensor = c->input(2);
+                ...
+                ParseFromTString(serialized_summary_metadata_tensor.scalar<tstring>()(), ...);
+                ...
+              }
+          - pattern-regex: \\.scalar<tstring>\\(\\)\\(\\)
+    pattern-not: |
+      OP_REQUIRES(
+          c,
+          TensorShapeUtils::IsScalar(serialized_summary_metadata_tensor.shape()),
+          errors::InvalidArgument(...));

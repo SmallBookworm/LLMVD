@@ -1,0 +1,22 @@
+rules:
+  - id: android_softmp3_output_buffer_size_check_missing
+    message: Missing validation of output buffer size against allocated memory, which may lead to buffer overflow (CVE-2016-2486).
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              mConfig->outputFrameSize = ...;
+              ...
+              mConfig->pOutputBuffer = reinterpret_cast<int16_t *>(outHeader->pBuffer);
+          - pattern: |
+              mConfig->outputFrameSize = ...;
+              ...
+              mConfig->pOutputBuffer = (int16_t *)(outHeader->pBuffer);
+    metavariable-pattern:
+      mConfig: { type: "MP3DecConfig *" }
+    pattern-not-inside: |
+      if ((int32)outHeader->nAllocLen < mConfig->outputFrameSize) {
+          ...
+          return;
+      }

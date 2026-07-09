@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2017-11142-unbounded-post-var-scanning
+    message: "Unbounded scanning of POST variables may lead to CPU exhaustion (CVE-2017-11142, CWE-400). Missing 'already_scanned' tracking can cause repeated processing of large inputs."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!vsep) {
+                  if (!eof) {
+                      return 0;
+                  }
+              }
+          - pattern: |
+              vsep = memchr(var->ptr, '&', var->end - var->ptr);
+    metavariable-pattern:
+      metavariable: $VAR
+      pattern: var

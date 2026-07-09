@@ -1,0 +1,20 @@
+rules:
+  - id: abrt-path-overflow-cve-2015-3315
+    message: |
+      Potential buffer overflow in path construction for ABRT coredump directory.
+      This may lead to symlink attacks allowing local users to read or modify arbitrary files.
+      Ensure snprintf return value is checked to prevent path truncation.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              snprintf($PATH, sizeof($PATH), "%s/%s-coredump", $LOC, $NAME);
+          - pattern: |
+              unsigned $LEN = snprintf($PATH, sizeof($PATH), "%s/ccpp-%s-%lu.new", $LOC, $DATE, $PID);
+              if ($LEN >= (sizeof($PATH) - sizeof("/"FILENAME_COREDUMP)))
+              {
+                  goto create_user_core;
+              }
+    metadata:
+      cwe: "CWE-59"

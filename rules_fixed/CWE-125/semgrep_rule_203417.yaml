@@ -1,0 +1,9 @@
+rules:
+  - id: cwe-125-out-of-bounds-read-typed-ast
+    message: "Potential out-of-bounds read due to missing bounds check before accessing CHILD(n, i)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (i < NCH(n) && TYPE(CHILD(n, i)) == COMMA)
+    pattern-not: |
+      if (TYPE(CHILD(n, i)) == COMMA)

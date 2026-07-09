@@ -1,0 +1,52 @@
+rules:
+  - id: imagemagick-cve-2017-12418-memory-leak
+    message: "Missing memory deallocation on error path may cause memory leak (CWE-772)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ($COND)
+            return $RET;
+      - pattern: |
+          if ($COND)
+            {
+              ... 
+              return $RET;
+            }
+    metavariable-pattern:
+      metavariable: $RET
+      pattern-either:
+        - pattern: -1
+        - pattern: 0
+    focus-metavariable: $RET
+    pattern-inside: |
+      static int format8BIM(...) {
+        ...
+        $TYPE *$PTR = (unsigned char *) AcquireQuantumMemory(...);
+        if ($PTR == (unsigned char *) NULL)
+          {
+            ...
+            return ...;
+          }
+        ...
+        if ($COND)
+          return ...;
+        ...
+      }
+    pattern-not-inside: |
+      static int format8BIM(...) {
+        ...
+        $TYPE *$PTR = (unsigned char *) AcquireQuantumMemory(...);
+        if ($PTR == (unsigned char *) NULL)
+          {
+            ...
+            return ...;
+          }
+        ...
+        if ($COND)
+          {
+            $PTR = (unsigned char *) RelinquishMagickMemory($PTR);
+            return ...;
+          }
+        ...
+      }

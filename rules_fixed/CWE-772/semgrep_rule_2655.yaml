@@ -1,0 +1,15 @@
+rules:
+  - id: imagemagick-pdf-memory-leak-cve-2017-12662
+    message: "Memory leak in WritePDFImage due to missing deallocation of 'xref' on error paths."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ($MEM_INFO == (MemoryInfo *) NULL)
+            ThrowWriterException($ERROR, $MESSAGE);
+      - pattern: |
+          if ($XREF == (MagickOffsetType *) NULL)
+            ThrowWriterException($ERROR, $MESSAGE);
+    fix-regex:
+      regex: 'ThrowWriterException\([^;]+\);'
+      replacement: 'xref=(MagickOffsetType *) RelinquishMagickMemory(xref);\n    ThrowWriterException($ERROR, $MESSAGE);'

@@ -1,0 +1,14 @@
+rules:
+  - id: imagemagick-intensity-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              (ssize_t) PixelPacketIntensity(...)
+          - pattern: |
+              (ssize_t) PixelPacketIntensity($X)
+    message: "PixelPacketIntensity() may return an overflowed value. Use ConstrainPixelIntensity() to ensure safe bounds."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-190"
+      cve: "CVE-2020-27754"

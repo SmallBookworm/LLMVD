@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2017-11473-buffer-overflow
+    message: "Missing bounds check on 'bus_irq' before using it as an index into 'isa_irq_to_gsi', which may lead to buffer overflow (CWE-120)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              isa_irq_to_gsi[bus_irq] = $VAL;
+          - pattern-inside: |
+              ... 
+              isa_irq_to_gsi[bus_irq] ...
+    pattern-not-inside: |
+      if (bus_irq >= NR_IRQS_LEGACY) {
+        ...
+        return;
+      }
+      ...
+    metavariable-regex:
+      metavariable: bus_irq
+      regex: bus_irq

@@ -1,0 +1,20 @@
+rules:
+  - id: gdimage_crop_invalid_color_index
+    message: "Missing validation of color index may lead to denial of service via invalid color index (CVE-2016-6128)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (threshold > 100.0) {
+        return NULL;
+      }
+      ... 
+      gdColorMatch($..., color, $...)
+    pattern-not: |
+      if (threshold > 100.0) {
+        return NULL;
+      }
+      if (color < 0 || (!gdImageTrueColor($...) && color >= gdImageColorsTotal($...))) {
+        return NULL;
+      }
+      ... 
+      gdColorMatch($..., color, $...)

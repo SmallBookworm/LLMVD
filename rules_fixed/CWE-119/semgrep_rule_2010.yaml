@@ -1,0 +1,13 @@
+rules:
+  - id: imagemagick-draw-dash-buffer-overflow
+    pattern: |
+      for ($I = 1; ($I < $NUMBER_VERTICES) && (...); ...)
+    where-metavariable-regex:
+      metavariable: $NUMBER_VERTICES
+      regex: ^number_vertices$
+    message: "Potential buffer overflow due to missing cast of 'number_vertices' to signed type in loop condition. This may lead to integer underflow or out-of-bounds access (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: ["CWE-119"]
+      cve: "CVE-2016-4564"

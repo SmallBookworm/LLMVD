@@ -1,0 +1,8 @@
+rules:
+  - id: kerberos_missing_kdc_verification
+    patterns:
+      - pattern: |
+          authenticate_user_krb5pwd($USER, $PSWD, $SERVICE, $REALM)
+    message: "Kerberos authentication without KDC verification is vulnerable to man-in-the-middle attacks (CVE-2015-3206, CWE-287)."
+    severity: WARNING
+    languages: [c]

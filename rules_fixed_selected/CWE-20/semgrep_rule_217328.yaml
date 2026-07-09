@@ -1,0 +1,9 @@
+rules:
+  - id: cbor2json-missing-error-check
+    message: Missing error check after rtCborDecDynUTF8Str may lead to use of uninitialized memory (CVE-2020-24753)
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      ret = rtCborDecDynUTF8Str(...);
+      ...
+      ret = rtJsonEncStringValue(...);

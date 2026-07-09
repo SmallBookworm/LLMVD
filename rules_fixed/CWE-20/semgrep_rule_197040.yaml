@@ -1,0 +1,25 @@
+rules:
+  - id: imagemagick-dds-zero-image-check
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (volume) {
+                num_images = dds_info.depth;
+              }
+              ...
+              for (n = 0; n < num_images; n++) {
+              }
+          - pattern: |
+              if (cubemap) {
+                ...
+                num_images = ...;
+              }
+              ...
+              for (n = 0; n < num_images; n++) {
+              }
+    message: "Missing validation of 'num_images' before loop may lead to invalid image processing (CVE-2017-9141)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2017-9141"

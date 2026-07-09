@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2016-3913-mediaplayerservice-missing-client-validation
+    patterns:
+      - pattern-either:
+          - pattern: |
+              sp<Client> $C = static_cast<Client*>(...);
+              ...
+              $M_NEXT_CLIENT = $C;
+          - pattern: |
+              sp<Client> $C = static_cast<Client*>(...);
+              $M_NEXT_CLIENT = $C;
+    message: "Missing validation of client ownership via mService->hasClient() before assigning mNextClient. This may lead to privilege escalation (CVE-2016-3913)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-264"
+      cve: "CVE-2016-3913"

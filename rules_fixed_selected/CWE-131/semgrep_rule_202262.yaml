@@ -1,0 +1,14 @@
+rules:
+  - id: cwe-131-asn1-bit-len-check
+    patterns:
+      - pattern-either:
+          - pattern: |
+              *$BIT_LEN = $LEN_BYTE * 8 - $DER[$LEN_LEN];
+              if ($STR_SIZE >= $LEN_BYTE) { ... }
+          - pattern: |
+              *$BIT_LEN = $LEN_BYTE * 8 - $DER[$LEN_LEN];
+              if ($STR_SIZE >= $LEN_BYTE)
+                memcpy(...);
+    message: "Missing validation of bit length may lead to out-of-bounds access (CWE-131)."
+    severity: ERROR
+    languages: [c]

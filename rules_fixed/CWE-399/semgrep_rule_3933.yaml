@@ -1,0 +1,33 @@
+rules:
+  - id: xfs_missing_ilock_unlock_on_quota_failure
+    message: "Missing xfs_iunlock call when xfs_qm_vop_chown_reserve fails, leading to a potential DoS (CWE-399, CVE-2019-15538)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (error)
+              goto out_cancel;
+          ...
+          out_cancel:
+          xfs_trans_cancel($TP);
+          ...
+          out_dqrele:
+          ...
+      - pattern: |
+          if (error) /* out of quota */
+              goto out_cancel;
+          ...
+          out_cancel:
+          xfs_trans_cancel($TP);
+          ...
+          out_dqrele:
+          ...
+    metavariable-pattern:
+      $TP: { type: "xfs_trans_t *" }
+    pattern-not-inside: |
+      out_cancel:
+      xfs_trans_cancel($TP);
+      xfs_iunlock($ip, XFS_ILOCK_EXCL);
+      ...
+      out_dqrele:
+      ...

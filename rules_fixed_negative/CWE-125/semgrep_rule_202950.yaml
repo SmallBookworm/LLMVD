@@ -1,0 +1,28 @@
+rules:
+  - id: cve-2018-19416-out-of-bounds-read
+    message: |
+      Out-of-bounds read vulnerability in remap_struct due to missing bounds checks before memmove/memset.
+      This may lead to crashes or potential code execution. Ensure bounds are validated using b_size before memory operations.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              memmove(..., ..., MINIMUM(..., ...));
+          - pattern: |
+              memset(..., ..., ... * ...);
+      - metavariable-regex:
+          metavariable: $FUNC
+          regex: remap_struct
+      - pattern-inside: |
+          void $FUNC(..., void *ps, unsigned int f_size, unsigned int g_size) {
+            ...
+            if (...) {
+              ...
+              memmove(..., ..., MINIMUM(..., ...));
+              ...
+            }
+            ...
+          }
+    metadata:
+      cwe: "CWE-125"

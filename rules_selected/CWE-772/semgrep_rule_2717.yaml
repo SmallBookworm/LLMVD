@@ -1,0 +1,27 @@
+rules:
+  - id: cve-2017-11310-memory-leak
+    message: "Memory leak in read_user_chunk_callback due to missing cleanup in error path (CVE-2017-11310, CWE-772)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (setjmp(png_jmpbuf($PING)))
+            {
+               ...
+               png_destroy_read_struct(&$PING, &$PING_INFO, &$END_INFO);
+               ...
+               if ($PIXEL_INFO != (MemoryInfo *) NULL)
+                 $PIXEL_INFO=RelinquishVirtualMemory($PIXEL_INFO);
+               ...
+               return($IMG);
+            }
+      - pattern: |
+          if (setjmp(png_jmpbuf($PING)))
+            {
+               ...
+               png_destroy_read_struct(&$PING, &$PING_INFO, &$END_INFO);
+               ...
+               return($IMG);
+            }
+    metavariable-pattern:
+      $PIXEL_INFO: "pixel_info"

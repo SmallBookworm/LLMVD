@@ -1,0 +1,30 @@
+rules:
+  - id: cve-2017-11171-bad-reference-counting
+    message: "Potential file descriptor leak due to premature GsmXSMPClient creation before successful XSMP authentication. This may lead to resource exhaustion and denial of service (CWE-835)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $CLIENT = gsm_xsmp_client_new($ICE_CONN);
+          $ICE_CONN->context = $CLIENT;
+          gsm_store_add(...);
+          g_object_unref($CLIENT);
+      - pattern: |
+          gsm_xsmp_client_new(...);
+          ...;
+          gsm_store_add(...);
+          g_object_unref(...);
+    metavariable-patterns:
+      - metavariable: $CLIENT
+        patterns:
+          - pattern-either:
+              - pattern: client
+              - pattern-inside: $CLIENT = gsm_xsmp_client_new(...)
+      - metavariable: $ICE_CONN
+        patterns:
+          - pattern-either:
+              - pattern: ice_conn
+              - pattern-inside: $ICE_CONN = ...
+    metadata:
+      cwe: ["CWE-835"]
+      cve: "CVE-2017-11171"

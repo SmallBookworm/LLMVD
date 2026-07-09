@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2019-11085-mmap-range-check
+    message: "Missing mmap range validation for vGPU aperture may lead to privilege escalation (CVE-2019-11085)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (index != VFIO_PCI_BAR2_REGION_INDEX)
+                  return -EINVAL;
+              ...
+              pgoff = vgpu_aperture_pa_base($VGPU) >> PAGE_SHIFT;
+              ...
+              remap_pfn_range($vma, $virtaddr, pgoff, $req_size, $pg_prot);
+          - pattern: |
+              if (index != VFIO_PCI_BAR2_REGION_INDEX)
+                  return -EINVAL;
+              ...
+              pgoff = ... >> PAGE_SHIFT;
+              ...
+              remap_pfn_range($vma, $virtaddr, pgoff, $req_size, $pg_prot);
+    metavariable-regex:
+      metavariable: $VGPU
+      regex: "vgpu"

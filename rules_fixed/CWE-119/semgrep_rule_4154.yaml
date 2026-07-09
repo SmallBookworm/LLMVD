@@ -1,0 +1,26 @@
+rules:
+  - id: rdesktop-cve-2018-8799-oob-read
+    message: "Out-of-bounds read vulnerability in process_secondary_order due to missing bounds checks before memory allocation or stream consumption. This may lead to denial of service (CVE-2018-8799)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: |
+                  $BMPDATA = (uint8 *) xmalloc($WIDTH * $HEIGHT * $BPP);
+              - pattern-inside: |
+                  ...
+              - pattern: |
+                  in_uint8a($S, ..., $WIDTH * $BPP);
+          - patterns:
+              - pattern: |
+                  in_uint8p($S, $DATA, $SIZE);
+              - pattern-inside: |
+                  ...
+              - pattern: |
+                  $BMPDATA = (uint8 *) xmalloc($WIDTH * $HEIGHT * $BPP);
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2018-8799"
+      references:
+        - https://github.com/rdesktop/rdesktop/commit/4dca546d04321a610c1835010b5dad85163b65e1

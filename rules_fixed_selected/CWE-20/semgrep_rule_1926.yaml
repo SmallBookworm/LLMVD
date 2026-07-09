@@ -1,0 +1,18 @@
+rules:
+  - id: cwe-20-sscanf-unsigned-int-mishandling
+    message: "Use of sscanf with %u to parse packet length as unsigned int may allow negative values, leading to denial of service. Use signed int with %d and validate for negativity instead."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              guint $VAR;
+              ...
+              sscanf(..., "LEN=%9u", &$VAR);
+          - pattern: |
+              unsigned int $VAR;
+              ...
+              sscanf(..., "LEN=%9u", &$VAR);
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2016-5355"

@@ -1,0 +1,30 @@
+rules:
+  - id: cve-2021-37750-null-server-check
+    message: "NULL pointer dereference vulnerability in KDC due to missing null check on request->server after FAST processing. This could allow an authenticated attacker to crash the KDC via a FAST TGS request with no server field."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          if ($SPRINC == NULL) {
+              ...
+              goto cleanup;
+          }
+      - pattern-either:
+          - pattern: |
+              $ERRCODE = kdc_find_fast(..., &$REQUEST, ...);
+              $SPRINC = $REQUEST->server;
+              if ($ERRCODE != 0) {
+                  ...
+                  goto cleanup;
+              }
+              ...
+              get_local_tgt(..., &$SPRINC->realm, ...);
+          - pattern: |
+              kdc_find_fast(..., &$REQUEST, ...);
+              $SPRINC = $REQUEST->server;
+              ...
+              get_local_tgt(..., &$SPRINC->realm, ...);
+    metavariable-pattern:
+      $SPRINC: "sprinc"
+      $REQUEST: "request"
+      $ERRCODE: "errcode"

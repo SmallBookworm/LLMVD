@@ -1,0 +1,11 @@
+rules:
+  - id: poppler-integer-overflow-gmalloc
+    message: "Potential integer overflow in memory allocation using gmalloc. Use gmallocn to avoid multiplication overflow."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          $PTR = (Guchar *)gmalloc($ROW_SIZE * $HEIGHT);
+    metadata:
+      cwe: "CWE-189"
+      cve: "CVE-2009-3605"

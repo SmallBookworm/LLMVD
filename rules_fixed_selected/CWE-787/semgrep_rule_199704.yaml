@@ -1,0 +1,12 @@
+rules:
+  - id: vim_spell_dump_buffer_overflow
+    message: "Potential stack-based buffer overflow in spell dump due to missing word length check (CVE-2022-2304, CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (c == 0)
+      {
+        ...
+        word[depth] = NUL;
+        ...
+      }

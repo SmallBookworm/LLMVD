@@ -1,0 +1,30 @@
+rules:
+  - id: cwe-125-java-line-number-table-buffer-overread
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (...; ...; ...) {
+                ...
+                $$lnattr->start_pc = R_BIN_JAVA_USHORT($$buffer, $$offset);
+                $$offset += 2;
+                $$lnattr->line_number = R_BIN_JAVA_USHORT($$buffer, $$offset);
+                ...
+              }
+          - pattern: |
+              for (...; ...; ...) {
+                ...
+                R_BIN_JAVA_USHORT($$buffer, $$offset);
+                $$offset += 2;
+                R_BIN_JAVA_USHORT($$buffer, $$offset);
+                ...
+              }
+      - pattern-not: |
+          if ($$offset - 2 > $$sz) {
+            break;
+          }
+    message: "Missing bounds check before reading from buffer may lead to heap-based buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2018-14017"

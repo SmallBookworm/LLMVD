@@ -1,0 +1,10 @@
+rules:
+  - id: dovecot-auth-policy-null-username-crash
+    message: "Potential NULL pointer dereference when context->request->user is NULL and passed to strlen(). This can lead to a denial of service (CVE-2016-8652)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          digest->loop(..., $USER, strlen($USER) + 1);
+    metavariable-pattern:
+      $USER: "context->request->user"

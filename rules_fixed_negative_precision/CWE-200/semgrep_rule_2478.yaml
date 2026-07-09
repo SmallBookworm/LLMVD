@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2017-14140-move-pages-permission-check
+    message: "Insecure permission check in move_pages() may leak memory layout via ASLR bypass. Use ptrace_may_access() instead."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!uid_eq($CRED1, $TCRED1) && !uid_eq($CRED2, $TCRED2) &&
+                  !uid_eq($CRED3, $TCRED3) && !uid_eq($CRED4, $TCRED4) &&
+                  !capable(CAP_SYS_NICE)) {
+                ...
+              }
+          - pattern: |
+              if (!uid_eq(..., ...) && !uid_eq(..., ...) &&
+                  !uid_eq(..., ...) && !uid_eq(..., ...) &&
+                  !capable(CAP_SYS_NICE))
+                ...
+    metadata:
+      cwe: ["CWE-200"]
+      cve: "CVE-2017-14140"

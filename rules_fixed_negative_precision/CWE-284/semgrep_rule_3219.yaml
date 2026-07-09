@@ -1,0 +1,10 @@
+rules:
+  - id: cve-2016-10030-insecure-file-open
+    message: "Insecure direct use of open() with user-controllable path may lead to arbitrary file overwrite (CVE-2016-10030, CWE-284)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      open($PATH, (O_CREAT|O_APPEND|O_WRONLY), 0644)
+    metadata:
+      cwe: ["CWE-284"]
+      cve: "CVE-2016-10030"

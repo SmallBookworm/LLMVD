@@ -1,0 +1,16 @@
+rules:
+  - id: glx_request_length_validation_missing
+    patterns:
+      - pattern-not: REQUEST_SIZE_MATCH($REQ_TYPE);
+      - pattern-either:
+          - pattern: __glXDisp_CreateContext(__GLXclientState* $cl, GLbyte* $pc)
+          - pattern: |
+              xGLXCreateContextReq* $req = (xGLXCreateContextReq*) $pc;
+              ...
+              if (!validGlxScreen($cl->client, $req->screen, ..., ...))
+    message: Missing request length validation may lead to denial of service or arbitrary code execution.
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-20"
+      cve: "CVE-2010-4818"

@@ -1,0 +1,15 @@
+rules:
+  - id: imagemagick-use-after-free-unmapblob
+    message: "Use-after-free vulnerability in DetachBlob: blob_info->data is used after being unmapped but before being set to NULL."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ($BLOB->mapped != $MAGICK_FALSE)
+            {
+              (void) UnmapBlob($BLOB->data, $BLOB->length);
+              RelinquishMagickResource(..., $BLOB->length);
+            }
+    metadata:
+      cwe: ["CWE-416"]
+      cve: "CVE-2019-14980"

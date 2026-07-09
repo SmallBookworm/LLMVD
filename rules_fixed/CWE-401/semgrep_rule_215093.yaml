@@ -1,0 +1,18 @@
+rules:
+  - id: matio-integer-overflow-cve-2020-19497
+    message: |
+      Integer overflow vulnerability in name length alignment calculation.
+      Missing overflow check before computing aligned length may lead to
+      integer wraparound and memory corruption. See CVE-2020-19497.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ( $LEN % 8 > 0 )
+              $LEN = $LEN + (8 - ($LEN % 8));
+      - pattern: |
+          if ( $LEN % 8 > 0 )
+              $LEN = $LEN+(8-($LEN % 8));
+    fix-regex:
+      regex: null
+      replacement: ""

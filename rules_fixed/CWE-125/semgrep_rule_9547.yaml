@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2018-1999014-mxf-out-of-bounds
+    message: "Potential out-of-bounds array access in MXF demuxer due to missing bounds check before array indexing."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (...; ... < $ARR_COUNT; ...) {
+                ...
+                $ARR_REF = &mxf->essence_container_data_refs[$IDX];
+                ...
+              }
+          - pattern: |
+              for (...; ... < $ARR_COUNT; ...) {
+                ...
+                mxf_resolve_strong_ref(mxf, &mxf->essence_container_data_refs[$IDX], ...);
+                ...
+              }
+    metavariable-pattern:
+      $ARR_COUNT: mxf->essence_container_data_count
+      $IDX: k

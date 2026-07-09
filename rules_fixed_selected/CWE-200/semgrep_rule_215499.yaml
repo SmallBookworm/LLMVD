@@ -1,0 +1,31 @@
+rules:
+  - id: cwe-200-uninitialized-padding
+    message: Structure padding field is not initialized, potentially leaking kernel memory.
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              struct $TYPE $VAR;
+              ...
+              $VAR.$FIELD1 = ...;
+              ...
+              RTA_PUT(..., sizeof($VAR), &$VAR);
+          - pattern: |
+              struct $TYPE $VAR = { ... };
+              ...
+              RTA_PUT(..., sizeof($VAR), &$VAR);
+      - metavariable-regex:
+          metavariable: $TYPE
+          regex: 'tc_cbq_ovl|tc_cbq_police|...other_vulnerable_structs...'
+      - pattern-not: |
+          $VAR.pad = 0;
+      - pattern: |
+          struct tc_cbq_ovl $VAR;
+          ...
+          $VAR.strategy = ...;
+          $VAR.priority2 = ...;
+          ...
+          $VAR.penalty = ...;
+          ...
+          RTA_PUT(..., sizeof($VAR), &$VAR);

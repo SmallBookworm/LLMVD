@@ -1,0 +1,27 @@
+rules:
+  - id: open_redirect_backslash_bypass
+    message: "Open redirect vulnerability due to missing backslash validation in URL. Backslashes can be used to bypass redirect validation as browsers convert them to forward slashes."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          if (*i == '\\') {
+              ...
+              return ...;
+          }
+      - pattern-either:
+          - pattern: |
+              for (...; *i; ...) {
+                  ...
+                  if (*i >= 0 && *i < ' ') { ... }
+                  ...
+              }
+          - pattern: |
+              for (...; *i; ...) {
+                  if (*i >= 0 && *i < ' ') { ... }
+                  ...
+              }
+    metavariable-regex:
+      metavariable: $...
+      regex: ".*"
+    fix: ""

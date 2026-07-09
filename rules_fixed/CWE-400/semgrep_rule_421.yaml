@@ -1,0 +1,16 @@
+rules:
+  - id: openssl-too-many-warning-alerts
+    message: "Missing alert count reset may lead to denial of service via excessive warning alerts (CVE-2016-8610)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (SSL3_RECORD_get_type($RR) != SSL3_RT_ALERT
+                  && SSL3_RECORD_get_length($RR) != 0)
+              $S->rlayer.alert_count = 0;
+      - pattern: |
+          if (SSL3_RECORD_get_type($RR) != SSL3_RT_ALERT && SSL3_RECORD_get_length($RR) != 0)
+              $S->rlayer.alert_count = 0;
+    metavariable-pattern:
+      $RR: 
+        pattern: $S->rlayer.rrec

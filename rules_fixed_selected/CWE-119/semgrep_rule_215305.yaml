@@ -1,0 +1,17 @@
+rules:
+  - id: isdn_ioctl_buffer_overflow
+    message: "Potential buffer overflow in isdn_ioctl due to missing null termination of iocts.drvid. This could lead to out-of-bounds memory access (CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (copy_from_user(&iocts, $ARGP, sizeof(isdn_ioctl_struct)))
+            return -EFAULT;
+          if (strlen(iocts.drvid)) { ... }
+      - pattern: |
+          if (copy_from_user(&iocts, $ARGP, sizeof(isdn_ioctl_struct)))
+            return -EFAULT;
+          ... 
+          if (strlen(iocts.drvid)) { ... }
+    metavariable-pattern:
+      iocts: isdn_ioctl_struct

@@ -1,0 +1,18 @@
+rules:
+  - id: cwe-476-huft_build-null-pointer-deref
+    message: "Potential NULL pointer dereference due to missing input validation in huft_build (CWE-476)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              p = (unsigned *) b;
+              ...
+              c[*p]++;
+          - pattern: |
+              p = (unsigned *) $PTR;
+              ...
+              c[*p]++;
+    metadata:
+      cwe: ["CWE-476"]
+      cve: "CVE-2015-9261"

@@ -1,0 +1,10 @@
+rules:
+  - id: gif2tiff-oob-write-cve-2013-4244
+    message: "Missing bounds check on 'code' before accessing suffix[code] may lead to out-of-bounds write (CVE-2013-4244, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (oldcode == -1) {
+        *(*fill)++ = suffix[code];
+        ...
+      }

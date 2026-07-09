@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2015-3195-asn1-combine-leak
+    message: "ASN1_TFLG_COMBINE error handling may leak memory due to unconditional ASN1_item_ex_free on error. Fixed by conditionally freeing only when combine flag is not set."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      ASN1_item_ex_free($pval, $it);
+    metavariable-regex:
+      - metavariable: $pval
+        regex: "ASN1_VALUE \\*\\*"
+      - metavariable: $it
+        regex: "const ASN1_ITEM \\*"
+    focus-metavariable: $pval
+    pattern-not-inside: |
+      if ($combine == 0)
+          ASN1_item_ex_free($pval, $it);
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2015-3195"

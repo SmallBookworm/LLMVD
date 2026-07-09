@@ -1,0 +1,32 @@
+rules:
+  - id: cve-2016-7145-sasl-authenticate-validation
+    message: "Missing validation of AUTHENTICATE parameter allows certificate fingerprint spoofing (CVE-2016-7145, CWE-287)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (first) {
+            if (!EmptyString(...))
+              ...
+            else
+              ...
+          }
+      - pattern: |
+          if (first) {
+            ...
+            if (feature_bool(...))
+              ...
+          }
+    pattern-not-inside: |
+      if (first) {
+        if (*parv[1] == ':' || strchr(parv[1], ' '))
+          return exit_client(...);
+        ...
+      }
+    metadata:
+      cwe: "CWE-287"
+      vulnerability: "CVE-2016-7145"
+    fix-regex:
+      regex: "" 
+      replacement: ""
+      enabled: false

@@ -1,0 +1,17 @@
+rules:
+  - id: cwe-125-lldp-mtu-missing-length-check
+    message: Missing length check before accessing buffer in LLDP MTU subtype handler may cause out-of-bounds read (CWE-125).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          case LLDP_PRIVATE_8023_SUBTYPE_MTU:
+              ND_PRINT(..., EXTRACT_16BITS(tptr + 4));
+      - pattern: |
+          case ...LLDP_PRIVATE_8023_SUBTYPE_MTU...:
+              ...
+              EXTRACT_16BITS(tptr + 4)
+              ...
+    metavariable-pattern:
+      metavariable: $SUBTYPE
+      pattern: LLDP_PRIVATE_8023_SUBTYPE_MTU

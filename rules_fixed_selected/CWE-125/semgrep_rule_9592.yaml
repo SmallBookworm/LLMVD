@@ -1,0 +1,13 @@
+rules:
+  - id: jasper-jpc_pi_nextpcrl-integer-overflow
+    message: Potential integer overflow leading to out-of-bounds heap read in jpc_pi_nextpcrl (CVE-2016-9583, CWE-125)
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          xstep = $PICOMP->hsamp * (1 << ($PIRLVL->prcwidthexpn + $PICOMP->numrlvls - $RLVLNO - 1));
+      - pattern: |
+          ystep = $PICOMP->vsamp * (1 << ($PIRLVL->prcheightexpn + $PICOMP->numrlvls - $RLVLNO - 1));
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2016-9583"

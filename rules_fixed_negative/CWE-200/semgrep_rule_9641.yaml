@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2012-6545-rfcomm-uninitialized-memory
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $DL = kmalloc($SIZE, GFP_KERNEL);
+              ...
+              copy_to_user($ARG, $DL, $SIZE2);
+          - pattern: |
+              $DL = kmalloc($SIZE, GFP_KERNEL);
+              ...
+              err = copy_to_user($ARG, $DL, $SIZE2);
+    message: "Use of kmalloc without initialization may leak uninitialized kernel memory to user space via copy_to_user. Use kzalloc instead."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2012-6545"

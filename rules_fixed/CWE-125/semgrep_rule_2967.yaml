@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2017-6347
+    message: "Use of csum_partial on non-linear skb data may cause buffer over-read (CVE-2017-6347, CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          csum_partial(skb_transport_header($skb) + $tlen, $offset, 0)
+    metavariable-patterns:
+      - metavariable: $skb
+        patterns:
+          - pattern-either:
+              - pattern: $skb
+    metadata:
+      cwe: ["CWE-125"]
+      cve: "CVE-2017-6347"

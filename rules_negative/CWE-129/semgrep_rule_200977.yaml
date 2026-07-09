@@ -1,0 +1,10 @@
+rules:
+  - id: sqlite_cve_2022_35737_array_bounds_overflow
+    message: "Potential array-bounds overflow in whereKeyStats due to missing bounds check on pRec->nField against pIdx->nSampleCol. Upgrade to SQLite 3.39.2 or later."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-129"
+      cve: "CVE-2022-35737"
+    pattern: |
+      assert( pRec->nField>0 && pRec->nField<=pIdx->nSampleCol );

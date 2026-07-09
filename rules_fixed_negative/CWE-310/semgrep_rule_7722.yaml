@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2019-5754-quic-proxy-vulnerability
+    message: "QUIC proxy for HTTPS URLs is explicitly disabled after being enabled, which may lead to cleartext exposure via malicious proxy (CVE-2019-5754)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          params->enable_quic_proxies_for_https_urls = ...;
+          params->enable_quic_proxies_for_https_urls = false;
+    metadata:
+      cwe: "CWE-310"
+      cve: "CVE-2019-5754"

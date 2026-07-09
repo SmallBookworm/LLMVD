@@ -1,0 +1,28 @@
+rules:
+  - id: cve-2015-3197-sslv2-cipher-enforcement
+    message: "SSLv2 cipher suite enforcement is missing, allowing use of disabled ciphers (CVE-2015-3197)."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-310"
+      cve: "CVE-2015-3197"
+    pattern-either:
+      - pattern: |
+          for (...; ...; ...) {
+            if (sk_SSL_CIPHER_find(..., sk_SSL_CIPHER_value(..., ...)) < 0) {
+              ...
+            }
+          }
+      - pattern: |
+          for (...; ...; ...) {
+            if (sk_SSL_CIPHER_find(..., ...) < 0) {
+              ...
+            }
+          }
+    pattern-not-inside: |
+      for (...; ...; ...) {
+        const SSL_CIPHER *cp = sk_SSL_CIPHER_value(..., ...);
+        if ((cp->algorithm_ssl & SSL_SSLV2) == 0 || sk_SSL_CIPHER_find(..., cp) < 0) {
+          ...
+        }
+      }

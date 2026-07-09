@@ -1,0 +1,12 @@
+rules:
+  - id: openldap-cancel-extop-infinite-loop
+    message: "Missing check for self-cancel in cancel_extop may lead to infinite loop (CVE-2020-36227, CWE-835)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if ( opid < 0 ) {
+        ...
+        return LDAP_PROTOCOL_ERROR;
+      }
+
+      ldap_pvt_thread_mutex_lock( &op->o_conn->c_mutex );

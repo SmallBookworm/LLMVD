@@ -1,0 +1,27 @@
+rules:
+  - id: cve-2017-13002-aodv-buffer-overread
+    message: "Missing bounds check on AODV extension header may lead to buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              switch ($EP->type) {
+              case AODV_EXT_HELLO:
+                  ...
+                  if ($LENGTH < sizeof(struct aodv_hello))
+                      goto trunc;
+                  ...
+              }
+          - pattern: |
+              switch ($EP->type) {
+              case AODV_EXT_HELLO:
+                  ...
+                  ND_TCHECK(*$AH);
+                  if ($LENGTH < sizeof(struct aodv_hello))
+                      goto trunc;
+                  ...
+              }
+    metavariable-pattern:
+      $EP: "const struct aodv_ext *"
+    fix: ""

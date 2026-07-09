@@ -1,0 +1,36 @@
+rules:
+  - id: bluetooth_l2cap_uninitialized_struct
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: struct sockaddr_l2 *$LA = (struct sockaddr_l2 *)...;
+              - pattern: $LA->sa_family = AF_BLUETOOTH;
+              - pattern: $LA->l2_psm = ...;
+              - pattern: bacpy(&$LA->l2_bdaddr, ...);
+              - pattern: $LA->l2_cid = ...;
+            metavariable-comparison:
+              - metavariable: $LA
+                should-match-regex: ^[a-zA-Z_][a-zA-Z0-9_]*$
+          - patterns:
+              - pattern: struct sockaddr_l2 *$ADDR = (struct sockaddr_l2 *)...;
+              - pattern: $ADDR->sa_family = AF_BLUETOOTH;
+              - pattern: $ADDR->l2_psm = ...;
+              - pattern: bacpy(&$ADDR->l2_bdaddr, ...);
+              - pattern: $ADDR->l2_cid = ...;
+            metavariable-comparison:
+              - metavariable: $ADDR
+                should-match-regex: ^[a-zA-Z_][a-zA-Z0-9_]*$
+      - pattern-not:
+          - pattern: memset($LA, 0, sizeof(struct sockaddr_l2));
+          - pattern: $LA->l2_psm = ...;
+          - pattern: bacpy(&$LA->l2_bdaddr, ...);
+          - pattern: $LA->l2_cid = ...;
+        metavariable-comparison:
+          - metavariable: $LA
+            should-match-regex: ^[a-zA-Z_][a-zA-Z0-9_]*$
+    message: "Uninitialized struct sockaddr_l2 may leak kernel stack memory. Missing memset(0) before use."
+    severity: WARNING
+    languages: [c]
+    metadata:
+      cwe: "CWE-200"
+      cve: "CVE-2012-6544"

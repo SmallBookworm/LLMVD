@@ -1,0 +1,44 @@
+rules:
+  - id: squid-snmp-memory-leak-cve-2018-19132
+    message: "Memory leak in SNMP packet handling: PDU not freed when access is denied or unsupported command is used."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (Community) {
+                  ...
+                  if (allow == ACCESS_ALLOWED && ...) {
+                      ...
+                  } else {
+                      ...
+                  }
+                  xfree(Community);
+              } else {
+                  ...
+                  snmp_free_pdu(PDU);
+              }
+          - pattern: |
+              if (Community) {
+                  ...
+                  if (allow == ACCESS_ALLOWED && ...) {
+                      ...
+                  } else {
+                      ...
+                  }
+                  xfree(Community);
+              }
+    pattern-not: |
+      if (Community) {
+          ...
+          if (allow == ACCESS_ALLOWED && ...) {
+              ...
+          } else {
+              ...
+              snmp_free_pdu(PDU);
+          }
+          xfree(Community);
+      } else {
+          ...
+          snmp_free_pdu(PDU);
+      }

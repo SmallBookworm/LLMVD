@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2015-7566
+    message: "Missing check for sufficient bulk-out endpoints may lead to NULL pointer dereference (CVE-2015-7566)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ($SERIAL->num_ports < 2)
+            return ...;
+      - pattern: |
+          if ($SERIAL->num_ports < 2)
+            { ... }
+    metavariable-pattern:
+      $SERIAL:
+        type: "struct usb_serial *"
+    fix: ""

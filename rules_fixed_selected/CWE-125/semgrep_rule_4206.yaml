@@ -1,0 +1,15 @@
+rules:
+  - id: cjson_buffer_overread
+    message: "Buffer over-read vulnerability in parse_string due to missing check for trailing backslash"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          while (*end_ptr != '\"' && *end_ptr && ++len)
+              if (*end_ptr++ == '\\') end_ptr++;
+      - pattern: |
+          while (*end_ptr!='\"' && *end_ptr && ++len)
+              if (*end_ptr++ == '\\') end_ptr++;
+    metadata:
+      cwe: ["CWE-125"]
+      cve: "CVE-2016-10749"

@@ -1,0 +1,19 @@
+rules:
+  - id: insecure_sign_extension_image_size
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((int64_t) $X * (int64_t) $Y <= $THRESHOLD / $BYTES) {
+                ...
+              }
+          - pattern: |
+              if ((int64_t)$X * (int64_t)$Y <= $THRESHOLD / $BYTES) {
+                ...
+              }
+    pattern-not: |
+      if ($X < 0 || $Y < 0) {
+        ...
+      }
+    message: "Missing validation for negative image dimensions may lead to insecure sign extension and memory corruption (CWE-284, CVE-2016-9190)."
+    severity: ERROR
+    languages: [c]

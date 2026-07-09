@@ -1,0 +1,15 @@
+rules:
+  - id: weechat-dcc-filename-buffer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (length > 0)
+              {
+                  if (($X[0] == '"') && ($X[length - 1] == '"'))
+                  {
+                      ...
+                  }
+              }
+    message: "Buffer overflow vulnerability in DCC filename parsing due to insufficient length check (CWE-119)."
+    severity: ERROR
+    languages: [c]

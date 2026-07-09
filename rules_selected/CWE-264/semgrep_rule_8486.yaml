@@ -1,0 +1,9 @@
+rules:
+  - id: uninitialized_key_request_type
+    message: "Uninitialized DrmPlugin::KeyRequestType variable may leak sensitive memory contents."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      DrmPlugin::KeyRequestType $VAR;
+      ...
+      getKeyRequest(..., &$VAR);

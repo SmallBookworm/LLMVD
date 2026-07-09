@@ -1,0 +1,12 @@
+rules:
+  - id: cve-2016-3136-mct-u232-null-deref
+    message: "Missing sanity check for serial->port[1] before dereference may lead to NULL pointer dereference (CVE-2016-3136)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $PORT->serial->port[1]->interrupt_in_urb;
+    metadata:
+      cwe: "CWE-703"
+      cve: "CVE-2016-3136"

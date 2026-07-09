@@ -1,0 +1,17 @@
+rules:
+  - id: php_session_binary_deserialize_use_after_free
+    message: "Missing PHP_VAR_UNSERIALIZE_DESTROY call before early return may lead to use-after-free (CWE-416)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (... || (p + namelen) >= endptr) {
+              return FAILURE;
+          }
+      - pattern: |
+          if (namelen < 0 || namelen > PS_BIN_MAX || (p + namelen) >= endptr) {
+              return FAILURE;
+          }
+    metavariable-pattern:
+      metavariable: $...
+      pattern: "..."

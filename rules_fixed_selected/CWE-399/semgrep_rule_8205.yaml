@@ -1,0 +1,29 @@
+rules:
+  - id: android_mediaserver_unlimited_memory_usage
+    patterns:
+      - pattern-not: |
+          limitProcessMemory(...);
+      - pattern-either:
+          - pattern: |
+              int main(...) {
+                  ...
+                  sp<ProcessState> proc(ProcessState::self());
+                  ...
+                  ProcessState::self()->startThreadPool();
+                  ...
+              }
+          - pattern: |
+              int main(...) {
+                  ...
+                  AudioFlinger::instantiate();
+                  MediaPlayerService::instantiate();
+                  ...
+                  ProcessState::self()->startThreadPool();
+                  ...
+              }
+    message: "Missing call to limitProcessMemory() may allow unlimited memory consumption leading to DoS (CVE-2016-3754)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-399"
+      cve: "CVE-2016-3754"

@@ -1,0 +1,11 @@
+rules:
+  - id: opencv-pxm-memcpy-buffer-overflow
+    message: "Buffer overflow vulnerability in memcpy due to incorrect size calculation. Use img.elemSize1() instead of CV_ELEM_SIZE1(m_type)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          memcpy(data, src, CV_ELEM_SIZE1(m_type) * m_width);
+    metadata:
+      cwe: "CWE-399"
+      cve: "CVE-2017-17760"

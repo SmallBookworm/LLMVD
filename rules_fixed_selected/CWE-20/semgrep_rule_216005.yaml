@@ -1,0 +1,30 @@
+rules:
+  - id: wget-cookie-injection-cve-2018-0494
+    message: "Potential cookie injection vulnerability due to unhandled \\r\\n in HTTP header continuation lines (CVE-2018-0494)."
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              do
+                {
+                  const char *end = strchr (hdr, '\n');
+                  if (end)
+                    hdr = end + 1;
+                  else
+                    hdr += strlen (hdr);
+                }
+              while (*hdr == ' ' || *hdr == '\t');
+          - pattern: |
+              do
+                {
+                  char *end = strchr (hdr, '\n');
+                  if (end)
+                    hdr = end + 1;
+                  else
+                    hdr += strlen (hdr);
+                }
+              while (*hdr == ' ' || *hdr == '\t');
+    metavariable-regex:
+      metavariable: hdr
+      regex: "hdr"

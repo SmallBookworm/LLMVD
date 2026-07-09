@@ -1,0 +1,34 @@
+rules:
+  - id: nfsd_oversized_args_check_missing
+    message: "Missing check for oversized NFSv2/v3 arguments, which may lead to denial of service (CVE-2017-7645)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (xdr && !xdr(...)) {
+            ...
+            *statp = rpc_garbage_args;
+            return 1;
+          }
+      - pattern: |
+          xdr = proc->pc_decode;
+          if (xdr && !xdr(...)) {
+            ...
+            *statp = rpc_garbage_args;
+            return 1;
+          }
+    pattern-not-inside: |
+      if (nfs_request_too_big(rqstp, proc)) {
+        ...
+        *statp = rpc_garbage_args;
+        return 1;
+      }
+      ...
+      if (xdr && !xdr(...)) {
+        ...
+        *statp = rpc_garbage_args;
+        return 1;
+      }
+    metavariable-pattern:
+      metavariable: $rqstp
+      pattern: struct svc_rqst *

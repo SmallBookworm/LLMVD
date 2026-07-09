@@ -1,0 +1,14 @@
+rules:
+  - id: openssl_fmtstr_overflow
+    message: "Potential buffer overflow in fmtstr due to unsafe string length calculation. This may lead to out-of-bounds read or write (CVE-2016-0799)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for ($STRLEN = 0; $VALUE[$STRLEN]; ++$STRLEN) ;
+          - pattern: |
+              for ($STRLEN = 0; $VALUE[$STRLEN]; $STRLEN++) ;
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2016-0799"

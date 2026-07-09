@@ -1,0 +1,26 @@
+rules:
+  - id: cwe-787-xlistfonts-out-of-bounds-write
+    message: |
+      Potential out-of-bounds write in XListFonts due to insufficient validation of server-provided length fields.
+      This may lead to memory corruption or privilege escalation (CVE-2016-7943).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (ch + length < chend) {
+            ...
+            length = *(unsigned char *)ch;
+            ...
+          } else
+            ...
+      - pattern: |
+          if (ch + length < chend) {
+            ...
+            length = *(unsigned char *)ch;
+            ...
+          } else {
+            ...
+          }
+    metavariable-regex:
+      metavariable: chend
+      regex: 'ch\s*\+\s*\(?\s*rlen\s*\+?\s*1\s*\)?'

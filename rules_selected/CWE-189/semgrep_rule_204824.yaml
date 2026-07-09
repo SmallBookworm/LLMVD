@@ -1,0 +1,11 @@
+rules:
+  - id: clamav-cve-2013-2020-integer-underflow
+    message: "Potential integer underflow leading to out-of-bounds read in parseicon function (CVE-2013-2020)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          enginesize = (width >> 3) - 2;
+    metadata:
+      cwe: "CWE-189"
+      cve: "CVE-2013-2020"

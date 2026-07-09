@@ -1,0 +1,22 @@
+rules:
+  - id: ndpi_ssh_integer_overflow
+    message: "Potential integer overflow in SSH dissector leading to heap overflow (CVE-2020-11939)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-190"
+      cve: "CVE-2020-11939"
+    pattern-either:
+      - pattern: |
+          $OFFSET += 4 + $LEN;
+      - pattern: |
+          $OFFSET += $LEN;
+    pattern-not-inside: |
+      if ($LEN > UINT32_MAX - $OFFSET)
+        goto invalid_payload;
+      ...
+      $OFFSET += $LEN;
+    pattern-inside: |
+      static u_int16_t concat_hash_string(...) {
+        ...
+      }

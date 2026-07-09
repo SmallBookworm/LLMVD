@@ -1,0 +1,34 @@
+rules:
+  - id: tflite_expand_dims_oob_read
+    message: "Potential out-of-bounds read in ExpandTensorDim due to missing lower bound check on axis. CVE-2021-37685 (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (axis < 0) {
+            axis = $INPUT_DIMS.size + 1 + axis;
+          }
+          TF_LITE_ENSURE($CONTEXT, axis <= $INPUT_DIMS.size);
+          ...
+          for (...; ...; ...) {
+            ...
+            $INPUT_DIMS.data[...];
+            ...
+          }
+      - pattern: |
+          if (axis < 0) {
+            axis = $INPUT_DIMS->size + 1 + axis;
+          }
+          TF_LITE_ENSURE($CONTEXT, axis <= $INPUT_DIMS->size);
+          ...
+          for (...; ...; ...) {
+            ...
+            $INPUT_DIMS->data[...];
+            ...
+          }
+    metavariable-pattern:
+      metavariable: $INPUT_DIMS
+      pattern-either:
+        - pattern: TfLiteIntArray&
+        - pattern: TfLiteIntArray*
+    fix: ""

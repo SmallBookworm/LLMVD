@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2018-16323-uninitialized-data-xbm
+    message: "XBM image data may remain uninitialized when a negative pixel value is encountered, potentially leaking sensitive memory contents."
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (c < 0)
+            break;
+      - pattern: |
+          if (c < 0)
+            $...;
+    metavariable-pattern:
+      metavariable: $...
+      pattern-not: |
+        {
+          data=(unsigned char *) RelinquishMagickMemory(data);
+          ThrowReaderException(...);
+        }

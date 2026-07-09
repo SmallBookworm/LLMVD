@@ -1,0 +1,43 @@
+rules:
+  - id: qemu-e1000-infinite-loop-cve-2021-20257
+    message: "Missing early check for tp->size >= msh in TSO transmit path may cause infinite loop (CVE-2021-20257)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (tp->cptse) {
+                ...
+                do {
+                  ...
+                  if (tp->size + bytes > msh)
+                    bytes = msh - tp->size;
+                  ...
+                } while (...);
+              }
+          - pattern: |
+              if (tp->cptse) {
+                ...
+                while (...) {
+                  ...
+                  if (tp->size + bytes > msh)
+                    bytes = msh - tp->size;
+                  ...
+                }
+              }
+    metavariable-pattern:
+      metavariable: msh
+      pattern: msh = ...;
+    pattern-not-inside: |
+      if (tp->cptse) {
+        ...
+        do {
+          ...
+          if (tp->size >= msh) {
+            goto ...;
+          }
+          if (tp->size + bytes > msh)
+            bytes = msh - tp->size;
+          ...
+        } while (...);
+      }

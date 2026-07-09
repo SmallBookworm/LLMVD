@@ -1,0 +1,12 @@
+rules:
+  - id: openssl-avx512ifma-rsa-memory-corruption
+    message: "Passing bit size instead of BN_ULONG count to bn_reduce_once_in_place may cause memory corruption on AVX512IFMA CPUs (CVE-2022-2274, CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      bn_reduce_once_in_place(..., ..., ..., ..., factor_size)
+    pattern-not: |
+      bn_reduce_once_in_place(..., ..., ..., ..., factor_size / (sizeof(BN_ULONG) * 8))
+    metavariable-regex:
+      metavariable: factor_size
+      regex: '\bfactor_size\b'

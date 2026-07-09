@@ -1,0 +1,23 @@
+rules:
+  - id: cwe-476-null-deref-regset-get
+    message: "Potential NULL pointer dereference due to missing check for regset->get before calling it. This can lead to denial of service or other impacts (CWE-476, CVE-2012-1097)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if ($REGSET->core_note_type &&
+              (!$REGSET->active || $REGSET->active(...))) {
+            ...
+            $REGSET->get(...);
+            ...
+          }
+      - pattern: |
+          if ($REGSET->core_note_type && ...) {
+            ...
+            $REGSET->get(...);
+            ...
+          }
+    metavariable-pattern:
+      metavariable: $REGSET
+      pattern-not: |
+        if (... && $REGSET->get && ...)

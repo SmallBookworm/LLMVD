@@ -1,0 +1,13 @@
+rules:
+  - id: insecure_cryptographically_random_values
+    message: "Function 'cryptographicallyRandomValues' is implemented as a no-op, which may weaken cryptographic protections."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern: |
+          void $FUNC(..., unsigned char* buffer, size_t length)
+          {
+          }
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern: cryptographicallyRandomValues

@@ -1,0 +1,20 @@
+rules:
+  - id: imagemagick-substitutestring-integer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (replace_extent == 0)
+                replace_extent = strlen(replace);
+              if (replace_extent > search_extent)
+              {
+                ...
+                p += replace_extent - 1;
+              }
+          - pattern: |
+              if (replace_extent == 0)
+                replace_extent = strlen(replace);
+              ...
+              p += replace_extent - 1;
+    message: "Missing check for zero replace_extent may cause integer underflow when computing p += replace_extent - 1, leading to potential buffer overflow (CWE-190)."
+    severity: ERROR
+    languages: [c]

@@ -1,0 +1,19 @@
+rules:
+  - id: ghostscript-pdfwrite-text-distance-overflow
+    message: "Missing overflow check for dx/dy in set_text_distance may lead to buffer overflow (CVE-2018-10194)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              int code = gs_distance_transform_inverse($DX, $DY, $PMAT, $PDIST);
+          - pattern: |
+              code = gs_distance_transform_inverse($DX, $DY, $PMAT, $PDIST);
+    metavariable-pattern:
+      metavariable: DX
+      pattern-not: |
+        ($DX > 1e38 || ... )
+    metavariable-pattern:
+      metavariable: DY
+      pattern-not: |
+        (... || $DY > 1e38)

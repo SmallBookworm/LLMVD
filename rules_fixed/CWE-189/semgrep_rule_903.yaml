@@ -1,0 +1,11 @@
+rules:
+  - id: cwe-189-signedness-error-pngdsp
+    patterns:
+      - pattern: |
+          for ($I = 0; $I <= $W - (int)sizeof($T); ...)
+    message: "Integer signedness error leading to potential out-of-bounds access. Ensure 'sizeof' result is cast to signed type when subtracting from signed integer."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-189"
+      cve: "CVE-2013-7014"

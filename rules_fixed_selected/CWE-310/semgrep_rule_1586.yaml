@@ -1,0 +1,32 @@
+rules:
+  - id: cve-2015-0204-freak-ephemeral-rsa
+    message: "Ephemeral RSA keys are allowed in non-export ciphersuites, which enables RSA-to-EXPORT_RSA downgrade attacks (FREAK)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (alg_k & SSL_kRSA)
+          {
+          ...
+          }
+      - pattern: |
+          if (alg_k & SSL_kRSA)
+          {
+          ...
+          s->session->sess_cert->peer_rsa_tmp=...;
+          ...
+          }
+    metavariable-pattern:
+      metavariable: $ALG_K
+      pattern: alg_k
+    pattern-not-inside: |
+      if (alg_k & SSL_kRSA)
+      {
+      ...
+      if (!SSL_C_IS_EXPORT(...))
+      {
+      ...
+      goto f_err;
+      }
+      ...
+      }

@@ -1,0 +1,18 @@
+rules:
+  - id: cifs_smb_send_rqst_null_socket_race_condition
+    patterns:
+      - pattern-either:
+          - pattern: |
+              struct socket *ssocket = $SERVER->ssocket;
+              ...
+              kernel_setsockopt(ssocket, ...);
+          - pattern: |
+              struct socket *ssocket = $SERVER->ssocket;
+              ...
+              kernel_setsockopt(ssocket, SOL_TCP, TCP_CORK, ...);
+    message: "Missing NULL check for 'ssocket' before calling kernel_setsockopt may lead to a race condition (CWE-362)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-362"
+      cve: "CVE-2013-3302"

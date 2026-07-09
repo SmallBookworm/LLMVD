@@ -1,0 +1,16 @@
+rules:
+  - id: gtk_lockscreen_popup_menu_missing
+    message: "Missing popup_menu handler in GtkWidgetClass may allow lock screen bypass via menu button (CVE-2014-1949)"
+    severity: HIGH
+    languages: [c]
+    pattern-not: $WIDGET_CLASS->popup_menu = ...
+    pattern: |
+      $WIDGET_CLASS->show = ...;
+      ...
+      $WIDGET_CLASS->visibility_notify_event = ...;
+    metavariable-pattern:
+      metavariable: $WIDGET_CLASS
+      pattern: GTK_WIDGET_CLASS(...)
+    fix-regex:
+      regex: ""
+      replacement: ""

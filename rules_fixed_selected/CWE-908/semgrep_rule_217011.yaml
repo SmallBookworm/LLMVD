@@ -1,0 +1,27 @@
+rules:
+  - id: qemu-loongarch-tlb-uninitialized-read
+    message: "Uninitialized TLB may lead to use of uninitialized memory in io_readx/io_writex. TLB should be cleared on CPU reset."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          #ifndef CONFIG_USER_ONLY
+          ... 
+          env->pc = ...;
+          #endif
+      - pattern: |
+          #ifndef CONFIG_USER_ONLY
+          ...
+          env->pc = ...;
+          ...
+          #endif
+    pattern-not: |
+      #ifndef CONFIG_USER_ONLY
+      ...
+      env->pc = ...;
+      memset(env->tlb, 0, sizeof(env->tlb));
+      ...
+      #endif
+    fix-regex:
+      regex: ''
+      replacement: ''

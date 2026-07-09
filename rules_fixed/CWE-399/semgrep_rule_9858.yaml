@@ -1,0 +1,11 @@
+rules:
+  - id: cwe-399-use-after-free-cve-2013-2913
+    message: Potential use-after-free vulnerability due to improper initialization of pointer members.
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      $CLASS::$CTOR($ARGS) : client_(NULL), model_(NULL), node_(NULL), folder_(NULL) {}
+    metavariable-regex:
+      $CLASS: "^[a-zA-Z_][a-zA-Z0-9_]*$"
+      $CTOR: "^[a-zA-Z_][a-zA-Z0-9_]*$"
+    fix: "$CLASS::$CTOR($ARGS) : client_(nullptr), model_(nullptr), node_(nullptr), folder_(nullptr) {}"

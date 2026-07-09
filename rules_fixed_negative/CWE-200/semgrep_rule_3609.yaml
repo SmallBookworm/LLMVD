@@ -1,0 +1,20 @@
+rules:
+  - id: openssh-user-enumeration-cve-2018-15473
+    message: "User enumeration vulnerability due to early bailout on invalid user before full packet parsing. This can leak information about valid usernames."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!authctxt->valid) {
+                ...
+                return ...;
+              }
+          - pattern: |
+              if (!authctxt->valid) {
+                ...
+                goto done;
+              }
+    metavariable-regex:
+      metavariable: $...
+      regex: ".*"

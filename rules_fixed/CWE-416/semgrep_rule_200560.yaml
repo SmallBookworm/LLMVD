@@ -1,0 +1,20 @@
+rules:
+  - id: use-after-free-sunkbd-reinit
+    message: "Potential use-after-free vulnerability due to scheduling work on a possibly freed object. Ensure work is canceled before teardown."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              schedule_work(&$OBJ->tq);
+          - pattern: |
+              schedule_work(&$OBJ.tq);
+    metavariable-patterns:
+      - metavariable: $OBJ
+        patterns:
+          - pattern-not: |
+              if ($OBJ->enabled)
+                  schedule_work(&$OBJ->tq);
+          - pattern-not: |
+              if ($OBJ->enabled)
+                  schedule_work(&$OBJ.tq);

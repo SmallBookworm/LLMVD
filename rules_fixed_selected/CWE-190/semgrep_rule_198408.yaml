@@ -1,0 +1,18 @@
+rules:
+  - id: libraw_parse_qt_integer_overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((size = get4()) < 8) return;
+              ...
+              parse_qt (save+size);
+          - pattern: |
+              if ((size = get4()) < 8) return;
+              ...
+              fseek (ifp, save+size, SEEK_SET);
+    message: "Potential integer overflow in parse_qt() due to missing overflow checks before using 'save + size'."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-190"
+      cve: "CVE-2018-5815"

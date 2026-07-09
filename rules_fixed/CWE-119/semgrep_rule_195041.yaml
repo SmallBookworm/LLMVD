@@ -1,0 +1,23 @@
+rules:
+  - id: rle-heap-buffer-overflow-cve-2016-10050
+    message: Heap-based buffer overflow in ReadRLEImage due to missing offset underflow check.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              offset = ...;
+              operand++;
+              if (offset + ((size_t) operand * number_planes) > pixel_info_length)
+                ...
+          - pattern: |
+              offset = ...;
+              operand++;
+              if (offset + (operand * number_planes) > pixel_info_length)
+                ...
+    fix-regex:
+      regex: (offset\\s*=\\s*[^;]+;\\s*operand\\+\\+;\\s*)if\\s*\\((offset\\s*\\+\\s*$$\(size_t\\)\\s*)?operand\\s*\\*\\s*number_planes\\s*>\\s*pixel_info_length\\)
+      replacement: $1if ((offset < 0) || ($2operand * number_planes > pixel_info_length))
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2016-10050"

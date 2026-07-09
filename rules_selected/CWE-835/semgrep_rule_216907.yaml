@@ -1,0 +1,28 @@
+rules:
+  - id: cve-2022-0778-infinite-loop-bn_mod_sqrt
+    message: "Potential infinite loop in BN_mod_sqrt() when handling non-prime moduli (CVE-2022-0778)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          while (!BN_is_one(t)) {
+              i++;
+              if (i == e) {
+                  ...
+              }
+              if (!BN_mod_mul(t, t, t, p, ctx))
+                  goto end;
+          }
+      - pattern: |
+          while (!BN_is_one(t)) {
+              i++;
+              if (i == e) {
+                  ...
+              }
+              ...
+          }
+    metadata:
+      cwe: "CWE-835"
+      cve: "CVE-2022-0778"
+      references:
+        - https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=3118eb64934499d93db3230748a452351d1d9a65

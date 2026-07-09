@@ -1,0 +1,20 @@
+rules:
+  - id: wavpack-caf-buffer-overread
+    message: "Potential buffer over-read in CAF file parsing due to missing chunk size validation. This could lead to denial-of-service or memory corruption (CVE-2018-7254, CWE-125)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!strncmp (caf_chunk_header.mChunkType, "chan", 4)) {
+                ...
+                CAFChannelLayout *caf_channel_layout = malloc ((size_t) caf_chunk_header.mChunkSize);
+                ...
+              }
+          - pattern: |
+              else {
+                ...
+                int bytes_to_copy = (uint32_t) caf_chunk_header.mChunkSize;
+                char *buff = malloc (bytes_to_copy);
+                ...
+              }

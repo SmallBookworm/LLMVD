@@ -1,0 +1,18 @@
+rules:
+  - id: integer-overflow-shared-memory
+    patterns:
+      - pattern-either:
+          - pattern: |
+              uint32 $SIZE = ($X + 0xffff) & ~0xffff;
+              ...
+              CreateFileMapping(..., static_cast<DWORD>($SIZE), ...);
+          - pattern: |
+              uint32 $SIZE = ($X + 65535) & ~65535;
+              ...
+              CreateFileMapping(..., static_cast<DWORD>($SIZE), ...);
+    message: "Potential integer overflow in shared memory allocation. Missing overflow check before rounding up size."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-189"
+      cve: "CVE-2012-5154"

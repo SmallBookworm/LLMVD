@@ -1,0 +1,9 @@
+rules:
+  - id: ffmpeg-pictordec-heap-buffer-overflow
+    message: "Potential heap-based buffer overflow in decode_frame due to incorrect dimension check logic (CWE-787)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (s->width != avctx->width && s->height != avctx->height) {
+      ...
+      }

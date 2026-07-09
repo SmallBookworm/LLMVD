@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2012-6548-uninit-parent-partref
+    message: "Uninitialized fid->udf.parent_partref may leak kernel heap memory (CVE-2012-6548, CWE-200)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          fid->udf.block = ...;
+          fid->udf.partref = ...;
+          fid->udf.generation = ...;
+          if (parent) { ... }
+      - pattern: |
+          fid->udf.block = ...;
+          fid->udf.partref = ...;
+          fid->udf.generation = ...;
+          ...
+          if (parent) { ... }
+    metavariable-pattern:
+      metavariable: fid
+      pattern: struct fid *
+    pattern-not: |
+      fid->udf.parent_partref = 0;

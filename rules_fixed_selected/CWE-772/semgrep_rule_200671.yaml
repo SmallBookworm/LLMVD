@@ -1,0 +1,30 @@
+rules:
+  - id: imagemagick-write-mpc-colormap-memory-leak
+    message: "Memory leak in WriteMPCImage due to missing RelinquishMagickMemory call in error path (CWE-772)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (colormap == (unsigned char *) NULL)
+            return(MagickFalse);
+          ...
+          switch (depth)
+          {
+            default:
+              ThrowWriterException(...);
+          }
+      - pattern: |
+          colormap = (unsigned char *) AcquireQuantumMemory(...);
+          if (colormap == (unsigned char *) NULL)
+            return(MagickFalse);
+          ...
+          switch (depth)
+          {
+            default:
+              ThrowWriterException(...);
+          }
+    metavariable-pattern:
+      metavariable: colormap
+      patterns:
+        - pattern-inside: $FUNC(...)
+        - pattern: (unsigned char *)

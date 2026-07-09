@@ -1,0 +1,27 @@
+rules:
+  - id: zrtpcpp-heap-buffer-overflow
+    message: Heap-based buffer overflow vulnerability in storeMsgTemp due to missing length validation before memcpy.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              memcpy($BUF, $SRC, $LEN);
+          - pattern: |
+              memcpy($BUF, $SRC, $EXPR);
+    pattern-not-inside: |
+      $TYPE $VAR = $LEN_EXPR;
+      $VAR = ($VAR > sizeof($BUF)) ? sizeof($BUF) : $VAR;
+      ...
+      memcpy($BUF, $SRC, $VAR);
+    metavariable-pattern:
+      metavariable: $BUF
+      pattern: tempMsgBuffer
+    metavariable-pattern:
+      metavariable: $LEN
+      pattern: |
+        pkt->getLength() * ZRTP_WORD_SIZE
+    metavariable-pattern:
+      metavariable: $EXPR
+      pattern: |
+        pkt->getLength() * ZRTP_WORD_SIZE

@@ -1,0 +1,30 @@
+rules:
+  - id: cve-2016-9191-proc-sys-readdir-missing-ref-drop
+    message: "Missing sysctl_head_finish(head) when returning early from proc_sys_readdir after grab_header, leading to reference leak and potential system hang (CVE-2016-9191)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (!dir_emit_dots(...))
+                  return 0;
+          - pattern: |
+              if (!dir_emit_dots(...))
+                  return ...;
+    metavariable-pattern:
+      metavariable: $FUNC
+      pattern: |
+        static int proc_sys_readdir(struct file *file, struct dir_context *ctx)
+        {
+            ...
+            struct ctl_table_header *head = grab_header(...);
+            ...
+            if (IS_ERR(head))
+                return PTR_ERR(head);
+            ...
+            if (!dir_emit_dots(file, ctx))
+                return ...;
+            ...
+            sysctl_head_finish(head);
+            ...
+        }

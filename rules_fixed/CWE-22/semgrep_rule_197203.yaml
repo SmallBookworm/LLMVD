@@ -1,0 +1,14 @@
+rules:
+  - id: ziparchive-directory-traversal
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $to->append($file);
+          - pattern: |
+              auto path = $to + $file.substr(...);
+    message: "Potential directory traversal vulnerability in ZipArchive::extractTo. File path is not sanitized before extraction."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-22"
+      cve: "CVE-2014-9767"

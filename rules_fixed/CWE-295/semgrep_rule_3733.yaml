@@ -1,0 +1,16 @@
+rules:
+  - id: libressl-hostname-verification-bypass
+    message: "Hostname verification can be bypassed when namelen is zero but name is not NULL, leading to potential man-in-the-middle attacks (CWE-295)."
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (name == NULL || namelen == 0)
+              return 1;
+      - pattern: |
+          if (name == NULL || $N == 0)
+              return 1;
+    metavariable-pattern:
+      metavariable: $N
+      patterns:
+        - pattern: namelen

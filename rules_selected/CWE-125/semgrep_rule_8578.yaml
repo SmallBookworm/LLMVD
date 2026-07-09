@@ -1,0 +1,21 @@
+rules:
+  - id: cve-2017-0812-out-of-bounds-write
+    message: "Potential out-of-bounds write due to missing validation of frames_wr before channel remapping. This may lead to memory corruption (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (channel_remapping_needed) {
+            ...
+            adjust_channels(..., frames_wr * ...);
+          }
+      - pattern: |
+          if (channel_remapping_needed && ...) {
+            ...
+            adjust_channels(..., frames_wr * ...);
+          }
+    pattern-not: |
+      if (channel_remapping_needed && frames_wr > 0) {
+        ...
+        adjust_channels(..., frames_wr * ...);
+      }

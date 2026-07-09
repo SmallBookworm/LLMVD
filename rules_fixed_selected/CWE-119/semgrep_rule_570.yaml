@@ -1,0 +1,13 @@
+rules:
+  - id: nbd_buffer_overflow_cve_2011_0530
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (len > BUFSIZE + sizeof(struct nbd_reply))
+                  err(...);
+    message: "Buffer overflow vulnerability due to incorrect bounds check. Should use 'BUFSIZE - sizeof(struct nbd_reply)' instead of 'BUFSIZE + sizeof(struct nbd_reply)'."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-119"
+      cve: "CVE-2011-0530"

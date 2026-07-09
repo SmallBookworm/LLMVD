@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2018-6033-missing-download-validation
+    message: Missing validation check 'delegate_->IsMostRecentDownloadItemAtFilePath(this)' may lead to insufficient data validation and potential arbitrary code execution.
+    severity: HIGH
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              return (!IsDone() || $IS_COMPLETE) && !IsTemporary() &&
+                      !file_externally_removed_;
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2018-6033"

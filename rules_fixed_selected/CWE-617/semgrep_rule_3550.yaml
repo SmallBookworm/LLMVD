@@ -1,0 +1,19 @@
+rules:
+  - id: imagemagick-readonejngimage-null-check
+    message: "Missing NULL check before WriteBlob may lead to denial of service (CWE-617)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (length != 0)
+             {
+               (void) WriteBlob($COLOR_IMAGE, $LENGTH, $CHUNK);
+               ...
+             }
+      - pattern: |
+          if (length != 0)
+             (void) WriteBlob($COLOR_IMAGE, $LENGTH, $CHUNK);
+    metavariable-pattern:
+      metavariable: $COLOR_IMAGE
+      pattern-not: |
+        ($COLOR_IMAGE != (Image *) NULL)

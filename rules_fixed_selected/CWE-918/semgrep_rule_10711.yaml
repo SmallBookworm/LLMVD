@@ -1,0 +1,15 @@
+rules:
+  - id: ssrf-via-pcap-open-live
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((fp = pcap_open_live(source, ...)) == NULL)
+                ...
+          - pattern: |
+              fp = pcap_open_live(source, ...)
+    message: "Potential SSRF vulnerability: capture source 'source' is passed directly to pcap_open_live without URL validation. This may allow remote attackers to open arbitrary URLs (CWE-918)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-918"
+      cve: "CVE-2019-15164"

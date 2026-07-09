@@ -1,0 +1,16 @@
+rules:
+  - id: icoutils-integer-overflow-cve-2017-5333
+    message: "Potential integer overflow due to missing size check before memcpy. This may lead to buffer overflow or arbitrary code execution."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (size > icondir->entries[c].bytes_in_res)
+            size = icondir->entries[c].bytes_in_res;
+          ...
+          memcpy(&memory[offset], data, size);
+      - pattern: |
+          if (size > icondir->entries[c].bytes_in_res)
+            size = icondir->entries[c].bytes_in_res;
+          ...
+          memcpy(&memory[offset], data+sizeof(uint16_t)*2, size-sizeof(uint16_t)*2)

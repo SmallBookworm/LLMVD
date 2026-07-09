@@ -1,0 +1,10 @@
+rules:
+  - id: cwe-416-use-after-free-hamradio-needs_free_netdev
+    message: "Setting 'needs_free_netdev = true' in hamradio drivers may lead to use-after-free (CWE-416) when combined with manual free_netdev calls."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      dev->needs_free_netdev = true;
+    metadata:
+      cwe: ["CWE-416"]
+      cve: "CVE-2022-1195"

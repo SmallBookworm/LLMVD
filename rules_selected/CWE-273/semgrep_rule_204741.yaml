@@ -1,0 +1,22 @@
+rules:
+  - id: cve-2022-0358-missing-drop-supplementary-groups
+    message: "Missing call to drop_supplementary_groups() before privilege separation, which may allow privilege escalation via SGID files (CVE-2022-0358)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          drop_supplementary_groups();
+          ...
+          setup_sandbox(...);
+      - pattern-either:
+          - pattern: |
+              fuse_daemonize(...);
+              ...
+              setup_sandbox(...);
+          - pattern: |
+              setup_capng();
+              ...
+              setup_sandbox(...);
+    metadata:
+      cwe: "CWE-273"
+      cve: "CVE-2022-0358"

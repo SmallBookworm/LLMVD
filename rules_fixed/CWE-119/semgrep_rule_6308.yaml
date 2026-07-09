@@ -1,0 +1,28 @@
+rules:
+  - id: cwe-119-async-pixel-transfer-bounds-check
+    message: Missing bounds check on shared memory offset and size may lead to buffer overflow (CWE-119).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $MEM_PARAMS.shm_data_offset = ...;
+          $MEM_PARAMS.shm_data_size = ...;
+          ...
+          $MANAGER->GetAsyncPixelTransferManager()->AsyncNotifyCompletion($MEM_PARAMS, ...);
+      - pattern: |
+          $MEM_PARAMS.shm_data_offset = ...;
+          $MEM_PARAMS.shm_data_size = sizeof(...);
+          ...
+          $MANAGER->GetAsyncPixelTransferManager()->AsyncNotifyCompletion($MEM_PARAMS, ...);
+    metavariable-patterns:
+      - metavariable: $MEM_PARAMS
+        patterns:
+          - pattern: AsyncMemoryParams
+      - metavariable: $MANAGER
+        patterns:
+          - pattern-inside: |
+              $T $MANAGER = ...;
+    pattern-not: |
+      uint32 $END = $MEM_PARAMS.shm_data_offset + $MEM_PARAMS.shm_data_size;
+      if ($END > $MEM_PARAMS.shm_size || $END < $MEM_PARAMS.shm_data_offset)
+        return false;

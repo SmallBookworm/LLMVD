@@ -1,0 +1,17 @@
+rules:
+  - id: android_gif_color_map_missing_check
+    message: "Missing null check for color map (cmap) before use may lead to improper input validation (CWE-20)."
+    severity: WARNING
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (cmap == NULL || cmap->ColorCount != (1 << cmap->BitsPerPixel)) {
+              ...
+          }
+          ... cmap ...
+      - pattern: |
+          if (cmap == NULL || ...) {
+              ...
+          }
+          const unsigned char* src = ...;
+          ... cmap ...

@@ -1,0 +1,25 @@
+rules:
+  - id: poppler-infinite-recursion-font-scanner
+    message: "Potential infinite recursion in FontInfoScanner::scanFonts due to missing visitedObjects check on Resources dictionary reference."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          Object obj2 = ...;
+          if (obj2.isStream()) {
+            Object resObj = obj2.streamGetDict()->lookup("Resources");
+            if (resObj.isDict() && resObj.getDict() != resDict) {
+              scanFonts(..., resObj.getDict(), ...);
+            }
+          }
+      - pattern: |
+          Object obj2 = ...;
+          if (obj2.isStream()) {
+            const Object resObj = obj2.streamGetDict()->lookup("Resources");
+            if (resObj.isDict() && resObj.getDict() != resDict) {
+              scanFonts(..., resObj.getDict(), ...);
+            }
+          }
+    metavariable-pattern:
+      metavariable: obj2
+      pattern: 'Object $OBJ = $DICTOBJ.fetch($XREF);'

@@ -1,0 +1,16 @@
+rules:
+  - id: cwe-120-buffer-overflow-pdf2json
+    message: "Potential buffer overflow due to missing bounds check after reallocation in CharCodeToUnicode::addMapping"
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          if ($CODE >= $MAPLEN) {
+            ...
+            $MAPLEN = ($CODE + 256) & ~255;
+            $MAP = greallocn(...);
+            ...
+          }
+    metadata:
+      cwe: "CWE-120"
+      cve: "CVE-2020-18750"

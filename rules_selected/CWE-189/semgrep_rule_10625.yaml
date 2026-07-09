@@ -1,0 +1,15 @@
+rules:
+  - id: optee_ta_mem_clear_incomplete
+    message: "TA memory is cleared only up to 'size', not the full allocation granularity, potentially leaking data from a previous Trusted Application."
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (mobj)
+              memset(mobj_get_va(mobj, 0), 0, $SIZE);
+      - pattern: |
+          if (mobj)
+              memset(mobj_get_va(mobj, 0), 0, size);
+    metavariable-regex:
+      metavariable: $SIZE
+      regex: "size"

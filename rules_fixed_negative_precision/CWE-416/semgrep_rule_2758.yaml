@@ -1,0 +1,22 @@
+rules:
+  - id: cwe-416-use-after-free-mruby-gc
+    message: "Potential use-after-free vulnerability due to missing clearing of unused stack region that may reference freed objects."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!mrb_immediate_p($V)) {
+            if (mrb_basic_ptr($V)->tt == MRB_TT_FREE) {
+              $STBASE[$I] = mrb_nil_value();
+            }
+            else {
+              mrb_gc_mark($MRB, mrb_basic_ptr($V));
+            }
+          }
+      - pattern: |
+          if (!mrb_immediate_p($V)) {
+            if (mrb_basic_ptr($V)->tt == MRB_TT_FREE)
+              $STBASE[$I] = mrb_nil_value();
+            else
+              mrb_gc_mark($MRB, mrb_basic_ptr($V));
+          }

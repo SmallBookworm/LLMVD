@@ -1,0 +1,20 @@
+rules:
+  - id: null_pointer_dereference_opencv_xml_parser
+    message: "Potential NULL pointer dereference in XML parsing due to missing null check after skipSpaces"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          $PTR = skipSpaces(...);
+          ...;
+          memcmp($PTR, ..., ...);
+      - pattern: |
+          $PTR = skipSpaces(...);
+          ...;
+          *$PTR;
+    metavariable-pattern:
+      metavariable: $PTR
+      patterns:
+        - pattern-not: null
+        - pattern-regex: ^[a-zA-Z_][a-zA-Z0-9_]*$
+    fix-equivalences: false

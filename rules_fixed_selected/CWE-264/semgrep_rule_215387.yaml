@@ -1,0 +1,20 @@
+rules:
+  - id: cve-2008-4210-truncate-missing-suid-sgid-strip
+    patterns:
+      - pattern-either:
+          - pattern: |
+              newattrs.ia_valid = ...;
+              ...
+              notify_change($DENTRY, &$NEWATTRS);
+          - pattern: |
+              $NEWATTRS.ia_valid = ...;
+              ...
+              notify_change($DENTRY, &$NEWATTRS);
+    pattern-not: |
+      $NEWATTRS.ia_valid |= should_remove_suid($DENTRY);
+    message: "Missing should_remove_suid() call in truncate path may allow privilege escalation via setuid/setgid bits"
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-264"
+      cve: "CVE-2008-4210"

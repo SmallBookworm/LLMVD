@@ -1,0 +1,15 @@
+rules:
+  - id: tiff_read_rgba_image_oriented_unchecked
+    message: "TIFFReadRGBAImageOriented return value is not checked, leading to potential use of uninitialized memory (CWE-754)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          TIFFReadRGBAImageOriented($tiff, $width, $height, $pixels, $orientation, 0);
+          ...
+          $pixels[...]
+      - pattern: |
+          TIFFReadRGBAImageOriented($tiff, $width, $height, $pixels, $orientation, 0);
+          ...
+          (uint32 *)$pixels
+    mode: search

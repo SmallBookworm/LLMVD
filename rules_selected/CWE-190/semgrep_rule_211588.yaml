@@ -1,0 +1,20 @@
+rules:
+  - id: qemu-ga-integer-overflow-guest-file-read
+    message: "Integer overflow in guest-file-read may lead to buffer allocation issues. Ensure 'count' is checked against UINT32_MAX before use."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (!has_count) {
+          ...
+      } else if (count < 0) {
+          ...
+      }
+    pattern-not: |
+      if (!has_count) {
+          ...
+      } else if (count < 0 || count >= UINT32_MAX) {
+          ...
+      }
+    fix-regex:
+      regex: '(else if \(count < 0\))'
+      replacement: 'else if (count < 0 || count >= UINT32_MAX)'

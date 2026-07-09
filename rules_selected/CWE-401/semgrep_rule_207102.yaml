@@ -1,0 +1,37 @@
+rules:
+  - id: qla3xxx-missing-skb-free-on-dma-error
+    message: "Memory leak: allocated skb is not freed when pci_dma_mapping_error occurs."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (pci_dma_mapping_error(..., ...)) {
+              ...
+              ql_free_large_buffers(...);
+              return ...;
+          }
+      - pattern: |
+          err = pci_dma_mapping_error(..., ...);
+          if (err) {
+              ...
+              ql_free_large_buffers(...);
+              return ...;
+          }
+    pattern-not: |
+      if (pci_dma_mapping_error(..., ...)) {
+          ...
+          dev_kfree_skb_irq($SKB);
+          ...
+          ql_free_large_buffers(...);
+          return ...;
+      }
+    pattern-not-inside: |
+      if (pci_dma_mapping_error(..., ...)) {
+          ...
+          dev_kfree_skb(...);
+          ...
+          ql_free_large_buffers(...);
+          return ...;
+      }
+    metavariable-pattern:
+      $SKB: "skb"

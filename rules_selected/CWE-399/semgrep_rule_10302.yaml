@@ -1,0 +1,17 @@
+rules:
+  - id: qemu-ide-prdt-zero-sector-handling
+    message: "Potential denial of service due to improper handling of PRDTs with zero complete sectors in IDE DMA preparation. The function should return -1 on error and 0 for empty but valid PRDTs."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          static int bmdma_prepare_buf(...) {
+              ...
+          }
+      - pattern: |
+          static int ahci_dma_prepare_buf(...) {
+              ...
+          }
+    metadata:
+      cwe: "CWE-399"
+      cve: "CVE-2014-9718"

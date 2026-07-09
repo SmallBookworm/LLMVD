@@ -1,0 +1,18 @@
+rules:
+  - id: wget-chunked-negative-length
+    message: "Missing validation of chunk length before use in fd_read() may lead to buffer overflow (CVE-2017-13090, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          remaining_chunk_size = strtol(...);
+          ...
+          if (remaining_chunk_size == 0) { ... }
+      - pattern: |
+          remaining_chunk_size = strtol(...);
+          ...
+          rdsize = MIN(remaining_chunk_size, ...);
+    metavariable-pattern:
+      metavariable: remaining_chunk_size
+      pattern-not: |
+        if (remaining_chunk_size < 0) { ... }

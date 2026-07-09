@@ -1,0 +1,25 @@
+rules:
+  - id: haproxy-dns-read-name-recursion
+    message: "dns_read_name() is vulnerable to stack exhaustion via infinite recursion due to missing depth limit in compressed DNS name handling."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (($...reader & 0xc0) == 0xc0) {
+                ...
+                $FUNC(..., buffer + reader[1], ...);
+                ...
+              }
+          - pattern: |
+              if ((*$...reader & 0xc0) == 0xc0) {
+                ...
+                $FUNC(..., buffer + reader[1], ...);
+                ...
+              }
+    metavariable-pattern:
+      metavariable: FUNC
+      pattern: dns_read_name
+    fix-regex:
+      regex: ""
+      replacement: ""

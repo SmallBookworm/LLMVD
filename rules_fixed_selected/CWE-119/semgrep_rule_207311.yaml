@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2019-20391-libyang-unchecked-feature-access
+    message: "Untrusted input may cause invalid memory access due to missing null check on expr->features[0] before calling resolve_iffeature_recursive."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (expr->expr) {
+          return resolve_iffeature_recursive(...);
+      }
+    pattern-not: |
+      if (expr->expr && expr->features[0]) {
+          return resolve_iffeature_recursive(...);
+      }

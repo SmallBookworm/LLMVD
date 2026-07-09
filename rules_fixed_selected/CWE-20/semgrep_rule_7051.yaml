@@ -1,0 +1,7 @@
+rules:
+  - id: cve-2017-5101-v4l2-jpeg-encode-accelerator-shared-memory
+    message: "Use of deprecated SharedMemoryHandle may lead to security issues (CVE-2017-5101)."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      base::SharedMemoryHandle()

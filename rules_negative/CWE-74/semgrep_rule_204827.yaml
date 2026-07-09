@@ -1,0 +1,11 @@
+rules:
+  - id: cwe-74-php-directoryiterator-null-byte
+    message: "Potential null byte injection in DirectoryIterator constructor due to use of 's' instead of 'p' in zend_parse_parameters"
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: zend_parse_parameters(..., "s", ...)
+      - pattern: zend_parse_parameters(..., "s|l", ...)
+    metadata:
+      cwe: "CWE-74"
+      cve: "CVE-2019-11045"

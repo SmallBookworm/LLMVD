@@ -1,0 +1,29 @@
+rules:
+  - id: freerdp-oob-read-irp
+    message: Missing bounds check on stream before reading eventId and pduLength may lead to out-of-bounds read (CWE-125).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          Stream_Read_UINT16($S, $EVENTID);
+          Stream_Read_UINT32($S, $PDULENGTH);
+      - pattern: |
+          Stream_Read_UINT32($S, $PDULENGTH);
+          Stream_Read_UINT16($S, $EVENTID);
+    metavariable-regex:
+      metavariable: $S
+      regex: 's'
+    patterns:
+      - pattern-not-inside: |
+          if (Stream_GetRemainingLength($S, ...) < 6) {
+            ...
+          }
+          ...
+          Stream_Read_UINT16($S, $EVENTID);
+          Stream_Read_UINT32($S, $PDULENGTH);
+      - pattern-not-inside: |
+          if (Stream_GetRemainingLength($S, ...) < 6)
+            return ...;
+          ...
+          Stream_Read_UINT16($S, $EVENTID);
+          Stream_Read_UINT32($S, $PDULENGTH);

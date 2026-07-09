@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2013-6621-use-after-free
+    message: "Potential use-after-free vulnerability due to missing message type logging before CHECK failure. This may lead to denial of service or unspecified impact (CVE-2013-6621, CWE-399)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!msg_is_ok) {
+            CHECK(false) << "Unable to deserialize message in RenderFrameImpl.";
+          }
+      - pattern: |
+          if (!msg_is_ok) {
+            CHECK(false) << $S;
+          }
+    metavariable-pattern:
+      $S: "Unable to deserialize message in RenderFrameImpl."

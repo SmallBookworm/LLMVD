@@ -1,0 +1,16 @@
+rules:
+  - id: integer-overflow-malloc-hdcp
+    message: Integer overflow in malloc size calculation may lead to heap-based buffer overflow.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              size_t size = ...;
+              void *inData = malloc(2 * size);
+          - pattern: |
+              size_t size = ...;
+              void *inData = malloc($SIZE * size);
+    metadata:
+      cwe: "CWE-189"
+      cve: "CVE-2015-3834"

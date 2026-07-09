@@ -1,0 +1,26 @@
+rules:
+  - id: imagemagick-xcf-load-level-offset-validation
+    message: Missing offset validation in load_level may lead to memory exhaustion (CVE-2017-13133, CWE-770).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - patterns:
+        - pattern: if (offset2 == 0)
+        - pattern: offset2 = (MagickOffsetType) (offset + ...);
+        - pattern: if (SeekBlob(..., offset, SEEK_SET) != offset)
+          after-pattern-inside: |
+            {
+              ...
+            }
+      - patterns:
+        - pattern: if (offset2 == 0)
+        - pattern: offset2 = (MagickOffsetType) (offset + ...);
+        - pattern: /* ... */
+        - pattern: if (SeekBlob(..., offset, SEEK_SET) != offset)
+          after-pattern-inside: |
+            {
+              ...
+            }
+    pattern-not:
+      - pattern: if (offset2 > GetBlobSize(...))
+      - pattern: ThrowBinaryException(...)

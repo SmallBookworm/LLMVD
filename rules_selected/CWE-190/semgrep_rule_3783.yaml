@@ -1,0 +1,31 @@
+rules:
+  - id: futex_requeue_integer_overflow
+    message: "Missing validation for negative nr_wake or nr_requeue values in futex_requeue may lead to integer overflow (CVE-2018-6927, CWE-190)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          static int futex_requeue(..., int nr_wake, int nr_requeue, ...)
+          {
+              ...
+              if (!IS_ENABLED(CONFIG_FUTEX_PI) && requeue_pi)
+                  return -ENOSYS;
+              ...
+          }
+      - pattern: |
+          static int futex_requeue(..., int nr_wake, int nr_requeue, ...)
+          {
+              ...
+              if (requeue_pi) {
+                  ...
+              }
+              ...
+          }
+    pattern-not-inside: |
+        static int futex_requeue(..., int nr_wake, int nr_requeue, ...)
+        {
+            ...
+            if (nr_wake < 0 || nr_requeue < 0)
+                return -EINVAL;
+            ...
+        }

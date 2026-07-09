@@ -1,0 +1,13 @@
+rules:
+  - id: dovecot-dict-var-expand-double-expansion
+    message: "Potential denial of service due to unsafe variable expansion in dict passdb/userdb. User-controlled input is passed to var_expand(), which may lead to excessive resource consumption."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          var_expand($PATH, $KEY->key, $EXPAND_TABLE, &$ERROR)
+    metadata:
+      cwe: "CWE-284"
+      cve: "CVE-2017-2669"
+      references:
+        - https://github.com/dovecot/core/commit/000030feb7a30f193197f1aab8a7b04a26b42735.patch

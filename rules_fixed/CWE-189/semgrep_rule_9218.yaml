@@ -1,0 +1,34 @@
+rules:
+  - id: cwe-189-mremap-integer-overflow
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (new_len > old_len) {
+                ...;
+                if (vma->vm_flags & (VM_DONTEXPAND | VM_PFNMAP)) {
+                  ...;
+                }
+                ...;
+              }
+          - pattern: |
+              if (new_len > old_len) {
+                ...;
+                if (vma->vm_flags & (VM_DONTEXPAND | VM_PFNMAP))
+                  goto ...;
+                ...;
+              }
+      - pattern-not: |
+          if (new_len > old_len) {
+            ...;
+            unsigned long pgoff = ...;
+            ...;
+            if (pgoff + (new_len >> PAGE_SHIFT) < pgoff)
+              goto ...;
+            ...;
+          }
+    message: "Potential integer overflow in mremap() due to missing pgoff wraparound check (CWE-189)."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-189"
+      cve: "CVE-2011-2496"

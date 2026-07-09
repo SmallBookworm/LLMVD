@@ -1,0 +1,32 @@
+rules:
+  - id: cve-2013-2596-fb-mmap-integer-overflow
+    message: |
+      Integer overflow vulnerability in fb_mmap may allow privilege escalation via crafted mmap2 calls.
+      The vulnerable code computes 'len' using PAGE_ALIGN on an unvalidated sum, which can wrap around,
+      leading to an invalid bounds check. Fixed version uses vm_iomap_memory() and validates offsets differently.
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - patterns:
+        - pattern: |
+            len = PAGE_ALIGN(($X & ~PAGE_MASK) + $Y);
+        - pattern-inside: |
+            ...
+        - pattern: |
+            if (($VMA->vm_end - $VMA->vm_start + $OFF) > len)
+                return -EINVAL;
+      - patterns:
+        - pattern: |
+            off = $VMA->vm_pgoff << PAGE_SHIFT;
+        - pattern-inside: |
+            ...
+        - pattern: |
+            len = PAGE_ALIGN(($X & ~PAGE_MASK) + $Y);
+        - pattern-inside: |
+            ...
+        - pattern: |
+            if ((... + off) > len)
+                ...
+    metadata:
+      cwe: "CWE-189"
+      cve: "CVE-2013-2596"

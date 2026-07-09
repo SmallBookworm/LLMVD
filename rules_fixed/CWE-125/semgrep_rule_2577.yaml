@@ -1,0 +1,16 @@
+rules:
+  - id: cve-2017-13007-pktap-buffer-overread
+    message: "Buffer over-read vulnerability in PKTAP parser due to passing original pcap_pkthdr instead of updated one to sub-dissector."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if ((printer = lookup_printer(...)) != NULL) {
+                  ...
+                  printer($ndo, $h, $p);
+                  ...
+              }
+    metavariable-pattern:
+      $h: 
+        pattern: "const struct pcap_pkthdr *"

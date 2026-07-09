@@ -1,0 +1,23 @@
+rules:
+  - id: use-after-free-in-snd-seq-device
+    message: "Missing cancellation of autoload work before device removal may lead to use-after-free (CWE-416)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          static int snd_seq_device_dev_free(struct snd_device *device)
+          {
+              struct snd_seq_device *dev = device->device_data;
+              put_device(&dev->dev);
+              return 0;
+          }
+      - pattern: |
+          static int snd_seq_device_dev_free(...)
+          {
+              ...
+              put_device(...);
+              ...
+          }
+    metadata:
+      cwe: ["CWE-416"]
+      cve: "CVE-2017-16528"

@@ -1,0 +1,18 @@
+rules:
+  - id: cwe-125-double-fetch-msnd
+    message: "Double fetch vulnerability detected: multiple reads of shared head/tail pointers without validation may lead to out-of-bounds access (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          while (readw($HEAD) != readw($TAIL)) {
+            ...
+            $VAL = readw($BUF + 2 * readw($HEAD));
+            ...
+          }
+      - pattern: |
+          while (readw($TAIL) != readw($HEAD)) {
+            ...
+            $VAL = readw($BUF + 2 * readw($HEAD));
+            ...
+          }

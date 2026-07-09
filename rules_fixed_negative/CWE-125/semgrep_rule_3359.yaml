@@ -1,0 +1,16 @@
+rules:
+  - id: imagemagick-hdr-buffer-overflow-cve-2016-7520
+    message: "Heap-based buffer overflow vulnerability in HDR pixel writing due to insufficient allocation size. Fixed by allocating extra padding (image->columns+128)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              pixels=(unsigned char *) AcquireQuantumMemory(image->columns,4*
+                 sizeof(*pixels));
+          - pattern: |
+              pixels = (unsigned char *) AcquireQuantumMemory(image->columns, 4 *
+                 sizeof(*pixels));
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2016-7520"

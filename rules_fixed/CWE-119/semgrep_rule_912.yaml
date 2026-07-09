@@ -1,0 +1,18 @@
+rules:
+  - id: cve-2013-6763-uio-mmap-physical-size-check-missing
+    message: Missing size validation before calling io_remap_pfn_range() may lead to memory corruption (CWE-119).
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (io_remap_pfn_range($VMA, $START, $PFN, $SIZE, $PROT)) {
+            ...
+          }
+      - pattern: |
+          if (remap_pfn_range($VMA, $START, $PFN, $SIZE, $PROT)) {
+            ...
+          }
+    metavariable-pattern:
+      metavariable: $SIZE
+      patterns:
+        - pattern-not: $LEN

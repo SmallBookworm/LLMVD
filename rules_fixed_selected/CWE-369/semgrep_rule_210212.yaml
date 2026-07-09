@@ -1,0 +1,11 @@
+rules:
+  - id: cwe-369-uninitialized-variable-im_vips2dz
+    message: "Uninitialized variable 'mode' may be used if filename does not contain ':'; this can lead to information leakage (CWE-369)."
+    severity: WARNING
+    languages: [c]
+    pattern: |
+      if( (p = strchr( name, ':' )) ) {
+          *p = '\0';
+          im_strncpy( mode, p + 1, FILENAME_MAX ); 
+      }
+      strcpy( buf, mode );

@@ -1,0 +1,10 @@
+rules:
+  - id: modsecurity-chunked-case-sensitive
+    message: "Case-sensitive 'strstr' used to check for 'chunked' in Transfer-Encoding header may allow bypass via capitalized 'Chunked' (CVE-2013-5705)."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern: strstr(..., "chunked")
+    metadata:
+      cwe: "CWE-703"
+      cve: "CVE-2013-5705"

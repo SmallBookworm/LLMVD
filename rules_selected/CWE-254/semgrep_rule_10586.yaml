@@ -1,0 +1,9 @@
+rules:
+  - id: redis-cross-protocol-scripting
+    message: Detected missing CLIENT_CLOSE_ASAP flag check, which may allow Cross Protocol Scripting (CWE-254).
+    severity: HIGH
+    languages: [c]
+    pattern: |
+      if (c->flags & CLIENT_CLOSE_AFTER_REPLY) break;
+    pattern-not: |
+      if (c->flags & (CLIENT_CLOSE_AFTER_REPLY|CLIENT_CLOSE_ASAP)) break;

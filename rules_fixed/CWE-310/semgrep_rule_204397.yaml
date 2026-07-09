@@ -1,0 +1,11 @@
+rules:
+  - id: libgadu-ssl-certificate-verification-missing
+    message: "SSL/TLS connection configured without certificate verification. This allows man-in-the-middle attacks. Use GG_SSL_ENABLED instead of GG_SSL_REQUIRED to enable certificate validation."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          $$glp.tls = GG_SSL_REQUIRED;
+    metadata:
+      cwe: "CWE-310"
+      cve: "CVE-2013-4488"

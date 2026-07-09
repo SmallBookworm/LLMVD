@@ -1,0 +1,17 @@
+rules:
+  - id: cwe-369-divide-by-zero-gst-riff
+    message: Division by zero possible when computing audio width from blockalign and channels. Ensure channels is checked before division.
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $ba * 8 / $ch
+          - pattern: |
+              $blockalign * 8 / $channels
+    metavariable-pattern:
+      metavariable: $ch
+      pattern-not:
+        regex: "\\($ch > 0\\)"
+    fix-regex:
+      enabled: false

@@ -1,0 +1,21 @@
+rules:
+  - id: cwe-125-out-of-bounds-read-ast_for_arguments
+    message: "Out-of-bounds read vulnerability in ast_for_arguments due to missing bounds check before accessing CHILD(n, i+1) or CHILD(n, i+2)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: if (i + 1 < NCH($N) && TYPE(CHILD($N, i + 1)) == EQUAL) {
+              - pattern-inside: |
+                  ...
+                  if (i + 1 < NCH($N) && TYPE(CHILD($N, i + 1)) == EQUAL) {
+                      ... ast_for_expr($C, CHILD($N, i + 2)) ...
+                  }
+                  ...
+          - pattern: |
+              ch = CHILD($N, i+1);
+              assert(TYPE(ch) == tfpdef || TYPE(ch) == vfpdef);
+    metadata:
+      cwe: "CWE-125"
+      cve: "CVE-2019-19275"

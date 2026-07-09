@@ -1,0 +1,23 @@
+rules:
+  - id: cve-2019-3557-oob-read-bz2file-readimpl
+    message: "Returning -1 from readImpl may cause out-of-bounds read in stream functions. Should return 0 on error instead."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (... < 0) {
+                return -1;
+              }
+          - pattern: |
+              if ($LEN < 0) {
+                return -1;
+              }
+    metavariable-pattern:
+      metavariable: $LEN
+      pattern: len
+    focus-metavariable: $LEN
+    path:
+      includes:
+        - "**/BZ2File.cpp"
+        - "**/OutputFile.cpp"

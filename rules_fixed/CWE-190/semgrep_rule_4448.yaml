@@ -1,0 +1,32 @@
+rules:
+  - id: libgit2-integer-overflow-path-length
+    message: "Missing check for unreasonable path length may lead to integer overflow and out-of-bounds read (CVE-2018-8098)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (!compressed) { ... }
+          else {
+            ...
+            GITERR_CHECK_ALLOC_ADD(&path_len, prefix_len, suffix_len);
+            GITERR_CHECK_ALLOC_ADD(&path_len, path_len, 1);
+            tmp_path = git__malloc(path_len);
+            ...
+          }
+      - pattern: |
+          else {
+            ...
+            GITERR_CHECK_ALLOC_ADD(&path_len, prefix_len, suffix_len);
+            GITERR_CHECK_ALLOC_ADD(&path_len, path_len, 1);
+            $TMP_PATH = git__malloc(path_len);
+            ...
+          }
+    pattern-not-inside: |
+      else {
+        ...
+        GITERR_CHECK_ALLOC_ADD(&path_len, prefix_len, suffix_len);
+        GITERR_CHECK_ALLOC_ADD(&path_len, path_len, 1);
+        if (path_len > GIT_PATH_MAX)
+            return ...;
+        ...
+      }

@@ -1,0 +1,24 @@
+rules:
+  - id: double-free-in-yyparse
+    patterns:
+      - pattern-either:
+          - pattern: |
+              free($S);
+              ...
+              free($S);
+          - pattern: |
+              if (...) {
+                ...
+                free($S);
+                ...
+                YYABORT;
+              }
+              ...
+              free($S);
+    message: "Potential double-free vulnerability detected in yyparse function. The pointer '$S' may be freed more than once if YYABORT is called after the first free."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-415: Double Free"
+      cve: "CVE-2019-20394"
+      confidence: HIGH

@@ -1,0 +1,14 @@
+rules:
+  - id: imagemagick-cve-2017-17884
+    message: "Memory leak in WriteOnePNGImage due to improper resource cleanup in error handling path."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          if (AcquireImageColormap($IMAGE, $COLORS, $EXCEPTION) == MagickFalse) {
+             ThrowWriterException($...);
+          }
+      - pattern: |
+          if (AcquireImageColormap($IMAGE, $COLORS, $EXCEPTION) == MagickFalse) {
+             $STMT;
+          }

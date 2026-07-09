@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2016-3137-missing-endpoint-check
+    message: Missing check for interrupt_in_urb before use may lead to NULL pointer dereference.
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      if (!port->interrupt_in_urb) {
+        ...
+        return ...;
+      }
+      usb_fill_int_urb(port->interrupt_in_urb, ...);
+    pattern-not: |
+      usb_fill_int_urb(port->interrupt_in_urb, ...);

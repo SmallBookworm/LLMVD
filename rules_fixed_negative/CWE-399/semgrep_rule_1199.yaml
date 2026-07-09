@@ -1,0 +1,12 @@
+rules:
+  - id: xfs_da3_fixhashpath_hash_comparison_bug
+    message: "Incorrect hash comparison in xfs_da3_fixhashpath may cause directory corruption due to comparing against btree[0] instead of btree[blk->index]."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          if (be32_to_cpu(btree->hashval) == lasthash)
+              break;
+    metadata:
+      cwe: ["CWE-399"]
+      cve: "CVE-2014-7283"

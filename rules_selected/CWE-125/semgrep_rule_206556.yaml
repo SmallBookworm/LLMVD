@@ -1,0 +1,32 @@
+rules:
+  - id: heap_buffer_overread_r_egg_lang_parsechar
+    message: "Missing bounds check before calling r_egg_lang_parsechar may lead to heap-based buffer over-read (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              for (; $B; ) {
+                r_egg_lang_parsechar($EGG, $B);
+                ...
+                int $R = r_buf_read(...);
+                ...
+              }
+          - pattern: |
+              while ($B) {
+                r_egg_lang_parsechar($EGG, $B);
+                ...
+                int $R = r_buf_read(...);
+                ...
+              }
+    pattern-not: |
+      if ($EGG->lang.elem_n >= sizeof($EGG->lang.elem)) {
+        ...
+        break;
+      }
+    metavariable-pattern:
+      metavariable: $EGG
+      pattern: REgg *
+    fix-regex:
+      regex: ""
+      replacement: ""

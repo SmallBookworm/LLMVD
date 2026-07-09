@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2022-28390-double-free
+    message: Double free vulnerability in ems_usb_start_xmit due to redundant dev_kfree_skb() after can_free_echo_skb()
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (unlikely($ERR)) {
+                ...
+                can_free_echo_skb(...);
+                ...
+                dev_kfree_skb($SKB);
+                ...
+              }
+    metavariable-pattern:
+      $SKB: skb

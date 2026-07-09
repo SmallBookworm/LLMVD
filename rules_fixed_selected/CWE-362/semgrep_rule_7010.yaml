@@ -1,0 +1,27 @@
+rules:
+  - id: cwe-362-race-condition-request-id-reuse
+    message: "Potential race condition due to missing validation of request ID reuse. This could allow arbitrary HTTP requests via request ID collision."
+    severity: WARNING
+    languages: [c]
+    patterns:
+      - pattern-not: |
+          if (IsRequestIDInUse(GlobalRequestID($CHILD_ID, $REQUEST_ID))) {
+            bad_message::ReceivedBadMessage(...);
+            return;
+          }
+      - pattern-either:
+          - pattern: |
+              void ResourceDispatcherHostImpl::BeginRequest(
+                int request_id,
+                ...,
+                int route_id) {
+                ...
+                int child_id = ...;
+                ...
+                LoaderMap::iterator it = pending_loaders_.find(
+                    GlobalRequestID(..., ...));
+                ...
+              }
+    metadata:
+      cwe: "CWE-362"
+      cve: "CVE-2016-1670"

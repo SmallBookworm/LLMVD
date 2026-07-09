@@ -1,0 +1,13 @@
+rules:
+  - id: cve-2014-7822-splice-write-missing-size-check
+    message: "Detected use of generic_file_splice_write without proper size validation, which may lead to denial of service (CVE-2014-7822)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern: |
+          generic_file_splice_write($PIPE, $FILE, $PPOS, $COUNT, $FLAGS)
+    metadata:
+      cwe: ["CWE-264"]
+      cve: "CVE-2014-7822"
+      references:
+        - https://github.com/torvalds/linux/commit/8d0207652cbe27d1f962050737848e5ad4671958

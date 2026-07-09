@@ -1,0 +1,11 @@
+rules:
+  - id: cwe-401-pmd-non-atomic-read
+    patterns:
+      - pattern: |
+          pmd_t pmdval = *$PMD;
+    message: "Non-atomic read of pmd_t may cause SMP race condition on 32-bit PAE systems. Use pmd_read_atomic() instead."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: "CWE-401"
+      cve: "CVE-2012-2373"

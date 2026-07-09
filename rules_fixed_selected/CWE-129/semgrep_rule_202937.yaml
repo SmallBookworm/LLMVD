@@ -1,0 +1,11 @@
+rules:
+  - id: cwe-129-array-index-out-of-bounds-libraw
+    message: "Array index 'pix' used to access 'raw_image' may be out of bounds. This can lead to memory corruption or arbitrary code execution (CWE-129)."
+    severity: ERROR
+    languages: [c]
+    pattern: |
+      raw_image[pix] = ...
+    pattern-not: |
+      if (pix >= raw_width * raw_height)
+        throw ...;
+      raw_image[pix] = ...

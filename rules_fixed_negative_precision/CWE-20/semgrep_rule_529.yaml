@@ -1,0 +1,11 @@
+rules:
+  - id: cve-2017-12178-xorg-xi-hierarchy-length-check
+    patterns:
+      - pattern: |
+          len = ((size_t)stuff->length << 2) - sizeof(xXIAnyHierarchyChangeInfo);
+    message: "Incorrect length calculation in ProcXIChangeHierarchy may lead to buffer over-read or code execution (CVE-2017-12178, CWE-20). Should subtract sizeof(xXIChangeHierarchyReq) instead."
+    severity: ERROR
+    languages: [c]
+    metadata:
+      cwe: ["CWE-20"]
+      cve: "CVE-2017-12178"

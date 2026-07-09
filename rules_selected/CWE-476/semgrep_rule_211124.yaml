@@ -1,0 +1,22 @@
+rules:
+  - id: unchecked-kstrdup_const
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $X = kstrdup_const(...);
+              ...
+              if (!...) { ... }
+          - pattern: |
+              $X = kstrdup_const(...);
+              ...
+              return ...;
+    pattern-not-inside: |
+      $X = kstrdup_const(...);
+      if (!$X) {
+        ...
+        return ...;
+      }
+      ...
+    message: "kstrdup_const() return value is not checked; may lead to NULL pointer dereference (CWE-476)."
+    severity: ERROR
+    languages: [c]

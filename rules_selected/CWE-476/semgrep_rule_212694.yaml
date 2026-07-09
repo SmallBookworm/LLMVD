@@ -1,0 +1,18 @@
+rules:
+  - id: cwe-476-libpng-null-deref-png_set_text_2
+    message: "Potential NULL pointer dereference in png_set_text_2 due to missing reset of max_text field after freeing text chunks (CVE-2016-10087)."
+    severity: ERROR
+    languages: [c]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              if (info_ptr->text != NULL && ...)
+              {
+                ...
+                info_ptr->text = NULL;
+                info_ptr->num_text = 0;
+                // missing: info_ptr->max_text = 0;
+              }
+    metadata:
+      cwe: "CWE-476"
+      cve: "CVE-2016-10087"

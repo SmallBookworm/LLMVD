@@ -1,0 +1,19 @@
+rules:
+  - id: cve-2015-4024
+    message: "Potential algorithmic complexity vulnerability due to inefficient string concatenation in multipart header parsing (CVE-2015-4024, CWE-399)."
+    severity: HIGH
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          prev_len = strlen(...);
+          cur_len = strlen(...);
+          entry.value = emalloc(prev_len + cur_len + 1);
+          memcpy(entry.value, prev_entry.value, prev_len);
+          memcpy(entry.value + prev_len, ..., cur_len);
+      - pattern: |
+          entry.value = emalloc(... + ... + 1);
+          memcpy(entry.value, ..., ...);
+          memcpy(entry.value + ..., ..., ...);
+    metadata:
+      cwe: "CWE-399"
+      cve: "CVE-2015-4024"

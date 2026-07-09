@@ -1,0 +1,24 @@
+rules:
+  - id: cve-2019-9022-dns-caa-buffer-overread
+    message: "Potential buffer overread in DNS_CAA record parsing due to missing length validation before memcpy-like operations. This could lead to out-of-bounds reads (CWE-125)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          case DNS_T_CAA:
+          ...
+          n = dlen - n - 2;
+          CHECKCP(n);
+          add_assoc_stringl(..., (char*)cp, n);
+      - pattern: |
+          case DNS_T_CAA:
+          ...
+          n = dlen - ... - ...;
+          CHECKCP(n);
+          add_assoc_stringl(..., (char*)cp, n);
+    metavariable-pattern:
+      metavariable: n
+      pattern: n
+    fix-regex:
+      regex: ""
+      replacement: ""

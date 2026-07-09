@@ -1,0 +1,17 @@
+rules:
+  - id: cve-2018-8799-out-of-bounds-read
+    message: "Missing bounds check before pointer arithmetic in process_secondary_order may lead to out-of-bounds read (CVE-2018-8799, CWE-119)."
+    severity: ERROR
+    languages: [c]
+    pattern-either:
+      - pattern: |
+          next_order = s->p + (sint16) $LENGTH + 7;
+          ...
+          s->p = next_order;
+      - pattern: |
+          $PTR = s->p + (sint16) $LENGTH + 7;
+          ...
+          s->p = $PTR;
+    metavariable-pattern:
+      $LENGTH: "length"
+    focus-metavariable: $LENGTH
